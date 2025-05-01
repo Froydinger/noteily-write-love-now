@@ -12,7 +12,6 @@ const SettingsPage = () => {
   const { toast } = useToast();
   const [settings, setSettings] = useState({
     enableAutoSave: true,
-    enableNotifications: false,
   });
 
   const handleToggleSetting = (setting: keyof typeof settings) => {
@@ -50,20 +49,6 @@ const SettingsPage = () => {
                   id="auto-save"
                   checked={settings.enableAutoSave}
                   onCheckedChange={() => handleToggleSetting('enableAutoSave')}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="notifications">Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive notifications for writing reminders
-                  </p>
-                </div>
-                <Switch
-                  id="notifications"
-                  checked={settings.enableNotifications}
-                  onCheckedChange={() => handleToggleSetting('enableNotifications')}
                 />
               </div>
             </div>
