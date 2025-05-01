@@ -28,6 +28,7 @@ import { useNotes, Note } from "@/contexts/NoteContext";
 import { formatDistanceToNow } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 export function AppSidebar() {
   const { notes, addNote, setCurrentNote } = useNotes();
@@ -145,7 +146,8 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-4 flex flex-col gap-2">
+        <ThemeToggle />
         <Button 
           variant="ghost" 
           size="sm"

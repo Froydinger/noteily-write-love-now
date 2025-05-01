@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNotes, Note } from '@/contexts/NoteContext';
 import { 
@@ -10,7 +9,7 @@ import {
   CommandGroup,
   CommandItem
 } from '@/components/ui/command';
-import { bold, italic, underline, listOrdered, listUnordered } from 'lucide-react';
+import { Bold, Italic, Underline, ListOrdered, ListUnordered } from 'lucide-react';
 
 interface NoteEditorProps {
   note: Note;
@@ -96,19 +95,19 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     { 
       id: 'bold', 
       name: 'Bold', 
-      icon: bold,
+      icon: Bold,
       execute: () => document.execCommand('bold', false) 
     },
     { 
       id: 'italic', 
       name: 'Italic', 
-      icon: italic,
+      icon: Italic,
       execute: () => document.execCommand('italic', false) 
     },
     { 
       id: 'underline', 
       name: 'Underline', 
-      icon: underline,
+      icon: Underline,
       execute: () => document.execCommand('underline', false) 
     },
     { 
@@ -134,13 +133,13 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     { 
       id: 'ul', 
       name: 'Bullet List', 
-      icon: listUnordered,
+      icon: ListUnordered,
       execute: () => document.execCommand('insertUnorderedList', false) 
     },
     { 
       id: 'ol', 
       name: 'Numbered List', 
-      icon: listOrdered,
+      icon: ListOrdered,
       execute: () => document.execCommand('insertOrderedList', false) 
     },
     { 
