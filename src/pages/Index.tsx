@@ -1,11 +1,10 @@
-
 import { useNotes } from '@/contexts/NoteContext';
 import NoteCard from '@/components/notes/NoteCard';
 import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
-import { Plus, SidebarTrigger } from 'lucide-react';
+import { Plus, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { SidebarTrigger as SidebarToggle } from '@/components/ui/sidebar';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
@@ -27,7 +26,7 @@ const Index = () => {
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          {isMobile && <SidebarToggle />}
+          {isMobile && <SidebarTrigger />}
           <h1 className="text-2xl font-serif font-medium">All Notes</h1>
         </div>
         
@@ -47,5 +46,3 @@ const Index = () => {
 };
 
 export default Index;
-
-import { Menu } from 'lucide-react';
