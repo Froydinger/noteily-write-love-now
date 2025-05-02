@@ -43,7 +43,7 @@ export default function ThemeToggle() {
       pressed={isDarkMode}
       onPressedChange={toggleTheme}
       className="w-full justify-start text-muted-foreground gap-2" 
-      variant="ghost"
+      variant="default"
       size="sm"
     >
       {isDarkMode ? (

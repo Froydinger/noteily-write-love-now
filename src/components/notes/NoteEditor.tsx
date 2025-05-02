@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNotes, Note } from '@/contexts/NoteContext';
 import { 
@@ -9,7 +10,7 @@ import {
   CommandGroup,
   CommandItem
 } from '@/components/ui/command';
-import { Bold, Italic, Underline, ListOrdered, ListUnordered } from 'lucide-react';
+import { Bold, Italic, Underline, ListOrdered, List } from 'lucide-react';
 
 interface NoteEditorProps {
   note: Note;
@@ -133,7 +134,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     { 
       id: 'ul', 
       name: 'Bullet List', 
-      icon: ListUnordered,
+      icon: List,
       execute: () => document.execCommand('insertUnorderedList', false) 
     },
     { 
