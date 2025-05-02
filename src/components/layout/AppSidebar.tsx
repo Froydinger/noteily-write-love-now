@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { 
   BookOpen, 
   Plus, 
-  Menu, 
   Heart, 
   Settings, 
   Pencil,
@@ -71,8 +70,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center space-x-2">
+      <SidebarHeader className="flex items-center justify-between px-4 py-4">
+        <div className="flex items-center space-x-3">
           <Heart className="h-5 w-5 text-neon-blue" />
           <h1 className="text-xl font-serif font-medium">Noteily</h1>
         </div>
@@ -90,39 +89,40 @@ export function AppSidebar() {
         {isMobile && <SidebarTrigger />}
       </SidebarHeader>
       
-      <SidebarContent className="pt-0">
+      <SidebarContent className="pt-2">
+        <div className="px-4 py-2 mb-2">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start gap-3 py-5 bg-secondary dark:border-neon-blue/30 dark:hover:border-neon-blue"
+            onClick={handleCreateNote}
+          >
+            <Plus className="h-4 w-4 dark:text-neon-blue" />
+            <span className="font-medium">New Note</span>
+          </Button>
+        </div>
+
         <SidebarGroup>
-          <div className="px-4 py-2">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start gap-2 bg-secondary dark:border-neon-blue/30 dark:hover:border-neon-blue"
-              onClick={handleCreateNote}
-            >
-              <Plus className="h-4 w-4 dark:text-neon-blue" />
-              New Note
-            </Button>
-          </div>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton 
                   asChild
-                  className={isActive('/') ? 'sidebar-menu-active' : ''}
+                  className={`px-4 py-2 ${isActive('/') ? 'sidebar-menu-active' : ''}`}
                 >
                   <a href="/" className="flex items-center gap-3">
                     <BookOpen className="h-4 w-4" />
-                    <span>All Notes</span>
+                    <span className="font-medium">All Notes</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton 
                   asChild
-                  className={isActive('/prompts') ? 'sidebar-menu-active' : ''}
+                  className={`px-4 py-2 ${isActive('/prompts') ? 'sidebar-menu-active' : ''}`}
                 >
                   <a href="/prompts" className="flex items-center gap-3">
                     <Pencil className="h-4 w-4" />
-                    <span>Writing Prompts</span>
+                    <span className="font-medium">Writing Prompts</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -130,21 +130,21 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup className="py-2">
-          <SidebarGroupLabel className="px-4 py-2">Recent Notes</SidebarGroupLabel>
+        <SidebarGroup className="py-4">
+          <SidebarGroupLabel className="px-4 text-sm uppercase tracking-wider font-medium text-muted-foreground mb-1">Recent Notes</SidebarGroupLabel>
           <SidebarGroupContent>
-            <ScrollArea className="h-[calc(100vh-220px)]">
-              <div className="px-2 py-1">
+            <ScrollArea className="h-[calc(100vh-280px)]">
+              <div className="px-3 py-1">
                 {filteredNotes.length > 0 ? (
                   filteredNotes.map((note) => (
                     <div 
                       key={note.id}
-                      className={`px-2 py-2 rounded-md hover:bg-secondary cursor-pointer transition-colors ${location.pathname === `/note/${note.id}` ? 'bg-accent text-accent-foreground dark:shadow-neon-blue-sm' : ''}`}
+                      className={`px-3 py-2.5 my-1 rounded-md hover:bg-secondary cursor-pointer transition-colors ${location.pathname === `/note/${note.id}` ? 'bg-accent text-accent-foreground dark:shadow-neon-blue-sm dark:border-l-2 dark:border-l-neon-blue' : ''}`}
                       onClick={() => handleSelectNote(note)}
                     >
                       <h3 className="text-sm font-medium truncate">{note.title || "Untitled Note"}</h3>
                       <p className="text-xs text-muted-foreground truncate">
-                        {note.content ? note.content.substring(0, 60) : "No content"}
+                        {note.content ? note.content.replace(/<[^>]*>?/gm, '').substring(0, 60) : "No content"}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
@@ -172,7 +172,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 flex flex-col gap-2">
+      <SidebarFooter className="p-4 flex flex-col gap-2 border-t border-border/40">
         <ThemeToggle />
         <Button 
           variant="ghost" 
@@ -182,7 +182,7 @@ export function AppSidebar() {
         >
           <a href="/settings">
             <Settings className="mr-2 h-4 w-4" />
-            Settings
+            <span>Settings</span>
           </a>
         </Button>
       </SidebarFooter>

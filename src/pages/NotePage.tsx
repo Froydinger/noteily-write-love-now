@@ -67,10 +67,11 @@ const NotePage = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={toggleSidebar}
-                className="hover:bg-secondary mr-1"
+                className="hover:bg-secondary dark:text-neon-blue"
                 title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
               >
                 {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
+                <span className="ml-2">{state === "expanded" ? "Hide sidebar" : "Show sidebar"}</span>
               </Button>
             )}
             <Button 

@@ -42,19 +42,19 @@ export default function ThemeToggle() {
       aria-label="Toggle theme"
       pressed={isDarkMode}
       onPressedChange={toggleTheme}
-      className="w-full justify-start text-muted-foreground gap-2 dark:data-[state=on]:shadow-neon-blue-sm"
-      variant="default"
+      className="w-full justify-start text-muted-foreground gap-2 dark:hover:bg-secondary/30 dark:data-[state=on]:shadow-neon-blue-sm"
+      variant="outline"
       size="sm"
     >
       {isDarkMode ? (
         <>
           <Moon className="h-4 w-4 text-neon-blue" />
-          <span>Switch Lights On</span>
+          <span>Dark Mode</span>
         </>
       ) : (
         <>
           <Sun className="h-4 w-4" />
-          <span>Switch Lights Off</span>
+          <span>Light Mode</span>
         </>
       )}
     </Toggle>

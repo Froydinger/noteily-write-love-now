@@ -1,16 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNotes, Note } from '@/contexts/NoteContext';
-import { 
-  Command,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem
-} from '@/components/ui/command';
-import { Bold, Italic, Underline, ListOrdered, List, Quote } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import FormatMenu from '@/components/notes/FormatMenu';
 
 interface NoteEditorProps {
   note: Note;
@@ -22,7 +13,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [showFormatMenu, setShowFormatMenu] = useState(false);
   const [formatMenuPosition, setFormatMenuPosition] = useState({ top: 0, left: 0 });
-  const [selection, setSelection] = useState<Selection | null>(null);
+  const [selection, setSelection] = useState<Range | null>(null);
   
   // Update title and content when note changes
   useEffect(() => {
@@ -30,7 +21,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     if (contentRef.current) {
       contentRef.current.innerHTML = note.content;
     }
-  }, [note.id, note.title, note.content]);
+  }, [note.id]);
 
   // Update title
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,6 +59,26 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     };
   }, [note.id, updateNote]);
 
+  // Save the current selection
+  const saveCurrentSelection = () => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      return selection.getRangeAt(0).cloneRange();
+    }
+    return null;
+  };
+
+  // Restore selection
+  const restoreSelection = (range: Range | null) => {
+    if (range) {
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    }
+  };
+
   // Handle key press for / command
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === '/' && !showFormatMenu) {
@@ -76,9 +87,9 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       const selection = window.getSelection();
       if (!selection || !selection.rangeCount) return;
       
-      setSelection(selection);
+      const range = selection.getRangeAt(0).cloneRange();
+      setSelection(range);
       
-      const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       
       setFormatMenuPosition({
@@ -87,66 +98,27 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       });
       
       setShowFormatMenu(true);
-    } else if (e.key === 'Escape' && showFormatMenu) {
-      setShowFormatMenu(false);
     }
   };
 
-  // Format commands - simplified with only the requested options
-  const formatCommands = [
-    { 
-      id: 'h1', 
-      name: 'Heading 1',
-      icon: Bold,
-      execute: () => execFormatCommand('formatBlock', '<h1>') 
-    },
-    { 
-      id: 'h2', 
-      name: 'Heading 2',
-      icon: Bold,
-      execute: () => execFormatCommand('formatBlock', '<h2>') 
-    },
-    { 
-      id: 'bold', 
-      name: 'Bold', 
-      icon: Bold,
-      execute: () => execFormatCommand('bold') 
-    },
-    { 
-      id: 'italic', 
-      name: 'Italic', 
-      icon: Italic,
-      execute: () => execFormatCommand('italic') 
-    },
-    { 
-      id: 'quote', 
-      name: 'Blockquote', 
-      icon: Quote,
-      execute: () => execFormatCommand('formatBlock', '<blockquote>') 
-    }
-  ];
-
-  // Improved format command function with better selection handling
+  // Execute formatting command without breaking selection
   const execFormatCommand = (command: string, value?: string) => {
-    setShowFormatMenu(false);
-    
-    // Focus back on the editor
     if (contentRef.current) {
       contentRef.current.focus();
       
-      // Restore selection if available
       if (selection) {
-        const range = selection.getRangeAt(0);
-        const newSelection = window.getSelection();
-        if (newSelection) {
-          newSelection.removeAllRanges();
-          newSelection.addRange(range);
-        }
+        restoreSelection(selection);
       }
       
       // Execute the command
       document.execCommand(command, false, value);
+      
+      // Save the new selection after formatting
+      const newSelection = saveCurrentSelection();
+      setSelection(newSelection);
     }
+    
+    setShowFormatMenu(false);
   };
 
   return (
@@ -163,39 +135,18 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       <div
         ref={contentRef}
         contentEditable
-        className="note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert"
+        className="note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert min-h-[50vh]"
         data-placeholder="Start writing here... (or press '/' for formatting options)"
         aria-label="Note content"
         onKeyDown={handleKeyDown}
       />
       
       {showFormatMenu && (
-        <div 
-          style={{
-            position: 'absolute',
-            top: formatMenuPosition.top + 'px',
-            left: formatMenuPosition.left + 'px',
-            zIndex: 50,
-          }}
-          className="bg-background border rounded-md shadow-lg w-60 dark:border-neon-blue/40"
-        >
-          <Command>
-            <CommandList>
-              <CommandGroup heading="Formatting">
-                {formatCommands.map((command) => (
-                  <CommandItem
-                    key={command.id}
-                    onSelect={() => command.execute()}
-                    className="flex items-center gap-2 cursor-pointer dark:hover:bg-accent dark:hover:text-accent-foreground"
-                  >
-                    {command.icon && <command.icon size={18} className="dark:text-neon-blue" />}
-                    <span>{command.name}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </div>
+        <FormatMenu 
+          position={formatMenuPosition}
+          onFormatSelect={execFormatCommand}
+          onClose={() => setShowFormatMenu(false)}
+        />
       )}
     </div>
   );
