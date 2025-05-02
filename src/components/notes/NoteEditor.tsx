@@ -3,14 +3,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNotes, Note } from '@/contexts/NoteContext';
 import { 
   Command,
-  CommandDialog,
   CommandInput,
   CommandList,
   CommandEmpty,
   CommandGroup,
   CommandItem
 } from '@/components/ui/command';
-import { Bold, Italic, Underline, ListOrdered, List } from 'lucide-react';
+import { Bold, Italic, Underline, ListOrdered, List, Quote } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface NoteEditorProps {
   note: Note;
@@ -82,8 +82,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       const rect = range.getBoundingClientRect();
       
       setFormatMenuPosition({
-        top: rect.bottom,
-        left: rect.left
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX
       });
       
       setShowFormatMenu(true);
@@ -92,86 +92,60 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     }
   };
 
-  // Format commands
+  // Format commands - simplified with only the requested options
   const formatCommands = [
+    { 
+      id: 'h1', 
+      name: 'Heading 1',
+      icon: Bold,
+      execute: () => execFormatCommand('formatBlock', '<h1>') 
+    },
+    { 
+      id: 'h2', 
+      name: 'Heading 2',
+      icon: Bold,
+      execute: () => execFormatCommand('formatBlock', '<h2>') 
+    },
     { 
       id: 'bold', 
       name: 'Bold', 
       icon: Bold,
-      execute: () => document.execCommand('bold', false) 
+      execute: () => execFormatCommand('bold') 
     },
     { 
       id: 'italic', 
       name: 'Italic', 
       icon: Italic,
-      execute: () => document.execCommand('italic', false) 
-    },
-    { 
-      id: 'underline', 
-      name: 'Underline', 
-      icon: Underline,
-      execute: () => document.execCommand('underline', false) 
-    },
-    { 
-      id: 'h1', 
-      name: 'Heading 1', 
-      execute: () => document.execCommand('formatBlock', false, '<h1>') 
-    },
-    { 
-      id: 'h2', 
-      name: 'Heading 2', 
-      execute: () => document.execCommand('formatBlock', false, '<h2>') 
-    },
-    { 
-      id: 'h3', 
-      name: 'Heading 3', 
-      execute: () => document.execCommand('formatBlock', false, '<h3>') 
+      execute: () => execFormatCommand('italic') 
     },
     { 
       id: 'quote', 
       name: 'Blockquote', 
-      execute: () => document.execCommand('formatBlock', false, '<blockquote>') 
-    },
-    { 
-      id: 'ul', 
-      name: 'Bullet List', 
-      icon: List,
-      execute: () => document.execCommand('insertUnorderedList', false) 
-    },
-    { 
-      id: 'ol', 
-      name: 'Numbered List', 
-      icon: ListOrdered,
-      execute: () => document.execCommand('insertOrderedList', false) 
-    },
-    { 
-      id: 'divider', 
-      name: 'Divider', 
-      execute: () => {
-        document.execCommand('insertHTML', false, '<hr>');
-      }
+      icon: Quote,
+      execute: () => execFormatCommand('formatBlock', '<blockquote>') 
     }
   ];
 
-  const handleFormatCommand = (command: typeof formatCommands[0]) => {
+  // Improved format command function with better selection handling
+  const execFormatCommand = (command: string, value?: string) => {
     setShowFormatMenu(false);
-    
-    // Restore selection if available
-    if (selection) {
-      const range = selection.getRangeAt(0);
-      const newSelection = window.getSelection();
-      if (newSelection) {
-        newSelection.removeAllRanges();
-        newSelection.addRange(range);
-      }
-    }
-    
-    // Execute the command
-    command.execute();
     
     // Focus back on the editor
     if (contentRef.current) {
       contentRef.current.focus();
+      
+      // Restore selection if available
+      if (selection) {
+        const range = selection.getRangeAt(0);
+        const newSelection = window.getSelection();
+        if (newSelection) {
+          newSelection.removeAllRanges();
+          newSelection.addRange(range);
+        }
+      }
+      
+      // Execute the command
+      document.execCommand(command, false, value);
     }
   };
 
@@ -206,17 +180,15 @@ export default function NoteEditor({ note }: NoteEditorProps) {
           className="bg-background border rounded-md shadow-lg w-60 dark:border-neon-blue/40"
         >
           <Command>
-            <CommandInput placeholder="Search formatting..." autoFocus className="dark:border-neon-blue/30" />
             <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup heading="Formatting">
                 {formatCommands.map((command) => (
                   <CommandItem
                     key={command.id}
-                    onSelect={() => handleFormatCommand(command)}
+                    onSelect={() => command.execute()}
                     className="flex items-center gap-2 cursor-pointer dark:hover:bg-accent dark:hover:text-accent-foreground"
                   >
-                    {command.icon && React.createElement(command.icon, { size: 18, className: "dark:text-neon-blue" })}
+                    {command.icon && <command.icon size={18} className="dark:text-neon-blue" />}
                     <span>{command.name}</span>
                   </CommandItem>
                 ))}

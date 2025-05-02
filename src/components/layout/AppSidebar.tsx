@@ -7,7 +7,9 @@ import {
   Menu, 
   Heart, 
   Settings, 
-  Pencil 
+  Pencil,
+  PanelLeftClose,
+  PanelLeft
 } from "lucide-react";
 import {
   Sidebar,
@@ -20,7 +22,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger
+  SidebarTrigger,
+  useSidebar
 } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -37,6 +40,7 @@ export function AppSidebar() {
   const [searchTerm, setSearchTerm] = useState("");
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const { state, toggleSidebar } = useSidebar();
 
   const filteredNotes = searchTerm 
     ? notes.filter(note => 
@@ -72,6 +76,17 @@ export function AppSidebar() {
           <Heart className="h-5 w-5 text-neon-blue" />
           <h1 className="text-xl font-serif font-medium">Noteily</h1>
         </div>
+        {!isMobile && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleSidebar}
+            className="hover:bg-secondary dark:text-neon-blue h-8 w-8 p-0"
+            title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
+          </Button>
+        )}
         {isMobile && <SidebarTrigger />}
       </SidebarHeader>
       

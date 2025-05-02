@@ -1,10 +1,11 @@
+
 import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Trash, Menu } from 'lucide-react';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ChevronLeft, Trash, PanelLeft, PanelLeftClose } from 'lucide-react';
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -25,6 +26,7 @@ const NotePage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { state, toggleSidebar } = useSidebar();
   
   const note = getNote(id || '');
   
@@ -58,7 +60,19 @@ const NotePage = () => {
       <header className="border-b p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {isMobile && <SidebarTrigger />}
+            {isMobile ? (
+              <SidebarTrigger />
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={toggleSidebar}
+                className="hover:bg-secondary mr-1"
+                title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
+              >
+                {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
+              </Button>
+            )}
             <Button 
               variant="ghost" 
               size="sm" 

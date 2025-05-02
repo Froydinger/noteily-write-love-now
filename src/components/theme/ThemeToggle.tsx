@@ -42,7 +42,7 @@ export default function ThemeToggle() {
       aria-label="Toggle theme"
       pressed={isDarkMode}
       onPressedChange={toggleTheme}
-      className={`w-full justify-start text-muted-foreground gap-2 dark:data-[state=on]:shadow-neon-blue-sm`} 
+      className="w-full justify-start text-muted-foreground gap-2 dark:data-[state=on]:shadow-neon-blue-sm"
       variant="default"
       size="sm"
     >
