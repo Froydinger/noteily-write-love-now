@@ -185,6 +185,16 @@ export function AppSidebar() {
             <span>Settings</span>
           </a>
         </Button>
+        
+        <a 
+          href="https://buymeacoffee.com/froydinger" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-1.5 px-2 rounded-md hover:bg-secondary mt-1"
+        >
+          <Heart className="h-4 w-4 text-pink-500" fill="#e91e63" />
+          <span>Support Noteily</span>
+        </a>
       </SidebarFooter>
     </Sidebar>
   );
