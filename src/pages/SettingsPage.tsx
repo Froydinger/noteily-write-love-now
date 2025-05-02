@@ -7,46 +7,14 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
 import { Moon, Sun } from 'lucide-react';
+import ThemeToggle from '@/components/theme/ThemeToggle';
 
 const SettingsPage = () => {
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const [settings, setSettings] = useState({
-    enableAutoSave: true,
-    darkMode: true,
+    enableAutoSave: true
   });
-
-  // Initialize settings
-  useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    setSettings(prev => ({
-      ...prev,
-      darkMode: isDarkMode
-    }));
-  }, []);
-
-  const handleToggleSetting = (setting: keyof typeof settings) => {
-    setSettings(prev => ({
-      ...prev,
-      [setting]: !prev[setting]
-    }));
-    
-    // Handle theme toggle specifically
-    if (setting === 'darkMode') {
-      if (settings.darkMode) {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      } else {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      }
-    }
-    
-    toast({
-      title: "Settings updated",
-      description: `${setting} has been ${settings[setting] ? 'disabled' : 'enabled'}.`,
-    });
-  };
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
@@ -70,7 +38,8 @@ const SettingsPage = () => {
                 <Switch
                   id="auto-save"
                   checked={settings.enableAutoSave}
-                  onCheckedChange={() => handleToggleSetting('enableAutoSave')}
+                  onCheckedChange={() => setSettings(prev => ({ ...prev, enableAutoSave: !prev.enableAutoSave }))}
+                  className="dark:data-[state=checked]:bg-neon-blue"
                 />
               </div>
               
@@ -81,15 +50,7 @@ const SettingsPage = () => {
                     Toggle between dark and light theme
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Sun className="h-4 w-4 text-muted-foreground" />
-                  <Switch
-                    id="dark-mode"
-                    checked={settings.darkMode}
-                    onCheckedChange={() => handleToggleSetting('darkMode')}
-                  />
-                  <Moon className="h-4 w-4 text-muted-foreground" />
-                </div>
+                <ThemeToggle />
               </div>
             </div>
           </div>

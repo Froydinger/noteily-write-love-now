@@ -70,6 +70,11 @@ export default {
 					900: '#4e4e4e',
 					950: '#282828',
 				},
+				neon: {
+					blue: '#1EAEDB',
+					lighter: '#33C3F0',
+					darker: '#0FA0CE',
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -85,6 +90,10 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			boxShadow: {
+				'neon-blue': '0 0 5px #1EAEDB, 0 0 10px #1EAEDB',
+				'neon-blue-sm': '0 0 3px #1EAEDB',
 			},
 			keyframes: {
 				'accordion-down': {

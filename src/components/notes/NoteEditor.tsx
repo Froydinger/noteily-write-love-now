@@ -24,12 +24,13 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const [formatMenuPosition, setFormatMenuPosition] = useState({ top: 0, left: 0 });
   const [selection, setSelection] = useState<Selection | null>(null);
   
-  // Initial content setting
+  // Update title and content when note changes
   useEffect(() => {
+    setTitle(note.title);
     if (contentRef.current) {
       contentRef.current.innerHTML = note.content;
     }
-  }, [note.id]);
+  }, [note.id, note.title, note.content]);
 
   // Update title
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -181,14 +182,14 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         value={title}
         onChange={handleTitleChange}
         placeholder="Untitled Note"
-        className="w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0"
+        className="w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 dark:focus:ring-neon-blue"
         aria-label="Note title"
       />
       
       <div
         ref={contentRef}
         contentEditable
-        className="note-editor prose prose-sm md:prose-base max-w-none focus:outline-none"
+        className="note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert"
         data-placeholder="Start writing here... (or press '/' for formatting options)"
         aria-label="Note content"
         onKeyDown={handleKeyDown}
@@ -202,10 +203,10 @@ export default function NoteEditor({ note }: NoteEditorProps) {
             left: formatMenuPosition.left + 'px',
             zIndex: 50,
           }}
-          className="bg-background border rounded-md shadow-lg w-60"
+          className="bg-background border rounded-md shadow-lg w-60 dark:border-neon-blue/40"
         >
           <Command>
-            <CommandInput placeholder="Search formatting..." autoFocus />
+            <CommandInput placeholder="Search formatting..." autoFocus className="dark:border-neon-blue/30" />
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup heading="Formatting">
@@ -213,9 +214,9 @@ export default function NoteEditor({ note }: NoteEditorProps) {
                   <CommandItem
                     key={command.id}
                     onSelect={() => handleFormatCommand(command)}
-                    className="flex items-center gap-2 cursor-pointer"
+                    className="flex items-center gap-2 cursor-pointer dark:hover:bg-accent dark:hover:text-accent-foreground"
                   >
-                    {command.icon && React.createElement(command.icon, { size: 18 })}
+                    {command.icon && React.createElement(command.icon, { size: 18, className: "dark:text-neon-blue" })}
                     <span>{command.name}</span>
                   </CommandItem>
                 ))}

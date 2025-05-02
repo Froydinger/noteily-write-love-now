@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { 
   BookOpen, 
   Plus, 
@@ -33,6 +33,7 @@ import ThemeToggle from "@/components/theme/ThemeToggle";
 export function AppSidebar() {
   const { notes, addNote, setCurrentNote } = useNotes();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const isMobile = useIsMobile();
   const { toast } = useToast();
@@ -60,11 +61,15 @@ export function AppSidebar() {
     navigate(`/note/${note.id}`);
   };
 
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <Sidebar>
       <SidebarHeader className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center space-x-2">
-          <Heart className="h-5 w-5 text-noteily-600" />
+          <Heart className="h-5 w-5 text-neon-blue" />
           <h1 className="text-xl font-serif font-medium">Noteily</h1>
         </div>
         {isMobile && <SidebarTrigger />}
@@ -75,17 +80,20 @@ export function AppSidebar() {
           <div className="px-4 py-2">
             <Button 
               variant="outline" 
-              className="w-full justify-start gap-2 bg-secondary"
+              className="w-full justify-start gap-2 bg-secondary dark:border-neon-blue/30 dark:hover:border-neon-blue"
               onClick={handleCreateNote}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 dark:text-neon-blue" />
               New Note
             </Button>
           </div>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton 
+                  asChild
+                  className={isActive('/') ? 'sidebar-menu-active' : ''}
+                >
                   <a href="/" className="flex items-center gap-3">
                     <BookOpen className="h-4 w-4" />
                     <span>All Notes</span>
@@ -93,7 +101,10 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton 
+                  asChild
+                  className={isActive('/prompts') ? 'sidebar-menu-active' : ''}
+                >
                   <a href="/prompts" className="flex items-center gap-3">
                     <Pencil className="h-4 w-4" />
                     <span>Writing Prompts</span>
@@ -113,7 +124,7 @@ export function AppSidebar() {
                   filteredNotes.map((note) => (
                     <div 
                       key={note.id}
-                      className="px-2 py-2 rounded-md hover:bg-secondary cursor-pointer transition-colors"
+                      className={`px-2 py-2 rounded-md hover:bg-secondary cursor-pointer transition-colors ${location.pathname === `/note/${note.id}` ? 'bg-accent text-accent-foreground dark:shadow-neon-blue-sm' : ''}`}
                       onClick={() => handleSelectNote(note)}
                     >
                       <h3 className="text-sm font-medium truncate">{note.title || "Untitled Note"}</h3>
@@ -151,7 +162,7 @@ export function AppSidebar() {
         <Button 
           variant="ghost" 
           size="sm"
-          className="w-full justify-start text-muted-foreground"
+          className={`w-full justify-start text-muted-foreground ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
           asChild
         >
           <a href="/settings">
