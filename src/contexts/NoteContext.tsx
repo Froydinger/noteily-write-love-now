@@ -3,6 +3,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { offlineStorage } from '@/lib/offlineStorage';
 
 export type Note = {
   id: string;
@@ -277,7 +278,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Load notes from Supabase when user is authenticated
+  // Load notes when user changes
   useEffect(() => {
     if (user) {
       loadNotes();
@@ -290,18 +291,28 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loadNotes = async () => {
     try {
+      // First, try to load from offline storage
+      const offlineNotes = await offlineStorage.loadNotes(user!.id);
+      if (offlineNotes.length > 0) {
+        setNotes(offlineNotes);
+        setLoading(false);
+      }
+
+      // Then try to sync from Supabase
       const { data, error } = await supabase
         .from('notes')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading notes:', error);
-        toast({
-          title: "Error loading notes",
-          description: "Failed to load your notes. Please try again.",
-          variant: "destructive",
-        });
+        console.error('Error loading notes from Supabase:', error);
+        // If we have offline notes, show them instead of error
+        if (offlineNotes.length === 0) {
+          toast({
+            title: "Loading offline notes",
+            description: "Working offline. Notes will sync when connection is restored.",
+          });
+        }
       } else {
         const formattedNotes = data.map(note => ({
           id: note.id,
@@ -310,10 +321,24 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           createdAt: note.created_at,
           updatedAt: note.updated_at,
         }));
+        
         setNotes(formattedNotes);
+        
+        // Save to offline storage for future offline access
+        await offlineStorage.saveNotes(formattedNotes, user!.id);
       }
     } catch (error) {
       console.error('Error loading notes:', error);
+      // Try to load offline notes as fallback
+      const offlineNotes = await offlineStorage.loadNotes(user!.id);
+      setNotes(offlineNotes);
+      
+      if (offlineNotes.length > 0) {
+        toast({
+          title: "Working offline",
+          description: "Showing cached notes. Changes will sync when online.",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -400,15 +425,29 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         )
       );
 
+      // Save to offline storage
+      await offlineStorage.saveNote(dbNote, user.id);
+
       return dbNote;
     } catch (error) {
       console.error('Error adding note:', error);
-      toast({
-        title: "Error creating note",
-        description: "Failed to create note. Please try again.",
-        variant: "destructive",
-      });
-      throw error;
+      
+      // Save to offline storage if online sync fails
+      try {
+        await offlineStorage.saveNote(tempNote, user.id);
+        toast({
+          title: "Note saved offline",
+          description: "Note saved locally. Will sync when connection is restored.",
+        });
+        return tempNote;
+      } catch (offlineError) {
+        toast({
+          title: "Error creating note",
+          description: "Failed to create note. Please try again.",
+          variant: "destructive",
+        });
+        throw error;
+      }
     }
   };
 
@@ -447,10 +486,21 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Error updating note:', error);
-        // Could implement rollback here if needed
+      }
+      
+      // Always save to offline storage
+      const noteToSave = notes.find(note => note.id === id);
+      if (noteToSave) {
+        await offlineStorage.saveNote({ ...noteToSave, ...updatedNote }, user.id);
       }
     } catch (error) {
       console.error('Error updating note:', error);
+      
+      // Save to offline storage if online update fails
+      const noteToSave = notes.find(note => note.id === id);
+      if (noteToSave) {
+        await offlineStorage.saveNote({ ...noteToSave, ...updatedNote }, user.id);
+      }
     }
   };
 
@@ -474,15 +524,15 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Error deleting note:', error);
-        toast({
-          title: "Error deleting note",
-          description: "Failed to delete note. Please try again.",
-          variant: "destructive",
-        });
-        // Could implement rollback here if needed
       }
+      
+      // Always delete from offline storage
+      await offlineStorage.deleteNote(id, user.id);
     } catch (error) {
       console.error('Error deleting note:', error);
+      
+      // Delete from offline storage even if online deletion fails
+      await offlineStorage.deleteNote(id, user.id);
     }
   };
 

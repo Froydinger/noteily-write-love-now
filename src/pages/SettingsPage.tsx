@@ -47,8 +47,8 @@ const SettingsPage = () => {
       answer: "Select text to see formatting options like bold, italic, and more. Use the formatting toolbar for quick styling."
     },
     {
-      question: "Is my data secure?",
-      answer: "Yes, your notes are encrypted and securely stored. When signed in, they sync across your devices."
+      question: "Is my data secure and private?",
+      answer: "Yes, your notes are encrypted with your unique key and stored securely. Only you can access your notes - we cannot read them, and neither can anyone else. When signed in, your encrypted notes sync across your devices."
     }
   ];
 
