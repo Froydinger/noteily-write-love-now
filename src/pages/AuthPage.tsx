@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import { LogIn, UserPlus } from 'lucide-react';
 
 const AuthPage = () => {
@@ -13,6 +14,7 @@ const AuthPage = () => {
   const [signInPassword, setSignInPassword] = useState('');
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
+  const [notBot, setNotBot] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ const AuthPage = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!signUpEmail || !signUpPassword) return;
+    if (!signUpEmail || !signUpPassword || !notBot) return;
 
     setIsLoading(true);
     const { error } = await signUp(signUpEmail, signUpPassword);
@@ -48,6 +50,7 @@ const AuthPage = () => {
     if (!error) {
       setSignUpEmail('');
       setSignUpPassword('');
+      setNotBot(false);
     }
   };
 
@@ -131,7 +134,22 @@ const AuthPage = () => {
                     minLength={6}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="not-bot"
+                    checked={notBot}
+                    onCheckedChange={(checked) => setNotBot(checked as boolean)}
+                    disabled={isLoading}
+                  />
+                  <Label htmlFor="not-bot" className="text-sm font-normal">
+                    I am not a robot
+                  </Label>
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isLoading || !notBot}
+                >
                   <UserPlus className="mr-2 h-4 w-4" />
                   {isLoading ? 'Creating account...' : 'Create Account'}
                 </Button>
