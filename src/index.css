@@ -135,49 +135,49 @@
   }
 
   .sepia {
-    --background: 47 96% 91%;
-    --foreground: 30 20% 20%;
+    --background: 35 30% 92%;
+    --foreground: 25 15% 25%;
 
-    --card: 47 96% 94%;
-    --card-foreground: 30 20% 20%;
+    --card: 35 25% 95%;
+    --card-foreground: 25 15% 25%;
 
-    --popover: 47 96% 94%;
-    --popover-foreground: 30 20% 20%;
+    --popover: 35 25% 95%;
+    --popover-foreground: 25 15% 25%;
 
-    --primary: 30 20% 20%;
-    --primary-foreground: 47 96% 91%;
+    --primary: 25 15% 25%;
+    --primary-foreground: 35 30% 92%;
 
-    --secondary: 43 69% 84%;
-    --secondary-foreground: 30 20% 20%;
+    --secondary: 35 20% 88%;
+    --secondary-foreground: 25 15% 25%;
 
-    --muted: 43 69% 84%;
-    --muted-foreground: 30 20% 40%;
+    --muted: 35 20% 88%;
+    --muted-foreground: 25 15% 45%;
 
-    --accent: 42 100% 50%;
-    --accent-foreground: 30 20% 20%;
+    --accent: 35 40% 60%;
+    --accent-foreground: 25 15% 25%;
 
     --destructive: 0 62% 30%;
-    --destructive-foreground: 47 96% 91%;
+    --destructive-foreground: 35 30% 92%;
 
-    --border: 43 69% 78%;
-    --input: 43 69% 78%;
-    --ring: 42 100% 50%;
+    --border: 35 20% 82%;
+    --input: 35 20% 82%;
+    --ring: 35 40% 60%;
 
-    --sidebar-background: 47 96% 88%;
-    --sidebar-foreground: 30 20% 30%;
-    --sidebar-primary: 30 20% 20%;
-    --sidebar-primary-foreground: 47 96% 88%;
-    --sidebar-accent: 43 69% 80%;
-    --sidebar-accent-foreground: 30 20% 20%;
-    --sidebar-border: 43 69% 78%;
-    --sidebar-ring: 42 100% 50%;
+    --sidebar-background: 35 25% 90%;
+    --sidebar-foreground: 25 15% 35%;
+    --sidebar-primary: 25 15% 25%;
+    --sidebar-primary-foreground: 35 25% 90%;
+    --sidebar-accent: 35 20% 84%;
+    --sidebar-accent-foreground: 25 15% 25%;
+    --sidebar-border: 35 20% 82%;
+    --sidebar-ring: 35 40% 60%;
 
     /* Beautiful gradient background */
     background: linear-gradient(180deg, 
-      hsl(48, 100%, 96%) 0%, 
-      hsl(46, 85%, 93%) 30%, 
-      hsl(44, 75%, 90%) 70%, 
-      hsl(42, 70%, 87%) 100%
+      hsl(35, 35%, 95%) 0%, 
+      hsl(33, 30%, 93%) 30%, 
+      hsl(31, 25%, 91%) 70%, 
+      hsl(29, 20%, 89%) 100%
     );
     background-attachment: fixed;
   }
