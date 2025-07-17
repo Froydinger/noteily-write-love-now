@@ -20,6 +20,26 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
     const theme = savedTheme || 'navy';
     setCurrentTheme(theme);
     applyTheme(theme);
+
+    // Listen for theme changes from other components
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'theme' && e.newValue) {
+        setCurrentTheme(e.newValue as Theme);
+      }
+    };
+
+    // Listen for custom theme change events
+    const handleThemeChange = (e: CustomEvent) => {
+      setCurrentTheme(e.detail);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('themeChange', handleThemeChange as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('themeChange', handleThemeChange as EventListener);
+    };
   }, []);
   
   const toggleTheme = () => {
@@ -49,6 +69,9 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
       document.documentElement.classList.add(theme);
     }
     localStorage.setItem('theme', theme);
+    
+    // Dispatch custom event to sync other components
+    window.dispatchEvent(new CustomEvent('themeChange', { detail: theme }));
   };
   
   const getThemeIcon = () => {
