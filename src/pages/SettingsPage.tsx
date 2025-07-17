@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
@@ -11,11 +12,38 @@ import { LogOut, User, HelpCircle } from 'lucide-react';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 
 const SettingsPage = () => {
+  const [currentTheme, setCurrentTheme] = useState('navy');
   const isMobile = useIsMobile();
   const { state } = useSidebar();
   const { toast } = useToast();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Initialize theme from localStorage
+    const savedTheme = localStorage.getItem('theme') || 'navy';
+    setCurrentTheme(savedTheme);
+
+    // Listen for theme changes
+    const handleThemeChange = (e: CustomEvent) => {
+      setCurrentTheme(e.detail);
+    };
+
+    window.addEventListener('themeChange', handleThemeChange as EventListener);
+    return () => {
+      window.removeEventListener('themeChange', handleThemeChange as EventListener);
+    };
+  }, []);
+
+  const getThemeLabel = (theme: string) => {
+    switch (theme) {
+      case 'light': return 'Light Mode';
+      case 'dark': return 'Dark Mode';
+      case 'navy': return 'Night Mode';
+      case 'sepia': return 'Fresh Page';
+      default: return 'Night Mode';
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -65,14 +93,19 @@ const SettingsPage = () => {
             <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
               <span>Preferences</span>
             </h2>
-            <div className="flex items-center justify-between">
+            <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <Label htmlFor="dark-mode" className="text-sm font-medium">Dark Mode</Label>
+                <Label htmlFor="theme" className="text-sm font-medium">Theme</Label>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Toggle between dark and light theme
+                  Choose your preferred theme
                 </p>
               </div>
-              <ThemeToggle variant="settings" />
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className="text-sm text-muted-foreground hidden sm:inline">
+                  {getThemeLabel(currentTheme)}
+                </span>
+                <ThemeToggle variant="settings" />
+              </div>
             </div>
           </div>
           
