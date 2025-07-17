@@ -86,6 +86,55 @@
     --sidebar-ring: 194 76% 49%;
   }
 
+  .navy {
+    --background: 220 25% 8%;
+    --foreground: 210 40% 95%;
+
+    --card: 220 25% 10%;
+    --card-foreground: 210 40% 95%;
+
+    --popover: 220 25% 10%;
+    --popover-foreground: 210 40% 95%;
+
+    --primary: 210 40% 95%;
+    --primary-foreground: 220 25% 8%;
+
+    --secondary: 220 25% 12%;
+    --secondary-foreground: 210 40% 95%;
+
+    --muted: 220 25% 12%;
+    --muted-foreground: 210 20% 70%;
+
+    --accent: 210 100% 65%;
+    --accent-foreground: 220 25% 8%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 95%;
+
+    --border: 220 25% 18%;
+    --input: 220 25% 18%;
+    --ring: 210 100% 65%;
+
+    --sidebar-background: 220 30% 6%;
+    --sidebar-foreground: 210 30% 80%;
+    --sidebar-primary: 210 40% 95%;
+    --sidebar-primary-foreground: 220 25% 8%;
+    --sidebar-accent: 210 100% 65%;
+    --sidebar-accent-foreground: 220 25% 8%;
+    --sidebar-border: 220 25% 15%;
+    --sidebar-ring: 210 100% 65%;
+
+    /* Beautiful gradient background */
+    background: linear-gradient(135deg, 
+      hsl(220, 30%, 6%) 0%, 
+      hsl(220, 25%, 8%) 25%, 
+      hsl(210, 25%, 10%) 50%, 
+      hsl(220, 25%, 8%) 75%, 
+      hsl(220, 30%, 6%) 100%
+    );
+    background-attachment: fixed;
+  }
+
   /* Apply dark mode by default */
   html {
     @apply dark;

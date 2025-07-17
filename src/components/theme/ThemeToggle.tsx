@@ -1,62 +1,88 @@
 
 import { useState, useEffect } from 'react';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Waves } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { useToast } from '@/hooks/use-toast';
 
+type Theme = 'light' | 'dark' | 'navy';
+
 export default function ThemeToggle() {
-  const [isDarkMode, setIsDarkMode] = useState(true); // Default to dark mode
+  const [currentTheme, setCurrentTheme] = useState<Theme>('dark'); // Default to dark mode
   const { toast } = useToast();
   
   useEffect(() => {
     // Initialize based on saved preference or default to dark
-    const savedTheme = localStorage.getItem('theme');
-    const isDark = savedTheme === 'light' ? false : true; // Default to dark if not set
-    setIsDarkMode(isDark);
-    applyTheme(isDark);
+    const savedTheme = localStorage.getItem('theme') as Theme;
+    const theme = savedTheme || 'dark';
+    setCurrentTheme(theme);
+    applyTheme(theme);
   }, []);
   
   const toggleTheme = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    applyTheme(newDarkMode);
+    const themeOrder: Theme[] = ['light', 'dark', 'navy'];
+    const currentIndex = themeOrder.indexOf(currentTheme);
+    const nextTheme = themeOrder[(currentIndex + 1) % themeOrder.length];
+    
+    setCurrentTheme(nextTheme);
+    applyTheme(nextTheme);
+    
+    const themeLabels = {
+      light: "Light mode enabled",
+      dark: "Dark mode enabled", 
+      navy: "Navy mode enabled"
+    };
     
     toast({
-      title: newDarkMode ? "Dark mode enabled" : "Light mode enabled",
+      title: themeLabels[nextTheme],
       description: "Theme preference has been saved.",
     });
   };
   
-  const applyTheme = (isDark: boolean) => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+  const applyTheme = (theme: Theme) => {
+    document.documentElement.classList.remove('dark', 'navy');
+    if (theme !== 'light') {
+      document.documentElement.classList.add(theme);
     }
+    localStorage.setItem('theme', theme);
   };
   
+  const getThemeIcon = () => {
+    switch (currentTheme) {
+      case 'light':
+        return <Sun className="h-4 w-4" />;
+      case 'dark':
+        return <Moon className="h-4 w-4 text-neon-blue" />;
+      case 'navy':
+        return <Waves className="h-4 w-4 text-accent" />;
+      default:
+        return <Moon className="h-4 w-4" />;
+    }
+  };
+
+  const getThemeLabel = () => {
+    switch (currentTheme) {
+      case 'light':
+        return 'Light Mode';
+      case 'dark':
+        return 'Dark Mode';
+      case 'navy':
+        return 'Navy Mode';
+      default:
+        return 'Dark Mode';
+    }
+  };
+
   return (
     <Toggle 
       aria-label="Toggle theme"
-      pressed={isDarkMode}
+      pressed={currentTheme !== 'light'}
       onPressedChange={toggleTheme}
-      className="w-full justify-start text-muted-foreground gap-2 dark:hover:bg-secondary/30 dark:data-[state=on]:shadow-neon-blue-sm"
+      className="w-full justify-start text-muted-foreground gap-2 dark:hover:bg-secondary/30 navy:hover:bg-secondary/30 dark:data-[state=on]:shadow-neon-blue-sm navy:data-[state=on]:shadow-neon-blue-sm"
       variant="outline"
       size="sm"
     >
-      {isDarkMode ? (
-        <>
-          <Moon className="h-4 w-4 text-neon-blue" />
-          <span>Dark Mode</span>
-        </>
-      ) : (
-        <>
-          <Sun className="h-4 w-4" />
-          <span>Light Mode</span>
-        </>
-      )}
+      {getThemeIcon()}
+      <span>{getThemeLabel()}</span>
     </Toggle>
   );
 }
