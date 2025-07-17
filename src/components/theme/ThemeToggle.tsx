@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Sun, Moon, Waves, FileText } from 'lucide-react';
+import { Sun, Moon, Waves, FileText, Monitor } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { useToast } from '@/hooks/use-toast';
 
@@ -52,13 +52,13 @@ export default function ThemeToggle() {
       case 'light':
         return <Sun className="h-4 w-4" />;
       case 'dark':
-        return <Moon className="h-4 w-4 text-neon-blue" />;
+        return <Monitor className="h-4 w-4" />;
       case 'navy':
-        return <Waves className="h-4 w-4 text-accent" />;
+        return <Moon className="h-4 w-4" />;
       case 'sepia':
         return <FileText className="h-4 w-4 text-amber-600" />;
       default:
-        return <Waves className="h-4 w-4" />;
+        return <Moon className="h-4 w-4" />;
     }
   };
 
