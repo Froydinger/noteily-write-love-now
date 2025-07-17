@@ -212,6 +212,66 @@
 }
 
 @layer components {
+  /* Sidebar bounce animations */
+  @keyframes bounce-in {
+    0% {
+      transform: translateX(-100%) scale(0.8);
+      opacity: 0;
+    }
+    50% {
+      transform: translateX(10px) scale(1.05);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes bounce-out {
+    0% {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translateX(-10px) scale(1.05);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateX(-100%) scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  @keyframes button-bounce {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+
+  /* Apply bounce animations to sidebar */
+  [data-sidebar="sidebar"] {
+    animation: bounce-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Add smooth transition for collapsing */
+  .group[data-state="collapsed"] [data-sidebar="sidebar"] {
+    animation: bounce-out 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Enhanced sidebar transitions */
+  .group[data-state="expanded"] [data-sidebar="sidebar"] {
+    animation: bounce-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Sidebar toggle button bounce */
+  .sidebar-toggle:active {
+    animation: button-bounce 0.3s ease-in-out;
+  }
+
   .note-editor {
     @apply min-h-[60vh] w-full outline-none font-opensans text-lg;
   }
