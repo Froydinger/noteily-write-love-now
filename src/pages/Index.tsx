@@ -4,13 +4,14 @@ import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
 import { Plus, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
   const { notes, addNote, setCurrentNote, loading } = useNotes();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { state } = useSidebar();
   
   const handleCreateNote = async () => {
     try {
@@ -30,7 +31,7 @@ const Index = () => {
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          {isMobile && <SidebarTrigger />}
+          {(isMobile || state === "collapsed") && <SidebarTrigger />}
           <h1 className="text-2xl font-serif font-medium">All Notes</h1>
         </div>
         

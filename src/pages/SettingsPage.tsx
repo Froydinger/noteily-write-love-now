@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,7 @@ import ThemeToggle from '@/components/theme/ThemeToggle';
 
 const SettingsPage = () => {
   const isMobile = useIsMobile();
+  const { state } = useSidebar();
   const { toast } = useToast();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const SettingsPage = () => {
   return (
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="flex items-center gap-2 mb-8">
-        {isMobile && <SidebarTrigger />}
+        {(isMobile || state === "collapsed") && <SidebarTrigger />}
         <h1 className="text-2xl font-serif font-medium">Settings</h1>
       </div>
       

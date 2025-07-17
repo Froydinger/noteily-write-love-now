@@ -4,13 +4,14 @@ import { useNotes } from '@/contexts/NoteContext';
 import PromptCard from '@/components/prompts/PromptCard';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const PromptsPage = () => {
   const { dailyPrompts, addNote, updateNote, setCurrentNote, refreshDailyPrompts } = useNotes();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { state } = useSidebar();
   
   const handleUsePrompt = async (prompt: typeof dailyPrompts[0]) => {
     try {
@@ -30,7 +31,7 @@ const PromptsPage = () => {
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          {isMobile && <SidebarTrigger />}
+          {(isMobile || state === "collapsed") && <SidebarTrigger />}
           <h1 className="text-2xl font-serif font-medium">Daily Writing Prompts</h1>
         </div>
         
