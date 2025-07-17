@@ -139,7 +139,7 @@ export function AppSidebar() {
                   filteredNotes.map((note) => (
                     <div 
                       key={note.id}
-                      className={`px-3 py-2.5 my-1 rounded-md hover:bg-secondary cursor-pointer transition-colors ${location.pathname === `/note/${note.id}` ? 'bg-accent text-accent-foreground dark:shadow-neon-blue-sm dark:border-l-2 dark:border-l-neon-blue' : ''}`}
+                      className={`px-3 py-2.5 my-1 rounded-md hover:bg-secondary cursor-pointer transition-colors ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
                       onClick={() => handleSelectNote(note)}
                     >
                       <h3 className="text-sm font-medium truncate">{note.title || "Untitled Note"}</h3>
