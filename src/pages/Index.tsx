@@ -1,8 +1,11 @@
+import { useState, useMemo } from 'react';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteCard from '@/components/notes/NoteCard';
 import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
-import { Plus, Menu } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -12,6 +15,25 @@ const Index = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { state } = useSidebar();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('latest');
+
+  const filteredAndSortedNotes = useMemo(() => {
+    let filtered = notes.filter(note => 
+      note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (note.content && note.content.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+    switch (sortOrder) {
+      case 'alphabetical':
+        return filtered.sort((a, b) => a.title.localeCompare(b.title));
+      case 'oldest':
+        return filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      case 'latest':
+      default:
+        return filtered.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    }
+  }, [notes, searchTerm, sortOrder]);
   
   const handleCreateNote = async () => {
     try {
@@ -40,9 +62,42 @@ const Index = () => {
           New Note
         </Button>
       </div>
+
+      {/* Search and Filter Controls */}
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search notes by title or content..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <div className="flex-shrink-0">
+            <Select value={sortOrder} onValueChange={setSortOrder}>
+              <SelectTrigger className="w-full sm:w-40">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="latest">Latest</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
+                <SelectItem value="alphabetical">A-Z</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        
+        {searchTerm && (
+          <div className="text-sm text-muted-foreground">
+            {filteredAndSortedNotes.length} of {notes.length} notes shown
+          </div>
+        )}
+      </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {notes.map((note) => (
+        {filteredAndSortedNotes.map((note) => (
           <NoteCard key={note.id} note={note} />
         ))}
       </div>
