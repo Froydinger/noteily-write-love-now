@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppLayout } from "./components/layout/AppLayout";
+import { PWAInstall } from "./components/pwa/PWAInstall";
+import { PWAUpdateNotification } from "./components/pwa/PWAUpdateNotification";
 import Index from "./pages/Index";
 import NotePage from "./pages/NotePage";
 import PromptsPage from "./pages/PromptsPage";
@@ -30,6 +32,8 @@ const App = () => (
             <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <PWAInstall />
+          <PWAUpdateNotification />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

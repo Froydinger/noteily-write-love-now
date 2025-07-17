@@ -105,7 +105,7 @@ const SettingsPage = () => {
           <div>
             <h2 className="text-lg font-medium mb-4 font-serif">About Noteily</h2>
             <p className="text-sm text-muted-foreground mb-2">
-              Noteily - "Note I Love You" is a minimalist notes app focused on self-love and creative expression.
+              Noteily - "Write What You Love" is a minimalist notes app focused on creative expression and passionate writing.
             </p>
             <p className="text-sm text-muted-foreground mb-2">
               Version 1.0.0
