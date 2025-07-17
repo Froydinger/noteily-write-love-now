@@ -6,7 +6,11 @@ import { useToast } from '@/hooks/use-toast';
 
 type Theme = 'light' | 'dark' | 'navy' | 'sepia';
 
-export default function ThemeToggle() {
+interface ThemeToggleProps {
+  variant?: 'sidebar' | 'settings';
+}
+
+export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
   const [currentTheme, setCurrentTheme] = useState<Theme>('navy'); // Default to navy mode (Night Mode)
   const { toast } = useToast();
   
@@ -76,6 +80,21 @@ export default function ThemeToggle() {
         return 'Night Mode';
     }
   };
+
+  if (variant === 'settings') {
+    return (
+      <Toggle 
+        aria-label="Toggle theme"
+        pressed={currentTheme !== 'light'}
+        onPressedChange={toggleTheme}
+        className="h-8 w-8 p-0 flex-shrink-0"
+        variant="outline"
+        size="sm"
+      >
+        {getThemeIcon()}
+      </Toggle>
+    );
+  }
 
   return (
     <Toggle 

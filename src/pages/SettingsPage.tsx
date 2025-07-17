@@ -72,7 +72,7 @@ const SettingsPage = () => {
                   Toggle between dark and light theme
                 </p>
               </div>
-              <ThemeToggle />
+              <ThemeToggle variant="settings" />
             </div>
           </div>
           
