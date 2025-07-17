@@ -173,7 +173,15 @@
     @apply text-muted-foreground italic;
   }
 
+  .sidebar-menu-active {
+    @apply border border-foreground/20 text-foreground bg-transparent;
+  }
+
   .dark .sidebar-menu-active {
-    @apply bg-accent text-accent-foreground shadow-neon-blue-sm;
+    @apply border border-white/20 text-foreground bg-transparent;
+  }
+
+  .navy .sidebar-menu-active {
+    @apply border border-white/30 text-foreground bg-transparent;
   }
 }
