@@ -134,9 +134,57 @@
     background-attachment: fixed;
   }
 
-  /* Apply dark mode by default */
+  .sepia {
+    --background: 47 96% 91%;
+    --foreground: 30 20% 20%;
+
+    --card: 47 96% 94%;
+    --card-foreground: 30 20% 20%;
+
+    --popover: 47 96% 94%;
+    --popover-foreground: 30 20% 20%;
+
+    --primary: 30 20% 20%;
+    --primary-foreground: 47 96% 91%;
+
+    --secondary: 43 69% 84%;
+    --secondary-foreground: 30 20% 20%;
+
+    --muted: 43 69% 84%;
+    --muted-foreground: 30 20% 40%;
+
+    --accent: 42 100% 50%;
+    --accent-foreground: 30 20% 20%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 47 96% 91%;
+
+    --border: 43 69% 78%;
+    --input: 43 69% 78%;
+    --ring: 42 100% 50%;
+
+    --sidebar-background: 47 96% 88%;
+    --sidebar-foreground: 30 20% 30%;
+    --sidebar-primary: 30 20% 20%;
+    --sidebar-primary-foreground: 47 96% 88%;
+    --sidebar-accent: 43 69% 80%;
+    --sidebar-accent-foreground: 30 20% 20%;
+    --sidebar-border: 43 69% 78%;
+    --sidebar-ring: 42 100% 50%;
+
+    /* Beautiful gradient background */
+    background: linear-gradient(180deg, 
+      hsl(48, 100%, 96%) 0%, 
+      hsl(46, 85%, 93%) 30%, 
+      hsl(44, 75%, 90%) 70%, 
+      hsl(42, 70%, 87%) 100%
+    );
+    background-attachment: fixed;
+  }
+
+  /* Apply navy mode by default */
   html {
-    @apply dark;
+    @apply navy;
   }
 }
 
@@ -183,5 +231,9 @@
 
   .navy .sidebar-menu-active {
     @apply border border-white/30 text-foreground bg-transparent;
+  }
+
+  .sepia .sidebar-menu-active {
+    @apply border border-foreground/20 text-foreground bg-transparent;
   }
 }
