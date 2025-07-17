@@ -22,7 +22,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
-  const { getNote, setCurrentNote, deleteNote } = useNotes();
+  const { getNote, setCurrentNote, deleteNote, loading } = useNotes();
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -31,14 +31,17 @@ const NotePage = () => {
   const note = getNote(id || '');
   
   useEffect(() => {
+    if (loading) return; // Wait for notes to load
+    
     if (note) {
       setCurrentNote(note);
     } else if (id) {
-      navigate('/not-found');
+      // Only navigate to not-found if loading is complete and note doesn't exist
+      navigate('/');
     }
     
     return () => setCurrentNote(null);
-  }, [id, note, navigate, setCurrentNote]);
+  }, [id, note, navigate, setCurrentNote, loading]);
   
   const handleDelete = () => {
     if (id) {
@@ -101,7 +104,7 @@ const NotePage = () => {
     }
   };
   
-  if (!note) {
+  if (loading || !note) {
     return <div className="p-8">Loading...</div>;
   }
   

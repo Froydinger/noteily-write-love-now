@@ -1,5 +1,5 @@
 
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -21,7 +21,7 @@ const NotFound = () => {
           Sorry, we couldn't find the page you're looking for.
         </p>
         <Button asChild>
-          <a href="/">Return to Home</a>
+          <Link to="/">Return to Home</Link>
         </Button>
       </div>
     </div>
