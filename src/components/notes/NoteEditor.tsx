@@ -70,7 +70,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         ref={contentRef}
         contentEditable
         className="note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert min-h-[50vh]"
-        data-placeholder="Start writing here... (use Ctrl/Cmd+B for bold, Ctrl/Cmd+I for italic, Ctrl/Cmd+U for underline)"
+        data-placeholder="Just start typing…"
         aria-label="Note content"
       />
     </div>
