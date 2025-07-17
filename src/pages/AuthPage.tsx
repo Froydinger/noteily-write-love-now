@@ -9,8 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LogIn, UserPlus } from 'lucide-react';
 
 const AuthPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [signInEmail, setSignInEmail] = useState('');
+  const [signInPassword, setSignInPassword] = useState('');
+  const [signUpEmail, setSignUpEmail] = useState('');
+  const [signUpPassword, setSignUpPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
@@ -24,10 +26,10 @@ const AuthPage = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!signInEmail || !signInPassword) return;
 
     setIsLoading(true);
-    const { error } = await signIn(email, password);
+    const { error } = await signIn(signInEmail, signInPassword);
     
     if (!error) {
       navigate('/');
@@ -37,15 +39,15 @@ const AuthPage = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!signUpEmail || !signUpPassword) return;
 
     setIsLoading(true);
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(signUpEmail, signUpPassword);
     setIsLoading(false);
     
     if (!error) {
-      setEmail('');
-      setPassword('');
+      setSignUpEmail('');
+      setSignUpPassword('');
     }
   };
 
@@ -72,8 +74,10 @@ const AuthPage = () => {
                   <Input
                     id="signin-email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={signInEmail}
+                    onChange={(e) => setSignInEmail(e.target.value)}
+                    autoComplete="email"
+                    placeholder="Enter your email"
                     required
                     disabled={isLoading}
                   />
@@ -83,8 +87,10 @@ const AuthPage = () => {
                   <Input
                     id="signin-password"
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={signInPassword}
+                    onChange={(e) => setSignInPassword(e.target.value)}
+                    autoComplete="current-password"
+                    placeholder="Enter your password"
                     required
                     disabled={isLoading}
                   />
@@ -103,8 +109,10 @@ const AuthPage = () => {
                   <Input
                     id="signup-email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={signUpEmail}
+                    onChange={(e) => setSignUpEmail(e.target.value)}
+                    autoComplete="email"
+                    placeholder="Enter your email"
                     required
                     disabled={isLoading}
                   />
@@ -114,8 +122,10 @@ const AuthPage = () => {
                   <Input
                     id="signup-password"
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={signUpPassword}
+                    onChange={(e) => setSignUpPassword(e.target.value)}
+                    autoComplete="new-password"
+                    placeholder="Create a password (min 6 characters)"
                     required
                     disabled={isLoading}
                     minLength={6}
