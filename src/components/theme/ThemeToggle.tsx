@@ -82,11 +82,12 @@ export default function ThemeToggle() {
       aria-label="Toggle theme"
       pressed={currentTheme !== 'light'}
       onPressedChange={toggleTheme}
-      className="h-8 w-8 p-0 flex-shrink-0"
-      variant="outline"
+      className="w-full justify-start btn-accessible h-9"
+      variant="default"
       size="sm"
     >
       {getThemeIcon()}
+      <span className="ml-2">{getThemeLabel()}</span>
     </Toggle>
   );
 }
