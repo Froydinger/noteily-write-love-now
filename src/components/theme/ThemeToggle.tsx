@@ -82,7 +82,7 @@ export default function ThemeToggle() {
       aria-label="Toggle theme"
       pressed={currentTheme !== 'light'}
       onPressedChange={toggleTheme}
-      className="w-full justify-start text-muted-foreground gap-2 dark:hover:bg-secondary/30 navy:hover:bg-secondary/30 sepia:hover:bg-secondary/30 dark:data-[state=on]:shadow-neon-blue-sm navy:data-[state=on]:shadow-neon-blue-sm sepia:data-[state=on]:shadow-amber-sm"
+      className="w-full justify-start gap-2 btn-accessible"
       variant="outline"
       size="sm"
     >

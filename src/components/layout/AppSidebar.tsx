@@ -84,7 +84,7 @@ export function AppSidebar() {
             variant="ghost"
             size="sm"
             onClick={toggleSidebar}
-            className="hover:bg-secondary dark:text-neon-blue h-8 w-8 p-0"
+            className="sidebar-toggle h-8 w-8 p-0"
             title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
           >
             {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
@@ -97,10 +97,10 @@ export function AppSidebar() {
         <div className="px-4 py-2 mb-2">
           <Button 
             variant="outline" 
-            className="w-full justify-start gap-3 py-5 bg-secondary dark:border-neon-blue/30 dark:hover:border-neon-blue"
+            className="w-full justify-start gap-3 py-5 btn-accessible"
             onClick={handleCreateNote}
           >
-            <Plus className="h-4 w-4 dark:text-neon-blue" />
+            <Plus className="h-4 w-4" />
             <span className="font-medium">New Note</span>
           </Button>
         </div>
@@ -143,7 +143,7 @@ export function AppSidebar() {
                   filteredNotes.map((note) => (
                     <div 
                       key={note.id}
-                      className={`px-3 py-2.5 my-1 rounded-md hover:bg-secondary cursor-pointer transition-colors ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
+                      className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
                       onClick={() => handleSelectNote(note)}
                     >
                       <h3 className="text-sm font-medium truncate">{note.title || "Untitled Note"}</h3>
@@ -162,7 +162,7 @@ export function AppSidebar() {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="mt-2"
+                        className="mt-2 btn-accessible"
                         onClick={() => setSearchTerm("")}
                       >
                         Clear search
@@ -181,7 +181,7 @@ export function AppSidebar() {
         <Button 
           variant="ghost" 
           size="sm"
-          className={`w-full justify-start text-muted-foreground ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
+          className={`w-full justify-start btn-accessible ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
           asChild
         >
           <a href="/settings">
@@ -194,7 +194,7 @@ export function AppSidebar() {
           href="https://buymeacoffee.com/froydinger" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-1.5 px-2 rounded-md hover:bg-secondary mt-1"
+          className="flex items-center gap-2 text-sm btn-accessible py-1.5 px-2 rounded-md mt-1"
         >
           <Heart className="h-4 w-4 text-pink-500" fill="#e91e63" />
           <span>Support Noteily</span>

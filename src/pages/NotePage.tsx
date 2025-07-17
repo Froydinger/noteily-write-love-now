@@ -120,7 +120,7 @@ const NotePage = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={toggleSidebar}
-                className="hover:bg-secondary dark:text-neon-blue"
+                className="btn-accessible"
                 title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
               >
                 {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
@@ -131,7 +131,7 @@ const NotePage = () => {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate('/')}
-              className="gap-1"
+              className="gap-1 btn-accessible"
             >
               <ChevronLeft className="h-4 w-4" />
               Back
@@ -143,7 +143,7 @@ const NotePage = () => {
               variant="ghost"
               size="sm"
               onClick={handleCopy}
-              className="text-muted-foreground hover:text-foreground"
+              className="btn-accessible"
               title="Copy note"
             >
               <Copy className="h-4 w-4" />
@@ -153,7 +153,7 @@ const NotePage = () => {
               variant="ghost"
               size="sm"
               onClick={handleShare}
-              className="text-muted-foreground hover:text-foreground"
+              className="btn-accessible"
               title="Share note"
             >
               <Share className="h-4 w-4" />
@@ -161,7 +161,7 @@ const NotePage = () => {
             
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-destructive">
+                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive-foreground hover:bg-destructive/10">
                   <Trash className="h-4 w-4" />
                 </Button>
               </AlertDialogTrigger>
@@ -173,8 +173,8 @@ const NotePage = () => {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDelete} className="bg-destructive">
+                  <AlertDialogCancel className="btn-accessible">Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
                     Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>

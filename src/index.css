@@ -221,6 +221,7 @@
     @apply text-muted-foreground italic;
   }
 
+  /* Sidebar active states with proper contrast */
   .sidebar-menu-active {
     @apply border border-foreground/20 text-foreground bg-transparent;
   }
@@ -235,5 +236,72 @@
 
   .sepia .sidebar-menu-active {
     @apply border border-foreground/20 text-foreground bg-transparent;
+  }
+
+  /* Button accessibility improvements */
+  .btn-accessible {
+    @apply transition-colors duration-200;
+  }
+
+  /* Light theme button styles */
+  .btn-accessible {
+    @apply text-foreground hover:text-foreground hover:bg-secondary/80;
+  }
+
+  /* Dark theme button styles */
+  .dark .btn-accessible {
+    @apply text-foreground hover:text-foreground hover:bg-secondary/80;
+  }
+
+  /* Navy theme button styles */
+  .navy .btn-accessible {
+    @apply text-foreground hover:text-foreground hover:bg-secondary/60;
+  }
+
+  /* Sepia theme button styles */
+  .sepia .btn-accessible {
+    @apply text-foreground hover:text-foreground hover:bg-secondary/80;
+  }
+
+  /* Sidebar toggle button specific styles */
+  .sidebar-toggle {
+    @apply transition-all duration-200;
+  }
+
+  .sidebar-toggle {
+    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/80;
+  }
+
+  .dark .sidebar-toggle {
+    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/80;
+  }
+
+  .navy .sidebar-toggle {
+    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/60;
+  }
+
+  .sepia .sidebar-toggle {
+    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/80;
+  }
+
+  /* General button contrast improvements */
+  .btn-contrast {
+    @apply transition-colors duration-200;
+  }
+
+  .btn-contrast {
+    @apply text-foreground/80 hover:text-foreground hover:bg-accent/10;
+  }
+
+  .dark .btn-contrast {
+    @apply text-foreground/80 hover:text-foreground hover:bg-accent/10;
+  }
+
+  .navy .btn-contrast {
+    @apply text-foreground/80 hover:text-foreground hover:bg-accent/10;
+  }
+
+  .sepia .btn-contrast {
+    @apply text-foreground/80 hover:text-foreground hover:bg-accent/10;
   }
 }
