@@ -8,17 +8,21 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
-  const { notes, addNote, setCurrentNote } = useNotes();
+  const { notes, addNote, setCurrentNote, loading } = useNotes();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
-  const handleCreateNote = () => {
-    const newNote = addNote();
-    setCurrentNote(newNote);
-    navigate(`/note/${newNote.id}`);
+  const handleCreateNote = async () => {
+    try {
+      const newNote = await addNote();
+      setCurrentNote(newNote);
+      navigate(`/note/${newNote.id}`);
+    } catch (error) {
+      console.error('Failed to create note:', error);
+    }
   };
 
-  if (notes.length === 0) {
+  if (loading || notes.length === 0) {
     return <EmptyNotesPlaceholder />;
   }
 

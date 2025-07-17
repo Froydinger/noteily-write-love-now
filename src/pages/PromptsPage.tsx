@@ -12,14 +12,18 @@ const PromptsPage = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
-  const handleUsePrompt = (prompt: typeof dailyPrompts[0]) => {
-    const newNote = addNote();
-    updateNote(newNote.id, {
-      title: prompt.text,
-      content: `<p>${prompt.text}</p><p><br></p><p>Your thoughts here...</p>`
-    });
-    setCurrentNote(newNote);
-    navigate(`/note/${newNote.id}`);
+  const handleUsePrompt = async (prompt: typeof dailyPrompts[0]) => {
+    try {
+      const newNote = await addNote();
+      await updateNote(newNote.id, {
+        title: prompt.text,
+        content: `<p>${prompt.text}</p><p><br></p><p>Your thoughts here...</p>`
+      });
+      setCurrentNote(newNote);
+      navigate(`/note/${newNote.id}`);
+    } catch (error) {
+      console.error('Failed to create note from prompt:', error);
+    }
   };
 
   return (

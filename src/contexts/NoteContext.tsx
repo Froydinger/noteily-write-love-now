@@ -1,5 +1,8 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 export type Note = {
   id: string;
@@ -20,9 +23,10 @@ type NoteContextType = {
   currentNote: Note | null;
   writingPrompts: WritingPrompt[];
   dailyPrompts: WritingPrompt[];
-  addNote: () => Note;
-  updateNote: (id: string, updates: Partial<Note>) => void;
-  deleteNote: (id: string) => void;
+  loading: boolean;
+  addNote: () => Promise<Note>;
+  updateNote: (id: string, updates: Partial<Note>) => Promise<void>;
+  deleteNote: (id: string) => Promise<void>;
   getNote: (id: string) => Note | undefined;
   setCurrentNote: (note: Note | null) => void;
   getRandomPrompt: () => WritingPrompt;
@@ -89,11 +93,7 @@ const shouldRefreshPrompts = (): boolean => {
 };
 
 export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [notes, setNotes] = useState<Note[]>(() => {
-    const savedNotes = localStorage.getItem('notes');
-    return savedNotes ? JSON.parse(savedNotes) : [];
-  });
-  
+  const [notes, setNotes] = useState<Note[]>([]);
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
   const [writingPrompts] = useState<WritingPrompt[]>(defaultPrompts);
   const [dailyPrompts, setDailyPrompts] = useState<WritingPrompt[]>(() => {
@@ -103,10 +103,52 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return getRandomPrompts(3);
   });
+  const [loading, setLoading] = useState(true);
+  
+  const { user } = useAuth();
+  const { toast } = useToast();
 
+  // Load notes from Supabase when user is authenticated
   useEffect(() => {
-    localStorage.setItem('notes', JSON.stringify(notes));
-  }, [notes]);
+    if (user) {
+      loadNotes();
+    } else {
+      setNotes([]);
+      setCurrentNote(null);
+      setLoading(false);
+    }
+  }, [user]);
+
+  const loadNotes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading notes:', error);
+        toast({
+          title: "Error loading notes",
+          description: "Failed to load your notes. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        const formattedNotes = data.map(note => ({
+          id: note.id,
+          title: note.title,
+          content: note.content,
+          createdAt: note.created_at,
+          updatedAt: note.updated_at,
+        }));
+        setNotes(formattedNotes);
+      }
+    } catch (error) {
+      console.error('Error loading notes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   // Check at midnight if we need to refresh prompts
   useEffect(() => {
@@ -141,46 +183,137 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('lastPromptsRefreshDate', new Date().toISOString());
   };
 
-  const addNote = () => {
-    const now = new Date().toISOString();
-    const newNote: Note = {
+  const addNote = async (): Promise<Note> => {
+    if (!user) {
+      throw new Error('User must be authenticated to add notes');
+    }
+
+    const tempNote: Note = {
       id: crypto.randomUUID(),
       title: 'Untitled Note',
       content: '',
-      createdAt: now,
-      updatedAt: now,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
-    
-    setNotes(prevNotes => [newNote, ...prevNotes]);
-    return newNote;
+
+    // Optimistically add to local state
+    setNotes(prevNotes => [tempNote, ...prevNotes]);
+
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .insert([{
+          user_id: user.id,
+          title: tempNote.title,
+          content: tempNote.content,
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        // Revert optimistic update on error
+        setNotes(prevNotes => prevNotes.filter(note => note.id !== tempNote.id));
+        throw error;
+      }
+
+      // Update with actual database data
+      const dbNote: Note = {
+        id: data.id,
+        title: data.title,
+        content: data.content,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      };
+
+      setNotes(prevNotes => 
+        prevNotes.map(note => 
+          note.id === tempNote.id ? dbNote : note
+        )
+      );
+
+      return dbNote;
+    } catch (error) {
+      console.error('Error adding note:', error);
+      toast({
+        title: "Error creating note",
+        description: "Failed to create note. Please try again.",
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
-  const updateNote = (id: string, updates: Partial<Note>) => {
+  const updateNote = async (id: string, updates: Partial<Note>) => {
+    if (!user) {
+      console.error('User must be authenticated to update notes');
+      return;
+    }
+
+    // Optimistically update local state
+    const updatedNote = {
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+
     setNotes(prevNotes => 
       prevNotes.map(note => 
         note.id === id 
-          ? { 
-              ...note, 
-              ...updates, 
-              updatedAt: new Date().toISOString() 
-            } 
+          ? { ...note, ...updatedNote }
           : note
       )
     );
     
     if (currentNote && currentNote.id === id) {
-      setCurrentNote({ 
-        ...currentNote, 
-        ...updates, 
-        updatedAt: new Date().toISOString() 
-      });
+      setCurrentNote({ ...currentNote, ...updatedNote });
+    }
+
+    try {
+      const { error } = await supabase
+        .from('notes')
+        .update({
+          title: updates.title,
+          content: updates.content,
+        })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating note:', error);
+        // Could implement rollback here if needed
+      }
+    } catch (error) {
+      console.error('Error updating note:', error);
     }
   };
 
-  const deleteNote = (id: string) => {
+  const deleteNote = async (id: string) => {
+    if (!user) {
+      console.error('User must be authenticated to delete notes');
+      return;
+    }
+
+    // Optimistically update local state
     setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
     if (currentNote && currentNote.id === id) {
       setCurrentNote(null);
+    }
+
+    try {
+      const { error } = await supabase
+        .from('notes')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting note:', error);
+        toast({
+          title: "Error deleting note",
+          description: "Failed to delete note. Please try again.",
+          variant: "destructive",
+        });
+        // Could implement rollback here if needed
+      }
+    } catch (error) {
+      console.error('Error deleting note:', error);
     }
   };
 
@@ -200,6 +333,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentNote, 
         writingPrompts,
         dailyPrompts,
+        loading,
         addNote, 
         updateNote, 
         deleteNote, 

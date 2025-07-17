@@ -48,15 +48,19 @@ export function AppSidebar() {
       )
     : notes;
 
-  const handleCreateNote = () => {
-    const newNote = addNote();
-    setCurrentNote(newNote);
-    navigate(`/note/${newNote.id}`);
-    
-    toast({
-      title: "Note created",
-      description: "Your new note has been created.",
-    });
+  const handleCreateNote = async () => {
+    try {
+      const newNote = await addNote();
+      setCurrentNote(newNote);
+      navigate(`/note/${newNote.id}`);
+      
+      toast({
+        title: "Note created",
+        description: "Your new note has been created.",
+      });
+    } catch (error) {
+      console.error('Failed to create note:', error);
+    }
   };
   
   const handleSelectNote = (note: Note) => {

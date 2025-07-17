@@ -6,15 +6,31 @@ import { Switch } from '@/components/ui/switch';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
-import { Moon, Sun } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { LogOut, User } from 'lucide-react';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 
 const SettingsPage = () => {
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [settings, setSettings] = useState({
     enableAutoSave: true
   });
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Signed out",
+      description: "You have been signed out successfully.",
+    });
+  };
+
+  const handleSignIn = () => {
+    navigate('/auth');
+  };
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
@@ -52,6 +68,36 @@ const SettingsPage = () => {
                 </div>
                 <ThemeToggle />
               </div>
+            </div>
+          </div>
+          
+          <div>
+            <h2 className="text-lg font-medium mb-4 font-serif">Account</h2>
+            <div className="space-y-4">
+              {user ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">{user.email}</p>
+                      <p className="text-xs text-muted-foreground">Signed in</p>
+                    </div>
+                  </div>
+                  <Button onClick={handleSignOut} variant="outline" className="w-full">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Sign in to sync your notes across all devices
+                  </p>
+                  <Button onClick={handleSignIn} className="w-full">
+                    Sign In
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
           

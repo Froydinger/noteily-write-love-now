@@ -1,17 +1,30 @@
 
-import { Plus } from 'lucide-react';
+import { Plus, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNotes } from '@/contexts/NoteContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function EmptyNotesPlaceholder() {
-  const { addNote, setCurrentNote } = useNotes();
+  const { addNote, setCurrentNote, loading } = useNotes();
   const navigate = useNavigate();
   
-  const handleCreateFirstNote = () => {
-    const newNote = addNote();
-    setCurrentNote(newNote);
-    navigate(`/note/${newNote.id}`);
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+        <p className="text-muted-foreground">Loading your notes...</p>
+      </div>
+    );
+  }
+  
+  const handleCreateFirstNote = async () => {
+    try {
+      const newNote = await addNote();
+      setCurrentNote(newNote);
+      navigate(`/note/${newNote.id}`);
+    } catch (error) {
+      console.error('Failed to create note:', error);
+    }
   };
   
   return (
@@ -28,5 +41,3 @@ export default function EmptyNotesPlaceholder() {
     </div>
   );
 }
-
-import { Heart } from 'lucide-react';
