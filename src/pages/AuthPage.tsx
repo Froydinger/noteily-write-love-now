@@ -99,7 +99,17 @@ const AuthPage = () => {
                   backgroundColor: 'transparent !important',
                   fontWeight: '500'
                 }}
-                data-state="signin"
+                onMouseEnter={(e) => {
+                  if (e.currentTarget.getAttribute('data-state') === 'active') {
+                    e.currentTarget.style.color = '#ffffff !important';
+                  }
+                }}
+                onClick={(e) => {
+                  setTimeout(() => {
+                    e.currentTarget.style.color = '#ffffff !important';
+                    e.currentTarget.style.backgroundColor = '#1EAEDB !important';
+                  }, 0);
+                }}
               >
                 Sign In
               </TabsTrigger>
@@ -111,7 +121,17 @@ const AuthPage = () => {
                   backgroundColor: 'transparent !important',
                   fontWeight: '500'
                 }}
-                data-state="signup"
+                onMouseEnter={(e) => {
+                  if (e.currentTarget.getAttribute('data-state') === 'active') {
+                    e.currentTarget.style.color = '#ffffff !important';
+                  }
+                }}
+                onClick={(e) => {
+                  setTimeout(() => {
+                    e.currentTarget.style.color = '#ffffff !important';
+                    e.currentTarget.style.backgroundColor = '#1EAEDB !important';
+                  }, 0);
+                }}
               >
                 Sign Up
               </TabsTrigger>
