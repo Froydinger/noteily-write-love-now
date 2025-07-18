@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
-import { LogIn, UserPlus } from 'lucide-react';
+import { LogIn, UserPlus, Heart } from 'lucide-react';
 
 const AuthPage = () => {
   const [signInEmail, setSignInEmail] = useState('');
@@ -55,11 +55,14 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-navy p-4">
+      <Card className="w-full max-w-md bg-navy-light border-navy-accent">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-serif">Welcome to Noteily</CardTitle>
-          <CardDescription>
+          <div className="flex justify-center mb-4">
+            <Heart className="h-8 w-8 text-neon-blue" />
+          </div>
+          <CardTitle className="text-2xl font-serif text-foreground">Welcome to Noteily</CardTitle>
+          <CardDescription className="text-muted-foreground">
             Sign in to sync your notes across all devices
           </CardDescription>
         </CardHeader>
