@@ -93,45 +93,37 @@ const AuthPage = () => {
             >
               <TabsTrigger 
                 value="signin" 
-                className="data-[state=active]:bg-[#1EAEDB] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-400"
                 style={{ 
-                  color: 'hsl(210, 20%, 60%) !important',
-                  backgroundColor: 'transparent !important',
-                  fontWeight: '500'
+                  color: 'hsl(210, 20%, 60%)',
+                  backgroundColor: 'transparent',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
                 }}
-                onMouseEnter={(e) => {
-                  if (e.currentTarget.getAttribute('data-state') === 'active') {
-                    e.currentTarget.style.color = '#ffffff !important';
-                  }
-                }}
-                onClick={(e) => {
-                  setTimeout(() => {
-                    e.currentTarget.style.color = '#ffffff !important';
-                    e.currentTarget.style.backgroundColor = '#1EAEDB !important';
-                  }, 0);
-                }}
+                className="
+                  data-[state=active]:!bg-[#1EAEDB] 
+                  data-[state=active]:!text-white 
+                  data-[state=inactive]:!bg-transparent 
+                  data-[state=inactive]:!text-gray-400
+                  hover:data-[state=inactive]:!bg-gray-800
+                "
               >
                 Sign In
               </TabsTrigger>
               <TabsTrigger 
                 value="signup" 
-                className="data-[state=active]:bg-[#1EAEDB] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-400"
                 style={{ 
-                  color: 'hsl(210, 20%, 60%) !important',
-                  backgroundColor: 'transparent !important',
-                  fontWeight: '500'
+                  color: 'hsl(210, 20%, 60%)',
+                  backgroundColor: 'transparent',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
                 }}
-                onMouseEnter={(e) => {
-                  if (e.currentTarget.getAttribute('data-state') === 'active') {
-                    e.currentTarget.style.color = '#ffffff !important';
-                  }
-                }}
-                onClick={(e) => {
-                  setTimeout(() => {
-                    e.currentTarget.style.color = '#ffffff !important';
-                    e.currentTarget.style.backgroundColor = '#1EAEDB !important';
-                  }, 0);
-                }}
+                className="
+                  data-[state=active]:!bg-[#1EAEDB] 
+                  data-[state=active]:!text-white 
+                  data-[state=inactive]:!bg-transparent 
+                  data-[state=inactive]:!text-gray-400
+                  hover:data-[state=inactive]:!bg-gray-800
+                "
               >
                 Sign Up
               </TabsTrigger>
