@@ -55,8 +55,8 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-navy p-4">
-      <Card className="w-full max-w-md bg-navy-light border-navy-accent">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <Heart className="h-8 w-8 text-neon-blue" />
