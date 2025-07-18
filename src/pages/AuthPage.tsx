@@ -144,9 +144,10 @@ const AuthPage = () => {
                     disabled={isLoading}
                     style={{
                       backgroundColor: 'hsl(215, 45%, 20%) !important',
-                      borderColor: 'hsl(215, 45%, 20%) !important',
+                      borderColor: 'transparent !important',
                       color: 'hsl(210, 40%, 95%) !important',
-                      border: '1px solid hsl(215, 45%, 20%) !important'
+                      border: 'none !important',
+                      outline: 'none !important'
                     }}
                   />
                 </div>
@@ -163,9 +164,10 @@ const AuthPage = () => {
                     disabled={isLoading}
                     style={{
                       backgroundColor: 'hsl(215, 45%, 20%) !important',
-                      borderColor: 'hsl(215, 45%, 20%) !important',
+                      borderColor: 'transparent !important',
                       color: 'hsl(210, 40%, 95%) !important',
-                      border: '1px solid hsl(215, 45%, 20%) !important'
+                      border: 'none !important',
+                      outline: 'none !important'
                     }}
                   />
                 </div>
@@ -210,9 +212,10 @@ const AuthPage = () => {
                     disabled={isLoading}
                     style={{
                       backgroundColor: 'hsl(215, 45%, 20%) !important',
-                      borderColor: 'hsl(215, 45%, 20%) !important',
+                      borderColor: 'transparent !important',
                       color: 'hsl(210, 40%, 95%) !important',
-                      border: '1px solid hsl(215, 45%, 20%) !important'
+                      border: 'none !important',
+                      outline: 'none !important'
                     }}
                   />
                 </div>
@@ -230,9 +233,10 @@ const AuthPage = () => {
                     minLength={6}
                     style={{
                       backgroundColor: 'hsl(215, 45%, 20%) !important',
-                      borderColor: 'hsl(215, 45%, 20%) !important',
+                      borderColor: 'transparent !important',
                       color: 'hsl(210, 40%, 95%) !important',
-                      border: '1px solid hsl(215, 45%, 20%) !important'
+                      border: 'none !important',
+                      outline: 'none !important'
                     }}
                   />
                 </div>
