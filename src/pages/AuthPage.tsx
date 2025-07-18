@@ -153,7 +153,7 @@ const AuthPage = () => {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full" 
+                  className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
                   disabled={isLoading} 
                   style={{
                     backgroundColor: '#1EAEDB !important',
@@ -161,6 +161,14 @@ const AuthPage = () => {
                     borderColor: '#1EAEDB !important',
                     border: '1px solid #1EAEDB !important',
                     fontWeight: '600 !important'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#0FA0CE !important';
+                    e.currentTarget.style.color = '#ffffff !important';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#1EAEDB !important';
+                    e.currentTarget.style.color = '#ffffff !important';
                   }}
                 >
                   <LogIn className="mr-2 h-4 w-4" style={{ color: '#ffffff !important' }} />
@@ -223,7 +231,7 @@ const AuthPage = () => {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full" 
+                  className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
                   disabled={isLoading || !notBot}
                   style={{
                     backgroundColor: '#1EAEDB !important',
@@ -231,6 +239,18 @@ const AuthPage = () => {
                     borderColor: '#1EAEDB !important',
                     border: '1px solid #1EAEDB !important',
                     fontWeight: '600 !important'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = '#0FA0CE !important';
+                      e.currentTarget.style.color = '#ffffff !important';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = '#1EAEDB !important';
+                      e.currentTarget.style.color = '#ffffff !important';
+                    }
                   }}
                 >
                   <UserPlus className="mr-2 h-4 w-4" style={{ color: '#ffffff !important' }} />
