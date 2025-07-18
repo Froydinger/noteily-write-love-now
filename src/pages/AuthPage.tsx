@@ -93,19 +93,25 @@ const AuthPage = () => {
             >
               <TabsTrigger 
                 value="signin" 
+                className="data-[state=active]:bg-[#1EAEDB] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-400"
                 style={{ 
-                  color: 'hsl(210, 40%, 95%) !important',
-                  backgroundColor: 'transparent !important'
+                  color: 'hsl(210, 20%, 60%) !important',
+                  backgroundColor: 'transparent !important',
+                  fontWeight: '500'
                 }}
+                data-state="signin"
               >
                 Sign In
               </TabsTrigger>
               <TabsTrigger 
                 value="signup" 
+                className="data-[state=active]:bg-[#1EAEDB] data-[state=active]:text-white data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-400"
                 style={{ 
-                  color: 'hsl(210, 40%, 95%) !important',
-                  backgroundColor: 'transparent !important'
+                  color: 'hsl(210, 20%, 60%) !important',
+                  backgroundColor: 'transparent !important',
+                  fontWeight: '500'
                 }}
+                data-state="signup"
               >
                 Sign Up
               </TabsTrigger>
