@@ -157,12 +157,13 @@ const AuthPage = () => {
                   disabled={isLoading} 
                   style={{
                     backgroundColor: '#1EAEDB !important',
-                    color: 'hsl(215, 45%, 12%) !important',
+                    color: '#ffffff !important',
                     borderColor: '#1EAEDB !important',
-                    border: '1px solid #1EAEDB !important'
+                    border: '1px solid #1EAEDB !important',
+                    fontWeight: '600 !important'
                   }}
                 >
-                  <LogIn className="mr-2 h-4 w-4" />
+                  <LogIn className="mr-2 h-4 w-4" style={{ color: '#ffffff !important' }} />
                   {isLoading ? 'Signing in...' : 'Sign In'}
                 </Button>
               </form>
@@ -226,12 +227,13 @@ const AuthPage = () => {
                   disabled={isLoading || !notBot}
                   style={{
                     backgroundColor: '#1EAEDB !important',
-                    color: 'hsl(215, 45%, 12%) !important',
+                    color: '#ffffff !important',
                     borderColor: '#1EAEDB !important',
-                    border: '1px solid #1EAEDB !important'
+                    border: '1px solid #1EAEDB !important',
+                    fontWeight: '600 !important'
                   }}
                 >
-                  <UserPlus className="mr-2 h-4 w-4" />
+                  <UserPlus className="mr-2 h-4 w-4" style={{ color: '#ffffff !important' }} />
                   {isLoading ? 'Creating account...' : 'Create Account'}
                 </Button>
               </form>

@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { LogIn, Loader2 } from "lucide-react";
+import { LogIn, Loader2, Heart } from "lucide-react";
 
 type AppLayoutProps = {
   children: React.ReactNode;
@@ -31,14 +31,33 @@ export function AppLayout({ children }: AppLayoutProps) {
   // Show auth prompt if not authenticated
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
+      <div 
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{
+          background: 'linear-gradient(180deg, hsl(215, 55%, 18%) 0%, hsl(218, 50%, 14%) 30%, hsl(220, 55%, 10%) 70%, hsl(222, 60%, 7%) 100%) !important',
+          backgroundAttachment: 'fixed'
+        }}
+      >
         <div className="text-center max-w-md">
-          <h1 className="text-3xl font-serif font-medium mb-4">Welcome to Noteily</h1>
-          <p className="text-muted-foreground mb-6">
+          <div className="flex justify-center mb-6">
+            <Heart className="h-12 w-12" style={{ color: '#1EAEDB' }} />
+          </div>
+          <h1 className="text-3xl font-serif font-medium mb-4" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Welcome to Noteily</h1>
+          <p className="mb-6" style={{ color: 'hsl(210, 20%, 70%) !important' }}>
             Sign in to access your notes and sync them across all your devices.
           </p>
-          <Button onClick={() => navigate('/auth')} size="lg">
-            <LogIn className="mr-2 h-4 w-4" />
+          <Button 
+            onClick={() => navigate('/auth')} 
+            size="lg"
+            style={{
+              backgroundColor: '#1EAEDB !important',
+              color: '#ffffff !important',
+              borderColor: '#1EAEDB !important',
+              border: '1px solid #1EAEDB !important',
+              fontWeight: '600 !important'
+            }}
+          >
+            <LogIn className="mr-2 h-4 w-4" style={{ color: '#ffffff !important' }} />
             Sign In
           </Button>
         </div>
