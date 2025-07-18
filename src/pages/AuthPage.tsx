@@ -55,28 +55,38 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{
+      background: 'linear-gradient(180deg, hsl(215, 55%, 18%) 0%, hsl(218, 50%, 14%) 30%, hsl(220, 55%, 10%) 70%, hsl(222, 60%, 7%) 100%)',
+      backgroundAttachment: 'fixed'
+    }}>
+      <Card className="w-full max-w-md" style={{
+        backgroundColor: 'hsl(215, 45%, 14%)',
+        borderColor: 'hsl(215, 45%, 20%)',
+        color: 'hsl(210, 40%, 95%)'
+      }}>
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Heart className="h-8 w-8 text-neon-blue" />
+            <Heart className="h-8 w-8" style={{ color: '#1EAEDB' }} />
           </div>
-          <CardTitle className="text-2xl font-serif text-foreground">Welcome to Noteily</CardTitle>
-          <CardDescription className="text-muted-foreground">
+          <CardTitle className="text-2xl font-serif" style={{ color: 'hsl(210, 40%, 95%)' }}>Welcome to Noteily</CardTitle>
+          <CardDescription style={{ color: 'hsl(210, 20%, 70%)' }}>
             Sign in to sync your notes across all devices
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2" style={{ 
+              backgroundColor: 'hsl(215, 45%, 16%)', 
+              borderColor: 'hsl(215, 45%, 20%)' 
+            }}>
+              <TabsTrigger value="signin" style={{ color: 'hsl(210, 40%, 95%)' }}>Sign In</TabsTrigger>
+              <TabsTrigger value="signup" style={{ color: 'hsl(210, 40%, 95%)' }}>Sign Up</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="signin-email" style={{ color: 'hsl(210, 40%, 95%)' }}>Email</Label>
                   <Input
                     id="signin-email"
                     type="email"
@@ -86,10 +96,15 @@ const AuthPage = () => {
                     placeholder="Enter your email"
                     required
                     disabled={isLoading}
+                    style={{
+                      backgroundColor: 'hsl(215, 45%, 20%)',
+                      borderColor: 'hsl(215, 45%, 20%)',
+                      color: 'hsl(210, 40%, 95%)'
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
+                  <Label htmlFor="signin-password" style={{ color: 'hsl(210, 40%, 95%)' }}>Password</Label>
                   <Input
                     id="signin-password"
                     type="password"
@@ -99,9 +114,18 @@ const AuthPage = () => {
                     placeholder="Enter your password"
                     required
                     disabled={isLoading}
+                    style={{
+                      backgroundColor: 'hsl(215, 45%, 20%)',
+                      borderColor: 'hsl(215, 45%, 20%)',
+                      color: 'hsl(210, 40%, 95%)'
+                    }}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full" disabled={isLoading} style={{
+                  backgroundColor: '#1EAEDB',
+                  color: 'hsl(215, 45%, 12%)',
+                  borderColor: '#1EAEDB'
+                }}>
                   <LogIn className="mr-2 h-4 w-4" />
                   {isLoading ? 'Signing in...' : 'Sign In'}
                 </Button>
@@ -111,7 +135,7 @@ const AuthPage = () => {
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email" style={{ color: 'hsl(210, 40%, 95%)' }}>Email</Label>
                   <Input
                     id="signup-email"
                     type="email"
@@ -121,10 +145,15 @@ const AuthPage = () => {
                     placeholder="Enter your email"
                     required
                     disabled={isLoading}
+                    style={{
+                      backgroundColor: 'hsl(215, 45%, 20%)',
+                      borderColor: 'hsl(215, 45%, 20%)',
+                      color: 'hsl(210, 40%, 95%)'
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password" style={{ color: 'hsl(210, 40%, 95%)' }}>Password</Label>
                   <Input
                     id="signup-password"
                     type="password"
@@ -135,6 +164,11 @@ const AuthPage = () => {
                     required
                     disabled={isLoading}
                     minLength={6}
+                    style={{
+                      backgroundColor: 'hsl(215, 45%, 20%)',
+                      borderColor: 'hsl(215, 45%, 20%)',
+                      color: 'hsl(210, 40%, 95%)'
+                    }}
                   />
                 </div>
                 <div className="flex items-center space-x-2">
@@ -144,7 +178,7 @@ const AuthPage = () => {
                     onCheckedChange={(checked) => setNotBot(checked as boolean)}
                     disabled={isLoading}
                   />
-                  <Label htmlFor="not-bot" className="text-sm font-normal">
+                  <Label htmlFor="not-bot" className="text-sm font-normal" style={{ color: 'hsl(210, 40%, 95%)' }}>
                     I am not a robot
                   </Label>
                 </div>
@@ -152,6 +186,11 @@ const AuthPage = () => {
                   type="submit" 
                   className="w-full" 
                   disabled={isLoading || !notBot}
+                  style={{
+                    backgroundColor: '#1EAEDB',
+                    color: 'hsl(215, 45%, 12%)',
+                    borderColor: '#1EAEDB'
+                  }}
                 >
                   <UserPlus className="mr-2 h-4 w-4" />
                   {isLoading ? 'Creating account...' : 'Create Account'}
