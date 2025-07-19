@@ -47,7 +47,7 @@ class EncryptionManager {
     return this.deviceFingerprint;
   }
 
-  // Generate deterministic encryption key from user ID and device fingerprint
+  // Generate deterministic encryption key from user ID only (device-independent)
   async generateKey(userId: string): Promise<CryptoKey> {
     if (this.key && this.keyGenerated) {
       return this.key;
@@ -73,9 +73,8 @@ class EncryptionManager {
       }
     }
 
-    // Generate deterministic key based on userId + device fingerprint
-    const deviceFingerprint = await this.getDeviceFingerprint();
-    const keyMaterial = userId + '|' + deviceFingerprint;
+    // Generate deterministic key based on userId only (works across devices)
+    const keyMaterial = userId + '|noteily-2024';
     
     const encoder = new TextEncoder();
     const keyData = encoder.encode(keyMaterial);
