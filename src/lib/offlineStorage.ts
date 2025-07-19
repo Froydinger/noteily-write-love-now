@@ -9,7 +9,7 @@ export class OfflineStorage {
   async saveNotes(notes: Note[], userId: string): Promise<void> {
     try {
       const notesData = JSON.stringify(notes);
-      const encrypted = await encryptionManager.encrypt(notesData, userId);
+      const encrypted = await encryptionManager.encryptLegacy(notesData, userId);
       localStorage.setItem(this.getStorageKey(userId), encrypted);
       localStorage.setItem(`${this.getStorageKey(userId)}_timestamp`, Date.now().toString());
     } catch (error) {

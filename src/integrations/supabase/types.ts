@@ -18,7 +18,10 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string
+          encrypted_content: string | null
+          encryption_metadata: Json | null
           id: string
+          is_encrypted: boolean | null
           title: string
           updated_at: string
           user_id: string
@@ -26,7 +29,10 @@ export type Database = {
         Insert: {
           content?: string | null
           created_at?: string
+          encrypted_content?: string | null
+          encryption_metadata?: Json | null
           id?: string
+          is_encrypted?: boolean | null
           title?: string
           updated_at?: string
           user_id: string
@@ -34,7 +40,10 @@ export type Database = {
         Update: {
           content?: string | null
           created_at?: string
+          encrypted_content?: string | null
+          encryption_metadata?: Json | null
           id?: string
+          is_encrypted?: boolean | null
           title?: string
           updated_at?: string
           user_id?: string
