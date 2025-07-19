@@ -77,7 +77,7 @@ const SettingsPage = () => {
     },
     {
       question: "How do I format text in my notes?",
-      answer: "Select text to see formatting options like bold, italic, and more. Use the formatting toolbar for quick styling."
+      answer: "Select text to see your device's formatting options like bold, italic, and more. Most devices support native text formatting when you select text."
     },
     {
       question: "Is my data secure and private?",
@@ -228,6 +228,38 @@ ${note.content}
             )}
           </div>
 
+
+          <div className="bg-card rounded-lg p-4 border">
+            <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
+              <HelpCircle className="h-5 w-5" />
+              FAQ
+            </h2>
+            <Accordion type="single" collapsible className="w-full">
+              {faqItems.map((item, index) => (
+                <AccordionItem key={index} value={`item-${index}`} className="border-b last:border-b-0">
+                  <AccordionTrigger className="text-sm font-medium text-left py-3 hover:no-underline">
+                    {item.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground pb-3">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+          
+          <div className="bg-card rounded-lg p-4 border">
+            <h2 className="text-lg font-medium mb-3 font-serif">About Noteily</h2>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Noteily - "Write What You Love" is a minimalist notes app focused on creative expression and passionate writing.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Version 2.0.5
+              </p>
+            </div>
+          </div>
+
           {user && (
             <div className="bg-card rounded-lg p-4 border">
               <h2 className="text-lg font-medium mb-3 font-serif">Data Management</h2>
@@ -282,37 +314,6 @@ ${note.content}
               </div>
             </div>
           )}
-
-          <div className="bg-card rounded-lg p-4 border">
-            <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
-              <HelpCircle className="h-5 w-5" />
-              FAQ
-            </h2>
-            <Accordion type="single" collapsible className="w-full">
-              {faqItems.map((item, index) => (
-                <AccordionItem key={index} value={`item-${index}`} className="border-b last:border-b-0">
-                  <AccordionTrigger className="text-sm font-medium text-left py-3 hover:no-underline">
-                    {item.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground pb-3">
-                    {item.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-          
-          <div className="bg-card rounded-lg p-4 border">
-            <h2 className="text-lg font-medium mb-3 font-serif">About Noteily</h2>
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Noteily - "Write What You Love" is a minimalist notes app focused on creative expression and passionate writing.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Version 2.0.1
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
