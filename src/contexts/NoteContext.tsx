@@ -321,15 +321,23 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           let content = note.content;
           
           // If note is marked as encrypted, decrypt it
-          if (note.is_encrypted && note.encrypted_content) {
+          if (note.is_encrypted) {
             try {
-              const decryptedTitle = await encryptionManager.decrypt(note.title, user!.id, note.encryption_metadata as any);
-              const decryptedContent = await encryptionManager.decrypt(note.encrypted_content, user!.id, note.encryption_metadata as any);
-              title = decryptedTitle;
-              content = decryptedContent;
+              // Decrypt title
+              title = await encryptionManager.decrypt(note.title, user!.id, note.encryption_metadata as any);
+              
+              // Decrypt content - handle both encrypted_content and fallback to content field
+              const contentToDecrypt = note.encrypted_content || note.content || '';
+              if (contentToDecrypt) {
+                content = await encryptionManager.decrypt(contentToDecrypt, user!.id, note.encryption_metadata as any);
+              } else {
+                content = '';
+              }
             } catch (error) {
-              console.error('Failed to decrypt note:', error);
-              // Keep original values if decryption fails
+              console.error('Failed to decrypt note:', note.id, error);
+              // If decryption fails completely, fall back to showing it's encrypted
+              title = '[Encrypted Note - Unable to Decrypt]';
+              content = '[Content encrypted and cannot be decrypted. This may be due to a different device or corrupted data.]';
             }
           } else if (!note.is_encrypted) {
             // Migrate unencrypted note to encrypted format
