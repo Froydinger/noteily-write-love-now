@@ -4,19 +4,24 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNotes } from '@/contexts/NoteContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, User, HelpCircle } from 'lucide-react';
+import { LogOut, User, HelpCircle, Download, Trash2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 
 const SettingsPage = () => {
   const [currentTheme, setCurrentTheme] = useState('navy');
+  const [isDeleting, setIsDeleting] = useState(false);
   const isMobile = useIsMobile();
   const { state } = useSidebar();
   const { toast } = useToast();
   const { user, signOut } = useAuth();
+  const { notes } = useNotes();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,6 +85,92 @@ const SettingsPage = () => {
     }
   ];
 
+  const handleExportNotes = () => {
+    if (!notes.length) {
+      toast({
+        title: "No notes to export",
+        description: "You don't have any notes to export yet.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create a formatted text content with all notes
+    const exportContent = notes.map(note => {
+      const createdDate = new Date(note.createdAt).toLocaleDateString();
+      const updatedDate = new Date(note.updatedAt).toLocaleDateString();
+      
+      return `
+=====================================
+Title: ${note.title}
+Created: ${createdDate}
+Updated: ${updatedDate}
+=====================================
+
+${note.content}
+
+`;
+    }).join('\n');
+
+    // Create blob and download
+    const blob = new Blob([exportContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `noteily-export-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Notes exported",
+      description: `Successfully exported ${notes.length} notes to a text file.`,
+    });
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    
+    setIsDeleting(true);
+    
+    try {
+      // First delete all user's notes
+      const { error: notesError } = await supabase
+        .from('notes')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (notesError) {
+        throw notesError;
+      }
+
+      // Sign out the user which will clear their session
+      await signOut();
+
+      // Clear local storage
+      localStorage.clear();
+      
+      toast({
+        title: "Account deleted",
+        description: "Your account and all data have been permanently deleted.",
+      });
+      
+      // Navigate to auth page
+      navigate('/auth');
+      
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Error deleting account",
+        description: error.message || "Failed to delete account. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="p-3 md:p-6 animate-fade-in min-h-screen">
       <div className="flex items-center gap-2 mb-6">
@@ -136,6 +227,61 @@ const SettingsPage = () => {
               </div>
             )}
           </div>
+
+          {user && (
+            <div className="bg-card rounded-lg p-4 border">
+              <h2 className="text-lg font-medium mb-3 font-serif">Data Management</h2>
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button 
+                    onClick={handleExportNotes} 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Export Notes
+                  </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        className="flex-1"
+                        disabled={isDeleting}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {isDeleting ? "Deleting..." : "Delete Account"}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete your account and remove all your notes from our servers.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={handleDeleteAccount}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Yes, delete my account
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+                
+                <div className="text-xs text-muted-foreground">
+                  <p><strong>Export Notes:</strong> Download all your notes as a single text file.</p>
+                  <p><strong>Delete Account:</strong> Permanently remove your account and all associated data.</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="bg-card rounded-lg p-4 border">
             <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
