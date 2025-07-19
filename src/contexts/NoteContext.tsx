@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { offlineStorage } from '@/lib/offlineStorage';
-import { encryptionManager } from '@/lib/encryption';
 
 export type Note = {
   id: string;
@@ -315,58 +314,13 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         }
       } else {
-        // Decrypt notes from Supabase and migrate unencrypted notes
-        const formattedNotes = await Promise.all(data.map(async note => {
-          let title = note.title;
-          let content = note.content;
-          
-          // If note is marked as encrypted, decrypt it
-          if (note.is_encrypted) {
-            try {
-              // Decrypt title
-              title = await encryptionManager.decrypt(note.title, user!.id, note.encryption_metadata as any);
-              
-              // Decrypt content - handle both encrypted_content and fallback to content field
-              const contentToDecrypt = note.encrypted_content || note.content || '';
-              if (contentToDecrypt) {
-                content = await encryptionManager.decrypt(contentToDecrypt, user!.id, note.encryption_metadata as any);
-              } else {
-                content = '';
-              }
-            } catch (error) {
-              console.error('Failed to decrypt note:', note.id, error);
-              // If decryption fails completely, fall back to showing it's encrypted
-              title = '[Encrypted Note - Unable to Decrypt]';
-              content = '[Content encrypted and cannot be decrypted. This may be due to a different device or corrupted data.]';
-            }
-          } else if (!note.is_encrypted) {
-            // Migrate unencrypted note to encrypted format
-            try {
-              const encryptedTitle = await encryptionManager.encrypt(note.title, user!.id);
-              const encryptedContent = await encryptionManager.encrypt(note.content, user!.id);
-              
-              // Update in database
-              await supabase
-                .from('notes')
-                .update({
-                  title: encryptedTitle.encryptedContent,
-                  encrypted_content: encryptedContent.encryptedContent,
-                  encryption_metadata: encryptedContent.metadata as any,
-                  is_encrypted: true
-                })
-                .eq('id', note.id);
-            } catch (error) {
-              console.error('Failed to encrypt existing note:', error);
-            }
-          }
-          
-          return {
-            id: note.id,
-            title,
-            content,
-            createdAt: note.created_at,
-            updatedAt: note.updated_at,
-          };
+        // Format notes from Supabase
+        const formattedNotes: Note[] = data.map(note => ({
+          id: note.id,
+          title: note.title,
+          content: note.content || '',
+          createdAt: note.created_at,
+          updatedAt: note.updated_at,
         }));
         
         setNotes(formattedNotes);
@@ -441,18 +395,12 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setNotes(prevNotes => [tempNote, ...prevNotes]);
 
     try {
-      // Encrypt note data before sending to Supabase
-      const encryptedTitle = await encryptionManager.encrypt(tempNote.title, user.id);
-      const encryptedContent = await encryptionManager.encrypt(tempNote.content, user.id);
-
       const { data, error } = await supabase
         .from('notes')
         .insert({
           user_id: user.id,
-          title: encryptedTitle.encryptedContent,
-          encrypted_content: encryptedContent.encryptedContent,
-          encryption_metadata: encryptedContent.metadata as any,
-          is_encrypted: true,
+          title: tempNote.title,
+          content: tempNote.content,
         })
         .select()
         .single();
@@ -529,22 +477,15 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      // Encrypt updates before sending to Supabase
       const updateData: any = {};
       
       if (updates.title !== undefined) {
-        const encryptedTitle = await encryptionManager.encrypt(updates.title, user.id);
-        updateData.title = encryptedTitle.encryptedContent;
-        updateData.encryption_metadata = encryptedTitle.metadata as any;
+        updateData.title = updates.title;
       }
       
       if (updates.content !== undefined) {
-        const encryptedContent = await encryptionManager.encrypt(updates.content, user.id);
-        updateData.encrypted_content = encryptedContent.encryptedContent;
-        updateData.encryption_metadata = encryptedContent.metadata as any;
+        updateData.content = updates.content;
       }
-      
-      updateData.is_encrypted = true;
 
       const { error } = await supabase
         .from('notes')
