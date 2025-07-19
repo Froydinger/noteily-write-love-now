@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNotes, Note } from '@/contexts/NoteContext';
+import DOMPurify from 'dompurify';
 
 interface NoteEditorProps {
   note: Note;
@@ -15,7 +16,9 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   useEffect(() => {
     setTitle(note.title);
     if (contentRef.current) {
-      contentRef.current.innerHTML = note.content;
+      // Sanitize content to prevent XSS attacks
+      const sanitizedContent = DOMPurify.sanitize(note.content);
+      contentRef.current.innerHTML = sanitizedContent;
     }
   }, [note.id]);
 
