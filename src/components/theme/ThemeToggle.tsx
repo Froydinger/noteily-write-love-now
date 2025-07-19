@@ -43,7 +43,7 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
   }, []);
   
   const toggleTheme = () => {
-    const themeOrder: Theme[] = ['light', 'dark', 'navy', 'sepia'];
+    const themeOrder: Theme[] = ['navy', 'dark', 'light', 'sepia'];
     const currentIndex = themeOrder.indexOf(currentTheme);
     const nextTheme = themeOrder[(currentIndex + 1) % themeOrder.length];
     
