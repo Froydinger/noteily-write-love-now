@@ -216,15 +216,27 @@ const AuthPage = () => {
 
                 <Button 
                   type="button"
-                  variant="outline"
                   className="w-full"
                   onClick={handleGoogleSignIn}
                   disabled={isLoading}
                   style={{
-                    backgroundColor: 'transparent !important',
+                    backgroundColor: '#ffffff !important',
                     borderColor: 'hsl(215, 45%, 20%) !important',
-                    color: 'hsl(210, 40%, 95%) !important',
-                    border: '1px solid hsl(215, 45%, 20%) !important'
+                    color: '#374151 !important',
+                    border: '1px solid hsl(215, 45%, 20%) !important',
+                    fontWeight: '500 !important'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = '#f9fafb !important';
+                      e.currentTarget.style.color = '#374151 !important';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = '#ffffff !important';
+                      e.currentTarget.style.color = '#374151 !important';
+                    }
                   }}
                 >
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -352,15 +364,27 @@ const AuthPage = () => {
 
                 <Button 
                   type="button"
-                  variant="outline"
                   className="w-full"
                   onClick={handleGoogleSignIn}
                   disabled={isLoading}
                   style={{
-                    backgroundColor: 'transparent !important',
+                    backgroundColor: '#ffffff !important',
                     borderColor: 'hsl(215, 45%, 20%) !important',
-                    color: 'hsl(210, 40%, 95%) !important',
-                    border: '1px solid hsl(215, 45%, 20%) !important'
+                    color: '#374151 !important',
+                    border: '1px solid hsl(215, 45%, 20%) !important',
+                    fontWeight: '500 !important'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = '#f9fafb !important';
+                      e.currentTarget.style.color = '#374151 !important';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = '#ffffff !important';
+                      e.currentTarget.style.color = '#374151 !important';
+                    }
                   }}
                 >
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
