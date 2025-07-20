@@ -71,12 +71,14 @@ const TermsPage = () => {
                 You agree not to use Noteily to:
               </p>
               <ul className="list-disc pl-6 mb-4">
-                <li>Store illegal, harmful, or offensive content</li>
-                <li>Violate any laws or regulations</li>
+                <li>Violate any applicable laws or regulations</li>
                 <li>Interfere with or disrupt our service</li>
                 <li>Attempt to gain unauthorized access to our systems</li>
                 <li>Share your account with others</li>
               </ul>
+              <p className="mb-4">
+                We don't monitor or judge the content of your notes. Your notes are private and we respect your freedom to write whatever you want, as long as it doesn't violate the law.
+              </p>
 
               <h2 className="text-xl font-semibold mb-3 mt-6">Your Content</h2>
               <p className="mb-4">
