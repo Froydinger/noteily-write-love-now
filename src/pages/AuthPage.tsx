@@ -68,37 +68,36 @@ const AuthPage = () => {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4" 
+      className="min-h-screen flex items-center justify-center p-4 bg-background" 
       style={{
-        background: 'linear-gradient(180deg, hsl(215, 55%, 18%) 0%, hsl(218, 50%, 14%) 30%, hsl(220, 55%, 10%) 70%, hsl(222, 60%, 7%) 100%) !important',
+        background: 'linear-gradient(180deg, hsl(215, 55%, 18%) 0%, hsl(218, 50%, 14%) 30%, hsl(220, 55%, 10%) 70%, hsl(222, 60%, 7%) 100%)',
         backgroundAttachment: 'fixed',
-        backgroundColor: 'hsl(215, 45%, 12%) !important'
+        backgroundColor: 'hsl(215, 45%, 12%)'
       }}
     >
       <Card 
-        className="w-full max-w-md border-0" 
+        className="w-full max-w-md border-0 bg-card text-card-foreground" 
         style={{
-          backgroundColor: 'hsl(215, 45%, 14%) !important',
-          border: 'none !important',
-          boxShadow: 'none !important',
-          color: 'hsl(210, 40%, 95%) !important'
+          backgroundColor: 'hsl(215, 45%, 14%)',
+          border: 'none',
+          boxShadow: 'none'
         }}
       >
-        <CardHeader className="text-center" style={{ backgroundColor: 'transparent !important', color: 'hsl(210, 40%, 95%) !important' }}>
+        <CardHeader className="text-center bg-transparent text-card-foreground">
           <div className="flex justify-center mb-4">
-            <Heart className="h-8 w-8" style={{ color: '#1EAEDB' }} />
+            <Heart className="h-8 w-8 text-accent" />
           </div>
-          <CardTitle className="text-2xl font-serif" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Welcome to Noteily</CardTitle>
-          <CardDescription style={{ color: 'hsl(210, 20%, 70%) !important' }}>
+          <CardTitle className="text-2xl font-serif text-card-foreground">Welcome to Noteily</CardTitle>
+          <CardDescription className="text-muted-foreground">
             {currentStep === 'email' ? 'Sign in to sync your notes across all devices' : `Continue as ${email}`}
           </CardDescription>
         </CardHeader>
-        <CardContent style={{ backgroundColor: 'transparent !important' }}>
+        <CardContent className="bg-transparent">
           {currentStep === 'email' ? (
             // Step 1: Email input + Google
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Email</Label>
+                <Label htmlFor="email" className="text-card-foreground">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -107,7 +106,7 @@ const AuthPage = () => {
                   autoComplete="email"
                   placeholder="Enter your email"
                   disabled={isLoading}
-                  className="border-0 focus:ring-0 focus:border-0"
+                  className="border-0 focus:ring-0 focus:border-0 bg-input text-foreground"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -115,36 +114,28 @@ const AuthPage = () => {
                     }
                   }}
                   style={{
-                    backgroundColor: 'hsl(215, 45%, 20%) !important',
-                    border: 'none !important',
-                    outline: 'none !important',
-                    boxShadow: 'none !important',
-                    color: 'hsl(210, 40%, 95%) !important'
+                    backgroundColor: 'hsl(215, 45%, 20%)',
+                    border: 'none',
+                    outline: 'none',
+                    boxShadow: 'none'
                   }}
                 />
               </div>
               <Button 
                 type="button"
                 onClick={handleEmailSubmit}
-                className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
+                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground border-accent" 
                 disabled={isLoading || !email}
-                style={{
-                  backgroundColor: '#1EAEDB !important',
-                  color: '#ffffff !important',
-                  borderColor: '#1EAEDB !important',
-                  border: '1px solid #1EAEDB !important',
-                  fontWeight: '600 !important'
-                }}
               >
                 Continue
               </Button>
               
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" style={{ borderColor: 'hsl(215, 45%, 20%) !important' }} />
+                  <span className="w-full border-t border-border" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="px-2" style={{ backgroundColor: 'hsl(215, 45%, 14%) !important', color: 'hsl(210, 20%, 70%) !important' }}>
+                  <span className="px-2 bg-card text-muted-foreground">
                     Or continue with
                   </span>
                 </div>
@@ -152,17 +143,9 @@ const AuthPage = () => {
 
               <Button 
                 type="button"
-                className="w-full border-0 focus:ring-0 focus:border-0"
+                className="w-full border-0 bg-transparent text-card-foreground hover:bg-secondary/50"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
-                style={{
-                  backgroundColor: 'transparent !important',
-                  border: 'none !important',
-                  outline: 'none !important',
-                  boxShadow: 'none !important',
-                  color: 'hsl(210, 40%, 95%) !important',
-                  fontWeight: '500 !important'
-                }}
               >
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -181,14 +164,7 @@ const AuthPage = () => {
                   type="button"
                   onClick={handleBack}
                   disabled={isLoading}
-                  style={{
-                    backgroundColor: 'transparent !important',
-                    border: 'none !important',
-                    color: 'hsl(210, 40%, 95%) !important',
-                    padding: '0 !important',
-                    fontSize: '14px !important'
-                  }}
-                  className="hover:text-blue-400"
+                  className="bg-transparent border-0 text-card-foreground hover:text-accent p-0 text-sm"
                 >
                   ← Back
                 </Button>
@@ -196,7 +172,7 @@ const AuthPage = () => {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="password" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Password</Label>
+                  <Label htmlFor="password" className="text-card-foreground">Password</Label>
                   <Input
                     id="password"
                     type="password"
@@ -205,7 +181,7 @@ const AuthPage = () => {
                     autoComplete="current-password"
                     placeholder="Enter your password"
                     disabled={isLoading}
-                    className="border-0 focus:ring-0 focus:border-0"
+                    className="border-0 focus:ring-0 focus:border-0 bg-input text-foreground"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -213,26 +189,18 @@ const AuthPage = () => {
                       }
                     }}
                     style={{
-                      backgroundColor: 'hsl(215, 45%, 20%) !important',
-                      border: 'none !important',
-                      outline: 'none !important',
-                      boxShadow: 'none !important',
-                      color: 'hsl(210, 40%, 95%) !important'
+                      backgroundColor: 'hsl(215, 45%, 20%)',
+                      border: 'none',
+                      outline: 'none',
+                      boxShadow: 'none'
                     }}
                   />
                 </div>
                 <Button 
                   type="button"
                   onClick={handleSignIn}
-                  className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
+                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground border-accent" 
                   disabled={isLoading || !password}
-                  style={{
-                    backgroundColor: '#1EAEDB !important',
-                    color: '#ffffff !important',
-                    borderColor: '#1EAEDB !important',
-                    border: '1px solid #1EAEDB !important',
-                    fontWeight: '600 !important'
-                  }}
                 >
                   {isLoading ? 'Continuing...' : 'Continue'}
                 </Button>
