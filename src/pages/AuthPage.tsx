@@ -81,9 +81,9 @@ const AuthPage = () => {
         className="w-full max-w-md" 
         style={{
           backgroundColor: 'hsl(215, 45%, 14%) !important',
-          borderColor: 'hsl(215, 45%, 20%) !important',
+          borderColor: 'transparent !important',
           color: 'hsl(210, 40%, 95%) !important',
-          border: '1px solid hsl(215, 45%, 20%) !important'
+          border: '1px solid transparent !important'
         }}
       >
         <CardHeader className="text-center" style={{ backgroundColor: 'transparent !important', color: 'hsl(210, 40%, 95%) !important' }}>
@@ -157,9 +157,9 @@ const AuthPage = () => {
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
                 style={{
-                  backgroundColor: '#ffffff !important',
+                  backgroundColor: 'transparent !important',
                   borderColor: 'hsl(215, 45%, 20%) !important',
-                  color: '#374151 !important',
+                  color: 'hsl(210, 40%, 95%) !important',
                   border: '1px solid hsl(215, 45%, 20%) !important',
                   fontWeight: '500 !important'
                 }}
@@ -197,31 +197,18 @@ const AuthPage = () => {
               <div className="flex gap-2 mb-4">
                 <Button
                   type="button"
-                  onClick={() => setAuthMode('password')}
-                  className="flex-1"
-                  style={{
-                    backgroundColor: authMode === 'password' ? '#1EAEDB !important' : 'transparent !important',
-                    borderColor: '#1EAEDB !important',
-                    color: authMode === 'password' ? '#ffffff !important' : '#1EAEDB !important',
-                    border: '1px solid #1EAEDB !important',
-                    fontWeight: '500 !important'
-                  }}
-                >
-                  Password
-                </Button>
-                <Button
-                  type="button"
                   onClick={() => setAuthMode('magic')}
-                  className="flex-1"
+                  disabled={isLoading}
                   style={{
-                    backgroundColor: authMode === 'magic' ? '#1EAEDB !important' : 'transparent !important',
-                    borderColor: '#1EAEDB !important',
-                    color: authMode === 'magic' ? '#ffffff !important' : '#1EAEDB !important',
-                    border: '1px solid #1EAEDB !important',
-                    fontWeight: '500 !important'
+                    backgroundColor: 'transparent !important',
+                    border: 'none !important',
+                    color: 'hsl(210, 40%, 95%) !important',
+                    padding: '0 !important',
+                    fontSize: '14px !important'
                   }}
+                  className="hover:text-blue-400"
                 >
-                  Magic Link
+                  Send magic link instead
                 </Button>
               </div>
 
@@ -243,13 +230,13 @@ const AuthPage = () => {
                           handleSignIn();
                         }
                       }}
-                      style={{
-                        backgroundColor: 'hsl(215, 45%, 20%) !important',
-                        borderColor: 'transparent !important',
-                        color: 'hsl(210, 40%, 95%) !important',
-                        border: 'none !important',
-                        outline: 'none !important'
-                      }}
+                        style={{
+                          backgroundColor: 'hsl(215, 45%, 20%) !important',
+                          borderColor: 'transparent !important',
+                          color: 'hsl(210, 40%, 95%) !important',
+                          border: 'none !important',
+                          outline: 'none !important'
+                        }}
                     />
                   </div>
                   <Button 
