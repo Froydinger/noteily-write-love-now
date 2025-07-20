@@ -10,13 +10,16 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotes } from '@/contexts/NoteContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, User, HelpCircle, Download, Trash2 } from 'lucide-react';
+import { LogOut, User, HelpCircle, Download, Trash2, Key } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from '@/components/theme/ThemeToggle';
+import { Input } from '@/components/ui/input';
 
 const SettingsPage = () => {
   const [currentTheme, setCurrentTheme] = useState('navy');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
   const isMobile = useIsMobile();
   const { state } = useSidebar();
   const { toast } = useToast();
@@ -129,6 +132,53 @@ ${note.content}
     });
   };
 
+  const handleChangePassword = async () => {
+    if (!newPassword.trim()) {
+      toast({
+        title: "Password required",
+        description: "Please enter a new password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setNewPassword('');
+      toast({
+        title: "Password updated",
+        description: "Your password has been successfully changed.",
+      });
+    } catch (error: any) {
+      console.error('Error changing password:', error);
+      toast({
+        title: "Error changing password",
+        description: error.message || "Failed to change password. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
   const handleDeleteAccount = async () => {
     if (!user) return;
     
@@ -203,7 +253,7 @@ ${note.content}
           <div className="bg-card rounded-lg p-4 border">
             <h2 className="text-lg font-medium mb-3 font-serif">Account</h2>
             {user ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   <div className="min-w-0 flex-1">
@@ -211,6 +261,34 @@ ${note.content}
                     <p className="text-xs text-muted-foreground">Signed in</p>
                   </div>
                 </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Key className="h-4 w-4 text-muted-foreground" />
+                    <Label htmlFor="new-password" className="text-sm font-medium">Change Password</Label>
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      id="new-password"
+                      type="password"
+                      placeholder="Enter new password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button 
+                      onClick={handleChangePassword} 
+                      size="sm" 
+                      disabled={isChangingPassword || !newPassword.trim()}
+                    >
+                      {isChangingPassword ? "Updating..." : "Update"}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Password must be at least 6 characters long
+                  </p>
+                </div>
+                
                 <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
