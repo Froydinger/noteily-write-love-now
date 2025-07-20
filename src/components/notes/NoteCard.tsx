@@ -29,7 +29,7 @@ export default function NoteCard({ note }: NoteCardProps) {
       onClick={handleClick}
     >
       <CardContent className="p-4">
-        <h3 className="font-medium text-lg mb-2 font-serif">{note.title || "Untitled Note"}</h3>
+        <h3 className="font-medium text-lg mb-2 font-serif break-words overflow-wrap-anywhere leading-tight">{note.title || "Untitled Note"}</h3>
         <p className="text-sm text-muted-foreground line-clamp-4">{truncatedContent}</p>
       </CardContent>
       <CardFooter className="p-4 pt-0 text-xs text-muted-foreground">
