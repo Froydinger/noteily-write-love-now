@@ -94,8 +94,8 @@ const AuthPage = () => {
           <div className="flex justify-center mb-4">
             <Heart className="h-8 w-8 text-accent" />
           </div>
-          <CardTitle className="text-2xl font-serif text-card-foreground">Welcome to Noteily</CardTitle>
-          <CardDescription className="text-muted-foreground">
+          <CardTitle className="text-2xl font-serif text-white">Welcome to Noteily</CardTitle>
+          <CardDescription className="text-gray-300">
             {currentStep === 'email' ? 'Sign in to sync your notes across all devices' : `Continue as ${email}`}
           </CardDescription>
         </CardHeader>
@@ -104,7 +104,7 @@ const AuthPage = () => {
             // Step 1: Email input + Google
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-card-foreground">Email</Label>
+                <Label htmlFor="email" className="text-white">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -142,7 +142,7 @@ const AuthPage = () => {
                   <span className="w-full border-t border-border" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="px-2 bg-card text-muted-foreground">
+                  <span className="px-2 bg-card text-gray-300">
                     Or continue with
                   </span>
                 </div>
@@ -150,7 +150,7 @@ const AuthPage = () => {
 
               <Button 
                 type="button"
-                className="w-full border-0 bg-transparent text-card-foreground hover:bg-secondary/50"
+                className="w-full border-0 bg-transparent text-white hover:bg-secondary/50"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
               >
@@ -171,7 +171,7 @@ const AuthPage = () => {
                   type="button"
                   onClick={handleBack}
                   disabled={isLoading}
-                  className="bg-transparent border-0 text-card-foreground hover:text-accent p-0 text-sm"
+                  className="bg-transparent border-0 text-white hover:text-accent p-0 text-sm"
                 >
                   ← Back
                 </Button>
@@ -179,7 +179,7 @@ const AuthPage = () => {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-card-foreground">Password</Label>
+                  <Label htmlFor="password" className="text-white">Password</Label>
                   <Input
                     id="password"
                     type="password"
