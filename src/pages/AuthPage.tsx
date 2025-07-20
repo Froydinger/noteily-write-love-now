@@ -68,7 +68,7 @@ const AuthPage = () => {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4 bg-background" 
+      className="min-h-screen flex items-center justify-center p-4 navy bg-background" 
       style={{
         background: 'linear-gradient(180deg, hsl(215, 55%, 18%) 0%, hsl(218, 50%, 14%) 30%, hsl(220, 55%, 10%) 70%, hsl(222, 60%, 7%) 100%)',
         backgroundAttachment: 'fixed',
