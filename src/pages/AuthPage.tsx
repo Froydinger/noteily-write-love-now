@@ -5,17 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Checkbox } from '@/components/ui/checkbox';
-import { LogIn, UserPlus, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [currentStep, setCurrentStep] = useState<'email' | 'auth'>('email');
-  const [authMode, setAuthMode] = useState<'password' | 'magic'>('password');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp, signInWithGoogle, signInWithMagicLink, user } = useAuth();
+  const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already logged in
@@ -58,14 +55,6 @@ const AuthPage = () => {
       // the error toast will already be shown by the signIn function
     }
     
-    setIsLoading(false);
-  };
-
-  const handleMagicLink = async () => {
-    if (!email) return;
-
-    setIsLoading(true);
-    await signInWithMagicLink(email);
     setIsLoading(false);
   };
 
@@ -188,7 +177,7 @@ const AuthPage = () => {
               </Button>
             </div>
           ) : (
-            // Step 2: Password or Magic Link
+            // Step 2: Password
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-4">
                 <Button
@@ -208,95 +197,49 @@ const AuthPage = () => {
                 </Button>
               </div>
 
-              <div className="flex gap-2 mb-4">
-                <Button
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="password" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                    placeholder="Enter your password"
+                    disabled={isLoading}
+                    className="border-0 focus:ring-0 focus:border-0"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSignIn();
+                      }
+                    }}
+                    style={{
+                      backgroundColor: 'hsl(215, 45%, 20%) !important',
+                      border: 'none !important',
+                      outline: 'none !important',
+                      boxShadow: 'none !important',
+                      color: 'hsl(210, 40%, 95%) !important'
+                    }}
+                  />
+                </div>
+                <Button 
                   type="button"
-                  onClick={() => setAuthMode('magic')}
-                  disabled={isLoading}
+                  onClick={handleSignIn}
+                  className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
+                  disabled={isLoading || !password}
                   style={{
-                    backgroundColor: 'transparent !important',
-                    border: 'none !important',
-                    color: 'hsl(210, 40%, 95%) !important',
-                    padding: '0 !important',
-                    fontSize: '14px !important'
+                    backgroundColor: '#1EAEDB !important',
+                    color: '#ffffff !important',
+                    borderColor: '#1EAEDB !important',
+                    border: '1px solid #1EAEDB !important',
+                    fontWeight: '600 !important'
                   }}
-                  className="hover:text-blue-400"
                 >
-                  Send magic link instead
+                  {isLoading ? 'Continuing...' : 'Continue'}
                 </Button>
               </div>
-
-              {authMode === 'password' ? (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="password" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Password</Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        autoComplete="current-password"
-                        placeholder="Enter your password"
-                        disabled={isLoading}
-                        className="border-0 focus:ring-0 focus:border-0"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleSignIn();
-                          }
-                        }}
-                        style={{
-                          backgroundColor: 'hsl(215, 45%, 20%) !important',
-                          border: 'none !important',
-                          outline: 'none !important',
-                          boxShadow: 'none !important',
-                          color: 'hsl(210, 40%, 95%) !important'
-                        }}
-                    />
-                  </div>
-                      <Button 
-                        type="button"
-                        onClick={handleSignIn}
-                        className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
-                        disabled={isLoading || !password}
-                        style={{
-                          backgroundColor: '#1EAEDB !important',
-                          color: '#ffffff !important',
-                          borderColor: '#1EAEDB !important',
-                          border: '1px solid #1EAEDB !important',
-                          fontWeight: '600 !important'
-                        }}
-                      >
-                        {isLoading ? 'Continuing...' : 'Continue'}
-                      </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="text-center space-y-2">
-                    <p style={{ color: 'hsl(210, 40%, 95%) !important' }}>
-                      We'll send a magic link to
-                    </p>
-                    <p className="font-medium" style={{ color: '#1EAEDB !important' }}>
-                      {email}
-                    </p>
-                  </div>
-                  <Button 
-                    type="button"
-                    onClick={handleMagicLink}
-                    className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
-                    disabled={isLoading}
-                    style={{
-                      backgroundColor: '#1EAEDB !important',
-                      color: '#ffffff !important',
-                      borderColor: '#1EAEDB !important',
-                      border: '1px solid #1EAEDB !important',
-                      fontWeight: '600 !important'
-                    }}
-                  >
-                    {isLoading ? 'Sending...' : 'Send Magic Link'}
-                  </Button>
-                </div>
-              )}
             </div>
           )}
         </CardContent>
