@@ -19,6 +19,7 @@ const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const { signIn, signUp, signInWithGoogle, user, resetPassword } = useAuth();
   const navigate = useNavigate();
 
@@ -69,10 +70,13 @@ const AuthPage = () => {
     if (!resetEmail) return;
 
     setIsLoading(true);
-    await resetPassword(resetEmail);
+    const { error } = await resetPassword(resetEmail);
     setIsLoading(false);
-    setShowResetForm(false);
-    setResetEmail('');
+    
+    if (!error) {
+      setResetSent(true);
+      // Keep form open to show success state
+    }
   };
 
   return (
@@ -228,43 +232,76 @@ const AuthPage = () => {
                  </div>
 
                  {showResetForm && (
-                   <form onSubmit={handleResetPassword} className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'hsl(215, 45%, 16%) !important' }}>
-                     <div className="space-y-3">
-                       <Label htmlFor="reset-email" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Reset Password</Label>
-                       <Input
-                         id="reset-email"
-                         type="email"
-                         value={resetEmail}
-                         onChange={(e) => setResetEmail(e.target.value)}
-                         placeholder="Enter your email"
-                         required
-                         disabled={isLoading}
-                         style={{
-                           backgroundColor: 'hsl(215, 45%, 20%) !important',
-                           borderColor: 'transparent !important',
-                           color: 'hsl(210, 40%, 95%) !important',
-                           border: 'none !important',
-                           outline: 'none !important'
-                         }}
-                       />
-                       <div className="flex gap-2">
-                         <Button 
-                           type="submit" 
-                           className="flex-1"
+                   <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'hsl(215, 45%, 16%) !important' }}>
+                     {!resetSent ? (
+                       <form onSubmit={handleResetPassword} className="space-y-3">
+                         <Label htmlFor="reset-email" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Reset Password</Label>
+                         <Input
+                           id="reset-email"
+                           type="email"
+                           value={resetEmail}
+                           onChange={(e) => setResetEmail(e.target.value)}
+                           placeholder="Enter your email"
+                           required
                            disabled={isLoading}
                            style={{
-                             backgroundColor: '#1EAEDB !important',
-                             color: '#ffffff !important',
-                             fontWeight: '500 !important'
+                             backgroundColor: 'hsl(215, 45%, 20%) !important',
+                             borderColor: 'transparent !important',
+                             color: 'hsl(210, 40%, 95%) !important',
+                             border: 'none !important',
+                             outline: 'none !important'
                            }}
-                         >
-                           {isLoading ? 'Sending...' : 'Send Reset Email'}
-                         </Button>
+                         />
+                         <div className="flex gap-2">
+                           <Button 
+                             type="submit" 
+                             className="flex-1"
+                             disabled={isLoading}
+                             style={{
+                               backgroundColor: '#1EAEDB !important',
+                               color: '#ffffff !important',
+                               fontWeight: '500 !important'
+                             }}
+                           >
+                             {isLoading ? 'Sending...' : 'Send Reset Email'}
+                           </Button>
+                           <Button 
+                             type="button" 
+                             onClick={() => {
+                               setShowResetForm(false);
+                               setResetSent(false);
+                               setResetEmail('');
+                             }}
+                             className="flex-1"
+                             disabled={isLoading}
+                             style={{
+                               backgroundColor: 'transparent !important',
+                               borderColor: 'hsl(215, 45%, 30%) !important',
+                               color: 'hsl(210, 40%, 95%) !important',
+                               border: '1px solid hsl(215, 45%, 30%) !important'
+                             }}
+                           >
+                             Cancel
+                           </Button>
+                         </div>
+                       </form>
+                     ) : (
+                       <div className="text-center space-y-3">
+                         <div className="text-green-400 text-lg">✓</div>
+                         <div style={{ color: 'hsl(210, 40%, 95%) !important' }}>
+                           <strong>Check your email!</strong>
+                         </div>
+                         <p className="text-sm" style={{ color: 'hsl(210, 20%, 70%) !important' }}>
+                           We've sent password reset instructions to <strong>{resetEmail}</strong>
+                         </p>
                          <Button 
                            type="button" 
-                           onClick={() => setShowResetForm(false)}
-                           className="flex-1"
-                           disabled={isLoading}
+                           onClick={() => {
+                             setShowResetForm(false);
+                             setResetSent(false);
+                             setResetEmail('');
+                           }}
+                           className="w-full"
                            style={{
                              backgroundColor: 'transparent !important',
                              borderColor: 'hsl(215, 45%, 30%) !important',
@@ -272,11 +309,11 @@ const AuthPage = () => {
                              border: '1px solid hsl(215, 45%, 30%) !important'
                            }}
                          >
-                           Cancel
+                           Done
                          </Button>
                        </div>
-                     </div>
-                   </form>
+                     )}
+                   </div>
                  )}
                 
                  <div className="relative my-4">

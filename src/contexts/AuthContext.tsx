@@ -115,7 +115,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string) => {
     console.log('Reset password called for email:', email);
-    const redirectUrl = `${window.location.origin}/auth`;
+    // Use current page URL instead of /auth to avoid navigation
+    const redirectUrl = window.location.href;
     
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -130,12 +131,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: error.message,
           variant: "destructive",
         });
-      } else {
-        toast({
-          title: "Reset email sent",
-          description: "Check your email for password reset instructions",
-        });
       }
+      // Don't show success toast here - let the component handle it
       
       return { error };
     } catch (err) {
