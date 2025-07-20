@@ -67,15 +67,20 @@ const AuthPage = () => {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!resetEmail) return;
 
     setIsLoading(true);
-    const { error } = await resetPassword(resetEmail);
-    setIsLoading(false);
     
-    if (!error) {
-      setResetSent(true);
-      // Keep form open to show success state
+    try {
+      const { error } = await resetPassword(resetEmail);
+      if (!error) {
+        setResetSent(true);
+      }
+    } catch (err) {
+      console.error('Reset error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 

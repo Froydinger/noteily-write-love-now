@@ -115,13 +115,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string) => {
     console.log('Reset password called for email:', email);
-    // Use current page URL instead of /auth to avoid navigation
-    const redirectUrl = window.location.href;
     
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl,
-      });
+      // Don't use redirectTo to avoid any navigation
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
       
       console.log('Reset password result:', { error });
       
@@ -132,7 +129,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           variant: "destructive",
         });
       }
-      // Don't show success toast here - let the component handle it
       
       return { error };
     } catch (err) {
