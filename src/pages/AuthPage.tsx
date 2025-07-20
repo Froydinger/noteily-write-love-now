@@ -65,9 +65,7 @@ const AuthPage = () => {
     setIsLoading(false);
   };
 
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleResetPassword = async () => {
     if (!resetEmail) return;
 
     setIsLoading(true);
@@ -239,7 +237,7 @@ const AuthPage = () => {
                  {showResetForm && (
                    <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'hsl(215, 45%, 16%) !important' }}>
                      {!resetSent ? (
-                       <form onSubmit={handleResetPassword} className="space-y-3">
+                       <div className="space-y-3">
                          <Label htmlFor="reset-email" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Reset Password</Label>
                          <Input
                            id="reset-email"
@@ -247,8 +245,13 @@ const AuthPage = () => {
                            value={resetEmail}
                            onChange={(e) => setResetEmail(e.target.value)}
                            placeholder="Enter your email"
-                           required
                            disabled={isLoading}
+                           onKeyDown={(e) => {
+                             if (e.key === 'Enter') {
+                               e.preventDefault();
+                               handleResetPassword();
+                             }
+                           }}
                            style={{
                              backgroundColor: 'hsl(215, 45%, 20%) !important',
                              borderColor: 'transparent !important',
@@ -259,7 +262,8 @@ const AuthPage = () => {
                          />
                          <div className="flex gap-2">
                            <Button 
-                             type="submit" 
+                             type="button"
+                             onClick={handleResetPassword}
                              className="flex-1"
                              disabled={isLoading}
                              style={{
@@ -289,7 +293,7 @@ const AuthPage = () => {
                              Cancel
                            </Button>
                          </div>
-                       </form>
+                       </div>
                      ) : (
                        <div className="text-center space-y-3">
                          <div className="text-green-400 text-lg">✓</div>
