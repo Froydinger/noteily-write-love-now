@@ -17,10 +17,7 @@ const AuthPage = () => {
   const [notBot, setNotBot] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [showResetForm, setShowResetForm] = useState(false);
-  const [resetSent, setResetSent] = useState(false);
-  const { signIn, signUp, signInWithGoogle, user, resetPassword } = useAuth();
+  const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already logged in
@@ -63,23 +60,6 @@ const AuthPage = () => {
     setIsLoading(true);
     await signInWithGoogle();
     setIsLoading(false);
-  };
-
-  const handleResetPassword = async () => {
-    if (!resetEmail) return;
-
-    setIsLoading(true);
-    
-    try {
-      const { error } = await resetPassword(resetEmail);
-      if (!error) {
-        setResetSent(true);
-      }
-    } catch (err) {
-      console.error('Reset error:', err);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (
@@ -222,108 +202,6 @@ const AuthPage = () => {
                   <LogIn className="mr-2 h-4 w-4" style={{ color: '#ffffff !important' }} />
                   {isLoading ? 'Signing in...' : 'Sign In'}
                  </Button>
-                 
-                 <div className="text-center mt-3">
-                   <button
-                     type="button"
-                     onClick={() => setShowResetForm(!showResetForm)}
-                     className="text-sm text-blue-400 hover:text-blue-300 underline"
-                     disabled={isLoading}
-                   >
-                     Forgot your password?
-                   </button>
-                 </div>
-
-                 {showResetForm && (
-                   <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'hsl(215, 45%, 16%) !important' }}>
-                     {!resetSent ? (
-                       <div className="space-y-3">
-                         <Label htmlFor="reset-email" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Reset Password</Label>
-                         <Input
-                           id="reset-email"
-                           type="email"
-                           value={resetEmail}
-                           onChange={(e) => setResetEmail(e.target.value)}
-                           placeholder="Enter your email"
-                           disabled={isLoading}
-                           onKeyDown={(e) => {
-                             if (e.key === 'Enter') {
-                               e.preventDefault();
-                               handleResetPassword();
-                             }
-                           }}
-                           style={{
-                             backgroundColor: 'hsl(215, 45%, 20%) !important',
-                             borderColor: 'transparent !important',
-                             color: 'hsl(210, 40%, 95%) !important',
-                             border: 'none !important',
-                             outline: 'none !important'
-                           }}
-                         />
-                         <div className="flex gap-2">
-                           <Button 
-                             type="button"
-                             onClick={handleResetPassword}
-                             className="flex-1"
-                             disabled={isLoading}
-                             style={{
-                               backgroundColor: '#1EAEDB !important',
-                               color: '#ffffff !important',
-                               fontWeight: '500 !important'
-                             }}
-                           >
-                             {isLoading ? 'Sending...' : 'Send Reset Email'}
-                           </Button>
-                           <Button 
-                             type="button" 
-                             onClick={() => {
-                               setShowResetForm(false);
-                               setResetSent(false);
-                               setResetEmail('');
-                             }}
-                             className="flex-1"
-                             disabled={isLoading}
-                             style={{
-                               backgroundColor: 'transparent !important',
-                               borderColor: 'hsl(215, 45%, 30%) !important',
-                               color: 'hsl(210, 40%, 95%) !important',
-                               border: '1px solid hsl(215, 45%, 30%) !important'
-                             }}
-                           >
-                             Cancel
-                           </Button>
-                         </div>
-                       </div>
-                     ) : (
-                       <div className="text-center space-y-3">
-                         <div className="text-green-400 text-lg">✓</div>
-                         <div style={{ color: 'hsl(210, 40%, 95%) !important' }}>
-                           <strong>Check your email!</strong>
-                         </div>
-                         <p className="text-sm" style={{ color: 'hsl(210, 20%, 70%) !important' }}>
-                           We've sent password reset instructions to <strong>{resetEmail}</strong>
-                         </p>
-                         <Button 
-                           type="button" 
-                           onClick={() => {
-                             setShowResetForm(false);
-                             setResetSent(false);
-                             setResetEmail('');
-                           }}
-                           className="w-full"
-                           style={{
-                             backgroundColor: 'transparent !important',
-                             borderColor: 'hsl(215, 45%, 30%) !important',
-                             color: 'hsl(210, 40%, 95%) !important',
-                             border: '1px solid hsl(215, 45%, 30%) !important'
-                           }}
-                         >
-                           Done
-                         </Button>
-                       </div>
-                     )}
-                   </div>
-                 )}
                 
                  <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center">
