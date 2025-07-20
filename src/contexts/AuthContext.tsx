@@ -10,8 +10,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
+  signInWithMagicLink: (email: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -102,6 +102,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const signInWithMagicLink = async (email: string) => {
+    const redirectUrl = 'https://noteily.app/';
+    
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
+    });
+    
+    if (error) {
+      toast({
+        title: "Magic link failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Check your email!",
+        description: "We've sent you a magic link to sign in.",
+      });
+    }
+    
+    return { error };
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -113,39 +139,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const resetPassword = async (email: string) => {
-    console.log('Reset password called for email:', email);
-    
-    try {
-      // Use your custom domain for the redirect
-      const redirectUrl = 'https://noteily.app/reset-password';
-      
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl,
-      });
-      
-      console.log('Reset password result:', { error });
-      
-      if (error) {
-        toast({
-          title: "Reset password failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-      
-      return { error };
-    } catch (err) {
-      console.error('Reset password error:', err);
-      toast({
-        title: "Reset password failed",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
-      return { error: err };
-    }
-  };
-
   return (
     <AuthContext.Provider value={{
       user,
@@ -154,8 +147,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signIn,
       signUp,
       signInWithGoogle,
+      signInWithMagicLink,
       signOut,
-      resetPassword,
     }}>
       {children}
     </AuthContext.Provider>
