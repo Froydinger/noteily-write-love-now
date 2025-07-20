@@ -39,20 +39,20 @@ const AuthPage = () => {
       // Sign in successful
       navigate('/');
     } else {
-      // Check if it's an "invalid credentials" error (user doesn't exist)
-      if (signInError.message.includes('Invalid login credentials') || 
-          signInError.message.includes('Email not confirmed') ||
-          signInError.message.includes('Invalid email or password')) {
+      // Check if it's specifically a "user not found" type error
+      if (signInError.message.includes('Invalid login credentials') && 
+          !signInError.message.includes('password')) {
         
-        // Try to sign up instead
+        // Only try to sign up if it seems like the user doesn't exist
+        // (not if it's a wrong password)
         const { error: signUpError } = await signUp(email, password);
         if (!signUpError) {
           // Sign up successful - clear password field
           setPassword('');
         }
       }
-      // If it's any other error (like wrong password for existing user), 
-      // the error toast will already be shown by the signIn function
+      // For all other errors (wrong password, etc.), the error toast 
+      // will already be shown by the signIn function
     }
     
     setIsLoading(false);
