@@ -201,26 +201,20 @@
   }
 
   /* Apply navy mode by default */
-  html, body {
+  html {
     @apply navy;
-    background: linear-gradient(180deg, 
-      hsl(215, 55%, 18%) 0%, 
-      hsl(218, 50%, 14%) 30%, 
-      hsl(220, 55%, 10%) 70%, 
-      hsl(222, 60%, 7%) 100%
-    ) !important;
-    background-attachment: fixed !important;
-    background-color: hsl(215, 45%, 12%) !important;
   }
+  
+  body {
+    @apply text-foreground antialiased font-opensans;
+    background: inherit;
+  }
+
 }
 
 @layer base {
   * {
     @apply border-border;
-  }
-  
-  body {
-    @apply text-foreground antialiased font-opensans;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -238,7 +232,6 @@
 }
 
 @layer components {
-  /* Sidebar subtle left-right bounce animations */
   @keyframes bounce-in {
     0% {
       transform: translateX(-100%);
