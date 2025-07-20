@@ -103,7 +103,7 @@ const PrivacyPage = () => {
                 If you have any questions about this privacy policy or your data, please contact us at:
               </p>
               <p className="mb-4">
-                <strong>Email:</strong> <a href="mailto:contact@winthenight.org" className="text-blue-400 hover:text-blue-300">contact@winthenight.org</a>
+                <strong>Email:</strong> <a href="mailto:help@noteily.app" className="text-blue-400 hover:text-blue-300">help@noteily.app</a>
               </p>
             </div>
           </CardContent>
