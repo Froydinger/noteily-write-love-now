@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, Copy, Share } from 'lucide-react';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
+import { handleViewportResize } from '@/lib/viewport';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +43,12 @@ const NotePage = () => {
     
     return () => setCurrentNote(null);
   }, [id, note, navigate, setCurrentNote, loading]);
+
+  // Handle viewport changes for mobile keyboard
+  useEffect(() => {
+    const cleanup = handleViewportResize();
+    return cleanup;
+  }, []);
   
   const handleDelete = () => {
     if (id) {

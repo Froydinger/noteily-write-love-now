@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart } from 'lucide-react';
+import { handleViewportResize } from '@/lib/viewport';
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');
@@ -21,6 +22,12 @@ const AuthPage = () => {
       navigate('/');
     }
   }, [user, navigate]);
+
+  // Handle viewport changes for mobile keyboard
+  useEffect(() => {
+    const cleanup = handleViewportResize();
+    return cleanup;
+  }, []);
 
   const handleEmailSubmit = () => {
     if (!email) return;
