@@ -10,15 +10,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { LogIn, UserPlus, Heart } from 'lucide-react';
 
 const AuthPage = () => {
-  const [signInEmail, setSignInEmail] = useState('');
-  const [signInPassword, setSignInPassword] = useState('');
-  const [signUpEmail, setSignUpEmail] = useState('');
-  const [signUpPassword, setSignUpPassword] = useState('');
-  const [notBot, setNotBot] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [currentStep, setCurrentStep] = useState<'email' | 'auth'>('email');
+  const [authMode, setAuthMode] = useState<'password' | 'magic'>('password');
   const [isLoading, setIsLoading] = useState(false);
-  const [magicLinkEmail, setMagicLinkEmail] = useState('');
-  const [showMagicLink, setShowMagicLink] = useState(false);
   const { signIn, signUp, signInWithGoogle, signInWithMagicLink, user } = useAuth();
   const navigate = useNavigate();
 
@@ -29,33 +25,36 @@ const AuthPage = () => {
     }
   }, [user, navigate]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!signInEmail || !signInPassword) return;
+  const handleEmailSubmit = () => {
+    if (!email) return;
+    setCurrentStep('auth');
+  };
+
+  const handleSignIn = async () => {
+    if (!email || !password) return;
 
     setIsLoading(true);
-    const { error } = await signIn(signInEmail, signInPassword);
+    const { error } = await signIn(email, password);
     
     if (!error) {
       navigate('/');
+    } else {
+      // If sign in fails, try sign up automatically
+      const { error: signUpError } = await signUp(email, password);
+      if (!signUpError) {
+        // Clear form and show success
+        setPassword('');
+      }
     }
     setIsLoading(false);
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!signUpEmail || !signUpPassword || !notBot || !agreeTerms) return;
+  const handleMagicLink = async () => {
+    if (!email) return;
 
     setIsLoading(true);
-    const { error } = await signUp(signUpEmail, signUpPassword);
+    await signInWithMagicLink(email);
     setIsLoading(false);
-    
-    if (!error) {
-      setSignUpEmail('');
-      setSignUpPassword('');
-      setNotBot(false);
-      setAgreeTerms(false);
-    }
   };
 
   const handleGoogleSignIn = async () => {
@@ -64,17 +63,9 @@ const AuthPage = () => {
     setIsLoading(false);
   };
 
-  const handleMagicLink = async () => {
-    if (!magicLinkEmail) return;
-
-    setIsLoading(true);
-    try {
-      await signInWithMagicLink(magicLinkEmail);
-      setShowMagicLink(false);
-      setMagicLinkEmail('');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleBack = () => {
+    setCurrentStep('email');
+    setPassword('');
   };
 
   return (
@@ -101,390 +92,211 @@ const AuthPage = () => {
           </div>
           <CardTitle className="text-2xl font-serif" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Welcome to Noteily</CardTitle>
           <CardDescription style={{ color: 'hsl(210, 20%, 70%) !important' }}>
-            Sign in to sync your notes across all devices
+            {currentStep === 'email' ? 'Sign in to sync your notes across all devices' : `Continue as ${email}`}
           </CardDescription>
         </CardHeader>
         <CardContent style={{ backgroundColor: 'transparent !important' }}>
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList 
-              className="grid w-full grid-cols-2" 
-              style={{ 
-                backgroundColor: 'hsl(215, 45%, 16%) !important', 
-                borderColor: 'hsl(215, 45%, 20%) !important',
-                border: '1px solid hsl(215, 45%, 20%) !important'
-              }}
-            >
-              <TabsTrigger 
-                value="signin" 
-                style={{ 
-                  color: 'hsl(210, 20%, 60%)',
-                  backgroundColor: 'transparent',
-                  fontWeight: '500',
-                  transition: 'all 0.2s ease'
-                }}
-                className="
-                  data-[state=active]:!bg-[#1EAEDB] 
-                  data-[state=active]:!text-white 
-                  data-[state=inactive]:!bg-transparent 
-                  data-[state=inactive]:!text-gray-400
-                  hover:data-[state=inactive]:!bg-gray-800
-                "
-              >
-                Sign In
-              </TabsTrigger>
-              <TabsTrigger 
-                value="signup" 
-                style={{ 
-                  color: 'hsl(210, 20%, 60%)',
-                  backgroundColor: 'transparent',
-                  fontWeight: '500',
-                  transition: 'all 0.2s ease'
-                }}
-                className="
-                  data-[state=active]:!bg-[#1EAEDB] 
-                  data-[state=active]:!text-white 
-                  data-[state=inactive]:!bg-transparent 
-                  data-[state=inactive]:!text-gray-400
-                  hover:data-[state=inactive]:!bg-gray-800
-                "
-              >
-                Sign Up
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Email</Label>
-                  <Input
-                    id="signin-email"
-                    type="email"
-                    value={signInEmail}
-                    onChange={(e) => setSignInEmail(e.target.value)}
-                    autoComplete="email"
-                    placeholder="Enter your email"
-                    required
-                    disabled={isLoading}
-                    style={{
-                      backgroundColor: 'hsl(215, 45%, 20%) !important',
-                      borderColor: 'transparent !important',
-                      color: 'hsl(210, 40%, 95%) !important',
-                      border: 'none !important',
-                      outline: 'none !important'
-                    }}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Password</Label>
-                  <Input
-                    id="signin-password"
-                    type="password"
-                    value={signInPassword}
-                    onChange={(e) => setSignInPassword(e.target.value)}
-                    autoComplete="current-password"
-                    placeholder="Enter your password"
-                    required
-                    disabled={isLoading}
-                    style={{
-                      backgroundColor: 'hsl(215, 45%, 20%) !important',
-                      borderColor: 'transparent !important',
-                      color: 'hsl(210, 40%, 95%) !important',
-                      border: 'none !important',
-                      outline: 'none !important'
-                    }}
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
-                  disabled={isLoading} 
+          {currentStep === 'email' ? (
+            // Step 1: Email input + Google
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  placeholder="Enter your email"
+                  disabled={isLoading}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleEmailSubmit();
+                    }
+                  }}
                   style={{
-                    backgroundColor: '#1EAEDB !important',
-                    color: '#ffffff !important',
-                    borderColor: '#1EAEDB !important',
-                    border: '1px solid #1EAEDB !important',
-                    fontWeight: '600 !important'
+                    backgroundColor: 'hsl(215, 45%, 20%) !important',
+                    borderColor: 'transparent !important',
+                    color: 'hsl(210, 40%, 95%) !important',
+                    border: 'none !important',
+                    outline: 'none !important'
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#0FA0CE !important';
-                    e.currentTarget.style.color = '#ffffff !important';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#1EAEDB !important';
-                    e.currentTarget.style.color = '#ffffff !important';
-                  }}
-                >
-                  <LogIn className="mr-2 h-4 w-4" style={{ color: '#ffffff !important' }} />
-                  {isLoading ? 'Signing in...' : 'Sign In'}
-                 </Button>
-                
-                 <div className="text-center mt-3">
-                   <button
-                     type="button"
-                     onClick={() => setShowMagicLink(!showMagicLink)}
-                     className="text-sm text-blue-400 hover:text-blue-300 underline"
-                     disabled={isLoading}
-                   >
-                     Email me a magic link instead
-                   </button>
-                 </div>
-
-                 {showMagicLink && (
-                   <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'hsl(215, 45%, 16%) !important' }}>
-                     <div className="space-y-3">
-                       <Label htmlFor="magic-email" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Magic Link</Label>
-                       <Input
-                         id="magic-email"
-                         type="email"
-                         value={magicLinkEmail}
-                         onChange={(e) => setMagicLinkEmail(e.target.value)}
-                         placeholder="Enter your email"
-                         disabled={isLoading}
-                         onKeyDown={(e) => {
-                           if (e.key === 'Enter') {
-                             e.preventDefault();
-                             handleMagicLink();
-                           }
-                         }}
-                         style={{
-                           backgroundColor: 'hsl(215, 45%, 20%) !important',
-                           borderColor: 'transparent !important',
-                           color: 'hsl(210, 40%, 95%) !important',
-                           border: 'none !important',
-                           outline: 'none !important'
-                         }}
-                       />
-                       <div className="flex gap-2">
-                         <Button 
-                           type="button"
-                           onClick={handleMagicLink}
-                           className="flex-1"
-                           disabled={isLoading || !magicLinkEmail}
-                           style={{
-                             backgroundColor: '#1EAEDB !important',
-                             color: '#ffffff !important',
-                             fontWeight: '500 !important'
-                           }}
-                         >
-                           {isLoading ? 'Sending...' : 'Send Magic Link'}
-                         </Button>
-                         <Button 
-                           type="button" 
-                           onClick={() => {
-                             setShowMagicLink(false);
-                             setMagicLinkEmail('');
-                           }}
-                           className="flex-1"
-                           disabled={isLoading}
-                           style={{
-                             backgroundColor: 'transparent !important',
-                             borderColor: 'hsl(215, 45%, 30%) !important',
-                             color: 'hsl(210, 40%, 95%) !important',
-                             border: '1px solid hsl(215, 45%, 30%) !important'
-                           }}
-                         >
-                           Cancel
-                         </Button>
-                       </div>
-                     </div>
-                   </div>
-                 )}
-                
-                 <div className="relative my-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" style={{ borderColor: 'hsl(215, 45%, 20%) !important' }} />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="px-2" style={{ backgroundColor: 'hsl(215, 45%, 14%) !important', color: 'hsl(210, 20%, 70%) !important' }}>
-                      Or continue with
-                    </span>
-                  </div>
+                />
+              </div>
+              <Button 
+                type="button"
+                onClick={handleEmailSubmit}
+                className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
+                disabled={isLoading || !email}
+                style={{
+                  backgroundColor: '#1EAEDB !important',
+                  color: '#ffffff !important',
+                  borderColor: '#1EAEDB !important',
+                  border: '1px solid #1EAEDB !important',
+                  fontWeight: '600 !important'
+                }}
+              >
+                Continue
+              </Button>
+              
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" style={{ borderColor: 'hsl(215, 45%, 20%) !important' }} />
                 </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="px-2" style={{ backgroundColor: 'hsl(215, 45%, 14%) !important', color: 'hsl(210, 20%, 70%) !important' }}>
+                    Or continue with
+                  </span>
+                </div>
+              </div>
 
-                <Button 
+              <Button 
+                type="button"
+                className="w-full"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading}
+                style={{
+                  backgroundColor: '#ffffff !important',
+                  borderColor: 'hsl(215, 45%, 20%) !important',
+                  color: '#374151 !important',
+                  border: '1px solid hsl(215, 45%, 20%) !important',
+                  fontWeight: '500 !important'
+                }}
+              >
+                <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continue with Google
+              </Button>
+            </div>
+          ) : (
+            // Step 2: Password or Magic Link
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Button
                   type="button"
-                  className="w-full"
-                  onClick={handleGoogleSignIn}
+                  onClick={handleBack}
                   disabled={isLoading}
                   style={{
-                    backgroundColor: '#ffffff !important',
-                    borderColor: 'hsl(215, 45%, 20%) !important',
-                    color: '#374151 !important',
-                    border: '1px solid hsl(215, 45%, 20%) !important',
-                    fontWeight: '500 !important'
+                    backgroundColor: 'transparent !important',
+                    border: 'none !important',
+                    color: 'hsl(210, 40%, 95%) !important',
+                    padding: '0 !important',
+                    fontSize: '14px !important'
                   }}
-                  onMouseEnter={(e) => {
-                    if (!e.currentTarget.disabled) {
-                      e.currentTarget.style.backgroundColor = '#f9fafb !important';
-                      e.currentTarget.style.color = '#374151 !important';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!e.currentTarget.disabled) {
-                      e.currentTarget.style.backgroundColor = '#ffffff !important';
-                      e.currentTarget.style.color = '#374151 !important';
-                    }
-                  }}
+                  className="hover:text-blue-400"
                 >
-                  <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                  </svg>
-                  Continue with Google
+                  ← Back
                 </Button>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    value={signUpEmail}
-                    onChange={(e) => setSignUpEmail(e.target.value)}
-                    autoComplete="email"
-                    placeholder="Enter your email"
-                    required
-                    disabled={isLoading}
-                    style={{
-                      backgroundColor: 'hsl(215, 45%, 20%) !important',
-                      borderColor: 'transparent !important',
-                      color: 'hsl(210, 40%, 95%) !important',
-                      border: 'none !important',
-                      outline: 'none !important'
-                    }}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    value={signUpPassword}
-                    onChange={(e) => setSignUpPassword(e.target.value)}
-                    autoComplete="new-password"
-                    placeholder="Create a password (min 6 characters)"
-                    required
-                    disabled={isLoading}
-                    minLength={6}
-                    style={{
-                      backgroundColor: 'hsl(215, 45%, 20%) !important',
-                      borderColor: 'transparent !important',
-                      color: 'hsl(210, 40%, 95%) !important',
-                      border: 'none !important',
-                      outline: 'none !important'
-                    }}
-                  />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="not-bot"
-                    checked={notBot}
-                    onCheckedChange={(checked) => setNotBot(checked as boolean)}
-                    disabled={isLoading}
-                  />
-                  <Label htmlFor="not-bot" className="text-sm font-normal" style={{ color: 'hsl(210, 40%, 95%) !important' }}>
-                    I am not a robot
-                  </Label>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <Checkbox 
-                    id="agree-terms"
-                    checked={agreeTerms}
-                    onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
-                    disabled={isLoading}
-                    className="mt-1"
-                  />
-                  <Label htmlFor="agree-terms" className="text-sm font-normal leading-relaxed" style={{ color: 'hsl(210, 40%, 95%) !important' }}>
-                    I agree to the{' '}
-                    <Link to="/terms" className="text-blue-400 hover:text-blue-300 underline">
-                      Terms of Service
-                    </Link>{' '}
-                    and{' '}
-                    <Link to="/privacy" className="text-blue-400 hover:text-blue-300 underline">
-                      Privacy Policy
-                    </Link>
-                  </Label>
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
-                  disabled={isLoading || !notBot || !agreeTerms}
-                  style={{
-                    backgroundColor: '#1EAEDB !important',
-                    color: '#ffffff !important',
-                    borderColor: '#1EAEDB !important',
-                    border: '1px solid #1EAEDB !important',
-                    fontWeight: '600 !important'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!e.currentTarget.disabled) {
-                      e.currentTarget.style.backgroundColor = '#0FA0CE !important';
-                      e.currentTarget.style.color = '#ffffff !important';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!e.currentTarget.disabled) {
-                      e.currentTarget.style.backgroundColor = '#1EAEDB !important';
-                      e.currentTarget.style.color = '#ffffff !important';
-                    }
-                  }}
-                >
-                  <UserPlus className="mr-2 h-4 w-4" style={{ color: '#ffffff !important' }} />
-                  {isLoading ? 'Creating account...' : 'Create Account'}
-                </Button>
-                
-                <div className="relative my-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" style={{ borderColor: 'hsl(215, 45%, 20%) !important' }} />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="px-2" style={{ backgroundColor: 'hsl(215, 45%, 14%) !important', color: 'hsl(210, 20%, 70%) !important' }}>
-                      Or continue with
-                    </span>
-                  </div>
-                </div>
+              </div>
 
-                <Button 
+              <div className="flex gap-2 mb-4">
+                <Button
                   type="button"
-                  className="w-full"
-                  onClick={handleGoogleSignIn}
-                  disabled={isLoading}
+                  onClick={() => setAuthMode('password')}
+                  className="flex-1"
                   style={{
-                    backgroundColor: '#ffffff !important',
-                    borderColor: 'hsl(215, 45%, 20%) !important',
-                    color: '#374151 !important',
-                    border: '1px solid hsl(215, 45%, 20%) !important',
+                    backgroundColor: authMode === 'password' ? '#1EAEDB !important' : 'transparent !important',
+                    borderColor: '#1EAEDB !important',
+                    color: authMode === 'password' ? '#ffffff !important' : '#1EAEDB !important',
+                    border: '1px solid #1EAEDB !important',
                     fontWeight: '500 !important'
                   }}
-                  onMouseEnter={(e) => {
-                    if (!e.currentTarget.disabled) {
-                      e.currentTarget.style.backgroundColor = '#f9fafb !important';
-                      e.currentTarget.style.color = '#374151 !important';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!e.currentTarget.disabled) {
-                      e.currentTarget.style.backgroundColor = '#ffffff !important';
-                      e.currentTarget.style.color = '#374151 !important';
-                    }
+                >
+                  Password
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => setAuthMode('magic')}
+                  className="flex-1"
+                  style={{
+                    backgroundColor: authMode === 'magic' ? '#1EAEDB !important' : 'transparent !important',
+                    borderColor: '#1EAEDB !important',
+                    color: authMode === 'magic' ? '#ffffff !important' : '#1EAEDB !important',
+                    border: '1px solid #1EAEDB !important',
+                    fontWeight: '500 !important'
                   }}
                 >
-                  <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                  </svg>
-                  Continue with Google
+                  Magic Link
                 </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
+              </div>
+
+              {authMode === 'password' ? (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="current-password"
+                      placeholder="Enter your password"
+                      disabled={isLoading}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleSignIn();
+                        }
+                      }}
+                      style={{
+                        backgroundColor: 'hsl(215, 45%, 20%) !important',
+                        borderColor: 'transparent !important',
+                        color: 'hsl(210, 40%, 95%) !important',
+                        border: 'none !important',
+                        outline: 'none !important'
+                      }}
+                    />
+                  </div>
+                  <Button 
+                    type="button"
+                    onClick={handleSignIn}
+                    className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
+                    disabled={isLoading || !password}
+                    style={{
+                      backgroundColor: '#1EAEDB !important',
+                      color: '#ffffff !important',
+                      borderColor: '#1EAEDB !important',
+                      border: '1px solid #1EAEDB !important',
+                      fontWeight: '600 !important'
+                    }}
+                  >
+                    {isLoading ? 'Signing in...' : 'Sign In'}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="text-center space-y-2">
+                    <p style={{ color: 'hsl(210, 40%, 95%) !important' }}>
+                      We'll send a magic link to
+                    </p>
+                    <p className="font-medium" style={{ color: '#1EAEDB !important' }}>
+                      {email}
+                    </p>
+                  </div>
+                  <Button 
+                    type="button"
+                    onClick={handleMagicLink}
+                    className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
+                    disabled={isLoading}
+                    style={{
+                      backgroundColor: '#1EAEDB !important',
+                      color: '#ffffff !important',
+                      borderColor: '#1EAEDB !important',
+                      border: '1px solid #1EAEDB !important',
+                      fontWeight: '600 !important'
+                    }}
+                  >
+                    {isLoading ? 'Sending...' : 'Send Magic Link'}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
