@@ -13,6 +13,7 @@ import NotePage from "./pages/NotePage";
 import PromptsPage from "./pages/PromptsPage";
 import SettingsPage from "./pages/SettingsPage";
 import AuthPage from "./pages/AuthPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import NotFound from "./pages/NotFound";
@@ -26,10 +27,11 @@ const App = () => (
       <Sonner position="bottom-right" duration={3000} />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/terms" element={<TermsPage />} />
+           <Routes>
+             <Route path="/auth" element={<AuthPage />} />
+             <Route path="/reset-password" element={<ResetPasswordPage />} />
+             <Route path="/privacy" element={<PrivacyPage />} />
+             <Route path="/terms" element={<TermsPage />} />
             <Route path="/" element={<AppLayout><Index /></AppLayout>} />
             <Route path="/note/:id" element={<AppLayout><NotePage /></AppLayout>} />
             <Route path="/prompts" element={<AppLayout><PromptsPage /></AppLayout>} />

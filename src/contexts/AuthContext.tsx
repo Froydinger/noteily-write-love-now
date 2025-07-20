@@ -117,8 +117,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('Reset password called for email:', email);
     
     try {
-      // Don't use redirectTo to avoid any navigation
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      // Use your custom domain for the redirect
+      const redirectUrl = 'https://noteily.app/reset-password';
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl,
+      });
       
       console.log('Reset password result:', { error });
       
