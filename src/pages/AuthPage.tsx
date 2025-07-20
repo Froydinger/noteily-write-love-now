@@ -34,18 +34,30 @@ const AuthPage = () => {
     if (!email || !password) return;
 
     setIsLoading(true);
-    const { error } = await signIn(email, password);
     
-    if (!error) {
+    // First try to sign in
+    const { error: signInError } = await signIn(email, password);
+    
+    if (!signInError) {
+      // Sign in successful
       navigate('/');
     } else {
-      // If sign in fails, try sign up automatically
-      const { error: signUpError } = await signUp(email, password);
-      if (!signUpError) {
-        // Clear form and show success
-        setPassword('');
+      // Check if it's an "invalid credentials" error (user doesn't exist)
+      if (signInError.message.includes('Invalid login credentials') || 
+          signInError.message.includes('Email not confirmed') ||
+          signInError.message.includes('Invalid email or password')) {
+        
+        // Try to sign up instead
+        const { error: signUpError } = await signUp(email, password);
+        if (!signUpError) {
+          // Sign up successful - clear password field
+          setPassword('');
+        }
       }
+      // If it's any other error (like wrong password for existing user), 
+      // the error toast will already be shown by the signIn function
     }
+    
     setIsLoading(false);
   };
 
@@ -242,21 +254,21 @@ const AuthPage = () => {
                         }}
                     />
                   </div>
-                  <Button 
-                    type="button"
-                    onClick={handleSignIn}
-                    className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
-                    disabled={isLoading || !password}
-                    style={{
-                      backgroundColor: '#1EAEDB !important',
-                      color: '#ffffff !important',
-                      borderColor: '#1EAEDB !important',
-                      border: '1px solid #1EAEDB !important',
-                      fontWeight: '600 !important'
-                    }}
-                  >
-                    {isLoading ? 'Signing in...' : 'Sign In'}
-                  </Button>
+                      <Button 
+                        type="button"
+                        onClick={handleSignIn}
+                        className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
+                        disabled={isLoading || !password}
+                        style={{
+                          backgroundColor: '#1EAEDB !important',
+                          color: '#ffffff !important',
+                          borderColor: '#1EAEDB !important',
+                          border: '1px solid #1EAEDB !important',
+                          fontWeight: '600 !important'
+                        }}
+                      >
+                        {isLoading ? 'Continuing...' : 'Continue'}
+                      </Button>
                 </div>
               ) : (
                 <div className="space-y-4">
