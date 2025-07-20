@@ -28,6 +28,29 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    
+    <!-- Inline script to set theme color immediately -->
+    <script>
+      (function() {
+        const html = document.documentElement;
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        
+        // Navy is default, but check for other themes
+        let themeColor = '#192028'; // Navy default
+        
+        if (html.classList.contains('light')) {
+          themeColor = '#ffffff';
+        } else if (html.classList.contains('dark')) {
+          themeColor = '#0a0a0a';
+        } else if (html.classList.contains('sepia')) {
+          themeColor = '#f5f1eb';
+        }
+        
+        if (metaThemeColor) {
+          metaThemeColor.setAttribute('content', themeColor);
+        }
+      })();
+    </script>
   </head>
 
   <body>
