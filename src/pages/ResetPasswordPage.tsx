@@ -16,11 +16,20 @@ const ResetPasswordPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Debug: log all URL parameters
+  useEffect(() => {
+    console.log('All URL parameters:', Object.fromEntries(searchParams.entries()));
+  }, [searchParams]);
+
   const accessToken = searchParams.get('access_token');
   const refreshToken = searchParams.get('refresh_token');
+  const type = searchParams.get('type');
 
   useEffect(() => {
-    if (!accessToken || !refreshToken) {
+    console.log('Reset page params:', { accessToken, refreshToken, type });
+    
+    // Check if this is a password reset link (type should be 'recovery')
+    if (type !== 'recovery' && !accessToken) {
       toast({
         title: "Invalid reset link",
         description: "This password reset link is invalid or has expired.",
@@ -28,7 +37,7 @@ const ResetPasswordPage = () => {
       });
       navigate('/auth');
     }
-  }, [accessToken, refreshToken, navigate, toast]);
+  }, [accessToken, refreshToken, type, navigate, toast]);
 
   const handleResetPassword = async () => {
     if (password !== confirmPassword) {
@@ -52,12 +61,23 @@ const ResetPasswordPage = () => {
     setIsLoading(true);
 
     try {
-      // Set the session using the tokens from the URL
+      // If we have tokens, set the session
       if (accessToken && refreshToken) {
-        await supabase.auth.setSession({
+        console.log('Setting session with tokens');
+        const { error: sessionError } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
         });
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          toast({
+            title: "Session error",
+            description: sessionError.message,
+            variant: "destructive",
+          });
+          return;
+        }
       }
 
       // Update the password
@@ -90,7 +110,8 @@ const ResetPasswordPage = () => {
     }
   };
 
-  if (!accessToken || !refreshToken) {
+  // Allow the page to load even without perfect tokens for debugging
+  if (type !== 'recovery' && !accessToken && !refreshToken) {
     return null;
   }
 
