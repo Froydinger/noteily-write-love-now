@@ -13,6 +13,8 @@ import NotePage from "./pages/NotePage";
 import PromptsPage from "./pages/PromptsPage";
 import SettingsPage from "./pages/SettingsPage";
 import AuthPage from "./pages/AuthPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import TermsPage from "./pages/TermsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,11 +23,13 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner position="bottom-right" />
+      <Sonner position="bottom-right" duration={3000} />
       <BrowserRouter>
         <AuthProvider>
           <Routes>
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
             <Route path="/" element={<AppLayout><Index /></AppLayout>} />
             <Route path="/note/:id" element={<AppLayout><NotePage /></AppLayout>} />
             <Route path="/prompts" element={<AppLayout><PromptsPage /></AppLayout>} />

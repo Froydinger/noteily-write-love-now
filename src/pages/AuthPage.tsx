@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,7 @@ const AuthPage = () => {
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
   const [notBot, setNotBot] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ const AuthPage = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!signUpEmail || !signUpPassword || !notBot) return;
+    if (!signUpEmail || !signUpPassword || !notBot || !agreeTerms) return;
 
     setIsLoading(true);
     const { error } = await signUp(signUpEmail, signUpPassword);
@@ -51,6 +52,7 @@ const AuthPage = () => {
       setSignUpEmail('');
       setSignUpPassword('');
       setNotBot(false);
+      setAgreeTerms(false);
     }
   };
 
@@ -251,10 +253,29 @@ const AuthPage = () => {
                     I am not a robot
                   </Label>
                 </div>
+                <div className="flex items-start space-x-2">
+                  <Checkbox 
+                    id="agree-terms"
+                    checked={agreeTerms}
+                    onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
+                    disabled={isLoading}
+                    className="mt-1"
+                  />
+                  <Label htmlFor="agree-terms" className="text-sm font-normal leading-relaxed" style={{ color: 'hsl(210, 40%, 95%) !important' }}>
+                    I agree to the{' '}
+                    <Link to="/terms" className="text-blue-400 hover:text-blue-300 underline">
+                      Terms of Service
+                    </Link>{' '}
+                    and{' '}
+                    <Link to="/privacy" className="text-blue-400 hover:text-blue-300 underline">
+                      Privacy Policy
+                    </Link>
+                  </Label>
+                </div>
                 <Button 
                   type="submit" 
                   className="w-full hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]" 
-                  disabled={isLoading || !notBot}
+                  disabled={isLoading || !notBot || !agreeTerms}
                   style={{
                     backgroundColor: '#1EAEDB !important',
                     color: '#ffffff !important',
