@@ -20,6 +20,7 @@ const SettingsPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
+  const [isDisconnectingGoogle, setIsDisconnectingGoogle] = useState(false);
   const isMobile = useIsMobile();
   const { state } = useSidebar();
   const { toast } = useToast();
@@ -179,6 +180,59 @@ ${note.content}
     }
   };
 
+  const isGoogleUser = () => {
+    return user?.app_metadata?.providers?.includes('google') || 
+           user?.identities?.some(identity => identity.provider === 'google');
+  };
+
+  const hasPassword = () => {
+    // Check if user has a password set (users who signed up with Google initially don't have a password)
+    return user?.app_metadata?.provider !== 'google' || newPassword.trim().length >= 6;
+  };
+
+  const handleDisconnectGoogle = async () => {
+    if (!user || !isGoogleUser()) return;
+
+    // Require password to be set first
+    if (newPassword.trim().length < 6) {
+      toast({
+        title: "Password required",
+        description: "Please set a password before disconnecting Google. This ensures you can still access your account.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsDisconnectingGoogle(true);
+
+    try {
+      // First set password
+      const { error: passwordError } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+      
+      if (passwordError) {
+        throw passwordError;
+      }
+      
+      setNewPassword('');
+
+      toast({
+        title: "Password set successfully",
+        description: "Your password has been set. You can now sign in with email/password. To fully disconnect Google, please contact support.",
+      });
+    } catch (error: any) {
+      console.error('Error setting password:', error);
+      toast({
+        title: "Error setting password",
+        description: error.message || "Failed to set password. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDisconnectingGoogle(false);
+    }
+  };
+
   const handleDeleteAccount = async () => {
     if (!user) return;
     
@@ -288,6 +342,26 @@ ${note.content}
                     Password must be at least 6 characters long
                   </p>
                 </div>
+                
+                {isGoogleUser() && (
+                  <div className="space-y-3 border-t pt-3">
+                    <div className="text-sm">
+                      <p className="font-medium text-muted-foreground mb-1">Google Account Connected</p>
+                      <p className="text-xs text-muted-foreground">
+                        Set a password to enable email/password login as backup
+                      </p>
+                    </div>
+                    <Button 
+                      onClick={handleDisconnectGoogle} 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                      disabled={isDisconnectingGoogle || newPassword.trim().length < 6}
+                    >
+                      {isDisconnectingGoogle ? "Setting Password..." : "Set Password for Account Security"}
+                    </Button>
+                  </div>
+                )}
                 
                 <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
                   <LogOut className="mr-2 h-4 w-4" />
