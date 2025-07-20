@@ -137,15 +137,10 @@ const AuthPage = () => {
                 Continue
               </Button>
               
-              <div className="relative my-4">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="px-2 bg-transparent text-gray-300">
-                    Or continue with
-                  </span>
-                </div>
+              <div className="my-4 flex justify-center">
+                <span className="text-xs uppercase text-gray-300">
+                  Or continue with
+                </span>
               </div>
 
               <Button 
