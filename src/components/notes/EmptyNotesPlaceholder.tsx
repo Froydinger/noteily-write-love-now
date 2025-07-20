@@ -46,7 +46,7 @@ export default function EmptyNotesPlaceholder() {
         </div>
       )}
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-        <Heart className="h-16 w-16 mb-6 text-noteily-300" />
+        <Heart className="h-16 w-16 mb-6 text-accent" />
         <h2 className="text-2xl font-serif font-medium mb-3">Welcome to Noteily</h2>
         <p className="text-muted-foreground max-w-md mb-8">
           Create your first note to start your journey of self-expression and reflection.
