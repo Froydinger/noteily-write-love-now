@@ -78,12 +78,12 @@ const AuthPage = () => {
       }}
     >
       <Card 
-        className="w-full max-w-md" 
+        className="w-full max-w-md border-0" 
         style={{
           backgroundColor: 'hsl(215, 45%, 14%) !important',
-          borderColor: 'transparent !important',
-          color: 'hsl(210, 40%, 95%) !important',
-          border: '1px solid transparent !important'
+          border: 'none !important',
+          boxShadow: 'none !important',
+          color: 'hsl(210, 40%, 95%) !important'
         }}
       >
         <CardHeader className="text-center" style={{ backgroundColor: 'transparent !important', color: 'hsl(210, 40%, 95%) !important' }}>
@@ -109,6 +109,7 @@ const AuthPage = () => {
                   autoComplete="email"
                   placeholder="Enter your email"
                   disabled={isLoading}
+                  className="border-0 focus:ring-0 focus:border-0"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -117,10 +118,10 @@ const AuthPage = () => {
                   }}
                   style={{
                     backgroundColor: 'hsl(215, 45%, 20%) !important',
-                    borderColor: 'transparent !important',
-                    color: 'hsl(210, 40%, 95%) !important',
                     border: 'none !important',
-                    outline: 'none !important'
+                    outline: 'none !important',
+                    boxShadow: 'none !important',
+                    color: 'hsl(210, 40%, 95%) !important'
                   }}
                 />
               </div>
@@ -153,14 +154,15 @@ const AuthPage = () => {
 
               <Button 
                 type="button"
-                className="w-full"
+                className="w-full border-0 focus:ring-0 focus:border-0"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
                 style={{
                   backgroundColor: 'transparent !important',
-                  borderColor: 'hsl(215, 45%, 20%) !important',
+                  border: 'none !important',
+                  outline: 'none !important',
+                  boxShadow: 'none !important',
                   color: 'hsl(210, 40%, 95%) !important',
-                  border: '1px solid hsl(215, 45%, 20%) !important',
                   fontWeight: '500 !important'
                 }}
               >
@@ -216,26 +218,27 @@ const AuthPage = () => {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="password" style={{ color: 'hsl(210, 40%, 95%) !important' }}>Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      autoComplete="current-password"
-                      placeholder="Enter your password"
-                      disabled={isLoading}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleSignIn();
-                        }
-                      }}
+                      <Input
+                        id="password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        autoComplete="current-password"
+                        placeholder="Enter your password"
+                        disabled={isLoading}
+                        className="border-0 focus:ring-0 focus:border-0"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleSignIn();
+                          }
+                        }}
                         style={{
                           backgroundColor: 'hsl(215, 45%, 20%) !important',
-                          borderColor: 'transparent !important',
-                          color: 'hsl(210, 40%, 95%) !important',
                           border: 'none !important',
-                          outline: 'none !important'
+                          outline: 'none !important',
+                          boxShadow: 'none !important',
+                          color: 'hsl(210, 40%, 95%) !important'
                         }}
                     />
                   </div>
