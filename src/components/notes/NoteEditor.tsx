@@ -22,12 +22,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     }
   }, [note.id]);
 
-  // Update title
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTitle = e.target.value;
-    setTitle(newTitle);
-    updateNote(note.id, { title: newTitle });
-  };
 
   // Handle content updates with debounce
   useEffect(() => {
@@ -60,12 +54,25 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 py-8 animate-fade-in">
-      <input
-        type="text"
+      <textarea
         value={title}
-        onChange={handleTitleChange}
+        onChange={(e) => {
+          const newTitle = e.target.value;
+          setTitle(newTitle);
+          updateNote(note.id, { title: newTitle });
+        }}
         placeholder="Untitled Note"
-        className="w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 dark:focus:ring-neon-blue"
+        className="w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 dark:focus:ring-neon-blue resize-none overflow-hidden"
+        style={{ 
+          minHeight: 'auto',
+          height: 'auto'
+        }}
+        rows={1}
+        onInput={(e) => {
+          const target = e.target as HTMLTextAreaElement;
+          target.style.height = 'auto';
+          target.style.height = target.scrollHeight + 'px';
+        }}
         aria-label="Note title"
       />
       
