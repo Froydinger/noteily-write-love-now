@@ -114,26 +114,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const resetPassword = async (email: string) => {
+    console.log('Reset password called for email:', email);
     const redirectUrl = `${window.location.origin}/auth`;
     
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: redirectUrl,
-    });
-    
-    if (error) {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl,
+      });
+      
+      console.log('Reset password result:', { error });
+      
+      if (error) {
+        toast({
+          title: "Reset password failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Reset email sent",
+          description: "Check your email for password reset instructions",
+        });
+      }
+      
+      return { error };
+    } catch (err) {
+      console.error('Reset password error:', err);
       toast({
         title: "Reset password failed",
-        description: error.message,
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Reset email sent",
-        description: "Check your email for password reset instructions",
-      });
+      return { error: err };
     }
-    
-    return { error };
   };
 
   return (
