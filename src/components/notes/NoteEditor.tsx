@@ -10,8 +10,17 @@ interface NoteEditorProps {
 export default function NoteEditor({ note }: NoteEditorProps) {
   const { updateNote } = useNotes();
   const [title, setTitle] = useState(note.title);
+  const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
+  // Auto-resize title textarea
+  useEffect(() => {
+    if (titleRef.current) {
+      titleRef.current.style.height = 'auto';
+      titleRef.current.style.height = titleRef.current.scrollHeight + 'px';
+    }
+  }, [title]);
+
   // Update title and content when note changes
   useEffect(() => {
     setTitle(note.title);
@@ -55,6 +64,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   return (
     <div className="w-full max-w-3xl mx-auto px-4 py-8 animate-fade-in">
       <textarea
+        ref={titleRef}
         value={title}
         onChange={(e) => {
           const newTitle = e.target.value;
