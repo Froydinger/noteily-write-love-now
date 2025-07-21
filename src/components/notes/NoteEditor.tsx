@@ -14,6 +14,75 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
+  // Simple keyboard detection and auto-scroll
+  useEffect(() => {
+    let keyboardHeight = 0;
+    
+    const scrollActiveElementIntoView = () => {
+      setTimeout(() => {
+        const activeElement = document.activeElement;
+        if (activeElement && (activeElement === titleRef.current || activeElement === contentRef.current)) {
+          activeElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center'
+          });
+        }
+      }, 100);
+    };
+    
+    const handleResize = () => {
+      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      const screenHeight = window.screen.height;
+      keyboardHeight = screenHeight - viewportHeight;
+      
+      // If keyboard is visible (height reduced by more than 150px)
+      if (keyboardHeight > 150) {
+        scrollActiveElementIntoView();
+      }
+    };
+
+    const handleFocus = () => {
+      // When keyboard appears (focus), align immediately
+      scrollActiveElementIntoView();
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        // When Enter is pressed, realign immediately
+        scrollActiveElementIntoView();
+      }
+    };
+
+    // Add event listeners
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+    }
+    
+    if (titleRef.current) {
+      titleRef.current.addEventListener('focus', handleFocus);
+      titleRef.current.addEventListener('keydown', handleKeyDown);
+    }
+    
+    if (contentRef.current) {
+      contentRef.current.addEventListener('focus', handleFocus);
+      contentRef.current.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+      }
+      if (titleRef.current) {
+        titleRef.current.removeEventListener('focus', handleFocus);
+        titleRef.current.removeEventListener('keydown', handleKeyDown);
+      }
+      if (contentRef.current) {
+        contentRef.current.removeEventListener('focus', handleFocus);
+        contentRef.current.removeEventListener('keydown', handleKeyDown);
+      }
+    };
+  }, []);
+
   // Auto-resize title textarea
   useEffect(() => {
     if (titleRef.current) {
@@ -33,7 +102,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   }, [note.id]);
 
 
-  // Handle content updates with debounce and auto-scroll
+  // Handle content updates with debounce
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     
@@ -48,54 +117,16 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       }
     };
 
-    const scrollToCursor = () => {
-      if (!contentRef.current) return;
-      
-      const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) return;
-      
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      
-      // If cursor is below viewport or close to bottom, scroll down
-      const viewportHeight = window.innerHeight;
-      const keyboardThreshold = viewportHeight * 0.6; // Assume keyboard takes up 40% of screen
-      
-      if (rect.bottom > keyboardThreshold) {
-        // Scroll the cursor position into view with some padding
-        const scrollTarget = rect.bottom - keyboardThreshold + 100;
-        window.scrollBy({
-          top: scrollTarget,
-          behavior: 'smooth'
-        });
-      }
-    };
-
-    const handleInput = () => {
-      handleContentChange();
-      // Delay scroll to allow content to render
-      setTimeout(scrollToCursor, 50);
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        // Extra delay for Enter key to handle new line creation
-        setTimeout(scrollToCursor, 100);
-      }
-    };
-
     const currentRef = contentRef.current;
     
     if (currentRef) {
-      currentRef.addEventListener('input', handleInput);
-      currentRef.addEventListener('keydown', handleKeyDown);
+      currentRef.addEventListener('input', handleContentChange);
     }
     
     return () => {
       clearTimeout(timeout);
       if (currentRef) {
-        currentRef.removeEventListener('input', handleInput);
-        currentRef.removeEventListener('keydown', handleKeyDown);
+        currentRef.removeEventListener('input', handleContentChange);
       }
     };
   }, [note.id, updateNote]);
