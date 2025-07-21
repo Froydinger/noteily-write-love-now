@@ -11,9 +11,42 @@ interface NoteEditorProps {
 export default function NoteEditor({ note }: NoteEditorProps) {
   const { updateNote } = useNotes();
   const [title, setTitle] = useState(note.title);
+  const [dynamicPadding, setDynamicPadding] = useState('pb-96');
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
+  // Dynamic padding based on viewport and content
+  useEffect(() => {
+    const updatePadding = () => {
+      if (!containerRef.current) return;
+      
+      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      const initialHeight = window.screen.height || window.innerHeight;
+      const keyboardHeight = initialHeight - viewportHeight;
+      
+      // If keyboard is open (significant height difference)
+      if (keyboardHeight > 200) {
+        // Add extra padding for keyboard
+        const extraPadding = Math.max(keyboardHeight, 400);
+        setDynamicPadding(`pb-[${extraPadding}px]`);
+      } else {
+        // Default large padding for scrolling space
+        setDynamicPadding('pb-96');
+      }
+    };
+
+    updatePadding();
+    
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updatePadding);
+      return () => window.visualViewport?.removeEventListener('resize', updatePadding);
+    } else {
+      window.addEventListener('resize', updatePadding);
+      return () => window.removeEventListener('resize', updatePadding);
+    }
+  }, []);
+
   // Auto-resize title textarea
   useEffect(() => {
     if (titleRef.current) {
@@ -150,7 +183,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   }, [note.content]);
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-96 animate-fade-in">
+    <div ref={containerRef} className={`w-full max-w-3xl mx-auto px-4 pt-8 animate-fade-in ${dynamicPadding}`}>
       <textarea
         ref={titleRef}
         value={title}
