@@ -90,17 +90,30 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       
-      // If cursor is below viewport or close to bottom, scroll down
-      const viewportHeight = window.innerHeight;
-      const keyboardThreshold = viewportHeight * 0.6; // Assume keyboard takes up 40% of screen
+      // Get the main scroll container (the NotePage container)
+      const scrollContainer = document.querySelector('[data-scroll-container]') || 
+                             document.querySelector('.flex-grow.overflow-auto') ||
+                             window;
+      
+      // Calculate if cursor is in keyboard area
+      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      const keyboardThreshold = viewportHeight * 0.5; // More aggressive threshold
       
       if (rect.bottom > keyboardThreshold) {
-        // Scroll the cursor position into view with some padding
-        const scrollTarget = rect.bottom - keyboardThreshold + 100;
-        window.scrollBy({
-          top: scrollTarget,
-          behavior: 'smooth'
-        });
+        // Calculate how much to scroll to bring cursor into view
+        const targetPosition = rect.top - keyboardThreshold + 150; // Extra padding above keyboard
+        
+        if (scrollContainer === window) {
+          window.scrollBy({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+        } else {
+          (scrollContainer as Element).scrollBy({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+        }
       }
     };
 
