@@ -79,13 +79,22 @@
             document.body.style.setProperty('background-color', color, 'important');
           }
           
-          // Clean up forced styles after CSS loads
-          setTimeout(() => {
-            document.documentElement.style.removeProperty('background-color');
-            if (document.body) {
-              document.body.style.removeProperty('background-color');
+          // Wait for CSS to load before cleaning up forced styles
+          const waitForCSS = () => {
+            // Check if React app is loaded and theme is applied
+            if (document.querySelector('#root > *') && document.documentElement.classList.length > 0) {
+              document.documentElement.style.removeProperty('background-color');
+              if (document.body) {
+                document.body.style.removeProperty('background-color');
+              }
+            } else {
+              // Keep checking every 100ms until CSS/React loads
+              setTimeout(waitForCSS, 100);
             }
-          }, 200);
+          };
+          
+          // Start checking after a short delay
+          setTimeout(waitForCSS, 200);
           
         } catch (e) {
           console.error('Theme script failed, using fallback:', e);
