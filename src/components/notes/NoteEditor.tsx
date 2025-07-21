@@ -47,17 +47,14 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter' && keyboardIsOpen) {
-        // When Enter is pressed and keyboard is already open, 
-        // prevent the resize handler from triggering unwanted scroll
-        e.preventDefault();
-        
-        // Insert line break manually
+        // Only prevent default for contentEditable, let textarea handle normally
         const target = e.target as HTMLElement;
         if (target === contentRef.current) {
+          e.preventDefault();
           document.execCommand('insertHTML', false, '<br>');
         }
         
-        // Then align after a short delay
+        // Then align after a short delay to show cursor above keyboard
         setTimeout(() => {
           scrollActiveElementIntoView();
         }, 50);
