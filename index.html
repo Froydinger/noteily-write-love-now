@@ -31,16 +31,16 @@
   </head>
 
   <body>
-    <!-- Apply user's actual theme immediately before any content loads -->
+    <!-- Apply user's actual theme and browser color immediately -->
     <script>
       (function() {
         // Check localStorage for saved theme, default to navy
         const savedTheme = localStorage.getItem('theme') || 'navy';
         
-        // Apply theme class to HTML
+        // Apply theme class to HTML immediately
         document.documentElement.className = savedTheme;
         
-        // Apply corresponding browser chrome color
+        // Set browser chrome colors for all viewports
         const themeColors = {
           light: '#ffffff',
           dark: '#0a0a0a', 
@@ -48,10 +48,25 @@
           sepia: '#f5f1eb'
         };
         
-        const meta = document.querySelector('meta[name="theme-color"]');
+        const themeColor = themeColors[savedTheme] || themeColors.navy;
+        
+        // Update all theme color meta tags
+        let meta = document.querySelector('meta[name="theme-color"]');
         if (meta) {
-          meta.content = themeColors[savedTheme] || themeColors.navy;
+          meta.content = themeColor;
         }
+        
+        // Also set apple status bar color
+        let appleMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+        if (appleMeta) {
+          appleMeta.content = savedTheme === 'light' ? 'default' : 'black-translucent';
+        }
+        
+        // Force browser repaint to apply colors immediately
+        document.body.style.backgroundColor = themeColor;
+        setTimeout(() => {
+          document.body.style.backgroundColor = '';
+        }, 1);
       })();
     </script>
     <div id="root"></div>
