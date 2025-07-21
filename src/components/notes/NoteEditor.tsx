@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNotes, Note } from '@/contexts/NoteContext';
 import DOMPurify from 'dompurify';
+import { ImageUploadButton } from './ImageUploadButton';
 
 interface NoteEditorProps {
   note: Note;
@@ -32,7 +33,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   }, [note.id]);
 
 
-  // Handle content updates with debounce
+  // Handle content updates with debounce and auto-scroll
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     
@@ -47,22 +48,109 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       }
     };
 
+    const scrollToCursor = () => {
+      if (!contentRef.current) return;
+      
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+      
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      
+      // If cursor is below viewport or close to bottom, scroll down
+      const viewportHeight = window.innerHeight;
+      const keyboardThreshold = viewportHeight * 0.6; // Assume keyboard takes up 40% of screen
+      
+      if (rect.bottom > keyboardThreshold) {
+        // Scroll the cursor position into view with some padding
+        const scrollTarget = rect.bottom - keyboardThreshold + 100;
+        window.scrollBy({
+          top: scrollTarget,
+          behavior: 'smooth'
+        });
+      }
+    };
+
+    const handleInput = () => {
+      handleContentChange();
+      // Delay scroll to allow content to render
+      setTimeout(scrollToCursor, 50);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        // Extra delay for Enter key to handle new line creation
+        setTimeout(scrollToCursor, 100);
+      }
+    };
+
     const currentRef = contentRef.current;
     
     if (currentRef) {
-      currentRef.addEventListener('input', handleContentChange);
+      currentRef.addEventListener('input', handleInput);
+      currentRef.addEventListener('keydown', handleKeyDown);
     }
     
     return () => {
       clearTimeout(timeout);
       if (currentRef) {
-        currentRef.removeEventListener('input', handleContentChange);
+        currentRef.removeEventListener('input', handleInput);
+        currentRef.removeEventListener('keydown', handleKeyDown);
       }
     };
   }, [note.id, updateNote]);
 
+  // Handle image insertion at cursor position
+  const insertImageAtCursor = (imageUrl: string) => {
+    if (!contentRef.current) return;
+
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.style.width = '50%';
+    img.style.height = 'auto';
+    img.style.display = 'block';
+    img.style.margin = '1rem auto';
+    img.style.borderRadius = '8px';
+    img.className = 'note-image';
+    img.setAttribute('data-image-id', Date.now().toString());
+
+    const selection = window.getSelection();
+    const range = selection?.getRangeAt(0);
+
+    if (range && contentRef.current.contains(range.commonAncestorContainer)) {
+      range.deleteContents();
+      range.insertNode(img);
+      
+      // Move cursor after the image
+      const newRange = document.createRange();
+      newRange.setStartAfter(img);
+      newRange.collapse(true);
+      selection?.removeAllRanges();
+      selection?.addRange(newRange);
+    } else {
+      // Fallback: append to end
+      contentRef.current.appendChild(img);
+    }
+
+    // Trigger content change to save
+    contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+
+  // Handle existing images in loaded content
+  useEffect(() => {
+    if (!contentRef.current) return;
+    
+    const images = contentRef.current.querySelectorAll('img');
+    images.forEach((img) => {
+      if (!img.hasAttribute('data-image-id')) {
+        img.setAttribute('data-image-id', Date.now().toString());
+        img.className = 'note-image';
+      }
+    });
+  }, [note.content]);
+
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 py-8 animate-fade-in">
+    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-96 animate-fade-in">
       <textarea
         ref={titleRef}
         value={title}
@@ -93,6 +181,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         data-placeholder="Just start typing…"
         aria-label="Note content"
       />
+      
+      <ImageUploadButton onImageInsert={insertImageAtCursor} />
     </div>
   );
 }
