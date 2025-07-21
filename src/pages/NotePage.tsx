@@ -191,7 +191,7 @@ const NotePage = () => {
         </div>
       </header>
       
-      <div className="flex-grow overflow-auto bg-background">
+      <div className="flex-grow overflow-auto">
         <NoteEditor note={note} />
       </div>
     </div>
