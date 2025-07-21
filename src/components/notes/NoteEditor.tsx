@@ -216,9 +216,10 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       <div
         ref={contentRef}
         contentEditable
-        className="note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert min-h-[50vh]"
+        className="note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert min-h-[50vh] max-h-none h-auto"
         data-placeholder="Just start typing…"
         aria-label="Note content"
+        style={{ maxHeight: 'none', height: 'auto' }}
       />
       
       <ImageUploadButton onImageInsert={insertImageAtCursor} />
