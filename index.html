@@ -30,12 +30,29 @@
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
   </head>
 
-  <body class="navy">
-    <!-- Apply navy theme immediately before any content loads -->
+  <body>
+    <!-- Apply user's actual theme immediately before any content loads -->
     <script>
-      document.documentElement.className = 'navy';
-      const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.content = '#192028';
+      (function() {
+        // Check localStorage for saved theme, default to navy
+        const savedTheme = localStorage.getItem('theme') || 'navy';
+        
+        // Apply theme class to HTML
+        document.documentElement.className = savedTheme;
+        
+        // Apply corresponding browser chrome color
+        const themeColors = {
+          light: '#ffffff',
+          dark: '#0a0a0a', 
+          navy: '#192028',
+          sepia: '#f5f1eb'
+        };
+        
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) {
+          meta.content = themeColors[savedTheme] || themeColors.navy;
+        }
+      })();
     </script>
     <div id="root"></div>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
