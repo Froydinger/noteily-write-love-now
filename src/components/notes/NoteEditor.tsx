@@ -107,13 +107,26 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
   // Show image controls when image is clicked
   const showImageControls = (img: HTMLImageElement) => {
+    console.log('Showing controls for image:', img.src);
+    
     // Remove any existing controls
     document.querySelectorAll('.image-control').forEach(el => el.remove());
 
-    const rect = img.getBoundingClientRect();
-    const editorRect = contentRef.current?.getBoundingClientRect();
-    
-    if (!editorRect) return;
+    // Create a wrapper around the image if it doesn't exist
+    let wrapper = img.parentElement;
+    if (!wrapper || !wrapper.classList.contains('image-wrapper')) {
+      wrapper = document.createElement('div');
+      wrapper.className = 'image-wrapper';
+      wrapper.style.cssText = `
+        position: relative;
+        display: inline-block;
+        margin: 1rem auto;
+        width: fit-content;
+      `;
+      
+      img.parentNode?.insertBefore(wrapper, img);
+      wrapper.appendChild(img);
+    }
 
     // Create move handle (top-left)
     const moveHandle = document.createElement('div');
@@ -121,8 +134,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     moveHandle.innerHTML = '⋮⋮';
     moveHandle.style.cssText = `
       position: absolute;
-      top: ${rect.top - editorRect.top - 12}px;
-      left: ${rect.left - editorRect.left - 12}px;
+      top: -12px;
+      left: -12px;
       width: 24px;
       height: 24px;
       background: hsl(var(--primary));
@@ -132,10 +145,11 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       align-items: center;
       justify-content: center;
       cursor: move;
-      font-size: 12px;
+      font-size: 10px;
       font-weight: bold;
       z-index: 1000;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      user-select: none;
     `;
 
     // Create resize handle (bottom-right)
@@ -144,8 +158,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     resizeHandle.innerHTML = '↘';
     resizeHandle.style.cssText = `
       position: absolute;
-      top: ${rect.bottom - editorRect.top - 12}px;
-      left: ${rect.right - editorRect.left - 12}px;
+      bottom: -12px;
+      right: -12px;
       width: 24px;
       height: 24px;
       background: hsl(var(--primary));
@@ -159,80 +173,45 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       font-weight: bold;
       z-index: 1000;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      user-select: none;
     `;
 
-    contentRef.current?.appendChild(moveHandle);
-    contentRef.current?.appendChild(resizeHandle);
+    wrapper.appendChild(moveHandle);
+    wrapper.appendChild(resizeHandle);
 
-    // Handle moving
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let imgStartX = 0;
-    let imgStartY = 0;
-
-    moveHandle.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      isDragging = true;
-      dragStartX = e.clientX;
-      dragStartY = e.clientY;
-      imgStartX = img.offsetLeft;
-      imgStartY = img.offsetTop;
-
-      const handleMouseMove = (e: MouseEvent) => {
-        if (!isDragging) return;
-        
-        const deltaX = e.clientX - dragStartX;
-        const deltaY = e.clientY - dragStartY;
-        
-        // For now, we'll just change the margin to simulate movement
-        const currentMarginTop = parseInt(img.style.marginTop) || 16;
-        const currentMarginLeft = parseInt(img.style.marginLeft) || 0;
-        
-        img.style.marginTop = Math.max(0, currentMarginTop + deltaY * 0.1) + 'px';
-        img.style.marginLeft = Math.max(-50, Math.min(50, currentMarginLeft + deltaX * 0.1)) + 'px';
-        
-        updateControlPositions();
-      };
-
-      const handleMouseUp = () => {
-        isDragging = false;
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-        contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
-      };
-
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    });
+    console.log('Controls added to wrapper');
 
     // Handle resizing
     let isResizing = false;
-    let resizeStartX = 0;
-    let imgStartWidth = 0;
-
-    resizeHandle.addEventListener('mousedown', (e) => {
+    
+    const handleResizeStart = (e: MouseEvent) => {
       e.preventDefault();
+      e.stopPropagation();
+      console.log('Resize started');
       isResizing = true;
-      resizeStartX = e.clientX;
-      imgStartWidth = img.offsetWidth;
+      
+      const startX = e.clientX;
+      const startWidth = img.offsetWidth;
+      const maxWidth = contentRef.current?.offsetWidth || 800;
 
       const handleMouseMove = (e: MouseEvent) => {
         if (!isResizing) return;
         
-        const deltaX = e.clientX - resizeStartX;
-        const newWidth = imgStartWidth + deltaX;
-        const maxWidth = contentRef.current?.offsetWidth || 800;
+        const deltaX = e.clientX - startX;
+        const newWidth = startWidth + deltaX;
         const minWidth = 100;
         
         const constrainedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
-        const percentage = (constrainedWidth / maxWidth) * 100;
+        const percentage = Math.min(Math.max((constrainedWidth / maxWidth) * 100, 10), 90);
         
         img.style.width = percentage + '%';
-        updateControlPositions();
+        img.style.height = 'auto';
+        
+        console.log('Resizing to:', percentage + '%');
       };
 
       const handleMouseUp = () => {
+        console.log('Resize ended');
         isResizing = false;
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -241,27 +220,57 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-    });
-
-    // Update control positions
-    const updateControlPositions = () => {
-      const newRect = img.getBoundingClientRect();
-      moveHandle.style.top = `${newRect.top - editorRect.top - 12}px`;
-      moveHandle.style.left = `${newRect.left - editorRect.left - 12}px`;
-      resizeHandle.style.top = `${newRect.bottom - editorRect.top - 12}px`;
-      resizeHandle.style.left = `${newRect.right - editorRect.left - 12}px`;
     };
+
+    resizeHandle.addEventListener('mousedown', handleResizeStart);
+
+    // Handle moving (simulate with margin adjustments)
+    let isDragging = false;
+    
+    const handleMoveStart = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('Move started');
+      isDragging = true;
+      
+      const startY = e.clientY;
+      const startMargin = parseInt(wrapper.style.marginTop) || 16;
+
+      const handleMouseMove = (e: MouseEvent) => {
+        if (!isDragging) return;
+        
+        const deltaY = e.clientY - startY;
+        const newMargin = Math.max(0, startMargin + deltaY * 0.2);
+        
+        wrapper.style.marginTop = newMargin + 'px';
+        console.log('Moving, new margin:', newMargin + 'px');
+      };
+
+      const handleMouseUp = () => {
+        console.log('Move ended');
+        isDragging = false;
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
+      };
+
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    };
+
+    moveHandle.addEventListener('mousedown', handleMoveStart);
 
     // Hide controls when clicking elsewhere
     const hideControls = (e: MouseEvent) => {
-      if (!moveHandle.contains(e.target as Node) && 
-          !resizeHandle.contains(e.target as Node) && 
-          !img.contains(e.target as Node)) {
+      const target = e.target as Element;
+      if (!wrapper.contains(target)) {
+        console.log('Hiding controls');
         document.querySelectorAll('.image-control').forEach(el => el.remove());
         document.removeEventListener('click', hideControls);
       }
     };
 
+    // Add hide controls listener after a short delay
     setTimeout(() => {
       document.addEventListener('click', hideControls);
     }, 100);
