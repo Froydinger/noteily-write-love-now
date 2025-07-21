@@ -22,10 +22,14 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       setTimeout(() => {
         const activeElement = document.activeElement;
         if (activeElement && (activeElement === titleRef.current || activeElement === contentRef.current)) {
+          // Position the element at the top of the visible area to stay above keyboard
           activeElement.scrollIntoView({ 
             behavior: 'smooth', 
-            block: 'center'
+            block: 'start'
           });
+          
+          // Add extra offset to ensure it's clearly above keyboard
+          window.scrollBy(0, -100);
         }
       }, 200);
     };
