@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNotes, Note } from '@/contexts/NoteContext';
 import DOMPurify from 'dompurify';
-import { ImageUploadButton } from './ImageUploadButton';
 
 interface NoteEditorProps {
   note: Note;
@@ -14,83 +13,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
-  // Simple keyboard detection and auto-scroll
-  useEffect(() => {
-    let keyboardIsOpen = false;
-    
-    const scrollActiveElementIntoView = () => {
-      setTimeout(() => {
-        const activeElement = document.activeElement;
-        if (activeElement && (activeElement === titleRef.current || activeElement === contentRef.current)) {
-          // Position the element at the top of the visible area to stay above keyboard
-          activeElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start'
-          });
-          
-          // Add extra offset to ensure it's clearly above keyboard
-          window.scrollBy(0, -100);
-        }
-      }, 200);
-    };
-    
-    const handleResize = () => {
-      const viewportHeight = window.visualViewport?.height || window.innerHeight;
-      const screenHeight = window.screen.height;
-      const keyboardHeight = screenHeight - viewportHeight;
-      
-      // Track keyboard state
-      const wasKeyboardOpen = keyboardIsOpen;
-      keyboardIsOpen = keyboardHeight > 200;
-      
-      // Only trigger scroll when keyboard first opens, not when it's already open
-      if (keyboardIsOpen && !wasKeyboardOpen) {
-        scrollActiveElementIntoView();
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && keyboardIsOpen) {
-        // Only prevent default for contentEditable, let textarea handle normally
-        const target = e.target as HTMLElement;
-        if (target === contentRef.current) {
-          e.preventDefault();
-          document.execCommand('insertHTML', false, '<br>');
-        }
-        
-        // Then align after a short delay to show cursor above keyboard
-        setTimeout(() => {
-          scrollActiveElementIntoView();
-        }, 50);
-      }
-    };
-
-    // Add event listeners
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleResize);
-    }
-    
-    if (titleRef.current) {
-      titleRef.current.addEventListener('keydown', handleKeyDown);
-    }
-    
-    if (contentRef.current) {
-      contentRef.current.addEventListener('keydown', handleKeyDown);
-    }
-
-    return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleResize);
-      }
-      if (titleRef.current) {
-        titleRef.current.removeEventListener('keydown', handleKeyDown);
-      }
-      if (contentRef.current) {
-        contentRef.current.removeEventListener('keydown', handleKeyDown);
-      }
-    };
-  }, []);
-
   // Auto-resize title textarea
   useEffect(() => {
     if (titleRef.current) {
@@ -139,57 +61,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     };
   }, [note.id, updateNote]);
 
-  // Handle image insertion at cursor position
-  const insertImageAtCursor = (imageUrl: string) => {
-    if (!contentRef.current) return;
-
-    const img = document.createElement('img');
-    img.src = imageUrl;
-    img.style.width = '50%';
-    img.style.height = 'auto';
-    img.style.display = 'block';
-    img.style.margin = '1rem auto';
-    img.style.borderRadius = '8px';
-    img.className = 'note-image';
-    img.setAttribute('data-image-id', Date.now().toString());
-
-    const selection = window.getSelection();
-    const range = selection?.getRangeAt(0);
-
-    if (range && contentRef.current.contains(range.commonAncestorContainer)) {
-      range.deleteContents();
-      range.insertNode(img);
-      
-      // Move cursor after the image
-      const newRange = document.createRange();
-      newRange.setStartAfter(img);
-      newRange.collapse(true);
-      selection?.removeAllRanges();
-      selection?.addRange(newRange);
-    } else {
-      // Fallback: append to end
-      contentRef.current.appendChild(img);
-    }
-
-    // Trigger content change to save
-    contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-  };
-
-  // Handle existing images in loaded content
-  useEffect(() => {
-    if (!contentRef.current) return;
-    
-    const images = contentRef.current.querySelectorAll('img');
-    images.forEach((img) => {
-      if (!img.hasAttribute('data-image-id')) {
-        img.setAttribute('data-image-id', Date.now().toString());
-        img.className = 'note-image';
-      }
-    });
-  }, [note.content]);
-
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-96 animate-fade-in">
+    <div className="w-full max-w-3xl mx-auto px-4 py-8 animate-fade-in">
       <textarea
         ref={titleRef}
         value={title}
@@ -216,13 +89,10 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       <div
         ref={contentRef}
         contentEditable
-        className="note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert min-h-[50vh] max-h-none h-auto"
+        className="note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert min-h-[50vh]"
         data-placeholder="Just start typing…"
         aria-label="Note content"
-        style={{ maxHeight: 'none', height: 'auto' }}
       />
-      
-      <ImageUploadButton onImageInsert={insertImageAtCursor} />
     </div>
   );
 }

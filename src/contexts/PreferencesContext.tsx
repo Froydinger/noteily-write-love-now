@@ -146,8 +146,8 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     // Save to localStorage immediately
     localStorage.setItem('theme', theme);
     
-    // Update browser theme color to match the applied theme
-    updateBrowserThemeColor(theme);
+    // Browser color is handled by inline script on load
+    // updateBrowserThemeColor(theme);
   };
 
   const updateBrowserThemeColor = (theme: ThemeType) => {
