@@ -350,6 +350,62 @@
     @apply text-muted-foreground italic;
   }
 
+  /* Image editing styles */
+  .note-editor .image-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 1rem 0;
+    border-radius: 8px;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .note-editor .image-wrapper:hover {
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.15);
+  }
+
+  .note-editor .note-image {
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+  }
+
+  .note-editor .resize-handle {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    background-color: hsl(var(--primary));
+    cursor: se-resize;
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+  }
+
+  .note-editor .resize-handle::before {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-bottom: 6px solid white;
+  }
+
+  .note-editor .image-wrapper:hover .resize-handle {
+    opacity: 1;
+  }
+
+  /* Drag and drop visual feedback */
+  .note-editor .note-image[draggable="true"] {
+    cursor: move;
+  }
+
+  .note-editor .note-image[draggable="true"]:hover {
+    transform: scale(1.02);
+  }
+
   /* Sidebar active states with proper contrast */
   .sidebar-menu-active {
     @apply border border-foreground/20 text-foreground bg-transparent;
