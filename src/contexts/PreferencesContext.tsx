@@ -174,6 +174,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     if (!metaTags[0] && !metaTags[1]) {
       const newMeta = document.createElement('meta');
       newMeta.name = 'theme-color';
+      newMeta.id = 'theme-meta';  // Add same ID as inline script
       newMeta.content = color;
       document.head.appendChild(newMeta);
     }
