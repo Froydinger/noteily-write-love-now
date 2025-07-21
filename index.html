@@ -38,6 +38,10 @@
         const fallbackColor = '#0a0a0a';
         
         try {
+          // FORCE CLEAR localStorage theme to fix white browser conflict on this device
+          localStorage.removeItem('theme');
+          console.log('CLEARED theme localStorage for fresh start');
+          
           const theme = localStorage.getItem('theme') || 'dark'; // Default to dark instead of navy
           const colors = { light: '#ffffff', dark: '#0a0a0a', navy: '#192028', sepia: '#f5f1eb' };
           const color = colors[theme] || fallbackColor;
