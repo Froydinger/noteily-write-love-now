@@ -16,6 +16,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   
   // Simple keyboard detection and auto-scroll
   useEffect(() => {
+    let keyboardIsOpen = false;
+    
     const scrollActiveElementIntoView = () => {
       setTimeout(() => {
         const activeElement = document.activeElement;
@@ -25,7 +27,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
             block: 'center'
           });
         }
-      }, 200); // Longer delay to ensure keyboard is fully open
+      }, 200);
     };
     
     const handleResize = () => {
@@ -33,20 +35,36 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       const screenHeight = window.screen.height;
       const keyboardHeight = screenHeight - viewportHeight;
       
-      // Only trigger when keyboard is fully visible and stable
-      if (keyboardHeight > 200) {
+      // Track keyboard state
+      const wasKeyboardOpen = keyboardIsOpen;
+      keyboardIsOpen = keyboardHeight > 200;
+      
+      // Only trigger scroll when keyboard first opens, not when it's already open
+      if (keyboardIsOpen && !wasKeyboardOpen) {
         scrollActiveElementIntoView();
       }
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        // When Enter is pressed, realign immediately
-        scrollActiveElementIntoView();
+      if (e.key === 'Enter' && keyboardIsOpen) {
+        // When Enter is pressed and keyboard is already open, 
+        // prevent the resize handler from triggering unwanted scroll
+        e.preventDefault();
+        
+        // Insert line break manually
+        const target = e.target as HTMLElement;
+        if (target === contentRef.current) {
+          document.execCommand('insertHTML', false, '<br>');
+        }
+        
+        // Then align after a short delay
+        setTimeout(() => {
+          scrollActiveElementIntoView();
+        }, 50);
       }
     };
 
-    // Add event listeners - NO focus listener to avoid premature scrolling
+    // Add event listeners
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleResize);
     }
