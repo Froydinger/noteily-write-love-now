@@ -73,80 +73,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     img.style.display = 'block';
     img.style.margin = '1rem auto';
     img.style.borderRadius = '8px';
-    img.style.cursor = 'pointer';
     img.className = 'note-image';
     img.setAttribute('data-image-id', Date.now().toString());
-
-    // Add drag to resize functionality - no buttons needed
-    let isDragging = false;
-    let startX = 0;
-    let startWidth = 0;
-    
-    const handleStart = (clientX: number, e: Event) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      // Blur to prevent keyboard
-      if (contentRef.current) {
-        contentRef.current.blur();
-      }
-      
-      isDragging = true;
-      startX = clientX;
-      startWidth = img.offsetWidth;
-    };
-    
-    const handleMove = (clientX: number) => {
-      if (!isDragging) return;
-      
-      const deltaX = clientX - startX;
-      const newWidth = startWidth + deltaX;
-      const maxWidth = contentRef.current?.offsetWidth || 800;
-      const minWidth = 100;
-      
-      const constrainedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
-      const percentage = Math.min(Math.max((constrainedWidth / maxWidth) * 100, 20), 80);
-      
-      img.style.width = percentage + '%';
-      img.style.height = 'auto';
-    };
-    
-    const handleEnd = () => {
-      if (isDragging) {
-        isDragging = false;
-        contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-    };
-    
-    // Touch events for mobile
-    img.addEventListener('touchstart', (e) => {
-      handleStart(e.touches[0].clientX, e);
-    }, { passive: false });
-    
-    img.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      handleMove(e.touches[0].clientX);
-    }, { passive: false });
-    
-    img.addEventListener('touchend', handleEnd);
-    
-    // Mouse events for desktop
-    img.addEventListener('mousedown', (e) => {
-      handleStart(e.clientX, e);
-      
-      const handleMouseMove = (e: MouseEvent) => {
-        handleMove(e.clientX);
-      };
-      
-      const handleMouseUp = () => {
-        handleEnd();
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-      
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    });
 
     const selection = window.getSelection();
     const range = selection?.getRangeAt(0);
@@ -179,78 +107,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       if (!img.hasAttribute('data-image-id')) {
         img.setAttribute('data-image-id', Date.now().toString());
         img.className = 'note-image';
-        img.style.cursor = 'pointer';
-        
-        // Add the same drag functionality to existing images
-        let isDragging = false;
-        let startX = 0;
-        let startWidth = 0;
-        
-        const handleStart = (clientX: number, e: Event) => {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          // Blur to prevent keyboard
-          if (contentRef.current) {
-            contentRef.current.blur();
-          }
-          
-          isDragging = true;
-          startX = clientX;
-          startWidth = (img as HTMLImageElement).offsetWidth;
-        };
-        
-        const handleMove = (clientX: number) => {
-          if (!isDragging) return;
-          
-          const deltaX = clientX - startX;
-          const newWidth = startWidth + deltaX;
-          const maxWidth = contentRef.current?.offsetWidth || 800;
-          const minWidth = 100;
-          
-          const constrainedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
-          const percentage = Math.min(Math.max((constrainedWidth / maxWidth) * 100, 20), 80);
-          
-          (img as HTMLImageElement).style.width = percentage + '%';
-          (img as HTMLImageElement).style.height = 'auto';
-        };
-        
-        const handleEnd = () => {
-          if (isDragging) {
-            isDragging = false;
-            contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
-          }
-        };
-        
-        // Touch events for mobile
-        img.addEventListener('touchstart', (e) => {
-          handleStart(e.touches[0].clientX, e);
-        }, { passive: false });
-        
-        img.addEventListener('touchmove', (e) => {
-          e.preventDefault();
-          handleMove(e.touches[0].clientX);
-        }, { passive: false });
-        
-        img.addEventListener('touchend', handleEnd);
-        
-        // Mouse events for desktop
-        img.addEventListener('mousedown', (e) => {
-          handleStart(e.clientX, e);
-          
-          const handleMouseMove = (e: MouseEvent) => {
-            handleMove(e.clientX);
-          };
-          
-          const handleMouseUp = () => {
-            handleEnd();
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-          };
-          
-          document.addEventListener('mousemove', handleMouseMove);
-          document.addEventListener('mouseup', handleMouseUp);
-        });
       }
     });
   }, [note.content]);
