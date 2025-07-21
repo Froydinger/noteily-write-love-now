@@ -112,7 +112,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   }, [note.content]);
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 py-8 animate-fade-in">
+    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-96 animate-fade-in">
       <textarea
         ref={titleRef}
         value={title}
