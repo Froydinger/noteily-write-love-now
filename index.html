@@ -9,7 +9,7 @@
     <meta name="author" content="Noteily" />
 
     <!-- PWA Configuration -->
-    <meta name="theme-color" content="#192028" />
+    <meta name="theme-color" content="#192028" id="theme-meta" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Noteily" />
@@ -32,13 +32,51 @@
 
   <body>
     <script>
-      // Simple, working theme application
-      const theme = localStorage.getItem('theme') || 'navy';
-      document.documentElement.className = theme;
-      
-      // Browser colors
-      const colors = { light: '#ffffff', dark: '#0a0a0a', navy: '#192028', sepia: '#f5f1eb' };
-      document.querySelector('meta[name="theme-color"]').content = colors[theme];
+      // BULLETPROOF theme application - runs immediately
+      try {
+        const theme = localStorage.getItem('theme') || 'navy';
+        const colors = { light: '#ffffff', dark: '#0a0a0a', navy: '#192028', sepia: '#f5f1eb' };
+        const color = colors[theme];
+        
+        console.log('SETTING THEME:', theme, 'COLOR:', color);
+        
+        // Apply theme class
+        document.documentElement.className = theme;
+        
+        // Multiple ways to set browser color
+        const meta1 = document.querySelector('meta[name="theme-color"]');
+        const meta2 = document.getElementById('theme-meta');
+        
+        if (meta1) {
+          meta1.setAttribute('content', color);
+          console.log('Set meta1:', meta1.content);
+        }
+        if (meta2) {
+          meta2.setAttribute('content', color);
+          console.log('Set meta2:', meta2.content);
+        }
+        
+        // Force create if missing
+        if (!meta1 && !meta2) {
+          const newMeta = document.createElement('meta');
+          newMeta.name = 'theme-color';
+          newMeta.content = color;
+          document.head.appendChild(newMeta);
+          console.log('Created new meta:', color);
+        }
+        
+        // Force background for immediate visual feedback
+        document.documentElement.style.setProperty('background-color', color, 'important');
+        document.body.style.setProperty('background-color', color, 'important');
+        
+        setTimeout(() => {
+          document.documentElement.style.removeProperty('background-color');
+          document.body.style.removeProperty('background-color');
+        }, 100);
+        
+      } catch (e) {
+        console.error('Theme script failed:', e);
+      }
     </script>
     <div id="root"></div>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
