@@ -18,6 +18,18 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   useEffect(() => {
     let keyboardHeight = 0;
     
+    const scrollActiveElementIntoView = () => {
+      setTimeout(() => {
+        const activeElement = document.activeElement;
+        if (activeElement && (activeElement === titleRef.current || activeElement === contentRef.current)) {
+          activeElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center'
+          });
+        }
+      }, 100);
+    };
+    
     const handleResize = () => {
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
       const screenHeight = window.screen.height;
@@ -25,23 +37,50 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       
       // If keyboard is visible (height reduced by more than 150px)
       if (keyboardHeight > 150) {
-        // Scroll active element into view above keyboard
-        setTimeout(() => {
-          const activeElement = document.activeElement;
-          if (activeElement && (activeElement === titleRef.current || activeElement === contentRef.current)) {
-            activeElement.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'center'
-            });
-          }
-        }, 100);
+        scrollActiveElementIntoView();
       }
     };
 
+    const handleFocus = () => {
+      // When keyboard appears (focus), align immediately
+      scrollActiveElementIntoView();
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        // When Enter is pressed, realign immediately
+        scrollActiveElementIntoView();
+      }
+    };
+
+    // Add event listeners
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleResize);
-      return () => window.visualViewport?.removeEventListener('resize', handleResize);
     }
+    
+    if (titleRef.current) {
+      titleRef.current.addEventListener('focus', handleFocus);
+      titleRef.current.addEventListener('keydown', handleKeyDown);
+    }
+    
+    if (contentRef.current) {
+      contentRef.current.addEventListener('focus', handleFocus);
+      contentRef.current.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+      }
+      if (titleRef.current) {
+        titleRef.current.removeEventListener('focus', handleFocus);
+        titleRef.current.removeEventListener('keydown', handleKeyDown);
+      }
+      if (contentRef.current) {
+        contentRef.current.removeEventListener('focus', handleFocus);
+        contentRef.current.removeEventListener('keydown', handleKeyDown);
+      }
+    };
   }, []);
 
   // Auto-resize title textarea
