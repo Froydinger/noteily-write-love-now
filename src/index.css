@@ -200,14 +200,16 @@
     background-attachment: fixed;
   }
 
-  /* Apply navy mode by default */
-  html {
+  /* Apply navy mode by default only if no theme class exists */
+  html:not(.light):not(.dark):not(.navy):not(.sepia) {
     @apply navy;
   }
   
   body {
     @apply text-foreground antialiased font-opensans;
     background: inherit;
+    margin: 0;
+    padding: 0;
   }
 
 }

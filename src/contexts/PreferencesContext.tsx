@@ -134,16 +134,16 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const applyTheme = (theme: ThemeType) => {
     const html = document.documentElement;
     
-    // Remove all theme classes first
+    // Remove all theme classes
     html.classList.remove('light', 'dark', 'navy', 'sepia');
     
     // Add the new theme class
     html.classList.add(theme);
     
-    // Save to localStorage for immediate access on next page load
+    // Save to localStorage immediately
     localStorage.setItem('theme', theme);
     
-    // Update browser theme color immediately
+    // Update browser theme color
     updateBrowserThemeColor(theme);
   };
 
