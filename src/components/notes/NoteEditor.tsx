@@ -77,20 +77,97 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     img.className = 'note-image';
     img.setAttribute('data-image-id', Date.now().toString());
 
-    // Add click handler for showing controls
-    img.addEventListener('click', (e) => {
+    // Add touch/click handlers for direct image interaction
+    let touchStartTime = 0;
+    let isLongPress = false;
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let startWidth = 0;
+    
+    // Touch start
+    img.addEventListener('touchstart', (e) => {
+      touchStartTime = Date.now();
+      isLongPress = false;
+      const touch = e.touches[0];
+      startX = touch.clientX;
+      startY = touch.clientY;
+      startWidth = img.offsetWidth;
+      
+      // Blur to prevent keyboard
+      if (contentRef.current) {
+        contentRef.current.blur();
+      }
+    }, { passive: false });
+    
+    // Touch move - handle resizing
+    img.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      
+      if (Date.now() - touchStartTime > 200) { // Long press detected
+        isLongPress = true;
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - startX;
+        const newWidth = startWidth + deltaX;
+        const maxWidth = contentRef.current?.offsetWidth || 800;
+        const minWidth = 100;
+        
+        const constrainedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
+        const percentage = Math.min(Math.max((constrainedWidth / maxWidth) * 100, 10), 90);
+        
+        img.style.width = percentage + '%';
+        img.style.height = 'auto';
+      }
+    }, { passive: false });
+    
+    // Touch end
+    img.addEventListener('touchend', (e) => {
+      if (isLongPress) {
+        contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      isLongPress = false;
+      isDragging = false;
+    });
+    
+    // Mouse events for desktop
+    img.addEventListener('mousedown', (e) => {
       e.preventDefault();
       e.stopPropagation();
       
-      // Blur the contentEditable to hide keyboard
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startWidth = img.offsetWidth;
+      
+      // Blur to prevent focus
       if (contentRef.current) {
         contentRef.current.blur();
       }
       
-      // Prevent focus on the contentEditable
-      setTimeout(() => {
-        showImageControls(img);
-      }, 50);
+      const handleMouseMove = (e: MouseEvent) => {
+        if (!isDragging) return;
+        
+        const deltaX = e.clientX - startX;
+        const newWidth = startWidth + deltaX;
+        const maxWidth = contentRef.current?.offsetWidth || 800;
+        const minWidth = 100;
+        
+        const constrainedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
+        const percentage = Math.min(Math.max((constrainedWidth / maxWidth) * 100, 10), 90);
+        
+        img.style.width = percentage + '%';
+        img.style.height = 'auto';
+      };
+      
+      const handleMouseUp = () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
+      };
+      
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
     });
 
     const selection = window.getSelection();
@@ -115,184 +192,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
   };
 
-  // Show image controls when image is clicked
-  const showImageControls = (img: HTMLImageElement) => {
-    console.log('Showing controls for image:', img.src);
-    
-    // Remove any existing controls
-    document.querySelectorAll('.image-control').forEach(el => el.remove());
-
-    // Create a wrapper around the image if it doesn't exist
-    let wrapper = img.parentElement;
-    if (!wrapper || !wrapper.classList.contains('image-wrapper')) {
-      wrapper = document.createElement('div');
-      wrapper.className = 'image-wrapper';
-      wrapper.style.cssText = `
-        position: relative;
-        display: inline-block;
-        margin: 1rem auto;
-        width: fit-content;
-      `;
-      
-      img.parentNode?.insertBefore(wrapper, img);
-      wrapper.appendChild(img);
-    }
-
-    // Create move handle (top-left)
-    const moveHandle = document.createElement('div');
-    moveHandle.className = 'image-control move-handle';
-    moveHandle.innerHTML = '⋮⋮';
-    moveHandle.style.cssText = `
-      position: absolute;
-      top: -12px;
-      left: -12px;
-      width: 24px;
-      height: 24px;
-      background: hsl(var(--primary));
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: move;
-      font-size: 10px;
-      font-weight: bold;
-      z-index: 1000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      user-select: none;
-    `;
-
-    // Create resize handle (bottom-right)
-    const resizeHandle = document.createElement('div');
-    resizeHandle.className = 'image-control resize-handle';
-    resizeHandle.innerHTML = '↘';
-    resizeHandle.style.cssText = `
-      position: absolute;
-      bottom: -12px;
-      right: -12px;
-      width: 24px;
-      height: 24px;
-      background: hsl(var(--primary));
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: se-resize;
-      font-size: 12px;
-      font-weight: bold;
-      z-index: 1000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      user-select: none;
-    `;
-
-    wrapper.appendChild(moveHandle);
-    wrapper.appendChild(resizeHandle);
-
-    console.log('Controls added to wrapper');
-
-    // Handle resizing
-    let isResizing = false;
-    
-    const handleResizeStart = (e: MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('Resize started');
-      isResizing = true;
-      
-      const startX = e.clientX;
-      const startWidth = img.offsetWidth;
-      const maxWidth = contentRef.current?.offsetWidth || 800;
-
-      const handleMouseMove = (e: MouseEvent) => {
-        if (!isResizing) return;
-        
-        const deltaX = e.clientX - startX;
-        const newWidth = startWidth + deltaX;
-        const minWidth = 100;
-        
-        const constrainedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
-        const percentage = Math.min(Math.max((constrainedWidth / maxWidth) * 100, 10), 90);
-        
-        img.style.width = percentage + '%';
-        img.style.height = 'auto';
-        
-        console.log('Resizing to:', percentage + '%');
-      };
-
-      const handleMouseUp = () => {
-        console.log('Resize ended');
-        isResizing = false;
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-        contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
-      };
-
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    };
-
-    resizeHandle.addEventListener('mousedown', handleResizeStart);
-
-    // Handle moving (simulate with margin adjustments)
-    let isDragging = false;
-    
-    const handleMoveStart = (e: MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('Move started');
-      isDragging = true;
-      
-      const startY = e.clientY;
-      const startMargin = parseInt(wrapper.style.marginTop) || 16;
-
-      const handleMouseMove = (e: MouseEvent) => {
-        if (!isDragging) return;
-        
-        const deltaY = e.clientY - startY;
-        const newMargin = Math.max(0, startMargin + deltaY * 0.2);
-        
-        wrapper.style.marginTop = newMargin + 'px';
-        console.log('Moving, new margin:', newMargin + 'px');
-      };
-
-      const handleMouseUp = () => {
-        console.log('Move ended');
-        isDragging = false;
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-        contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
-      };
-
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    };
-
-    moveHandle.addEventListener('mousedown', handleMoveStart);
-
-    // Hide controls when clicking elsewhere
-    const hideControls = (e: MouseEvent) => {
-      const target = e.target as Element;
-      if (!wrapper.contains(target)) {
-        console.log('Hiding controls');
-        document.querySelectorAll('.image-control').forEach(el => el.remove());
-        document.removeEventListener('click', hideControls);
-      }
-    };
-
-    // Add hide controls listener after a short delay
-    setTimeout(() => {
-      document.addEventListener('click', hideControls);
-    }, 100);
-  };
-
-  // Clean up image controls when component unmounts
-  useEffect(() => {
-    return () => {
-      document.querySelectorAll('.image-control').forEach(el => el.remove());
-    };
-  }, []);
-
   // Handle existing images in loaded content
   useEffect(() => {
     if (!contentRef.current) return;
@@ -303,19 +202,91 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         img.setAttribute('data-image-id', Date.now().toString());
         img.className = 'note-image';
         img.style.cursor = 'pointer';
-        img.addEventListener('click', (e) => {
+        
+        // Add the same touch/click handlers for existing images
+        let touchStartTime = 0;
+        let isLongPress = false;
+        let isDragging = false;
+        let startX = 0;
+        let startWidth = 0;
+        
+        // Touch events
+        img.addEventListener('touchstart', (e) => {
+          touchStartTime = Date.now();
+          isLongPress = false;
+          const touch = e.touches[0];
+          startX = touch.clientX;
+          startWidth = (img as HTMLImageElement).offsetWidth;
+          
+          if (contentRef.current) {
+            contentRef.current.blur();
+          }
+        }, { passive: false });
+        
+        img.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          
+          if (Date.now() - touchStartTime > 200) {
+            isLongPress = true;
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - startX;
+            const newWidth = startWidth + deltaX;
+            const maxWidth = contentRef.current?.offsetWidth || 800;
+            const minWidth = 100;
+            
+            const constrainedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
+            const percentage = Math.min(Math.max((constrainedWidth / maxWidth) * 100, 10), 90);
+            
+            (img as HTMLImageElement).style.width = percentage + '%';
+            (img as HTMLImageElement).style.height = 'auto';
+          }
+        }, { passive: false });
+        
+        img.addEventListener('touchend', (e) => {
+          if (isLongPress) {
+            contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+          isLongPress = false;
+          isDragging = false;
+        });
+        
+        // Mouse events
+        img.addEventListener('mousedown', (e) => {
           e.preventDefault();
           e.stopPropagation();
           
-          // Blur the contentEditable to hide keyboard
+          isDragging = true;
+          startX = e.clientX;
+          startWidth = (img as HTMLImageElement).offsetWidth;
+          
           if (contentRef.current) {
             contentRef.current.blur();
           }
           
-          // Prevent focus on the contentEditable
-          setTimeout(() => {
-            showImageControls(img as HTMLImageElement);
-          }, 50);
+          const handleMouseMove = (e: MouseEvent) => {
+            if (!isDragging) return;
+            
+            const deltaX = e.clientX - startX;
+            const newWidth = startWidth + deltaX;
+            const maxWidth = contentRef.current?.offsetWidth || 800;
+            const minWidth = 100;
+            
+            const constrainedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
+            const percentage = Math.min(Math.max((constrainedWidth / maxWidth) * 100, 10), 90);
+            
+            (img as HTMLImageElement).style.width = percentage + '%';
+            (img as HTMLImageElement).style.height = 'auto';
+          };
+          
+          const handleMouseUp = () => {
+            isDragging = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
+          };
+          
+          document.addEventListener('mousemove', handleMouseMove);
+          document.addEventListener('mouseup', handleMouseUp);
         });
       }
     });
