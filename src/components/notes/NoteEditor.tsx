@@ -16,8 +16,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   
   // Simple keyboard detection and auto-scroll
   useEffect(() => {
-    let keyboardHeight = 0;
-    
     const scrollActiveElementIntoView = () => {
       setTimeout(() => {
         const activeElement = document.activeElement;
@@ -27,23 +25,18 @@ export default function NoteEditor({ note }: NoteEditorProps) {
             block: 'center'
           });
         }
-      }, 100);
+      }, 200); // Longer delay to ensure keyboard is fully open
     };
     
     const handleResize = () => {
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
       const screenHeight = window.screen.height;
-      keyboardHeight = screenHeight - viewportHeight;
+      const keyboardHeight = screenHeight - viewportHeight;
       
-      // If keyboard is visible (height reduced by more than 150px)
-      if (keyboardHeight > 150) {
+      // Only trigger when keyboard is fully visible and stable
+      if (keyboardHeight > 200) {
         scrollActiveElementIntoView();
       }
-    };
-
-    const handleFocus = () => {
-      // When keyboard appears (focus), align immediately
-      scrollActiveElementIntoView();
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -53,18 +46,16 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       }
     };
 
-    // Add event listeners
+    // Add event listeners - NO focus listener to avoid premature scrolling
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleResize);
     }
     
     if (titleRef.current) {
-      titleRef.current.addEventListener('focus', handleFocus);
       titleRef.current.addEventListener('keydown', handleKeyDown);
     }
     
     if (contentRef.current) {
-      contentRef.current.addEventListener('focus', handleFocus);
       contentRef.current.addEventListener('keydown', handleKeyDown);
     }
 
@@ -73,11 +64,9 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         window.visualViewport.removeEventListener('resize', handleResize);
       }
       if (titleRef.current) {
-        titleRef.current.removeEventListener('focus', handleFocus);
         titleRef.current.removeEventListener('keydown', handleKeyDown);
       }
       if (contentRef.current) {
-        contentRef.current.removeEventListener('focus', handleFocus);
         contentRef.current.removeEventListener('keydown', handleKeyDown);
       }
     };
