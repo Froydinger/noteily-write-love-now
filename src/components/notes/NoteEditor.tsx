@@ -33,7 +33,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   }, [note.id]);
 
 
-  // Handle content updates with debounce
+  // Handle content updates with debounce and auto-scroll
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     
@@ -48,16 +48,54 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       }
     };
 
+    const scrollToCursor = () => {
+      if (!contentRef.current) return;
+      
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+      
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      
+      // If cursor is below viewport or close to bottom, scroll down
+      const viewportHeight = window.innerHeight;
+      const keyboardThreshold = viewportHeight * 0.6; // Assume keyboard takes up 40% of screen
+      
+      if (rect.bottom > keyboardThreshold) {
+        // Scroll the cursor position into view with some padding
+        const scrollTarget = rect.bottom - keyboardThreshold + 100;
+        window.scrollBy({
+          top: scrollTarget,
+          behavior: 'smooth'
+        });
+      }
+    };
+
+    const handleInput = () => {
+      handleContentChange();
+      // Delay scroll to allow content to render
+      setTimeout(scrollToCursor, 50);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        // Extra delay for Enter key to handle new line creation
+        setTimeout(scrollToCursor, 100);
+      }
+    };
+
     const currentRef = contentRef.current;
     
     if (currentRef) {
-      currentRef.addEventListener('input', handleContentChange);
+      currentRef.addEventListener('input', handleInput);
+      currentRef.addEventListener('keydown', handleKeyDown);
     }
     
     return () => {
       clearTimeout(timeout);
       if (currentRef) {
-        currentRef.removeEventListener('input', handleContentChange);
+        currentRef.removeEventListener('input', handleInput);
+        currentRef.removeEventListener('keydown', handleKeyDown);
       }
     };
   }, [note.id, updateNote]);
