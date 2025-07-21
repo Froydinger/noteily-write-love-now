@@ -60,6 +60,27 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
       return;
     }
 
+    // iOS-specific: Check for file availability and try to read it
+    if (isIOS()) {
+      try {
+        // Try to read the file to ensure it's actually available
+        const reader = new FileReader();
+        const fileCheckPromise = new Promise((resolve, reject) => {
+          reader.onload = () => resolve(true);
+          reader.onerror = () => reject(new Error('File not available - may be an iCloud placeholder'));
+          reader.onabort = () => reject(new Error('File read aborted'));
+        });
+        
+        reader.readAsArrayBuffer(file.slice(0, 1024)); // Read first 1KB as test
+        await fileCheckPromise;
+        console.log('File availability check passed');
+      } catch (error) {
+        console.error('File availability check failed:', error);
+        toast.error('This image is not fully downloaded. Please open it in Photos app and wait for it to download, then try again.');
+        return;
+      }
+    }
+
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `${user.id}/${fileName}`;
