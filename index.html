@@ -32,51 +32,87 @@
 
   <body>
     <script>
-      // BULLETPROOF theme application - runs immediately
-      try {
-        const theme = localStorage.getItem('theme') || 'navy';
-        const colors = { light: '#ffffff', dark: '#0a0a0a', navy: '#192028', sepia: '#f5f1eb' };
-        const color = colors[theme];
+      // SUPER AGGRESSIVE browser color setting - runs FIRST
+      (function() {
+        // IMMEDIATE fallback to black instead of white
+        const fallbackColor = '#0a0a0a';
         
-        console.log('SETTING THEME:', theme, 'COLOR:', color);
-        
-        // Apply theme class
-        document.documentElement.className = theme;
-        
-        // Multiple ways to set browser color
-        const meta1 = document.querySelector('meta[name="theme-color"]');
-        const meta2 = document.getElementById('theme-meta');
-        
-        if (meta1) {
-          meta1.setAttribute('content', color);
-          console.log('Set meta1:', meta1.content);
+        try {
+          const theme = localStorage.getItem('theme') || 'navy';
+          const colors = { light: '#ffffff', dark: '#0a0a0a', navy: '#192028', sepia: '#f5f1eb' };
+          const color = colors[theme] || fallbackColor;
+          
+          console.log('IMMEDIATE THEME SETUP:', theme, 'COLOR:', color);
+          
+          // SET BROWSER COLOR IMMEDIATELY - MULTIPLE WAYS
+          const setMetaColor = (color) => {
+            // Find all possible meta tags
+            const metas = [
+              document.querySelector('meta[name="theme-color"]'),
+              document.getElementById('theme-meta')
+            ];
+            
+            // Update existing ones
+            metas.forEach(meta => {
+              if (meta) meta.setAttribute('content', color);
+            });
+            
+            // Create if none exist
+            if (!metas[0] && !metas[1]) {
+              const newMeta = document.createElement('meta');
+              newMeta.name = 'theme-color';
+              newMeta.id = 'theme-meta';
+              newMeta.content = color;
+              document.head.appendChild(newMeta);
+            }
+          };
+          
+          // Set color IMMEDIATELY
+          setMetaColor(color);
+          
+          // Apply theme class
+          document.documentElement.className = theme;
+          
+          // Force body background immediately
+          document.documentElement.style.setProperty('background-color', color, 'important');
+          if (document.body) {
+            document.body.style.setProperty('background-color', color, 'important');
+          }
+          
+          // Clean up forced styles after CSS loads
+          setTimeout(() => {
+            document.documentElement.style.removeProperty('background-color');
+            if (document.body) {
+              document.body.style.removeProperty('background-color');
+            }
+          }, 200);
+          
+        } catch (e) {
+          console.error('Theme script failed, using fallback:', e);
+          // FALLBACK: Set to black instead of white
+          const setMetaColor = (color) => {
+            const metas = [
+              document.querySelector('meta[name="theme-color"]'),
+              document.getElementById('theme-meta')
+            ];
+            metas.forEach(meta => {
+              if (meta) meta.setAttribute('content', color);
+            });
+            if (!metas[0] && !metas[1]) {
+              const newMeta = document.createElement('meta');
+              newMeta.name = 'theme-color';
+              newMeta.id = 'theme-meta';
+              newMeta.content = color;
+              document.head.appendChild(newMeta);
+            }
+          };
+          setMetaColor(fallbackColor);
+          document.documentElement.style.setProperty('background-color', fallbackColor, 'important');
+          if (document.body) {
+            document.body.style.setProperty('background-color', fallbackColor, 'important');
+          }
         }
-        if (meta2) {
-          meta2.setAttribute('content', color);
-          console.log('Set meta2:', meta2.content);
-        }
-        
-        // Force create if missing
-        if (!meta1 && !meta2) {
-          const newMeta = document.createElement('meta');
-          newMeta.name = 'theme-color';
-          newMeta.content = color;
-          document.head.appendChild(newMeta);
-          console.log('Created new meta:', color);
-        }
-        
-        // Force background for immediate visual feedback
-        document.documentElement.style.setProperty('background-color', color, 'important');
-        document.body.style.setProperty('background-color', color, 'important');
-        
-        setTimeout(() => {
-          document.documentElement.style.removeProperty('background-color');
-          document.body.style.removeProperty('background-color');
-        }, 100);
-        
-      } catch (e) {
-        console.error('Theme script failed:', e);
-      }
+      })();
     </script>
     <div id="root"></div>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
