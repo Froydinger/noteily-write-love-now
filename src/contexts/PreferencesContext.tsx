@@ -148,9 +148,6 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const updateBrowserThemeColor = (theme: ThemeType) => {
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) return;
-
     const themeColors = {
       light: '#ffffff',
       dark: '#0a0a0a',
@@ -158,7 +155,30 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
       sepia: '#f5f1eb'
     };
 
-    metaThemeColor.setAttribute('content', themeColors[theme]);
+    const color = themeColors[theme];
+
+    // Update ALL possible meta tags to ensure consistency
+    const metaTags = [
+      document.querySelector('meta[name="theme-color"]'),
+      document.getElementById('theme-meta'),
+      document.querySelector('meta[name="msapplication-navbutton-color"]')
+    ];
+
+    metaTags.forEach(meta => {
+      if (meta) {
+        meta.setAttribute('content', color);
+      }
+    });
+
+    // Create theme-color meta if missing
+    if (!metaTags[0] && !metaTags[1]) {
+      const newMeta = document.createElement('meta');
+      newMeta.name = 'theme-color';
+      newMeta.content = color;
+      document.head.appendChild(newMeta);
+    }
+
+    console.log('PreferencesContext updated browser color to:', color, 'for theme:', theme);
   };
 
   return (
