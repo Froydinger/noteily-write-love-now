@@ -9,6 +9,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotes } from '@/contexts/NoteContext';
+import { usePreferences } from '@/contexts/PreferencesContext';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, User, HelpCircle, Download, Trash2, Key } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,7 +17,6 @@ import ThemeToggle from '@/components/theme/ThemeToggle';
 import { Input } from '@/components/ui/input';
 
 const SettingsPage = () => {
-  const [currentTheme, setCurrentTheme] = useState('navy');
   const [isDeleting, setIsDeleting] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
@@ -26,23 +26,9 @@ const SettingsPage = () => {
   const { toast } = useToast();
   const { user, signOut } = useAuth();
   const { notes } = useNotes();
+  const { preferences } = usePreferences();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Initialize theme from localStorage
-    const savedTheme = localStorage.getItem('theme') || 'navy';
-    setCurrentTheme(savedTheme);
-
-    // Listen for theme changes
-    const handleThemeChange = (e: CustomEvent) => {
-      setCurrentTheme(e.detail);
-    };
-
-    window.addEventListener('themeChange', handleThemeChange as EventListener);
-    return () => {
-      window.removeEventListener('themeChange', handleThemeChange as EventListener);
-    };
-  }, []);
 
   const getThemeLabel = (theme: string) => {
     switch (theme) {
@@ -239,7 +225,17 @@ ${note.content}
     setIsDeleting(true);
     
     try {
-      // First delete all user's notes
+      // First delete user preferences
+      const { error: preferencesError } = await supabase
+        .from('user_preferences')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (preferencesError) {
+        console.warn('Error deleting user preferences:', preferencesError);
+      }
+
+      // Then delete all user's notes
       const { error: notesError } = await supabase
         .from('notes')
         .delete()
@@ -297,7 +293,7 @@ ${note.content}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <span className="text-sm text-muted-foreground hidden sm:inline">
-                  {getThemeLabel(currentTheme)}
+                  {getThemeLabel(preferences.theme)}
                 </span>
                 <ThemeToggle variant="settings" />
               </div>

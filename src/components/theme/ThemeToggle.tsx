@@ -1,54 +1,22 @@
-
-import { useState, useEffect } from 'react';
 import { Sun, Moon, Waves, FileText, Monitor } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { useToast } from '@/hooks/use-toast';
-
-type Theme = 'light' | 'dark' | 'navy' | 'sepia';
+import { usePreferences, ThemeType } from '@/contexts/PreferencesContext';
 
 interface ThemeToggleProps {
   variant?: 'sidebar' | 'settings';
 }
 
 export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
-  const [currentTheme, setCurrentTheme] = useState<Theme>('navy'); // Default to navy mode (Night Mode)
+  const { preferences, updateTheme } = usePreferences();
   const { toast } = useToast();
   
-  useEffect(() => {
-    // Initialize based on saved preference or default to navy
-    const savedTheme = localStorage.getItem('theme') as Theme;
-    const theme = savedTheme || 'navy';
-    setCurrentTheme(theme);
-    applyTheme(theme);
-
-    // Listen for theme changes from other components
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'theme' && e.newValue) {
-        setCurrentTheme(e.newValue as Theme);
-      }
-    };
-
-    // Listen for custom theme change events
-    const handleThemeChange = (e: CustomEvent) => {
-      setCurrentTheme(e.detail);
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('themeChange', handleThemeChange as EventListener);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('themeChange', handleThemeChange as EventListener);
-    };
-  }, []);
-  
-  const toggleTheme = () => {
-    const themeOrder: Theme[] = ['navy', 'dark', 'light', 'sepia'];
-    const currentIndex = themeOrder.indexOf(currentTheme);
+  const toggleTheme = async () => {
+    const themeOrder: ThemeType[] = ['navy', 'dark', 'light', 'sepia'];
+    const currentIndex = themeOrder.indexOf(preferences.theme);
     const nextTheme = themeOrder[(currentIndex + 1) % themeOrder.length];
     
-    setCurrentTheme(nextTheme);
-    applyTheme(nextTheme);
+    await updateTheme(nextTheme);
     
     const themeLabels = {
       light: "Light mode enabled",
@@ -63,19 +31,8 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
     });
   };
   
-  const applyTheme = (theme: Theme) => {
-    document.documentElement.classList.remove('dark', 'navy', 'sepia');
-    if (theme !== 'light') {
-      document.documentElement.classList.add(theme);
-    }
-    localStorage.setItem('theme', theme);
-    
-    // Dispatch custom event to sync other components
-    window.dispatchEvent(new CustomEvent('themeChange', { detail: theme }));
-  };
-  
   const getThemeIcon = () => {
-    switch (currentTheme) {
+    switch (preferences.theme) {
       case 'light':
         return <Sun className="h-4 w-4" />;
       case 'dark':
@@ -90,7 +47,7 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
   };
 
   const getThemeLabel = () => {
-    switch (currentTheme) {
+    switch (preferences.theme) {
       case 'light':
         return 'Light Mode';
       case 'dark':
@@ -108,7 +65,7 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
     return (
       <Toggle 
         aria-label="Toggle theme"
-        pressed={currentTheme !== 'light'}
+        pressed={preferences.theme !== 'light'}
         onPressedChange={toggleTheme}
         className="h-8 w-8 p-0 flex-shrink-0"
         variant="outline"
@@ -122,7 +79,7 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
   return (
     <Toggle 
       aria-label="Toggle theme"
-      pressed={currentTheme !== 'light'}
+      pressed={preferences.theme !== 'light'}
       onPressedChange={toggleTheme}
       className="w-full justify-start btn-accessible h-9"
       variant="default"
