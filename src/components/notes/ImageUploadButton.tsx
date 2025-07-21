@@ -14,12 +14,16 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
   const { user } = useAuth();
 
   const handleUpload = async (file: File) => {
+    console.log('Starting image upload process...', { file: file.name, user: user?.id });
+    
     if (!user) {
+      console.error('No user found when trying to upload');
       toast.error('Please sign in to upload images');
       return;
     }
 
     if (!file.type.startsWith('image/')) {
+      console.error('Invalid file type:', file.type);
       toast.error('Please select an image file');
       return;
     }
@@ -28,22 +32,30 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `${user.id}/${fileName}`;
 
+    console.log('Uploading to path:', filePath);
+
     try {
       const { error: uploadError } = await supabase.storage
         .from('note-images')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      console.log('Upload successful, getting public URL...');
 
       const { data: { publicUrl } } = supabase.storage
         .from('note-images')
         .getPublicUrl(filePath);
 
+      console.log('Public URL:', publicUrl);
       onImageInsert(publicUrl);
       toast.success('Image uploaded successfully');
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast.error('Failed to upload image');
+      toast.error(`Failed to upload image: ${error.message || 'Unknown error'}`);
     }
   };
 
