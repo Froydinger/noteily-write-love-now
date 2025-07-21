@@ -202,7 +202,40 @@
 
   /* Apply navy mode by default only if no theme class exists */
   html:not(.light):not(.dark):not(.navy):not(.sepia) {
-    @apply navy;
+    --background: 215 45% 12%;
+    --foreground: 210 40% 95%;
+    --card: 215 45% 14%;
+    --card-foreground: 210 40% 95%;
+    --popover: 215 45% 14%;
+    --popover-foreground: 210 40% 95%;
+    --primary: 210 40% 95%;
+    --primary-foreground: 215 45% 12%;
+    --secondary: 215 45% 16%;
+    --secondary-foreground: 210 40% 95%;
+    --muted: 215 45% 16%;
+    --muted-foreground: 210 20% 70%;
+    --accent: 220 100% 70%;
+    --accent-foreground: 215 45% 12%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 95%;
+    --border: 215 45% 20%;
+    --input: 215 45% 20%;
+    --ring: 220 100% 70%;
+    --sidebar-background: 215 50% 8%;
+    --sidebar-foreground: 210 30% 80%;
+    --sidebar-primary: 210 40% 95%;
+    --sidebar-primary-foreground: 215 50% 8%;
+    --sidebar-accent: 220 100% 70%;
+    --sidebar-accent-foreground: 215 50% 8%;
+    --sidebar-border: 215 45% 18%;
+    --sidebar-ring: 220 100% 70%;
+    background: linear-gradient(180deg, 
+      hsl(215, 55%, 18%) 0%, 
+      hsl(218, 50%, 14%) 30%, 
+      hsl(220, 55%, 10%) 70%, 
+      hsl(222, 60%, 7%) 100%
+    );
+    background-attachment: fixed;
   }
   
   body {
