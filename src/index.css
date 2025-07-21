@@ -358,41 +358,7 @@
   }
 
   .note-editor .note-image:hover {
-    transform: scale(1.02);
-  }
-
-  .note-editor .image-wrapper {
-    position: relative;
-    display: inline-block;
-    margin: 1rem auto;
-    width: fit-content;
-  }
-
-  .note-editor .image-resize-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 32px;
-    height: 32px;
-    background: white;
-    color: black;
-    border: 2px solid #e5e5e5;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    transition: all 0.2s ease;
-  }
-
-  .note-editor .image-resize-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    border-color: #d1d1d1;
+    transform: scale(1.01);
   }
 
   /* Sidebar active states with proper contrast */

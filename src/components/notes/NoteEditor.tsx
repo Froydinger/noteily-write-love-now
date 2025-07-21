@@ -77,20 +77,75 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     img.className = 'note-image';
     img.setAttribute('data-image-id', Date.now().toString());
 
-    // Add click handler for showing resize button
-    img.addEventListener('click', (e) => {
+    // Add drag to resize functionality - no buttons needed
+    let isDragging = false;
+    let startX = 0;
+    let startWidth = 0;
+    
+    const handleStart = (clientX: number, e: Event) => {
       e.preventDefault();
       e.stopPropagation();
       
-      // Blur the contentEditable to hide keyboard
+      // Blur to prevent keyboard
       if (contentRef.current) {
         contentRef.current.blur();
       }
       
-      // Show resize button after brief delay
-      setTimeout(() => {
-        showResizeButton(img);
-      }, 50);
+      isDragging = true;
+      startX = clientX;
+      startWidth = img.offsetWidth;
+    };
+    
+    const handleMove = (clientX: number) => {
+      if (!isDragging) return;
+      
+      const deltaX = clientX - startX;
+      const newWidth = startWidth + deltaX;
+      const maxWidth = contentRef.current?.offsetWidth || 800;
+      const minWidth = 100;
+      
+      const constrainedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
+      const percentage = Math.min(Math.max((constrainedWidth / maxWidth) * 100, 20), 80);
+      
+      img.style.width = percentage + '%';
+      img.style.height = 'auto';
+    };
+    
+    const handleEnd = () => {
+      if (isDragging) {
+        isDragging = false;
+        contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    };
+    
+    // Touch events for mobile
+    img.addEventListener('touchstart', (e) => {
+      handleStart(e.touches[0].clientX, e);
+    }, { passive: false });
+    
+    img.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      handleMove(e.touches[0].clientX);
+    }, { passive: false });
+    
+    img.addEventListener('touchend', handleEnd);
+    
+    // Mouse events for desktop
+    img.addEventListener('mousedown', (e) => {
+      handleStart(e.clientX, e);
+      
+      const handleMouseMove = (e: MouseEvent) => {
+        handleMove(e.clientX);
+      };
+      
+      const handleMouseUp = () => {
+        handleEnd();
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
     });
 
     const selection = window.getSelection();
@@ -115,108 +170,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
   };
 
-  // Show resize button when image is clicked
-  const showResizeButton = (img: HTMLImageElement) => {
-    // Remove any existing resize buttons
-    document.querySelectorAll('.image-resize-btn').forEach(el => el.remove());
-
-    // Get current size to determine next size
-    const currentWidth = img.style.width || '50%';
-    const sizes = ['30%', '50%', '70%'];
-    const currentIndex = sizes.indexOf(currentWidth);
-    const nextSize = sizes[(currentIndex + 1) % sizes.length];
-
-    // Create resize button
-    const resizeBtn = document.createElement('button');
-    resizeBtn.className = 'image-resize-btn';
-    resizeBtn.innerHTML = '↔';
-    resizeBtn.style.cssText = `
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 32px;
-      height: 32px;
-      background: white;
-      color: black;
-      border: 2px solid #e5e5e5;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
-      z-index: 1000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      transition: all 0.2s ease;
-    `;
-
-    // Create wrapper if it doesn't exist
-    let wrapper = img.parentElement;
-    if (!wrapper || !wrapper.classList.contains('image-wrapper')) {
-      wrapper = document.createElement('div');
-      wrapper.className = 'image-wrapper';
-      wrapper.style.cssText = `
-        position: relative;
-        display: inline-block;
-        margin: 1rem auto;
-        width: fit-content;
-      `;
-      
-      img.parentNode?.insertBefore(wrapper, img);
-      wrapper.appendChild(img);
-    }
-
-    wrapper.appendChild(resizeBtn);
-
-    // Handle resize button click
-    resizeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      // Add bounce animation class
-      img.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-      
-      // Change size
-      img.style.width = nextSize;
-      img.style.height = 'auto';
-
-      // Remove transition after animation
-      setTimeout(() => {
-        img.style.transition = '';
-      }, 300);
-
-      // Save changes
-      contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
-      
-      // Hide button after click
-      setTimeout(() => {
-        resizeBtn.remove();
-      }, 1000);
-    });
-
-    // Hide button when clicking elsewhere
-    const hideButton = (e: MouseEvent) => {
-      const target = e.target as Element;
-      if (!wrapper?.contains(target)) {
-        resizeBtn.remove();
-        document.removeEventListener('click', hideButton);
-      }
-    };
-
-    setTimeout(() => {
-      document.addEventListener('click', hideButton);
-    }, 100);
-
-    // Auto-hide after 3 seconds
-    setTimeout(() => {
-      if (resizeBtn.parentNode) {
-        resizeBtn.remove();
-        document.removeEventListener('click', hideButton);
-      }
-    }, 3000);
-  };
-
   // Handle existing images in loaded content
   useEffect(() => {
     if (!contentRef.current) return;
@@ -228,20 +181,75 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         img.className = 'note-image';
         img.style.cursor = 'pointer';
         
-        // Add click handler for showing resize button
-        img.addEventListener('click', (e) => {
+        // Add the same drag functionality to existing images
+        let isDragging = false;
+        let startX = 0;
+        let startWidth = 0;
+        
+        const handleStart = (clientX: number, e: Event) => {
           e.preventDefault();
           e.stopPropagation();
           
-          // Blur the contentEditable to hide keyboard
+          // Blur to prevent keyboard
           if (contentRef.current) {
             contentRef.current.blur();
           }
           
-          // Show resize button after brief delay
-          setTimeout(() => {
-            showResizeButton(img as HTMLImageElement);
-          }, 50);
+          isDragging = true;
+          startX = clientX;
+          startWidth = (img as HTMLImageElement).offsetWidth;
+        };
+        
+        const handleMove = (clientX: number) => {
+          if (!isDragging) return;
+          
+          const deltaX = clientX - startX;
+          const newWidth = startWidth + deltaX;
+          const maxWidth = contentRef.current?.offsetWidth || 800;
+          const minWidth = 100;
+          
+          const constrainedWidth = Math.min(Math.max(newWidth, minWidth), maxWidth);
+          const percentage = Math.min(Math.max((constrainedWidth / maxWidth) * 100, 20), 80);
+          
+          (img as HTMLImageElement).style.width = percentage + '%';
+          (img as HTMLImageElement).style.height = 'auto';
+        };
+        
+        const handleEnd = () => {
+          if (isDragging) {
+            isDragging = false;
+            contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        };
+        
+        // Touch events for mobile
+        img.addEventListener('touchstart', (e) => {
+          handleStart(e.touches[0].clientX, e);
+        }, { passive: false });
+        
+        img.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          handleMove(e.touches[0].clientX);
+        }, { passive: false });
+        
+        img.addEventListener('touchend', handleEnd);
+        
+        // Mouse events for desktop
+        img.addEventListener('mousedown', (e) => {
+          handleStart(e.clientX, e);
+          
+          const handleMouseMove = (e: MouseEvent) => {
+            handleMove(e.clientX);
+          };
+          
+          const handleMouseUp = () => {
+            handleEnd();
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+          };
+          
+          document.addEventListener('mousemove', handleMouseMove);
+          document.addEventListener('mouseup', handleMouseUp);
         });
       }
     });
