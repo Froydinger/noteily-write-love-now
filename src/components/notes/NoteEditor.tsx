@@ -11,39 +11,36 @@ interface NoteEditorProps {
 export default function NoteEditor({ note }: NoteEditorProps) {
   const { updateNote } = useNotes();
   const [title, setTitle] = useState(note.title);
-  const [dynamicPadding, setDynamicPadding] = useState('pb-96');
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   
-  // Dynamic padding based on viewport and content
+  // Simple keyboard detection and auto-scroll
   useEffect(() => {
-    const updatePadding = () => {
-      if (!containerRef.current) return;
-      
+    let keyboardHeight = 0;
+    
+    const handleResize = () => {
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
-      const initialHeight = window.screen.height || window.innerHeight;
-      const keyboardHeight = initialHeight - viewportHeight;
+      const screenHeight = window.screen.height;
+      keyboardHeight = screenHeight - viewportHeight;
       
-      // If keyboard is open (significant height difference)
-      if (keyboardHeight > 200) {
-        // Add extra padding for keyboard
-        const extraPadding = Math.max(keyboardHeight, 400);
-        setDynamicPadding(`pb-[${extraPadding}px]`);
-      } else {
-        // Default large padding for scrolling space
-        setDynamicPadding('pb-96');
+      // If keyboard is visible (height reduced by more than 150px)
+      if (keyboardHeight > 150) {
+        // Scroll active element into view above keyboard
+        setTimeout(() => {
+          const activeElement = document.activeElement;
+          if (activeElement && (activeElement === titleRef.current || activeElement === contentRef.current)) {
+            activeElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center'
+            });
+          }
+        }, 100);
       }
     };
 
-    updatePadding();
-    
     if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', updatePadding);
-      return () => window.visualViewport?.removeEventListener('resize', updatePadding);
-    } else {
-      window.addEventListener('resize', updatePadding);
-      return () => window.removeEventListener('resize', updatePadding);
+      window.visualViewport.addEventListener('resize', handleResize);
+      return () => window.visualViewport?.removeEventListener('resize', handleResize);
     }
   }, []);
 
@@ -66,7 +63,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   }, [note.id]);
 
 
-  // Handle content updates with debounce and auto-scroll
+  // Handle content updates with debounce
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     
@@ -81,67 +78,16 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       }
     };
 
-    const scrollToCursor = () => {
-      if (!contentRef.current) return;
-      
-      const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) return;
-      
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      
-      // Get the main scroll container (the NotePage container)
-      const scrollContainer = document.querySelector('[data-scroll-container]') || 
-                             document.querySelector('.flex-grow.overflow-auto') ||
-                             window;
-      
-      // Calculate if cursor is in keyboard area
-      const viewportHeight = window.visualViewport?.height || window.innerHeight;
-      const keyboardThreshold = viewportHeight * 0.5; // More aggressive threshold
-      
-      if (rect.bottom > keyboardThreshold) {
-        // Calculate how much to scroll to bring cursor into view
-        const targetPosition = rect.top - keyboardThreshold + 150; // Extra padding above keyboard
-        
-        if (scrollContainer === window) {
-          window.scrollBy({
-            top: targetPosition,
-            behavior: 'smooth'
-          });
-        } else {
-          (scrollContainer as Element).scrollBy({
-            top: targetPosition,
-            behavior: 'smooth'
-          });
-        }
-      }
-    };
-
-    const handleInput = () => {
-      handleContentChange();
-      // Delay scroll to allow content to render
-      setTimeout(scrollToCursor, 50);
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        // Extra delay for Enter key to handle new line creation
-        setTimeout(scrollToCursor, 100);
-      }
-    };
-
     const currentRef = contentRef.current;
     
     if (currentRef) {
-      currentRef.addEventListener('input', handleInput);
-      currentRef.addEventListener('keydown', handleKeyDown);
+      currentRef.addEventListener('input', handleContentChange);
     }
     
     return () => {
       clearTimeout(timeout);
       if (currentRef) {
-        currentRef.removeEventListener('input', handleInput);
-        currentRef.removeEventListener('keydown', handleKeyDown);
+        currentRef.removeEventListener('input', handleContentChange);
       }
     };
   }, [note.id, updateNote]);
@@ -196,7 +142,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   }, [note.content]);
 
   return (
-    <div ref={containerRef} className={`w-full max-w-3xl mx-auto px-4 pt-8 animate-fade-in ${dynamicPadding}`}>
+    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-96 animate-fade-in">
       <textarea
         ref={titleRef}
         value={title}
