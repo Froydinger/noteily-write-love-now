@@ -217,6 +217,19 @@
     @apply border-border;
   }
   
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+  }
+  
+  #root {
+    width: 100%;
+    min-height: 100vh;
+  }
+  
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;
   }

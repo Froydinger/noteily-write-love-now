@@ -31,16 +31,13 @@
   </head>
 
   <body>
-    <!-- Apply user's actual theme and browser color immediately -->
+    <!-- AGGRESSIVE theme and browser color application -->
     <script>
       (function() {
-        // Check localStorage for saved theme, default to navy
+        // Get saved theme immediately
         const savedTheme = localStorage.getItem('theme') || 'navy';
         
-        // Apply theme class to HTML immediately
-        document.documentElement.className = savedTheme;
-        
-        // Set browser chrome colors for all viewports
+        // Theme color mappings
         const themeColors = {
           light: '#ffffff',
           dark: '#0a0a0a', 
@@ -50,23 +47,41 @@
         
         const themeColor = themeColors[savedTheme] || themeColors.navy;
         
-        // Update all theme color meta tags
-        let meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) {
-          meta.content = themeColor;
-        }
+        // IMMEDIATELY apply theme to html and body
+        document.documentElement.className = savedTheme;
+        document.body.className = savedTheme;
         
-        // Also set apple status bar color
-        let appleMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-        if (appleMeta) {
-          appleMeta.content = savedTheme === 'light' ? 'default' : 'black-translucent';
-        }
+        // FORCE update ALL meta tags
+        const metaTags = [
+          { name: 'theme-color', content: themeColor },
+          { name: 'msapplication-navbutton-color', content: themeColor },
+          { name: 'apple-mobile-web-app-status-bar-style', content: savedTheme === 'light' ? 'default' : 'black-translucent' }
+        ];
         
-        // Force browser repaint to apply colors immediately
+        metaTags.forEach(tag => {
+          let meta = document.querySelector(`meta[name="${tag.name}"]`);
+          if (meta) {
+            meta.setAttribute('content', tag.content);
+          } else {
+            meta = document.createElement('meta');
+            meta.name = tag.name;
+            meta.content = tag.content;
+            document.head.appendChild(meta);
+          }
+        });
+        
+        // FORCE browser repaint with immediate background color
+        document.documentElement.style.backgroundColor = themeColor;
         document.body.style.backgroundColor = themeColor;
+        
+        // Clear after repaint
         setTimeout(() => {
+          document.documentElement.style.backgroundColor = '';
           document.body.style.backgroundColor = '';
-        }, 1);
+        }, 50);
+        
+        // Log for debugging
+        console.log('THEME APPLIED:', savedTheme, 'COLOR:', themeColor);
       })();
     </script>
     <div id="root"></div>
