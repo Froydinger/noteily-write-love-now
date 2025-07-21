@@ -353,34 +353,46 @@
   /* Image editing styles */
   .note-editor .note-image {
     border-radius: 8px;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease;
     cursor: pointer;
   }
 
   .note-editor .note-image:hover {
     transform: scale(1.02);
-    box-shadow: 0 4px 12px hsl(var(--primary) / 0.15);
   }
 
-  .note-editor .image-control {
-    pointer-events: all;
-    user-select: none;
+  .note-editor .image-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 1rem auto;
+    width: fit-content;
+  }
+
+  .note-editor .image-resize-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: white;
+    color: black;
+    border: 2px solid #e5e5e5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     transition: all 0.2s ease;
   }
 
-  .note-editor .image-control:hover {
+  .note-editor .image-resize-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-  }
-
-  .note-editor .move-handle {
-    font-family: monospace;
-    line-height: 1;
-  }
-
-  .note-editor .resize-handle {
-    font-weight: bold;
-    line-height: 1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    border-color: #d1d1d1;
   }
 
   /* Sidebar active states with proper contrast */
