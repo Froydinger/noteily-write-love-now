@@ -342,41 +342,23 @@
   }
 
   .note-editor {
-    @apply min-h-[60vh] w-full outline-none font-opensans text-lg leading-relaxed;
-    line-height: 1.8;
+    @apply min-h-[60vh] w-full outline-none font-opensans text-lg;
   }
   
   .note-editor:empty:before {
     content: attr(data-placeholder);
-    @apply text-muted-foreground italic opacity-60;
+    @apply text-muted-foreground italic;
   }
 
-  /* Enhanced image editing styles */
+  /* Image editing styles */
   .note-editor .note-image {
-    border-radius: 12px;
-    transition: all 0.3s ease;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   }
 
   .note-editor .note-image:hover {
-    transform: scale(1.02);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  }
-
-  /* Enhanced prose styling for better readability */
-  .note-editor.prose {
-    @apply text-foreground/90;
-  }
-
-  .note-editor.prose h1,
-  .note-editor.prose h2,
-  .note-editor.prose h3 {
-    @apply text-foreground font-serif font-semibold;
-  }
-
-  .note-editor.prose p {
-    @apply text-foreground/85 leading-relaxed;
+    transform: scale(1.01);
   }
 
   /* Sidebar active states with proper contrast */
