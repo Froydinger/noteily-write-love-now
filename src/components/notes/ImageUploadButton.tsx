@@ -13,8 +13,26 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
 
+  // Check if we're on iOS
+  const isIOS = () => {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  };
+
+  // Check if file is an iCloud placeholder (common iOS issue)
+  const isICloudPlaceholder = (file: File) => {
+    // iCloud placeholders are often very small (< 1KB) or have specific characteristics
+    return file.size < 1024 && isIOS();
+  };
+
   const handleUpload = async (file: File) => {
-    console.log('Starting image upload process...', { file: file.name, user: user?.id });
+    console.log('Starting image upload process...', { 
+      fileName: file.name, 
+      fileSize: file.size, 
+      fileType: file.type,
+      isIOS: isIOS(),
+      userId: user?.id 
+    });
     
     if (!user) {
       console.error('No user found when trying to upload');
@@ -25,6 +43,20 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
     if (!file.type.startsWith('image/')) {
       console.error('Invalid file type:', file.type);
       toast.error('Please select an image file');
+      return;
+    }
+
+    // Check for iCloud placeholder on iOS
+    if (isICloudPlaceholder(file)) {
+      console.error('iCloud placeholder detected');
+      toast.error('This photo is stored in iCloud. Please download it to your device first by opening it in Photos app, then try again.');
+      return;
+    }
+
+    // Additional check for very small files that might be placeholders
+    if (file.size === 0) {
+      console.error('File is empty (0 bytes)');
+      toast.error('The selected file appears to be empty. Please try a different image.');
       return;
     }
 
