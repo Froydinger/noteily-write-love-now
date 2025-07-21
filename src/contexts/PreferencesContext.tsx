@@ -33,9 +33,15 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   useEffect(() => {
     const loadPreferences = async () => {
       if (!user) {
-        // Not authenticated - use default navy theme
+        // Not authenticated - use default navy theme but don't re-apply if already applied
         setPreferences({ theme: 'navy' });
-        applyTheme('navy');
+        const html = document.documentElement;
+        if (!html.classList.contains('navy')) {
+          applyTheme('navy');
+        } else {
+          // Just update the browser color in case it's wrong
+          updateBrowserThemeColor('navy');
+        }
         setLoading(false);
         return;
       }
@@ -129,7 +135,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const applyTheme = (theme: ThemeType) => {
     const html = document.documentElement;
     
-    // Remove all theme classes
+    // Remove all theme classes first
     html.classList.remove('light', 'dark', 'navy', 'sepia');
     
     // Add the new theme class
