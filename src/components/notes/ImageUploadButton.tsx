@@ -60,23 +60,56 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
       return;
     }
 
-    // iOS-specific: Check for file availability and try to read it
+    // iOS-specific: Enhanced file availability check
     if (isIOS()) {
       try {
-        // Try to read the file to ensure it's actually available
+        console.log('Performing iOS-specific file checks...');
+        
+        // Check 1: Try to read file as blob URL
+        const blobUrl = URL.createObjectURL(file);
+        const img = new Image();
+        
+        const imageLoadPromise = new Promise((resolve, reject) => {
+          img.onload = () => {
+            URL.revokeObjectURL(blobUrl);
+            resolve(true);
+          };
+          img.onerror = () => {
+            URL.revokeObjectURL(blobUrl);
+            reject(new Error('Image failed to load - may be iCloud placeholder'));
+          };
+          
+          // Timeout after 10 seconds
+          setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+            reject(new Error('Image load timeout'));
+          }, 10000);
+        });
+        
+        img.src = blobUrl;
+        await imageLoadPromise;
+        
+        // Check 2: Try to read the file data
         const reader = new FileReader();
         const fileCheckPromise = new Promise((resolve, reject) => {
-          reader.onload = () => resolve(true);
-          reader.onerror = () => reject(new Error('File not available - may be an iCloud placeholder'));
+          reader.onload = (e) => {
+            if (e.target?.result && (e.target.result as ArrayBuffer).byteLength > 0) {
+              resolve(true);
+            } else {
+              reject(new Error('File has no data'));
+            }
+          };
+          reader.onerror = () => reject(new Error('File read error - not available'));
           reader.onabort = () => reject(new Error('File read aborted'));
         });
         
-        reader.readAsArrayBuffer(file.slice(0, 1024)); // Read first 1KB as test
+        reader.readAsArrayBuffer(file.slice(0, 2048)); // Read first 2KB
         await fileCheckPromise;
-        console.log('File availability check passed');
+        console.log('iOS file availability checks passed');
+        
       } catch (error) {
-        console.error('File availability check failed:', error);
-        toast.error('This image is not fully downloaded. Please open it in Photos app and wait for it to download, then try again.');
+        console.error('iOS file availability check failed:', error);
+        toast.error('This image is not fully available. If from iCloud, please open it in Photos app and wait for download, then try again.');
         return;
       }
     }
@@ -140,6 +173,8 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
         accept="image/*"
         onChange={handleFileSelect}
         className="hidden"
+        multiple={false}
+        capture="environment"
       />
     </>
   );
