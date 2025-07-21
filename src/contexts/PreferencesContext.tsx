@@ -105,6 +105,9 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     // Update local state immediately for responsive UI
     setPreferences(prev => ({ ...prev, theme: newTheme }));
     applyTheme(newTheme);
+    
+    // Update browser color when user explicitly changes theme
+    updateBrowserThemeColor(newTheme);
 
     if (!user) {
       // For non-authenticated users, only update local state
@@ -143,8 +146,8 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     // Save to localStorage immediately
     localStorage.setItem('theme', theme);
     
-    // Update browser theme color
-    updateBrowserThemeColor(theme);
+    // Browser color is handled by inline script on load
+    // updateBrowserThemeColor(theme);
   };
 
   const updateBrowserThemeColor = (theme: ThemeType) => {
