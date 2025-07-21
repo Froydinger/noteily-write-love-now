@@ -80,7 +80,17 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     // Add click handler for showing controls
     img.addEventListener('click', (e) => {
       e.preventDefault();
-      showImageControls(img);
+      e.stopPropagation();
+      
+      // Blur the contentEditable to hide keyboard
+      if (contentRef.current) {
+        contentRef.current.blur();
+      }
+      
+      // Prevent focus on the contentEditable
+      setTimeout(() => {
+        showImageControls(img);
+      }, 50);
     });
 
     const selection = window.getSelection();
@@ -295,7 +305,17 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         img.style.cursor = 'pointer';
         img.addEventListener('click', (e) => {
           e.preventDefault();
-          showImageControls(img as HTMLImageElement);
+          e.stopPropagation();
+          
+          // Blur the contentEditable to hide keyboard
+          if (contentRef.current) {
+            contentRef.current.blur();
+          }
+          
+          // Prevent focus on the contentEditable
+          setTimeout(() => {
+            showImageControls(img as HTMLImageElement);
+          }, 50);
         });
       }
     });
