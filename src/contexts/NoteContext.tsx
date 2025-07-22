@@ -9,6 +9,7 @@ export type Note = {
   id: string;
   title: string;
   content: string;
+  featuredImage?: string;
   createdAt: string;
   updatedAt: string;
 };
