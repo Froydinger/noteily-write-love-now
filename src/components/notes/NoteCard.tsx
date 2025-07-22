@@ -12,7 +12,11 @@ export default function NoteCard({ note }: NoteCardProps) {
   const navigate = useNavigate();
   
   const contentPreview = note.content 
-    ? note.content.replace(/<[^>]*>/g, '') // Remove HTML tags
+    ? note.content
+        .replace(/<br\s*\/?>/gi, ' ') // Convert line breaks to spaces
+        .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim()
     : 'No content';
   
   const truncatedContent = contentPreview.length > 120 
