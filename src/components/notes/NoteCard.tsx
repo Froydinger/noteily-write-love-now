@@ -15,6 +15,12 @@ export default function NoteCard({ note }: NoteCardProps) {
     ? note.content
         .replace(/<br\s*\/?>/gi, ' ') // Convert line breaks to spaces
         .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces to regular spaces
+        .replace(/&amp;/g, '&') // Convert encoded ampersands
+        .replace(/&lt;/g, '<') // Convert encoded less-than
+        .replace(/&gt;/g, '>') // Convert encoded greater-than
+        .replace(/&quot;/g, '"') // Convert encoded quotes
+        .replace(/&#39;/g, "'") // Convert encoded apostrophes
         .replace(/\s+/g, ' ') // Normalize whitespace
         .trim()
     : 'No content';
