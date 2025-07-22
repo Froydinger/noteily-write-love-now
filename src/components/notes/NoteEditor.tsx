@@ -3,11 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNotes, Note } from '@/contexts/NoteContext';
 import DOMPurify from 'dompurify';
 import { ImageUploadButton } from './ImageUploadButton';
-import { FeaturedImageUpload } from './FeaturedImageUpload';
-import { FeaturedImage } from './FeaturedImage';
-import { Button } from '@/components/ui/button';
-import { Copy } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface NoteEditorProps {
   note: Note;
@@ -174,51 +169,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     });
   }, [note.content]);
 
-  const handleCopyNote = async () => {
-    const textContent = note.title + '\n\n' + contentRef.current?.innerText || '';
-    try {
-      await navigator.clipboard.writeText(textContent);
-      toast.success('Note copied to clipboard');
-    } catch (error) {
-      toast.error('Failed to copy note');
-    }
-  };
-
-  const handleFeaturedImageUpload = (imageUrl: string) => {
-    updateNote(note.id, { featuredImage: imageUrl });
-  };
-
-  const handleRemoveFeaturedImage = () => {
-    updateNote(note.id, { featuredImage: '' });
-  };
-
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-96 animate-fade-in">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <FeaturedImageUpload onImageUpload={handleFeaturedImageUpload} />
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleCopyNote}
-            className="flex items-center gap-2"
-            aria-label="Copy note"
-          >
-            <Copy className="h-4 w-4" />
-            Copy
-          </Button>
-        </div>
-      </div>
-
-      {/* Featured Image */}
-      {note.featuredImage && (
-        <FeaturedImage 
-          imageUrl={note.featuredImage} 
-          onRemove={handleRemoveFeaturedImage} 
-        />
-      )}
-
       <textarea
         ref={titleRef}
         value={title}

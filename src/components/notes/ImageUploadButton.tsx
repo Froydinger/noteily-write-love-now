@@ -174,6 +174,7 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
         onChange={handleFileSelect}
         className="hidden"
         multiple={false}
+        capture="environment"
       />
     </>
   );
