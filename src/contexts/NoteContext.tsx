@@ -11,6 +11,7 @@ export type Note = {
   content: string;
   createdAt: string;
   updatedAt: string;
+  featured_image?: string;
 };
 
 export type WritingPrompt = {
@@ -321,6 +322,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           content: note.content || '',
           createdAt: note.created_at,
           updatedAt: note.updated_at,
+          featured_image: note.featured_image,
         }));
         
         setNotes(formattedNotes);
@@ -485,6 +487,10 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (updates.content !== undefined) {
         updateData.content = updates.content;
+      }
+      
+      if (updates.featured_image !== undefined) {
+        updateData.featured_image = updates.featured_image;
       }
 
       const { error } = await supabase

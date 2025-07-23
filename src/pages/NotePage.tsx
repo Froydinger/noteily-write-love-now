@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, Copy, Share } from 'lucide-react';
+import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, Copy, Share, ImagePlus } from 'lucide-react';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -19,10 +19,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useIsMobile } from '@/hooks/use-mobile';
+import { FeaturedImageUpload } from '@/components/notes/FeaturedImageUpload';
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
-  const { getNote, setCurrentNote, deleteNote, loading } = useNotes();
+  const { getNote, setCurrentNote, deleteNote, loading, updateNote } = useNotes();
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -105,6 +106,12 @@ const NotePage = () => {
       console.error('Share failed:', error);
     }
   };
+
+  const handleFeaturedImageSet = (imageUrl: string) => {
+    if (note) {
+      updateNote(note.id, { featured_image: imageUrl });
+    }
+  };
   
   if (loading || !note) {
     return <div className="p-8">Loading...</div>;
@@ -141,6 +148,12 @@ const NotePage = () => {
           </div>
           
           <div className="flex items-center gap-1">
+            <FeaturedImageUpload 
+              noteId={note.id}
+              onImageSet={handleFeaturedImageSet}
+              hasImage={!!note.featured_image}
+            />
+            
             <Button
               variant="ghost"
               size="sm"

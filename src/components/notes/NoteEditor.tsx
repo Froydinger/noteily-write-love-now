@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNotes, Note } from '@/contexts/NoteContext';
 import DOMPurify from 'dompurify';
 import { ImageUploadButton } from './ImageUploadButton';
+import { FeaturedImage } from './FeaturedImage';
 
 interface NoteEditorProps {
   note: Note;
@@ -193,6 +194,10 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         }}
         aria-label="Note title"
       />
+      
+      {note.featured_image && (
+        <FeaturedImage imageUrl={note.featured_image} alt={note.title} />
+      )}
       
       <div
         ref={contentRef}
