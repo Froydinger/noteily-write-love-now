@@ -322,7 +322,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           content: note.content || '',
           createdAt: note.created_at,
           updatedAt: note.updated_at,
-          featured_image: note.featured_image,
+          featured_image: (note as any).featured_image || undefined,
         }));
         
         setNotes(formattedNotes);
