@@ -102,7 +102,7 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
           throw new Error('Failed to crop image');
         }
         resolve(blob);
-      }, 'image/jpeg', 0.8);
+      }, 'image/png'); // Use PNG for lossless quality
     });
   }, []);
 
@@ -123,13 +123,14 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
         return;
       }
 
-      const fileName = `${user.id}/${noteId}-featured-${Date.now()}.jpg`;
+      const fileName = `${user.id}/${noteId}-featured-${Date.now()}.png`;
       
       const { error: uploadError } = await supabase.storage
         .from('note-images')
         .upload(fileName, croppedBlob, {
-          contentType: 'image/jpeg',
-          upsert: true
+          contentType: 'image/png',
+          upsert: true,
+          cacheControl: '3600'
         });
 
       if (uploadError) {
