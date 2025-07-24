@@ -81,19 +81,40 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
 
-    canvas.width = crop.width;
-    canvas.height = crop.height;
+    // Calculate the actual crop dimensions in the source image
+    const sourceCropWidth = crop.width * scaleX;
+    const sourceCropHeight = crop.height * scaleY;
+
+    // Set minimum output width for high quality (maintain aspect ratio)
+    const minOutputWidth = 1200;
+    const aspectRatio = sourceCropWidth / sourceCropHeight;
+    
+    let outputWidth = Math.max(minOutputWidth, sourceCropWidth);
+    let outputHeight = outputWidth / aspectRatio;
+
+    // If the source is smaller than our minimum, use source dimensions
+    if (sourceCropWidth < minOutputWidth) {
+      outputWidth = sourceCropWidth;
+      outputHeight = sourceCropHeight;
+    }
+
+    canvas.width = outputWidth;
+    canvas.height = outputHeight;
+
+    // Enable high-quality image rendering
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     ctx.drawImage(
       image,
       crop.x * scaleX,
       crop.y * scaleY,
-      crop.width * scaleX,
-      crop.height * scaleY,
+      sourceCropWidth,
+      sourceCropHeight,
       0,
       0,
-      crop.width,
-      crop.height,
+      outputWidth,
+      outputHeight,
     );
 
     return new Promise((resolve) => {
