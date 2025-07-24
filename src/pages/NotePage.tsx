@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, Copy, Share, ImagePlus } from 'lucide-react';
+import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus } from 'lucide-react';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useIsMobile } from '@/hooks/use-mobile';
 import { FeaturedImageUpload } from '@/components/notes/FeaturedImageUpload';
+import { ExportMenu } from '@/components/notes/ExportMenu';
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -154,25 +155,11 @@ const NotePage = () => {
               hasImage={!!note.featured_image}
             />
             
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCopy}
-              className="btn-accessible"
-              title="Copy note"
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleShare}
-              className="btn-accessible"
-              title="Share note"
-            >
-              <Share className="h-4 w-4" />
-            </Button>
+            <ExportMenu
+              note={note}
+              onCopy={handleCopy}
+              onShare={handleShare}
+            />
             
             <AlertDialog>
               <AlertDialogTrigger asChild>
