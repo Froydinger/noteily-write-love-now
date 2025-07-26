@@ -24,44 +24,46 @@ import { PreferencesProvider } from "./contexts/PreferencesContext";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [showSplash, setShowSplash] = useState(true);
-
-  if (showSplash) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <SplashScreen onComplete={() => setShowSplash(false)} />
-        </TooltipProvider>
-      </QueryClientProvider>
-    );
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner position="bottom-right" duration={3000} />
         <BrowserRouter>
           <AuthProvider>
-            <PreferencesProvider>
-              <Routes>
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-                <Route path="/privacy" element={<PrivacyPage />} />
-                <Route path="/terms" element={<TermsPage />} />
-                <Route path="/" element={<AppLayout><Index /></AppLayout>} />
-                <Route path="/note/:id" element={<AppLayout><NotePage /></AppLayout>} />
-                <Route path="/prompts" element={<AppLayout><PromptsPage /></AppLayout>} />
-                <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <PWAInstall />
-              <PWAUpdateNotification />
-            </PreferencesProvider>
+            <AppContent />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
+  );
+};
+
+const AppContent = () => {
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
+
+  return (
+    <>
+      <Toaster />
+      <Sonner position="bottom-right" duration={3000} />
+      <PreferencesProvider>
+        <Routes>
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/" element={<AppLayout><Index /></AppLayout>} />
+          <Route path="/note/:id" element={<AppLayout><NotePage /></AppLayout>} />
+          <Route path="/prompts" element={<AppLayout><PromptsPage /></AppLayout>} />
+          <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <PWAInstall />
+        <PWAUpdateNotification />
+      </PreferencesProvider>
+    </>
   );
 };
 
