@@ -441,6 +441,7 @@
     transform: scale(1.01);
   }
 
+  /* Sidebar active states with proper contrast */
   .sidebar-menu-active {
     @apply border border-foreground/20 text-foreground bg-transparent rounded-sm;
   }
