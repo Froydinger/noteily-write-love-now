@@ -8,7 +8,8 @@ import {
   Settings, 
   Pencil,
   PanelLeftClose,
-  PanelLeft
+  PanelLeft,
+  RefreshCw
 } from "lucide-react";
 import {
   Sidebar,
@@ -181,7 +182,18 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-4 flex flex-col gap-2 border-t border-border/40">
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => window.location.reload()}
+            className="btn-accessible flex-1 justify-center"
+            title="Sync notes"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
         <Button 
           variant="ghost" 
           size="sm"

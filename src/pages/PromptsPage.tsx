@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { RefreshCw } from 'lucide-react';
 
 const PromptsPage = () => {
   const { dailyPrompts, addNote, updateNote, setCurrentNote, refreshDailyPrompts } = useNotes();
@@ -37,11 +38,23 @@ const PromptsPage = () => {
         
         <Button 
           variant="outline" 
-          className="text-xs"
+          size="sm"
+          className="btn-accessible hidden sm:flex"
           onClick={refreshDailyPrompts}
         >
           Refresh
-          <span className="text-xs ml-1 text-muted-foreground">(resets automatically at midnight)</span>
+          <span className="text-xs ml-1 text-muted-foreground">(resets at midnight)</span>
+        </Button>
+        
+        {/* Mobile version - icon only */}
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="btn-accessible sm:hidden"
+          onClick={refreshDailyPrompts}
+          title="Refresh prompts"
+        >
+          <RefreshCw className="h-4 w-4" />
         </Button>
       </div>
       
