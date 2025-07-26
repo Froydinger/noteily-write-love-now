@@ -476,48 +476,48 @@
 
   /* Button accessibility improvements */
   .btn-accessible {
-    @apply transition-all duration-200 hover:scale-[1.02];
+    @apply transition-all duration-200 hover:scale-[1.02] rounded-full;
   }
 
   /* Light theme button styles */
   .btn-accessible {
-    @apply text-foreground hover:text-foreground hover:bg-secondary/80;
+    @apply text-foreground hover:text-foreground hover:bg-secondary/80 rounded-full;
   }
 
   /* Dark theme button styles */
   .dark .btn-accessible {
-    @apply text-foreground hover:text-foreground hover:bg-secondary/80;
+    @apply text-foreground hover:text-foreground hover:bg-secondary/80 rounded-full;
   }
 
   /* Navy theme button styles */
   .navy .btn-accessible {
-    @apply text-foreground hover:text-foreground hover:bg-secondary/60;
+    @apply text-foreground hover:text-foreground hover:bg-secondary/60 rounded-full;
   }
 
   /* Sepia theme button styles */
   .sepia .btn-accessible {
-    @apply text-foreground hover:text-foreground hover:bg-secondary/80;
+    @apply text-foreground hover:text-foreground hover:bg-secondary/80 rounded-full;
   }
 
   /* Sidebar toggle button specific styles */
   .sidebar-toggle {
-    @apply transition-all duration-200;
+    @apply transition-all duration-200 rounded-full;
   }
 
   .sidebar-toggle {
-    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/80;
+    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/80 rounded-full;
   }
 
   .dark .sidebar-toggle {
-    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/80;
+    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/80 rounded-full;
   }
 
   .navy .sidebar-toggle {
-    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/60;
+    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-full;
   }
 
   .sepia .sidebar-toggle {
-    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/80;
+    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/80 rounded-full;
   }
 
   /* General button contrast improvements */
