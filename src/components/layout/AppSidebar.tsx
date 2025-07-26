@@ -34,7 +34,7 @@ import { useToast } from "@/hooks/use-toast";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 
 export function AppSidebar() {
-  const { notes, addNote, setCurrentNote } = useNotes();
+  const { notes, addNote, setCurrentNote, syncNotes } = useNotes();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
@@ -63,10 +63,25 @@ export function AppSidebar() {
       console.error('Failed to create note:', error);
     }
   };
+
+  const handleSync = async () => {
+    // Hide sidebar first
+    if (isMobile && state === "expanded") {
+      toggleSidebar();
+    }
+    
+    // Then sync notes
+    await syncNotes();
+  };
   
   const handleSelectNote = (note: Note) => {
     setCurrentNote(note);
     navigate(`/note/${note.id}`);
+    
+    // Auto-hide sidebar on mobile after selecting a note
+    if (isMobile && state === "expanded") {
+      toggleSidebar();
+    }
   };
 
   const isActive = (path: string) => {
@@ -187,7 +202,7 @@ export function AppSidebar() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => window.location.reload()}
+            onClick={handleSync}
             className="btn-accessible flex-1 justify-center"
             title="Sync notes"
           >

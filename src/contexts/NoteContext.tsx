@@ -33,6 +33,7 @@ type NoteContextType = {
   setCurrentNote: (note: Note | null) => void;
   getRandomPrompt: () => WritingPrompt;
   refreshDailyPrompts: () => void;
+  syncNotes: () => Promise<void>;
 };
 
 const defaultPrompts: WritingPrompt[] = [
@@ -554,6 +555,14 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return notes.find(note => note.id === id);
   };
 
+  const syncNotes = async () => {
+    await loadNotes();
+    toast({
+      title: "Notes synced",
+      description: "Your notes have been refreshed from the server.",
+    });
+  };
+
   const getRandomPrompt = () => {
     const randomIndex = Math.floor(Math.random() * writingPrompts.length);
     return writingPrompts[randomIndex];
@@ -573,7 +582,8 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         getNote,
         setCurrentNote,
         getRandomPrompt,
-        refreshDailyPrompts
+        refreshDailyPrompts,
+        syncNotes
       }}
     >
       {children}
