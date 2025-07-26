@@ -196,7 +196,11 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       />
       
       {note.featured_image && (
-        <FeaturedImage imageUrl={note.featured_image} alt={note.title} />
+        <FeaturedImage 
+          imageUrl={note.featured_image} 
+          alt={note.title}
+          onDelete={() => updateNote(note.id, { featured_image: null })}
+        />
       )}
       
       <div
