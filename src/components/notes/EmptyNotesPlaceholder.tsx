@@ -20,9 +20,8 @@ export default function EmptyNotesPlaceholder() {
             <SidebarTrigger />
           </div>
         )}
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-          <p className="text-muted-foreground">Loading your notes...</p>
+        {/* Hidden div to maintain layout but no visible loading text */}
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 opacity-0">
         </div>
       </div>
     );
