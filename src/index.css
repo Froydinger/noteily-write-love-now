@@ -442,7 +442,7 @@
   }
 
   .sidebar-menu-active {
-    @apply border border-foreground/20 text-foreground bg-transparent rounded-md;
+    @apply border border-foreground/20 text-foreground bg-transparent rounded-sm;
   }
 
   /* PWA Slide up animation */
@@ -462,15 +462,15 @@
   }
 
   .dark .sidebar-menu-active {
-    @apply border border-white/20 text-foreground bg-transparent rounded-md;
+    @apply border border-white/20 text-foreground bg-transparent rounded-sm;
   }
 
   .navy .sidebar-menu-active {
-    @apply border border-white/30 text-foreground bg-transparent rounded-md;
+    @apply border border-white/30 text-foreground bg-transparent rounded-sm;
   }
 
   .sepia .sidebar-menu-active {
-    @apply border border-foreground/20 text-foreground bg-transparent rounded-md;
+    @apply border border-foreground/20 text-foreground bg-transparent rounded-sm;
   }
 
   /* Button accessibility improvements */
