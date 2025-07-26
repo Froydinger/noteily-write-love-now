@@ -13,7 +13,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       setIsVisible(false);
       // Wait for fade out animation to complete
       setTimeout(onComplete, 300);
-    }, 800);
+    }, 1200); // Increased duration to cover loading states
 
     return () => clearTimeout(timer);
   }, [onComplete]);

@@ -27,7 +27,13 @@ const App = () => {
   const [showSplash, setShowSplash] = useState(true);
 
   if (showSplash) {
-    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <SplashScreen onComplete={() => setShowSplash(false)} />
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
   }
 
   return (
