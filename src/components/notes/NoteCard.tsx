@@ -35,14 +35,14 @@ export default function NoteCard({ note }: NoteCardProps) {
 
   return (
     <Card 
-      className="h-full cursor-pointer hover:border-noteily-300 transition-all hover:-translate-y-1"
+      className="h-full cursor-pointer group hover:border-primary/40 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-lg animate-float-in"
       onClick={handleClick}
     >
-      <CardContent className="p-4">
-        <h3 className="font-medium text-lg mb-2 font-serif break-words overflow-wrap-anywhere leading-tight">{note.title || "Untitled Note"}</h3>
-        <p className="text-sm text-muted-foreground line-clamp-4">{truncatedContent}</p>
+      <CardContent className="p-4 transition-all duration-300 group-hover:translate-y-[-1px]">
+        <h3 className="font-medium text-lg mb-2 font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-primary transition-colors duration-300">{note.title || "Untitled Note"}</h3>
+        <p className="text-sm text-muted-foreground line-clamp-4 group-hover:text-foreground/80 transition-colors duration-300">{truncatedContent}</p>
       </CardContent>
-      <CardFooter className="p-4 pt-0 text-xs text-muted-foreground">
+      <CardFooter className="p-4 pt-0 text-xs text-muted-foreground transition-all duration-300 group-hover:text-muted-foreground/80">
         Last modified {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
       </CardFooter>
     </Card>

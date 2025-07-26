@@ -46,13 +46,17 @@ export default function EmptyNotesPlaceholder() {
         </div>
       )}
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-        <Heart className="h-16 w-16 mb-6 text-accent" />
-        <h2 className="text-2xl font-serif font-medium mb-3">Welcome to Noteily</h2>
-        <p className="text-muted-foreground max-w-md mb-8">
+        <Heart className="h-16 w-16 mb-6 text-accent animate-gentle-bounce" />
+        <h2 className="text-2xl font-serif font-medium mb-3 animate-fade-in" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>Welcome to Noteily</h2>
+        <p className="text-muted-foreground max-w-md mb-8 animate-fade-in" style={{ animationDelay: '0.4s', animationFillMode: 'both' }}>
           Create your first note to start your journey of self-expression and reflection.
         </p>
-        <Button onClick={handleCreateFirstNote} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
+        <Button 
+          onClick={handleCreateFirstNote} 
+          className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-lg animate-scale-in group"
+          style={{ animationDelay: '0.6s', animationFillMode: 'both' }}
+        >
+          <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
           Create Your First Note
         </Button>
       </div>

@@ -50,15 +50,19 @@ const Index = () => {
   }
 
   return (
-    <div className="p-4 md:p-8 animate-fade-in">
+    <div className="p-4 md:p-8 animate-fade-in"
+         style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           {(isMobile || state === "collapsed") && <SidebarTrigger />}
           <h1 className="text-2xl font-serif font-medium">All Notes</h1>
         </div>
         
-        <Button onClick={handleCreateNote} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
+        <Button 
+          onClick={handleCreateNote} 
+          className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md"
+        >
+          <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
           New Note
         </Button>
       </div>
@@ -97,8 +101,17 @@ const Index = () => {
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredAndSortedNotes.map((note) => (
-          <NoteCard key={note.id} note={note} />
+        {filteredAndSortedNotes.map((note, index) => (
+          <div 
+            key={note.id}
+            className="animate-float-in"
+            style={{ 
+              animationDelay: `${index * 0.1}s`,
+              animationFillMode: 'both'
+            }}
+          >
+            <NoteCard note={note} />
+          </div>
         ))}
       </div>
     </div>

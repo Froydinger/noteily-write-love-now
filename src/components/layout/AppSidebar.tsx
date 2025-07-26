@@ -97,10 +97,10 @@ export function AppSidebar() {
         <div className="px-4 py-2 mb-2">
           <Button 
             variant="outline" 
-            className="w-full justify-start gap-3 py-5 btn-accessible"
+            className="w-full justify-start gap-3 py-5 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md"
             onClick={handleCreateNote}
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
             <span className="font-medium">New Note</span>
           </Button>
         </div>
@@ -143,8 +143,12 @@ export function AppSidebar() {
                   filteredNotes.map((note) => (
                     <div 
                       key={note.id}
-                      className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
+                      className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
                       onClick={() => handleSelectNote(note)}
+                      style={{ 
+                        animationDelay: `${notes.indexOf(note) * 0.05}s`,
+                        animationFillMode: 'both'
+                      }}
                     >
                       <h3 className="text-sm font-medium truncate">{note.title || "Untitled Note"}</h3>
                       <p className="text-xs text-muted-foreground truncate">
