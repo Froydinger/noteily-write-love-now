@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -9,21 +9,30 @@ interface FeaturedImageProps {
 }
 
 export function FeaturedImage({ imageUrl, alt = "Featured image", onDelete }: FeaturedImageProps) {
+  const [showDelete, setShowDelete] = useState(false);
+
+  const handleImageClick = () => {
+    if (onDelete) {
+      setShowDelete(!showDelete);
+    }
+  };
+
   return (
-    <div className="relative w-full mb-6 rounded-lg overflow-hidden group">
+    <div className="relative w-full mb-6 rounded-lg overflow-hidden">
       <img
         src={imageUrl}
         alt={alt}
-        className="w-full h-auto object-cover"
+        className="w-full h-auto object-cover cursor-pointer"
         style={{ aspectRatio: '16/10' }}
+        onClick={handleImageClick}
       />
-      {onDelete && (
-        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
+      {onDelete && showDelete && (
+        <div className="absolute top-2 right-2 animate-scale-in">
           <Button
             variant="destructive"
             size="sm"
             onClick={onDelete}
-            className="bg-destructive/80 hover:bg-destructive backdrop-blur-sm"
+            className="bg-destructive/90 hover:bg-destructive backdrop-blur-sm shadow-lg"
             title="Remove featured image"
           >
             <X className="h-4 w-4" />
