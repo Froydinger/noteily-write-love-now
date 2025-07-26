@@ -52,7 +52,7 @@ export default function EmptyNotesPlaceholder() {
         </p>
         <Button 
           onClick={handleCreateFirstNote} 
-          className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-lg animate-scale-in group"
+          className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-lg animate-scale-in group rounded-full"
           style={{ animationDelay: '0.6s', animationFillMode: 'both' }}
         >
           <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />

@@ -100,7 +100,7 @@ export function AppSidebar() {
             variant="ghost"
             size="sm"
             onClick={toggleSidebar}
-            className="sidebar-toggle h-8 w-8 p-0"
+            className="sidebar-toggle h-8 w-8 p-0 rounded-full"
             title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
           >
             {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
@@ -113,7 +113,7 @@ export function AppSidebar() {
         <div className="px-4 py-2 mb-2">
           <Button 
             variant="outline" 
-            className="w-full justify-start gap-3 py-5 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md"
+            className="w-full justify-start gap-3 py-5 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md rounded-full"
             onClick={handleCreateNote}
           >
             <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
@@ -159,7 +159,7 @@ export function AppSidebar() {
                   filteredNotes.map((note) => (
                     <div 
                       key={note.id}
-                      className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
+                      className={`px-3 py-2.5 my-1 rounded-full btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
                       onClick={() => handleSelectNote(note)}
                       style={{ 
                         animationDelay: `${notes.indexOf(note) * 0.05}s`,
@@ -182,7 +182,7 @@ export function AppSidebar() {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="mt-2 btn-accessible"
+                        className="mt-2 btn-accessible rounded-full"
                         onClick={() => setSearchTerm("")}
                       >
                         Clear search
@@ -203,7 +203,7 @@ export function AppSidebar() {
             variant="ghost"
             size="sm"
             onClick={handleSync}
-            className="btn-accessible flex-1 justify-center"
+            className="btn-accessible flex-1 justify-center rounded-full"
             title="Sync notes"
           >
             <RefreshCw className="h-4 w-4" />
@@ -212,7 +212,7 @@ export function AppSidebar() {
         <Button 
           variant="ghost" 
           size="sm"
-          className={`w-full justify-start btn-accessible ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
+          className={`w-full justify-start btn-accessible rounded-full ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
           asChild
         >
           <a href="/settings">

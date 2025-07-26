@@ -60,7 +60,7 @@ const Index = () => {
         
         <Button 
           onClick={handleCreateNote} 
-          className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md"
+          className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full"
         >
           <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
           New Note

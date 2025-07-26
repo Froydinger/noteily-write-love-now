@@ -32,7 +32,7 @@ export function FeaturedImage({ imageUrl, alt = "Featured image", onDelete }: Fe
             variant="destructive"
             size="sm"
             onClick={onDelete}
-            className="bg-destructive/90 hover:bg-destructive backdrop-blur-sm shadow-lg"
+            className="bg-destructive/90 hover:bg-destructive backdrop-blur-sm shadow-lg rounded-full"
             title="Remove featured image"
           >
             <X className="h-4 w-4" />

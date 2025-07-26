@@ -39,7 +39,7 @@ const PromptsPage = () => {
         <Button 
           variant="outline" 
           size="sm"
-          className="btn-accessible hidden sm:flex"
+          className="btn-accessible hidden sm:flex rounded-full"
           onClick={refreshDailyPrompts}
         >
           Refresh
@@ -50,7 +50,7 @@ const PromptsPage = () => {
         <Button 
           variant="outline" 
           size="sm"
-          className="btn-accessible sm:hidden"
+          className="btn-accessible sm:hidden rounded-full"
           onClick={refreshDailyPrompts}
           title="Refresh prompts"
         >

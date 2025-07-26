@@ -17,7 +17,7 @@ export default function PromptCard({ prompt, onUsePrompt }: PromptCardProps) {
           <Button 
             variant="outline" 
             onClick={() => onUsePrompt(prompt)}
-            className="w-full"
+            className="w-full rounded-full"
           >
             Write with this prompt
           </Button>
