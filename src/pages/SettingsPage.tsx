@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNotes } from '@/contexts/NoteContext';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, User, HelpCircle, Download, Trash2, Key } from 'lucide-react';
+import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { Input } from '@/components/ui/input';
@@ -405,6 +405,27 @@ ${note.content}
               <p className="text-xs text-muted-foreground">
                 Version 2.0.5
               </p>
+            </div>
+          </div>
+          
+          <div className="bg-card rounded-lg p-4 border">
+            <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
+              <Heart className="h-5 w-5 text-pink-500" fill="#e91e63" />
+              Support Noteily
+            </h2>
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Enjoying Noteily? Consider supporting development to help keep the app running and add new features.
+              </p>
+              <a 
+                href="https://buymeacoffee.com/froydinger" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm btn-accessible py-2 px-3 rounded-md border border-border hover:bg-accent transition-colors"
+              >
+                <Heart className="h-4 w-4 text-pink-500" fill="#e91e63" />
+                <span>Buy me a coffee</span>
+              </a>
             </div>
           </div>
 
