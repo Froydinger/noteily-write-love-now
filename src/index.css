@@ -446,7 +446,7 @@
   /* Sidebar active states with proper contrast */
   .sidebar-menu-active {
     @apply border border-foreground/20 text-foreground bg-transparent;
-    border-radius: 0.125rem !important; /* rounded-sm */
+    border-radius: 0.375rem !important; /* rounded-md */
   }
 
   /* PWA Slide up animation */
@@ -467,17 +467,17 @@
 
   .dark .sidebar-menu-active {
     @apply border border-white/20 text-foreground bg-transparent;
-    border-radius: 0.125rem !important; /* rounded-sm */
+    border-radius: 0.375rem !important; /* rounded-md */
   }
 
   .navy .sidebar-menu-active {
     @apply border border-white/30 text-foreground bg-transparent;
-    border-radius: 0.125rem !important; /* rounded-sm */
+    border-radius: 0.375rem !important; /* rounded-md */
   }
 
   .sepia .sidebar-menu-active {
     @apply border border-foreground/20 text-foreground bg-transparent;
-    border-radius: 0.125rem !important; /* rounded-sm */
+    border-radius: 0.375rem !important; /* rounded-md */
   }
 
   /* Button accessibility improvements */
