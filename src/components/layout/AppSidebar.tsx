@@ -159,7 +159,7 @@ export function AppSidebar() {
                   filteredNotes.map((note) => (
                     <div 
                       key={note.id}
-                      className={`px-3 py-2.5 my-1 rounded-full btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
+                      className={`px-3 py-2.5 my-1 rounded-sm btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
                       onClick={() => handleSelectNote(note)}
                       style={{ 
                         animationDelay: `${notes.indexOf(note) * 0.05}s`,
