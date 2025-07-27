@@ -127,7 +127,7 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton 
                   asChild
-                  className={`px-4 py-2 rounded-full ${isActive('/') ? 'sidebar-menu-active' : ''}`}
+                  className={`px-4 py-2 rounded-full ${isActive('/') ? 'sidebar-nav-active' : ''}`}
                 >
                   <a href="/" className="flex items-center gap-3 rounded-full">
                     <BookOpen className="h-4 w-4" />
@@ -138,7 +138,7 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton 
                   asChild
-                  className={`px-4 py-2 rounded-full ${isActive('/prompts') ? 'sidebar-menu-active' : ''}`}
+                  className={`px-4 py-2 rounded-full ${isActive('/prompts') ? 'sidebar-nav-active' : ''}`}
                 >
                   <a href="/prompts" className="flex items-center gap-3 rounded-full">
                     <Pencil className="h-4 w-4" />
