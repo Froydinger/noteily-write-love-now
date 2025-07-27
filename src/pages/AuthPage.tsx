@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart } from 'lucide-react';
 import { handleViewportResize } from '@/lib/viewport';
+import { useToast } from '@/hooks/use-toast';
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');
@@ -17,6 +18,7 @@ const AuthPage = () => {
   const [willCreateAccount, setWillCreateAccount] = useState(false);
   const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -65,9 +67,22 @@ const AuthPage = () => {
       if (signInError.message.includes('Invalid login credentials')) {
         setIsCreatingAccount(true);
         setWillCreateAccount(true);
+        
+        // Show welcome message before creating account
+        toast({
+          title: "Welcome to Noteily! 🎉",
+          description: "Creating your account...",
+          className: "bg-green-600 text-white border-green-600",
+        });
+        
         const { error: signUpError } = await signUp(email, password);
         if (!signUpError) {
           setPassword('');
+          toast({
+            title: "Account created successfully! ✨",
+            description: "You're all set to start taking notes.",
+            className: "bg-green-600 text-white border-green-600",
+          });
         }
         setIsCreatingAccount(false);
       }
