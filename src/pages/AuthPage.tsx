@@ -13,6 +13,7 @@ const AuthPage = () => {
   const [password, setPassword] = useState('');
   const [currentStep, setCurrentStep] = useState<'email' | 'auth'>('email');
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
 
@@ -38,6 +39,7 @@ const AuthPage = () => {
     if (!email || !password) return;
 
     setIsLoading(true);
+    setIsCreatingAccount(false);
     
     // First try to sign in
     const { error: signInError } = await signIn(email, password);
@@ -48,10 +50,12 @@ const AuthPage = () => {
     } else {
       // If sign in fails with "Invalid login credentials", try to create account
       if (signInError.message.includes('Invalid login credentials')) {
+        setIsCreatingAccount(true);
         const { error: signUpError } = await signUp(email, password);
         if (!signUpError) {
           setPassword('');
         }
+        setIsCreatingAccount(false);
       }
       // For other errors (like "Email not confirmed"), let the original error show
     }
@@ -201,7 +205,7 @@ const AuthPage = () => {
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground border-accent" 
                   disabled={isLoading || !password}
                 >
-                  {isLoading ? 'Continuing...' : 'Continue'}
+                  {isCreatingAccount ? 'Creating your account...' : isLoading ? 'Signing in...' : 'Sign in'}
                 </Button>
               </div>
             </div>
