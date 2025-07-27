@@ -15,7 +15,6 @@ const AuthPage = () => {
   const [currentStep, setCurrentStep] = useState<'email' | 'auth'>('email');
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
-  const [willCreateAccount, setWillCreateAccount] = useState(false);
   const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -33,20 +32,8 @@ const AuthPage = () => {
     return cleanup;
   }, []);
 
-  const handleEmailSubmit = async () => {
+  const handleEmailSubmit = () => {
     if (!email) return;
-    
-    // Try a quick sign-in attempt with a dummy password to check if user exists
-    const { error } = await signIn(email, 'dummy-password-check');
-    
-    if (error && error.message.includes('Invalid login credentials')) {
-      // User doesn't exist, this will be a sign-up
-      setWillCreateAccount(true);
-    } else {
-      // User exists or other error (like wrong password, which means user exists)
-      setWillCreateAccount(false);
-    }
-    
     setCurrentStep('auth');
   };
 
@@ -56,36 +43,36 @@ const AuthPage = () => {
     setIsLoading(true);
     setIsCreatingAccount(false);
     
-    if (willCreateAccount) {
-      // Skip signIn attempt for new accounts to avoid error toast
-      setIsCreatingAccount(true);
-      
-      // Show welcome message before creating account
-      toast({
-        title: "Welcome to Noteily! 🎉",
-        description: "Creating your account...",
-        className: "bg-green-600 text-white border-green-600",
-      });
-      
-      const { error: signUpError } = await signUp(email, password);
-      if (!signUpError) {
-        setPassword('');
+    // First try to sign in
+    const { error: signInError } = await signIn(email, password);
+    
+    if (!signInError) {
+      // Sign in successful
+      navigate('/');
+    } else {
+      // If sign in fails with "Invalid login credentials", try to create account
+      if (signInError.message.includes('Invalid login credentials')) {
+        setIsCreatingAccount(true);
+        
+        // Show welcome message before creating account
         toast({
-          title: "Account created successfully! ✨",
-          description: "You're all set to start taking notes.",
+          title: "Welcome to Noteily! 🎉",
+          description: "Creating your account...",
           className: "bg-green-600 text-white border-green-600",
         });
+        
+        const { error: signUpError } = await signUp(email, password);
+        if (!signUpError) {
+          setPassword('');
+          toast({
+            title: "Account created successfully! ✨",
+            description: "You're all set to start taking notes.",
+            className: "bg-green-600 text-white border-green-600",
+          });
+        }
+        setIsCreatingAccount(false);
       }
-      setIsCreatingAccount(false);
-    } else {
-      // Existing user - try to sign in
-      const { error: signInError } = await signIn(email, password);
-      
-      if (!signInError) {
-        // Sign in successful
-        navigate('/');
-      }
-      // Let AuthContext handle the error toast for actual sign-in failures
+      // For other errors (like "Email not confirmed"), let the original error show
     }
     
     setIsLoading(false);
@@ -100,7 +87,6 @@ const AuthPage = () => {
   const handleBack = () => {
     setCurrentStep('email');
     setPassword('');
-    setWillCreateAccount(false);
   };
 
   return (
@@ -128,9 +114,7 @@ const AuthPage = () => {
           <CardDescription className="text-gray-300">
             {currentStep === 'email' 
               ? 'Sign in to sync your notes across all devices' 
-              : willCreateAccount 
-                ? `Create your account with ${email}` 
-                : `Sign in as ${email}`}
+              : `Continue as ${email}`}
           </CardDescription>
         </CardHeader>
         <CardContent className="bg-transparent">
@@ -241,8 +225,8 @@ const AuthPage = () => {
                   {isCreatingAccount 
                     ? 'Creating your account...' 
                     : isLoading 
-                      ? (willCreateAccount ? 'Creating account...' : 'Signing in...') 
-                      : (willCreateAccount ? 'Create account' : 'Sign in')}
+                      ? 'Signing in...' 
+                      : 'Sign in'}
                 </Button>
               </div>
             </div>
