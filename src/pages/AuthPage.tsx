@@ -14,6 +14,7 @@ const AuthPage = () => {
   const [currentStep, setCurrentStep] = useState<'email' | 'auth'>('email');
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [willCreateAccount, setWillCreateAccount] = useState(false);
   const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
 
@@ -51,6 +52,7 @@ const AuthPage = () => {
       // If sign in fails with "Invalid login credentials", try to create account
       if (signInError.message.includes('Invalid login credentials')) {
         setIsCreatingAccount(true);
+        setWillCreateAccount(true);
         const { error: signUpError } = await signUp(email, password);
         if (!signUpError) {
           setPassword('');
@@ -72,6 +74,7 @@ const AuthPage = () => {
   const handleBack = () => {
     setCurrentStep('email');
     setPassword('');
+    setWillCreateAccount(false);
   };
 
   return (
@@ -97,7 +100,11 @@ const AuthPage = () => {
           </div>
           <CardTitle className="text-2xl font-serif text-white">Welcome to Noteily</CardTitle>
           <CardDescription className="text-gray-300">
-            {currentStep === 'email' ? 'Sign in to sync your notes across all devices' : `Continue as ${email}`}
+            {currentStep === 'email' 
+              ? 'Sign in to sync your notes across all devices' 
+              : willCreateAccount 
+                ? `Create your account with ${email}` 
+                : `Sign in as ${email}`}
           </CardDescription>
         </CardHeader>
         <CardContent className="bg-transparent">
@@ -205,7 +212,11 @@ const AuthPage = () => {
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground border-accent" 
                   disabled={isLoading || !password}
                 >
-                  {isCreatingAccount ? 'Creating your account...' : isLoading ? 'Signing in...' : 'Sign in'}
+                  {isCreatingAccount 
+                    ? 'Creating your account...' 
+                    : isLoading 
+                      ? (willCreateAccount ? 'Creating account...' : 'Signing in...') 
+                      : (willCreateAccount ? 'Create account' : 'Sign in')}
                 </Button>
               </div>
             </div>
