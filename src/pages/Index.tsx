@@ -9,9 +9,10 @@ import { Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import PullToRefresh from 'react-simple-pull-to-refresh';
 
 const Index = () => {
-  const { notes, addNote, setCurrentNote, loading } = useNotes();
+  const { notes, addNote, setCurrentNote, loading, syncNotes } = useNotes();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { state } = useSidebar();
@@ -45,11 +46,15 @@ const Index = () => {
     }
   };
 
+  const handleRefresh = async () => {
+    await syncNotes();
+  };
+
   if (loading || notes.length === 0) {
     return <EmptyNotesPlaceholder />;
   }
 
-  return (
+  const content = (
     <div className="p-6 md:p-10 animate-fade-in"
          style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
       <div className="flex items-center justify-between mb-6">
@@ -116,6 +121,12 @@ const Index = () => {
       </div>
     </div>
   );
+
+  return isMobile ? (
+    <PullToRefresh onRefresh={handleRefresh} pullingContent="">
+      {content}
+    </PullToRefresh>
+  ) : content;
 };
 
 export default Index;

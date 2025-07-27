@@ -476,27 +476,27 @@
 
   /* Button accessibility improvements */
   .btn-accessible {
-    @apply transition-all duration-200 hover:scale-[1.02] rounded-full;
+    @apply transition-all duration-200 hover:scale-[1.02] rounded-sm;
   }
 
   /* Light theme button styles */
   .btn-accessible {
-    @apply text-foreground hover:text-foreground hover:bg-secondary/80 rounded-full;
+    @apply text-foreground hover:text-foreground hover:bg-secondary/80 rounded-sm;
   }
 
   /* Dark theme button styles */
   .dark .btn-accessible {
-    @apply text-foreground hover:text-foreground hover:bg-secondary/80 rounded-full;
+    @apply text-foreground hover:text-foreground hover:bg-secondary/80 rounded-sm;
   }
 
   /* Navy theme button styles */
   .navy .btn-accessible {
-    @apply text-foreground hover:text-foreground hover:bg-secondary/60 rounded-full;
+    @apply text-foreground hover:text-foreground hover:bg-secondary/60 rounded-sm;
   }
 
   /* Sepia theme button styles */
   .sepia .btn-accessible {
-    @apply text-foreground hover:text-foreground hover:bg-secondary/80 rounded-full;
+    @apply text-foreground hover:text-foreground hover:bg-secondary/80 rounded-sm;
   }
 
   /* Sidebar toggle button specific styles */
