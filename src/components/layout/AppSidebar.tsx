@@ -196,30 +196,30 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 flex flex-col gap-2 border-t border-border/40">
-        <div className="flex items-center gap-2">
+      <SidebarFooter className="p-4 border-t border-border/40">
+        <div className="flex items-center justify-center gap-1">
           <ThemeToggle variant="settings" />
           <Button
             variant="ghost"
             size="sm"
             onClick={handleSync}
-            className="btn-accessible flex-1 justify-center rounded-full"
+            className="btn-accessible h-8 w-8 p-0 rounded-full"
             title="Sync notes"
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className={`btn-accessible h-8 w-8 p-0 rounded-full ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
+            asChild
+            title="Settings"
+          >
+            <a href="/settings">
+              <Settings className="h-4 w-4" />
+            </a>
+          </Button>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          className={`w-full justify-start btn-accessible rounded-full ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
-          asChild
-        >
-          <a href="/settings">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-          </a>
-        </Button>
       </SidebarFooter>
     </Sidebar>
   );
