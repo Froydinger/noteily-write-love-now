@@ -443,8 +443,9 @@
     transform: scale(1.01);
   }
 
-  /* Sidebar active states with proper contrast */
-  .sidebar-menu-button:hover {
+  /* Sidebar hover states for both menu buttons and note items */
+  .sidebar-menu-button:hover,
+  .btn-accessible:hover {
     @apply bg-accent text-accent-foreground;
     border-radius: 0.375rem !important; /* rounded-md for consistency */
   }
