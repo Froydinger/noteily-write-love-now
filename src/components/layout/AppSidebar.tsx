@@ -25,7 +25,7 @@ import {
   SidebarTrigger,
   useSidebar
 } from "@/components/ui/sidebar";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { Button } from "@/components/ui/button";
 import { useNotes, Note } from "@/contexts/NoteContext";
 import { formatDistanceToNow } from "date-fns";
@@ -153,7 +153,7 @@ export function AppSidebar() {
         <SidebarGroup className="py-4">
           <SidebarGroupLabel className="px-4 text-sm uppercase tracking-wider font-medium text-muted-foreground mb-1">Recent Notes</SidebarGroupLabel>
           <SidebarGroupContent>
-            <ScrollArea className="h-[calc(100vh-280px)]">
+            <div className="h-[calc(100vh-280px)] overflow-y-auto">
               <div className="px-3 py-1">
                 {filteredNotes.length > 0 ? (
                   filteredNotes.map((note) => (
@@ -191,7 +191,7 @@ export function AppSidebar() {
                   </div>
                 )}
               </div>
-            </ScrollArea>
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

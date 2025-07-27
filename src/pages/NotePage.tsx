@@ -191,7 +191,7 @@ const NotePage = () => {
         </div>
       </header>
       
-      <div className="flex-grow" data-scroll-container>
+      <div className="flex-grow overflow-y-auto" data-scroll-container>
         <NoteEditor note={note} />
       </div>
     </div>
