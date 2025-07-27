@@ -31,8 +31,20 @@ const AuthPage = () => {
     return cleanup;
   }, []);
 
-  const handleEmailSubmit = () => {
+  const handleEmailSubmit = async () => {
     if (!email) return;
+    
+    // Try a quick sign-in attempt with a dummy password to check if user exists
+    const { error } = await signIn(email, 'dummy-password-check');
+    
+    if (error && error.message.includes('Invalid login credentials')) {
+      // User doesn't exist, this will be a sign-up
+      setWillCreateAccount(true);
+    } else {
+      // User exists or other error (like wrong password, which means user exists)
+      setWillCreateAccount(false);
+    }
+    
     setCurrentStep('auth');
   };
 
