@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart } from 'lucide-react';
-import { handleViewportResize } from '@/lib/viewport';
+import { handleAuthKeyboard } from '@/lib/viewport';
 import { useToast } from '@/hooks/use-toast';
 
 const AuthPage = () => {
@@ -27,9 +27,9 @@ const AuthPage = () => {
     }
   }, [user, navigate]);
 
-  // Handle viewport changes for mobile keyboard
+  // Handle auth page keyboard
   useEffect(() => {
-    const cleanup = handleViewportResize();
+    const cleanup = handleAuthKeyboard();
     return cleanup;
   }, []);
 

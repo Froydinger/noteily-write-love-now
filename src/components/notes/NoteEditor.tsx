@@ -15,44 +15,15 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
-  // Minimal focus handling - prevent initial aggressive scrolling
+  // Apply iOS zoom prevention on mount
   useEffect(() => {
-    const handleFocus = (e: FocusEvent) => {
-      const target = e.target as HTMLElement;
-      if (target === titleRef.current || target === contentRef.current) {
-        // Only gentle repositioning, no aggressive scrolling on initial focus
-        setTimeout(() => {
-          const rect = target.getBoundingClientRect();
-          const viewportHeight = window.visualViewport?.height || window.innerHeight;
-          
-          // Only scroll if element is actually hidden under keyboard
-          if (rect.bottom > viewportHeight * 0.7) {
-            target.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'start',
-              inline: 'nearest'
-            });
-          }
-        }, 150); // Shorter delay, less aggressive
-      }
-    };
-
-    if (titleRef.current) {
-      titleRef.current.addEventListener('focus', handleFocus);
+    // Ensure title and content have proper font size to prevent zoom
+    if (titleRef.current && parseFloat(getComputedStyle(titleRef.current).fontSize) < 16) {
+      titleRef.current.style.fontSize = '16px';
     }
-    
-    if (contentRef.current) {
-      contentRef.current.addEventListener('focus', handleFocus);
+    if (contentRef.current && parseFloat(getComputedStyle(contentRef.current).fontSize) < 16) {
+      contentRef.current.style.fontSize = '16px';
     }
-
-    return () => {
-      if (titleRef.current) {
-        titleRef.current.removeEventListener('focus', handleFocus);
-      }
-      if (contentRef.current) {
-        contentRef.current.removeEventListener('focus', handleFocus);
-      }
-    };
   }, []);
 
   // Auto-resize title textarea
