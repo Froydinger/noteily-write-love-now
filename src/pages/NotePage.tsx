@@ -21,6 +21,7 @@ import {
 import { useIsMobile } from '@/hooks/use-mobile';
 import { FeaturedImageUpload } from '@/components/notes/FeaturedImageUpload';
 import { ExportMenu } from '@/components/notes/ExportMenu';
+import { handleViewportResize } from '@/lib/viewport';
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -45,7 +46,11 @@ const NotePage = () => {
     return () => setCurrentNote(null);
   }, [id, note, navigate, setCurrentNote, loading]);
 
-  // Note: Viewport handling is now managed by NoteEditor's cursor tracking system
+  // Handle mobile keyboard viewport changes
+  useEffect(() => {
+    const cleanup = handleViewportResize();
+    return cleanup;
+  }, []);
   
   const handleDelete = () => {
     if (id) {

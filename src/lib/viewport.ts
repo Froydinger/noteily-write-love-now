@@ -1,40 +1,30 @@
-// Viewport utilities for handling mobile keyboard behavior
+// Simplified viewport utilities for handling mobile keyboard behavior
 export const handleViewportResize = () => {
-  let initialViewportHeight = window.visualViewport?.height || window.innerHeight;
-  let currentScrollPosition = 0;
-
+  let isKeyboardOpen = false;
+  
   const handleViewportChange = () => {
     if (!window.visualViewport) return;
 
-    const currentViewportHeight = window.visualViewport.height;
-    const heightDifference = initialViewportHeight - currentViewportHeight;
+    const viewportHeight = window.visualViewport.height;
+    const windowHeight = window.innerHeight;
+    const heightDiff = windowHeight - viewportHeight;
 
-    // If viewport height decreased significantly (keyboard appeared)
-    if (heightDifference > 150) {
-      currentScrollPosition = window.scrollY;
-    }
-    // If viewport height increased back (keyboard disappeared)
-    else if (heightDifference < 50 && currentScrollPosition > 0) {
-      // Small delay to ensure keyboard is fully hidden
+    // Keyboard is open if viewport height is significantly smaller
+    const keyboardWasOpen = isKeyboardOpen;
+    isKeyboardOpen = heightDiff > 150;
+
+    // Only handle keyboard close - don't interfere when opening
+    if (keyboardWasOpen && !isKeyboardOpen) {
+      // Small delay to let the keyboard fully hide, then gently reset scroll
       setTimeout(() => {
-        window.scrollTo(0, 0);
-        currentScrollPosition = 0;
-      }, 100);
-    }
-  };
-
-  // Handle resize events
-  const handleResize = () => {
-    if (!window.visualViewport) {
-      // Fallback for browsers without visualViewport
-      const newHeight = window.innerHeight;
-      const heightDiff = initialViewportHeight - newHeight;
-      
-      if (heightDiff < 50) {
-        setTimeout(() => {
-          window.scrollTo(0, 0);
-        }, 100);
-      }
+        // Only scroll to top if we're on auth page or note page
+        const isAuthPage = window.location.pathname === '/auth';
+        const isNotePage = window.location.pathname.includes('/note/');
+        
+        if (isAuthPage || isNotePage) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 150);
     }
   };
 
@@ -42,10 +32,9 @@ export const handleViewportResize = () => {
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', handleViewportChange);
     return () => window.visualViewport?.removeEventListener('resize', handleViewportChange);
-  } else {
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
   }
+  
+  return () => {}; // No-op cleanup for browsers without visualViewport
 };
 
 // Fix for iOS Safari viewport issues

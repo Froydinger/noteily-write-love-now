@@ -15,60 +15,36 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
-  // Simple keyboard detection and auto-scroll
+  // Minimal focus handling - let the global viewport handler manage scrolling
   useEffect(() => {
-    const scrollActiveElementIntoView = () => {
-      setTimeout(() => {
-        const activeElement = document.activeElement;
-        if (activeElement && (activeElement === titleRef.current || activeElement === contentRef.current)) {
-          activeElement.scrollIntoView({ 
+    const handleFocus = (e: FocusEvent) => {
+      const target = e.target as HTMLElement;
+      if (target === titleRef.current || target === contentRef.current) {
+        // Just ensure the element is visible without aggressive scrolling
+        setTimeout(() => {
+          target.scrollIntoView({ 
             behavior: 'smooth', 
-            block: 'center'
+            block: 'nearest',
+            inline: 'nearest'
           });
-        }
-      }, 200); // Longer delay to ensure keyboard is fully open
-    };
-    
-    const handleResize = () => {
-      const viewportHeight = window.visualViewport?.height || window.innerHeight;
-      const screenHeight = window.screen.height;
-      const keyboardHeight = screenHeight - viewportHeight;
-      
-      // Only trigger when keyboard is fully visible and stable
-      if (keyboardHeight > 200) {
-        scrollActiveElementIntoView();
+        }, 300);
       }
     };
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        // When Enter is pressed, realign immediately
-        scrollActiveElementIntoView();
-      }
-    };
-
-    // Add event listeners - NO focus listener to avoid premature scrolling
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleResize);
-    }
-    
     if (titleRef.current) {
-      titleRef.current.addEventListener('keydown', handleKeyDown);
+      titleRef.current.addEventListener('focus', handleFocus);
     }
     
     if (contentRef.current) {
-      contentRef.current.addEventListener('keydown', handleKeyDown);
+      contentRef.current.addEventListener('focus', handleFocus);
     }
 
     return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleResize);
-      }
       if (titleRef.current) {
-        titleRef.current.removeEventListener('keydown', handleKeyDown);
+        titleRef.current.removeEventListener('focus', handleFocus);
       }
       if (contentRef.current) {
-        contentRef.current.removeEventListener('keydown', handleKeyDown);
+        contentRef.current.removeEventListener('focus', handleFocus);
       }
     };
   }, []);
