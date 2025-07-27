@@ -46,17 +46,14 @@ const AuthPage = () => {
       // Sign in successful
       navigate('/');
     } else {
-      // Only try to sign up if it's a very specific "user not found" error
-      // Most "Invalid login credentials" errors are actually wrong passwords for existing users
-      if (signInError.message.includes('Email not confirmed')) {
-        // This is likely a new user who needs to confirm email, try sign up
+      // If sign in fails with "Invalid login credentials", try to create account
+      if (signInError.message.includes('Invalid login credentials')) {
         const { error: signUpError } = await signUp(email, password);
         if (!signUpError) {
           setPassword('');
         }
       }
-      // For all other errors (wrong password, user not found, etc.), 
-      // just let the original sign-in error show - don't try to sign up
+      // For other errors (like "Email not confirmed"), let the original error show
     }
     
     setIsLoading(false);
