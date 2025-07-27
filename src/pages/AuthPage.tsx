@@ -179,7 +179,7 @@ const AuthPage = () => {
                   type="button"
                   onClick={handleBack}
                   disabled={isLoading}
-                  className="bg-transparent border-0 text-white hover:text-accent p-0 text-sm"
+                  className="bg-transparent border-0 text-white hover:text-accent px-3 py-2 text-sm rounded-full hover:bg-white/10 transition-all"
                 >
                   ← Back
                 </Button>
@@ -227,7 +227,7 @@ const AuthPage = () => {
                   type="button"
                   onClick={handleBack}
                   disabled={isLoading}
-                  className="bg-transparent border-0 text-white hover:text-accent p-0 text-sm"
+                  className="bg-transparent border-0 text-white hover:text-accent px-3 py-2 text-sm rounded-full hover:bg-white/10 transition-all"
                 >
                   ← Back
                 </Button>
