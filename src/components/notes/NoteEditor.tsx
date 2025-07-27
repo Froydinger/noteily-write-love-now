@@ -15,19 +15,25 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
-  // Minimal focus handling - let the global viewport handler manage scrolling
+  // Minimal focus handling - prevent initial aggressive scrolling
   useEffect(() => {
     const handleFocus = (e: FocusEvent) => {
       const target = e.target as HTMLElement;
       if (target === titleRef.current || target === contentRef.current) {
-        // Just ensure the element is visible without aggressive scrolling
+        // Only gentle repositioning, no aggressive scrolling on initial focus
         setTimeout(() => {
-          target.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'nearest',
-            inline: 'nearest'
-          });
-        }, 300);
+          const rect = target.getBoundingClientRect();
+          const viewportHeight = window.visualViewport?.height || window.innerHeight;
+          
+          // Only scroll if element is actually hidden under keyboard
+          if (rect.bottom > viewportHeight * 0.7) {
+            target.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start',
+              inline: 'nearest'
+            });
+          }
+        }, 150); // Shorter delay, less aggressive
       }
     };
 
