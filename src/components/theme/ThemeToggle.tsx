@@ -67,7 +67,7 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
         aria-label="Toggle theme"
         pressed={preferences.theme !== 'light'}
         onPressedChange={toggleTheme}
-        className="h-8 w-8 p-0 flex-shrink-0"
+        className="h-8 w-8 p-0 flex-shrink-0 btn-accessible rounded-full"
         variant="outline"
         size="sm"
       >

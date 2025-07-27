@@ -198,7 +198,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="p-4 flex flex-col gap-2 border-t border-border/40">
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+          <ThemeToggle variant="settings" />
           <Button
             variant="ghost"
             size="sm"
