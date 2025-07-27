@@ -60,10 +60,14 @@ const NotePage = () => {
   const handleCopy = () => {
     if (!note) return;
     
-    // Create a plain text version of the note content
+    // Create a clean plain text version without artificial line breaks
     const contentElement = document.createElement('div');
     contentElement.innerHTML = note.content;
-    const plainText = `${note.title}\n\n${contentElement.innerText}`;
+    
+    // Extract text content and normalize whitespace to remove artificial line breaks
+    const textContent = contentElement.textContent || contentElement.innerText || '';
+    const cleanText = textContent.replace(/\s+/g, ' ').trim();
+    const plainText = `${note.title}\n\n${cleanText}`;
     
     navigator.clipboard.writeText(plainText).then(() => {
       toast({
@@ -83,10 +87,12 @@ const NotePage = () => {
   const handleShare = async () => {
     if (!note) return;
     
-    // Create a plain text version of the note
+    // Create a clean plain text version
     const contentElement = document.createElement('div');
     contentElement.innerHTML = note.content;
-    const plainText = `${note.title}\n\n${contentElement.innerText}`;
+    const textContent = contentElement.textContent || contentElement.innerText || '';
+    const cleanText = textContent.replace(/\s+/g, ' ').trim();
+    const plainText = `${note.title}\n\n${cleanText}`;
     
     try {
       if (navigator.share) {
@@ -185,7 +191,7 @@ const NotePage = () => {
         </div>
       </header>
       
-      <div className="flex-grow overflow-auto" data-scroll-container>
+      <div className="flex-grow" data-scroll-container>
         <NoteEditor note={note} />
       </div>
     </div>

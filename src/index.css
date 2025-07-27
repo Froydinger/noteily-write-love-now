@@ -446,7 +446,7 @@
   /* Sidebar active states with proper contrast */
   .sidebar-menu-button:hover {
     @apply bg-accent text-accent-foreground;
-    border-radius: 0.375rem !important; /* rounded-md for recent notes hover */
+    border-radius: 0.375rem !important; /* rounded-md for consistency */
   }
 
   .sidebar-menu-active {

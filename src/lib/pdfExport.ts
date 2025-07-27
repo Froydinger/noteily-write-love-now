@@ -71,7 +71,7 @@ export const exportNoteToPDF = async (note: NoteForExport): Promise<void> => {
   pdf.setFontSize(12);
   pdf.setFont('helvetica', 'normal');
   
-  // Convert HTML content to plain text
+  // Convert HTML content to clean plain text
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = note.content;
   
@@ -83,7 +83,9 @@ export const exportNoteToPDF = async (note: NoteForExport): Promise<void> => {
     img.parentNode?.replaceChild(imgPlaceholder, img);
   }
   
-  const plainTextContent = tempDiv.innerText || tempDiv.textContent || '';
+  // Extract text and normalize whitespace to remove artificial line breaks from wrapping
+  const textContent = tempDiv.textContent || tempDiv.innerText || '';
+  const plainTextContent = textContent.replace(/\s+/g, ' ').trim();
   
   // Split content into lines that fit the page width
   const contentLines = pdf.splitTextToSize(plainTextContent, contentWidth);
@@ -113,10 +115,11 @@ export const exportNoteToPDF = async (note: NoteForExport): Promise<void> => {
 };
 
 export const exportNoteAsText = (note: NoteForExport): void => {
-  // Convert HTML content to plain text
+  // Convert HTML content to clean plain text
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = note.content;
-  const plainText = tempDiv.innerText || tempDiv.textContent || '';
+  const textContent = tempDiv.textContent || tempDiv.innerText || '';
+  const plainText = textContent.replace(/\s+/g, ' ').trim();
   
   const exportContent = `${note.title || 'Untitled Note'}\n\n${plainText}`;
   
