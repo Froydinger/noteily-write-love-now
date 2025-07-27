@@ -56,37 +56,36 @@ const AuthPage = () => {
     setIsLoading(true);
     setIsCreatingAccount(false);
     
-    // First try to sign in
-    const { error: signInError } = await signIn(email, password);
-    
-    if (!signInError) {
-      // Sign in successful
-      navigate('/');
-    } else {
-      // If sign in fails with "Invalid login credentials", try to create account
-      if (signInError.message.includes('Invalid login credentials')) {
-        setIsCreatingAccount(true);
-        setWillCreateAccount(true);
-        
-        // Show welcome message before creating account
+    if (willCreateAccount) {
+      // Skip signIn attempt for new accounts to avoid error toast
+      setIsCreatingAccount(true);
+      
+      // Show welcome message before creating account
+      toast({
+        title: "Welcome to Noteily! 🎉",
+        description: "Creating your account...",
+        className: "bg-green-600 text-white border-green-600",
+      });
+      
+      const { error: signUpError } = await signUp(email, password);
+      if (!signUpError) {
+        setPassword('');
         toast({
-          title: "Welcome to Noteily! 🎉",
-          description: "Creating your account...",
+          title: "Account created successfully! ✨",
+          description: "You're all set to start taking notes.",
           className: "bg-green-600 text-white border-green-600",
         });
-        
-        const { error: signUpError } = await signUp(email, password);
-        if (!signUpError) {
-          setPassword('');
-          toast({
-            title: "Account created successfully! ✨",
-            description: "You're all set to start taking notes.",
-            className: "bg-green-600 text-white border-green-600",
-          });
-        }
-        setIsCreatingAccount(false);
       }
-      // For other errors (like "Email not confirmed"), let the original error show
+      setIsCreatingAccount(false);
+    } else {
+      // Existing user - try to sign in
+      const { error: signInError } = await signIn(email, password);
+      
+      if (!signInError) {
+        // Sign in successful
+        navigate('/');
+      }
+      // Let AuthContext handle the error toast for actual sign-in failures
     }
     
     setIsLoading(false);
