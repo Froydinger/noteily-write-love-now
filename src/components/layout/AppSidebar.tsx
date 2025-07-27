@@ -127,9 +127,9 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton 
                   asChild
-                  className={`px-4 py-2 rounded-md ${isActive('/') ? 'sidebar-menu-active' : ''}`}
+                  className={`px-4 py-2 rounded-full ${isActive('/') ? 'sidebar-menu-active' : ''}`}
                 >
-                  <a href="/" className="flex items-center gap-3 rounded-md">
+                  <a href="/" className="flex items-center gap-3 rounded-full">
                     <BookOpen className="h-4 w-4" />
                     <span className="font-medium">All Notes</span>
                   </a>
@@ -138,9 +138,9 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton 
                   asChild
-                  className={`px-4 py-2 rounded-md ${isActive('/prompts') ? 'sidebar-menu-active' : ''}`}
+                  className={`px-4 py-2 rounded-full ${isActive('/prompts') ? 'sidebar-menu-active' : ''}`}
                 >
-                  <a href="/prompts" className="flex items-center gap-3 rounded-md">
+                  <a href="/prompts" className="flex items-center gap-3 rounded-full">
                     <Pencil className="h-4 w-4" />
                     <span className="font-medium">Writing Prompts</span>
                   </a>
@@ -159,7 +159,7 @@ export function AppSidebar() {
                   filteredNotes.map((note) => (
                     <div 
                       key={note.id}
-                      className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
+                      className={`px-3 py-2.5 my-1 rounded-full btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
                       onClick={() => handleSelectNote(note)}
                       style={{ 
                         animationDelay: `${notes.indexOf(note) * 0.05}s`,
