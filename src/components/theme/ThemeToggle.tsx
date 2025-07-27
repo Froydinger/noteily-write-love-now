@@ -1,7 +1,8 @@
 import { Sun, Moon, Waves, FileText, Monitor } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
-import { useToast } from '@/hooks/use-toast';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { usePreferences, ThemeType } from '@/contexts/PreferencesContext';
+import { useState } from 'react';
 
 interface ThemeToggleProps {
   variant?: 'sidebar' | 'settings';
@@ -9,7 +10,7 @@ interface ThemeToggleProps {
 
 export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
   const { preferences, updateTheme } = usePreferences();
-  const { toast } = useToast();
+  const [showTooltip, setShowTooltip] = useState(false);
   
   const toggleTheme = async () => {
     const themeOrder: ThemeType[] = ['navy', 'dark', 'light', 'sepia'];
@@ -18,17 +19,9 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
     
     await updateTheme(nextTheme);
     
-    const themeLabels = {
-      light: "Light mode enabled",
-      dark: "Dark mode enabled", 
-      navy: "Night Mode enabled",
-      sepia: "Fresh Page enabled"
-    };
-    
-    toast({
-      title: themeLabels[nextTheme],
-      description: "Theme preference has been saved.",
-    });
+    // Show tooltip briefly
+    setShowTooltip(true);
+    setTimeout(() => setShowTooltip(false), 1500);
   };
   
   const getThemeIcon = () => {
@@ -63,30 +56,48 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
 
   if (variant === 'settings') {
     return (
-      <Toggle 
-        aria-label="Toggle theme"
-        pressed={preferences.theme !== 'light'}
-        onPressedChange={toggleTheme}
-        className="h-8 w-8 p-0 flex-shrink-0 btn-accessible rounded-full"
-        variant="outline"
-        size="sm"
-      >
-        {getThemeIcon()}
-      </Toggle>
+      <TooltipProvider>
+        <Tooltip open={showTooltip}>
+          <TooltipTrigger asChild>
+            <Toggle 
+              aria-label="Toggle theme"
+              pressed={preferences.theme !== 'light'}
+              onPressedChange={toggleTheme}
+              className="h-8 w-8 p-0 flex-shrink-0 btn-accessible rounded-full"
+              variant="outline"
+              size="sm"
+            >
+              {getThemeIcon()}
+            </Toggle>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="text-xs">
+            {getThemeLabel()}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   }
 
   return (
-    <Toggle 
-      aria-label="Toggle theme"
-      pressed={preferences.theme !== 'light'}
-      onPressedChange={toggleTheme}
-      className="w-full justify-start btn-accessible h-9"
-      variant="default"
-      size="sm"
-    >
-      {getThemeIcon()}
-      <span className="ml-2">{getThemeLabel()}</span>
-    </Toggle>
+    <TooltipProvider>
+      <Tooltip open={showTooltip}>
+        <TooltipTrigger asChild>
+          <Toggle 
+            aria-label="Toggle theme"
+            pressed={preferences.theme !== 'light'}
+            onPressedChange={toggleTheme}
+            className="w-full justify-start btn-accessible h-9"
+            variant="default"
+            size="sm"
+          >
+            {getThemeIcon()}
+            <span className="ml-2">{getThemeLabel()}</span>
+          </Toggle>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="text-xs">
+          {getThemeLabel()}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
