@@ -262,14 +262,13 @@
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden; /* Prevent any body/html scrolling */
   }
   
   #root {
     width: 100%;
     height: 100vh;
-    overflow: hidden;
+    overflow: hidden; /* Root container should not scroll */
   }
   
   h1, h2, h3, h4, h5, h6 {
