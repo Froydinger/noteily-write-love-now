@@ -55,69 +55,71 @@ const Index = () => {
   }
 
   const content = (
-    <div className="p-6 md:p-10 animate-fade-in"
-         style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          {(isMobile || state === "collapsed") && <SidebarTrigger />}
-          <h1 className="text-2xl font-serif font-medium">All Notes</h1>
-        </div>
-        
-        <Button 
-          onClick={handleCreateNote} 
-          className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full"
-        >
-          <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-          New Note
-        </Button>
-      </div>
-
-      {/* Search and Filter Controls */}
-      <div className="mb-6 space-y-4">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search notes by title or content..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+    <div className="h-full overflow-y-auto">
+      <div className="p-6 md:p-10 animate-fade-in"
+           style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            {(isMobile || state === "collapsed") && <SidebarTrigger />}
+            <h1 className="text-2xl font-serif font-medium">All Notes</h1>
           </div>
-          <div className="flex-shrink-0">
-            <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="latest">Latest</SelectItem>
-                <SelectItem value="oldest">Oldest</SelectItem>
-                <SelectItem value="alphabetical">A-Z</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        
-        {searchTerm && (
-          <div className="text-sm text-muted-foreground">
-            {filteredAndSortedNotes.length} of {notes.length} notes shown
-          </div>
-        )}
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
-        {filteredAndSortedNotes.map((note, index) => (
-          <div 
-            key={note.id}
-            className="animate-float-in"
-            style={{ 
-              animationDelay: `${index * 0.1}s`,
-              animationFillMode: 'both'
-            }}
+          
+          <Button 
+            onClick={handleCreateNote} 
+            className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full"
           >
-            <NoteCard note={note} />
+            <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+            New Note
+          </Button>
+        </div>
+
+        {/* Search and Filter Controls */}
+        <div className="mb-6 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search notes by title or content..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex-shrink-0">
+              <Select value={sortOrder} onValueChange={setSortOrder}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="latest">Latest</SelectItem>
+                  <SelectItem value="oldest">Oldest</SelectItem>
+                  <SelectItem value="alphabetical">A-Z</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        ))}
+          
+          {searchTerm && (
+            <div className="text-sm text-muted-foreground">
+              {filteredAndSortedNotes.length} of {notes.length} notes shown
+            </div>
+          )}
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
+          {filteredAndSortedNotes.map((note, index) => (
+            <div 
+              key={note.id}
+              className="animate-float-in"
+              style={{ 
+                animationDelay: `${index * 0.1}s`,
+                animationFillMode: 'both'
+              }}
+            >
+              <NoteCard note={note} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
