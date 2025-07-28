@@ -272,14 +272,15 @@ ${note.content}
   };
 
   return (
-    <div className="p-3 md:p-6 animate-fade-in min-h-screen">
-      <div className="flex items-center gap-2 mb-6">
-        {(isMobile || state === "collapsed") && <SidebarTrigger />}
-        <h1 className="text-xl md:text-2xl font-serif font-medium">Settings</h1>
-      </div>
-      
-      <div className="max-w-2xl mx-auto">
-        <div className="space-y-4 md:space-y-6">
+    <div className="h-full overflow-y-auto">
+      <div className="p-3 md:p-6 animate-fade-in min-h-screen">
+        <div className="flex items-center gap-2 mb-6">
+          {(isMobile || state === "collapsed") && <SidebarTrigger />}
+          <h1 className="text-xl md:text-2xl font-serif font-medium">Settings</h1>
+        </div>
+        
+        <div className="max-w-2xl mx-auto">
+          <div className="space-y-4 md:space-y-6">
           <div className="bg-card rounded-lg p-4 border">
             <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
               <span>Preferences</span>
@@ -483,6 +484,7 @@ ${note.content}
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>
