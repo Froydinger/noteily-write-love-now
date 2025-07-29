@@ -16,5 +16,11 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     detectSessionInUrl: true,
     flowType: 'pkce',
     storageKey: 'supabase.auth.token',
-  }
+    debug: false,
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'noteily-app',
+    },
+  },
 });
