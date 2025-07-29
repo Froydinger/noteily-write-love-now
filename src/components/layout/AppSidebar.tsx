@@ -90,7 +90,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="flex items-center justify-between px-4 py-4">
+      <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0">
         <div className="flex items-center space-x-3 flex-1">
           <Heart className="h-5 w-5 text-neon-blue" />
           <h1 className="text-xl font-serif font-medium">Noteily</h1>
