@@ -35,14 +35,14 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   if (!isVisible) {
     return (
       <div className="fixed inset-0 bg-background flex items-center justify-center z-50 animate-fade-out pointer-events-none">
-        <Heart className="h-16 w-16 text-neon-blue animate-pulse" />
+        <Heart className="h-16 w-16 text-neon-blue transition-all duration-300 ease-out" />
       </div>
     );
   }
 
   return (
     <div className="fixed inset-0 bg-background flex items-center justify-center z-50 animate-scale-in">
-      <Heart className="h-16 w-16 text-neon-blue animate-heartbeat" />
+      <Heart className="h-16 w-16 text-neon-blue transition-all duration-300 ease-out" />
     </div>
   );
 }
