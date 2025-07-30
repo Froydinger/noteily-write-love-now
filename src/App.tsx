@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppLayout } from "./components/layout/AppLayout";
+import { SplashScreen } from "./components/layout/SplashScreen";
 import { PWAInstall } from "./components/pwa/PWAInstall";
 import { PWAUpdateNotification } from "./components/pwa/PWAUpdateNotification";
 import Index from "./pages/Index";
@@ -36,6 +38,12 @@ const App = () => {
 };
 
 const AppContent = () => {
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
+
   return (
     <>
       <Toaster />
