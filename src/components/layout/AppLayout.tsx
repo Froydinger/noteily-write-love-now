@@ -13,13 +13,8 @@ type AppLayoutProps = {
 };
 
 export function AppLayout({ children }: AppLayoutProps) {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-
-  // Show minimal loading without visual flash
-  if (loading) {
-    return <div className="min-h-screen bg-background" />;
-  }
 
   // Show auth prompt if not authenticated
   if (!user) {

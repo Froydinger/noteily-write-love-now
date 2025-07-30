@@ -33,17 +33,15 @@ const NotePage = () => {
   const note = getNote(id || '');
   
   useEffect(() => {
-    if (loading) return; // Wait for notes to load
-    
     if (note) {
       setCurrentNote(note);
     } else if (id) {
-      // Only navigate to not-found if loading is complete and note doesn't exist
+      // Navigate home if note doesn't exist
       navigate('/');
     }
     
     return () => setCurrentNote(null);
-  }, [id, note, navigate, setCurrentNote, loading]);
+  }, [id, note, navigate, setCurrentNote]);
 
   
   const handleDelete = () => {
@@ -119,8 +117,8 @@ const NotePage = () => {
     }
   };
   
-  if (loading || !note) {
-    return <div className="p-8">Loading...</div>;
+  if (!note) {
+    return <div className="p-8">Note not found</div>;
   }
   
   return (

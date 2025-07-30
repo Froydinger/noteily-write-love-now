@@ -7,25 +7,10 @@ import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function EmptyNotesPlaceholder() {
-  const { addNote, setCurrentNote, loading } = useNotes();
+  const { addNote, setCurrentNote } = useNotes();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { state } = useSidebar();
-  
-  if (loading) {
-    return (
-      <div className="relative">
-        {(isMobile || state === "collapsed") && (
-          <div className="absolute top-4 left-4 z-10">
-            <SidebarTrigger />
-          </div>
-        )}
-        {/* Hidden div to maintain layout but no visible loading text */}
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 opacity-0">
-        </div>
-      </div>
-    );
-  }
   
   const handleCreateFirstNote = async () => {
     try {
