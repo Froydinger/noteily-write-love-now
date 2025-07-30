@@ -27,7 +27,7 @@ export const usePreferences = () => {
 export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [preferences, setPreferences] = useState<UserPreferences>({ theme: 'navy' });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Load user preferences - prioritize localStorage, sync with Supabase
   useEffect(() => {

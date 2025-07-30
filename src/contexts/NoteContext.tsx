@@ -275,7 +275,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return getRandomPrompts(3);
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   
   const { user } = useAuth();
   const { toast } = useToast();
@@ -293,14 +293,13 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loadNotes = async () => {
     try {
-      // First, try to load from offline storage
+      // First, try to load from offline storage immediately
       const offlineNotes = await offlineStorage.loadNotes(user!.id);
       if (offlineNotes.length > 0) {
         setNotes(offlineNotes);
-        setLoading(false);
       }
 
-      // Then try to sync from Supabase
+      // Then sync from Supabase in background without blocking UI
       const { data, error } = await supabase
         .from('notes')
         .select('*')
@@ -308,7 +307,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Error loading notes from Supabase:', error);
-        // If we have offline notes, show them instead of error
+        // Only show error if we have no offline notes
         if (offlineNotes.length === 0) {
           toast({
             title: "Loading offline notes",
