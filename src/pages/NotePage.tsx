@@ -122,7 +122,7 @@ const NotePage = () => {
   }
   
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col overflow-hidden">
       <header className="border-b p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -189,7 +189,7 @@ const NotePage = () => {
         </div>
       </header>
       
-      <div className="flex-grow overflow-y-auto" data-scroll-container>
+      <div className="flex-grow" data-scroll-container>
         <NoteEditor note={note} />
       </div>
     </div>

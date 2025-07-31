@@ -81,9 +81,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <NoteProvider>
       <SidebarProvider>
-        <div className="flex h-screen w-screen overflow-hidden">
+        <div className="flex h-screen w-screen">
           <AppSidebar />
-          <main className="flex-1 flex flex-col overflow-hidden">
+          <main className="flex-1 overflow-y-auto">
             {children}
           </main>
         </div>
