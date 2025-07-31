@@ -29,7 +29,7 @@ const PromptsPage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full overflow-y-auto">
       <div className="p-4 md:p-8 animate-fade-in">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">

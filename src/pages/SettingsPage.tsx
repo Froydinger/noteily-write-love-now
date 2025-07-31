@@ -272,7 +272,7 @@ ${note.content}
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full overflow-y-auto">
       <div className="p-3 md:p-6 animate-fade-in min-h-screen">
         <div className="flex items-center gap-2 mb-6">
           {(isMobile || state === "collapsed") && <SidebarTrigger />}
