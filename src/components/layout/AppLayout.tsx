@@ -83,7 +83,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <SidebarProvider>
         <div className="flex h-screen w-screen">
           <AppSidebar />
-          <main className="flex-1 overflow-y-auto" style={{ touchAction: 'pan-y' }}>
+          <main className="flex-1 overflow-y-auto">
             {children}
           </main>
         </div>
