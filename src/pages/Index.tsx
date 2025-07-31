@@ -50,7 +50,7 @@ const Index = () => {
     await syncNotes();
   };
 
-  if (notes.length === 0) {
+  if (!loading && notes.length === 0) {
     return <EmptyNotesPlaceholder />;
   }
 
