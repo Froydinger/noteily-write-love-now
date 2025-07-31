@@ -25,10 +25,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         fadeOut ? 'opacity-0' : 'opacity-100'
       }`}
     >
-      <Heart 
-        className="h-16 w-16 text-accent animate-fade-in" 
-        style={{ animationDelay: '0.2s', animationFillMode: 'both' }}
-      />
+      <Heart className="h-16 w-16 text-accent" />
     </div>
   );
 }
