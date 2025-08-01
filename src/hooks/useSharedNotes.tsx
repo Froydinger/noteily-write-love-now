@@ -119,6 +119,10 @@ export function useSharedNotes(noteId?: string) {
         return { success: false, error: 'Cannot share with yourself' };
       }
 
+      // Check if there's an existing user with this email
+      const { data: existingUser } = await supabase.auth.admin.listUsers();
+      const targetUser = existingUser?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase().trim());
+
       // Create the share
       const { data, error } = await supabase
         .from('shared_notes')
@@ -126,6 +130,7 @@ export function useSharedNotes(noteId?: string) {
           note_id: noteId,
           owner_id: user.id,
           shared_with_email: email.toLowerCase().trim(),
+          shared_with_user_id: targetUser?.id || null, // Link immediately if user exists
           permission
         })
         .select()
