@@ -44,6 +44,47 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_notes: {
+        Row: {
+          created_at: string
+          id: string
+          note_id: string
+          owner_id: string
+          permission: string
+          shared_with_email: string
+          shared_with_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note_id: string
+          owner_id: string
+          permission: string
+          shared_with_email: string
+          shared_with_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note_id?: string
+          owner_id?: string
+          permission?: string
+          shared_with_email?: string
+          shared_with_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_notes_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_preferences: {
         Row: {
           created_at: string
