@@ -372,7 +372,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .eq('user_id', user!.id)
           .order('created_at', { ascending: false }),
         
-        // Get notes shared with user by user_id OR email
+        // Get notes shared with user by user_id
         supabase
           .from('shared_notes')
           .select(`
@@ -380,7 +380,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
             permission,
             notes!inner(*)
           `)
-          .or(`shared_with_user_id.eq.${user!.id},shared_with_email.eq.${user!.email}`),
+          .eq('shared_with_user_id', user!.id),
           
         // Get all shares for notes owned by the user
         supabase
@@ -695,16 +695,6 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const isOwner = noteToDelete.user_id === user.id;
     const isSharedNote = noteToDelete.isSharedWithUser && !noteToDelete.isOwnedByUser;
 
-    console.log('Delete note debug:', {
-      noteId: id,
-      userId: user.id,
-      noteUserId: noteToDelete.user_id,
-      isOwnedByUser: noteToDelete.isOwnedByUser,
-      isSharedWithUser: noteToDelete.isSharedWithUser,
-      isOwner,
-      isSharedNote
-    });
-
     // Optimistically update local state
     setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
     if (currentNote && currentNote.id === id) {
@@ -713,30 +703,15 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       if (isSharedNote) {
-        console.log('Deleting shared note access for user:', user.id, 'note:', id);
-        // If it's a shared note, remove all share records for this user (both by user_id and email)
-        const { error: userIdError } = await supabase
+        // If it's a shared note, only remove the share record (user's access)
+        const { error } = await supabase
           .from('shared_notes')
           .delete()
           .eq('note_id', id)
           .eq('shared_with_user_id', user.id);
 
-        const { error: emailError } = await supabase
-          .from('shared_notes')
-          .delete()
-          .eq('note_id', id)
-          .eq('shared_with_email', user.email);
-
-        if (userIdError) {
-          console.error('Error removing note access by user_id:', userIdError);
-        }
-        
-        if (emailError) {
-          console.error('Error removing note access by email:', emailError);
-        }
-        
-        if (!userIdError || !emailError) {
-          console.log('Successfully removed shared note access');
+        if (error) {
+          console.error('Error removing note access:', error);
         }
       } else if (isOwner) {
         // Use soft delete function for owned notes
