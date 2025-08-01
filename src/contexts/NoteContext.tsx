@@ -301,6 +301,8 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setNotes(offlineNotes);
       }
 
+      console.log('loadNotes: Loading owned and shared notes...');
+      
       // Fetch both owned notes and shared notes
       const [ownedNotesResponse, sharedNotesResponse] = await Promise.all([
         // Get user's own notes
@@ -310,7 +312,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .eq('user_id', user!.id)
           .order('created_at', { ascending: false }),
         
-        // Get notes shared with user (only by user_id, not email to avoid auth.users queries)
+        // Get notes shared with user by user_id
         supabase
           .from('shared_notes')
           .select(`
@@ -320,6 +322,13 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           `)
           .eq('shared_with_user_id', user!.id)
       ]);
+
+      console.log('loadNotes: Responses received', {
+        ownedNotesError: ownedNotesResponse.error,
+        ownedNotesCount: ownedNotesResponse.data?.length || 0,
+        sharedNotesError: sharedNotesResponse.error,
+        sharedNotesCount: sharedNotesResponse.data?.length || 0
+      });
 
       if (ownedNotesResponse.error) {
         console.error('Error loading owned notes from Supabase:', ownedNotesResponse.error);
