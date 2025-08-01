@@ -14,7 +14,7 @@ import PullToRefresh from 'react-simple-pull-to-refresh';
 
 const Index = () => {
   const { user } = useAuth();
-  const { notes, addNote, setCurrentNote, loading, syncNotes } = useNotes();
+  const { notes, addNote, setCurrentNote, loading, syncNotes, hasInitialLoad } = useNotes();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { state } = useSidebar();
@@ -52,14 +52,18 @@ const Index = () => {
     await syncNotes();
   };
 
-  // Only show empty state when loading is complete AND notes are actually empty AND we have a user
-  // Add extra check to ensure this only shows when we're definitely done loading
-  if (!loading && notes.length === 0 && user && !loading) {
+  // Debug logging to track the race condition
+  console.log('Index render state:', { loading, notesLength: notes.length, hasUser: !!user, hasInitialLoad });
+
+  // Only show empty state when we've completed the initial load AND notes are actually empty AND we have a user
+  if (hasInitialLoad && !loading && notes.length === 0 && user) {
+    console.log('Showing EmptyNotesPlaceholder - hasInitialLoad:', hasInitialLoad);
     return <EmptyNotesPlaceholder />;
   }
 
-  // Don't render anything during loading to prevent flashing
-  if (loading) {
+  // Don't render anything during loading or before initial load to prevent flashing
+  if (loading || !hasInitialLoad) {
+    console.log('Still loading or no initial load, returning null', { loading, hasInitialLoad });
     return null;
   }
 

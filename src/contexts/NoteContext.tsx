@@ -26,6 +26,7 @@ type NoteContextType = {
   writingPrompts: WritingPrompt[];
   dailyPrompts: WritingPrompt[];
   loading: boolean;
+  hasInitialLoad: boolean;
   addNote: () => Promise<Note>;
   updateNote: (id: string, updates: Partial<Note>) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
@@ -275,16 +276,20 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return getRandomPrompts(3);
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start with loading true
+  const [hasInitialLoad, setHasInitialLoad] = useState(false);
   
   const { user } = useAuth();
   const { toast } = useToast();
 
   // Load notes when user changes
   useEffect(() => {
+    console.log('NoteContext useEffect: user changed', { hasUser: !!user });
     if (user) {
+      console.log('NoteContext useEffect: calling loadNotes');
       loadNotes();
     } else {
+      console.log('NoteContext useEffect: no user, clearing state');
       setNotes([]);
       setCurrentNote(null);
       setLoading(false);
@@ -292,6 +297,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user]);
 
   const loadNotes = async () => {
+    console.log('loadNotes: Starting, setting loading to true');
     setLoading(true);
     try {
       // First, try to load from offline storage immediately
@@ -344,7 +350,9 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
     } finally {
+      console.log('loadNotes: Finished, setting loading to false');
       setLoading(false);
+      setHasInitialLoad(true);
     }
   };
   
@@ -576,6 +584,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         writingPrompts,
         dailyPrompts,
         loading,
+        hasInitialLoad,
         addNote, 
         updateNote, 
         deleteNote, 
