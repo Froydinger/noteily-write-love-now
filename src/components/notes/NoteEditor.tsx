@@ -110,40 +110,49 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
   };
 
-  // Handle paste events to strip formatting
+  // Handle paste events to strip formatting and normalize line breaks
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
     
     const text = e.clipboardData.getData('text/plain');
     if (!text) return;
     
-    // Split text by line breaks and create proper line breaks
-    const lines = text.split(/\r?\n/);
-    const selection = window.getSelection();
-    const range = selection?.getRangeAt(0);
+    // Normalize multiple line breaks to single line breaks and trim
+    const normalizedText = text
+      .replace(/\r\n/g, '\n')  // Normalize Windows line endings
+      .replace(/\n{2,}/g, '\n') // Replace multiple line breaks with single
+      .trim();
     
-    if (range) {
-      range.deleteContents();
+    // Get current selection
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+    
+    const range = selection.getRangeAt(0);
+    
+    // Delete current selection if any
+    range.deleteContents();
+    
+    // Split by single line breaks and insert
+    const lines = normalizedText.split('\n');
+    
+    lines.forEach((line, index) => {
+      // Insert text node for each line (including empty ones)
+      const textNode = document.createTextNode(line);
+      range.insertNode(textNode);
+      range.setStartAfter(textNode);
       
-      lines.forEach((line, index) => {
-        if (line.trim()) {
-          const textNode = document.createTextNode(line);
-          range.insertNode(textNode);
-        }
-        
-        // Add line break except for the last line
-        if (index < lines.length - 1) {
-          const br = document.createElement('br');
-          range.insertNode(br);
-          range.setStartAfter(br);
-        }
-      });
-      
-      // Move cursor to end of inserted content
-      range.collapse(false);
-      selection?.removeAllRanges();
-      selection?.addRange(range);
-    }
+      // Add line break except for the last line
+      if (index < lines.length - 1) {
+        const br = document.createElement('br');
+        range.insertNode(br);
+        range.setStartAfter(br);
+      }
+    });
+    
+    // Collapse range to end
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
     
     // Trigger content change to save
     if (contentRef.current) {
