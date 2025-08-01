@@ -309,15 +309,19 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
       if (e.key === 'Enter') {
         e.preventDefault();
+        e.stopPropagation();
         
         // Check if this is a double enter (empty current item)
         if (textSpan.textContent?.trim() === '') {
           // Exit checklist mode - create normal paragraph after container
-          const newParagraph = document.createElement('div');
+          const newParagraph = document.createElement('p');
           newParagraph.innerHTML = '<br>';
+          newParagraph.style.minHeight = '1.2em';
           
           // Insert after the checklist container
-          container.parentNode?.insertBefore(newParagraph, container.nextSibling);
+          if (container.parentNode) {
+            container.parentNode.insertBefore(newParagraph, container.nextSibling);
+          }
           
           // Remove empty checklist item if it's the only one
           if (container.children.length === 1) {
@@ -336,9 +340,26 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         } else {
           // Create new checklist item
           const newItem = createChecklistItem('');
-          container.insertBefore(newItem, item.nextSibling);
+          if (item.nextSibling) {
+            container.insertBefore(newItem, item.nextSibling);
+          } else {
+            container.appendChild(newItem);
+          }
+          
           const newTextInput = newItem.querySelector('.checklist-text') as HTMLElement;
-          newTextInput?.focus();
+          if (newTextInput) {
+            // Clear any existing content and focus
+            newTextInput.innerHTML = '';
+            newTextInput.focus();
+            
+            // Set cursor at the beginning
+            const range = document.createRange();
+            const selection = window.getSelection();
+            range.setStart(newTextInput, 0);
+            range.collapse(true);
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+          }
         }
         
         // Trigger content change to save
