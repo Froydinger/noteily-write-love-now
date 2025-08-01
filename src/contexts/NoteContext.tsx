@@ -317,7 +317,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .eq('user_id', user!.id)
           .order('created_at', { ascending: false }),
         
-        // Get notes shared with user
+        // Get notes shared with user (only by user_id, not email to avoid auth.users queries)
         supabase
           .from('shared_notes')
           .select(`
@@ -325,7 +325,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
             permission,
             notes!inner(*)
           `)
-          .or(`shared_with_user_id.eq.${user!.id},shared_with_email.eq.${user!.email}`)
+          .eq('shared_with_user_id', user!.id)
       ]);
 
       if (ownedNotesResponse.error) {
