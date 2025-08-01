@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Share, ListChecks, Loader2 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Download, Share, ListChecks, Loader2, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { exportNoteToPDF, type NoteForExport } from '@/lib/pdfExport';
+import { ShareModal } from './ShareModal';
 
 interface ExportMenuProps {
   note: NoteForExport;
@@ -13,6 +15,7 @@ interface ExportMenuProps {
 export function ExportMenu({ note, onShare, onInsertChecklist }: ExportMenuProps) {
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const handlePDFExport = async () => {
     if (isExporting) return;
@@ -49,16 +52,29 @@ export function ExportMenu({ note, onShare, onInsertChecklist }: ExportMenuProps
         <ListChecks className="h-4 w-4" />
       </Button>
       
-      {/* Share button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onShare}
-        className="btn-accessible"
-        title="Share note"
-      >
-        <Share className="h-4 w-4" />
-      </Button>
+      {/* Share dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="btn-accessible"
+            title="Share note"
+          >
+            <Share className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setShowShareModal(true)}>
+            <Users className="h-4 w-4 mr-2" />
+            Share w/ Noteily
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onShare}>
+            <Share className="h-4 w-4 mr-2" />
+            Share w/ Other
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       
       {/* PDF Export button */}
       <Button
@@ -75,6 +91,14 @@ export function ExportMenu({ note, onShare, onInsertChecklist }: ExportMenuProps
           <Download className="h-4 w-4" />
         )}
       </Button>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        noteId={note.id}
+        noteTitle={note.title}
+      />
     </>
   );
 }

@@ -15,6 +15,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
+  const isReadOnly = note.isShared && note.permission === 'read';
+  
   // Apply iOS zoom prevention on mount
   useEffect(() => {
     // Ensure title and content have proper font size to prevent zoom
@@ -495,12 +497,14 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         ref={titleRef}
         value={title}
         onChange={(e) => {
+          if (isReadOnly) return;
           const newTitle = e.target.value;
           setTitle(newTitle);
           updateNote(note.id, { title: newTitle });
         }}
         placeholder="Untitled Note"
-        className="w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 dark:focus:ring-neon-blue resize-none overflow-hidden"
+        className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 dark:focus:ring-neon-blue resize-none overflow-hidden ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+        readOnly={isReadOnly}
         style={{ 
           minHeight: 'auto',
           height: 'auto'
@@ -524,14 +528,14 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       
       <div
         ref={contentRef}
-        contentEditable
-        className="note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert min-h-[50vh]"
-        data-placeholder="Just start typing…"
+        contentEditable={!isReadOnly}
+        className={`note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert min-h-[50vh] ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+        data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
         aria-label="Note content"
-        onPaste={handlePaste}
+        onPaste={isReadOnly ? undefined : handlePaste}
       />
       
-      <ImageUploadButton onImageInsert={insertImageAtCursor} />
+      {!isReadOnly && <ImageUploadButton onImageInsert={insertImageAtCursor} />}
     </div>
   );
 }

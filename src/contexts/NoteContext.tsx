@@ -12,6 +12,8 @@ export type Note = {
   createdAt: string;
   updatedAt: string;
   featured_image?: string;
+  isShared?: boolean;
+  permission?: 'read' | 'write';
 };
 
 export type WritingPrompt = {
@@ -306,37 +308,71 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setNotes(offlineNotes);
       }
 
-      // Then sync from Supabase in background without blocking UI
-      const { data, error } = await supabase
-        .from('notes')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // Fetch both owned notes and shared notes
+      const [ownedNotesResponse, sharedNotesResponse] = await Promise.all([
+        // Get user's own notes
+        supabase
+          .from('notes')
+          .select('*')
+          .eq('user_id', user!.id)
+          .order('created_at', { ascending: false }),
+        
+        // Get notes shared with user
+        supabase
+          .from('shared_notes')
+          .select(`
+            note_id,
+            permission,
+            notes!inner(*)
+          `)
+          .or(`shared_with_user_id.eq.${user!.id},shared_with_email.eq.${user!.email}`)
+      ]);
 
-      if (error) {
-        console.error('Error loading notes from Supabase:', error);
-        // Only show error if we have no offline notes
-        if (offlineNotes.length === 0) {
-          toast({
-            title: "Loading offline notes",
-            description: "Working offline. Notes will sync when connection is restored.",
-          });
-        }
-      } else {
-        // Format notes from Supabase
-        const formattedNotes: Note[] = data.map(note => ({
-          id: note.id,
-          title: note.title,
-          content: note.content || '',
-          createdAt: note.created_at,
-          updatedAt: note.updated_at,
-          featured_image: (note as any).featured_image || undefined,
-        }));
-        
-        setNotes(formattedNotes);
-        
-        // Save to offline storage for future offline access
-        await offlineStorage.saveNotes(formattedNotes, user!.id);
+      if (ownedNotesResponse.error) {
+        console.error('Error loading owned notes from Supabase:', ownedNotesResponse.error);
       }
+
+      if (sharedNotesResponse.error) {
+        console.error('Error loading shared notes from Supabase:', sharedNotesResponse.error);
+      }
+
+      // Combine owned and shared notes
+      const ownedNotes = ownedNotesResponse.data || [];
+      const sharedNotes = sharedNotesResponse.data?.map(share => ({
+        ...share.notes,
+        isShared: true,
+        permission: share.permission
+      })) || [];
+
+      // Format notes from Supabase
+      const formattedOwnedNotes: Note[] = ownedNotes.map(note => ({
+        id: note.id,
+        title: note.title,
+        content: note.content || '',
+        createdAt: note.created_at,
+        updatedAt: note.updated_at,
+        featured_image: (note as any).featured_image || undefined,
+      }));
+
+      const formattedSharedNotes: Note[] = sharedNotes.map(note => ({
+        id: note.id,
+        title: note.title,
+        content: note.content || '',
+        createdAt: note.created_at,
+        updatedAt: note.updated_at,
+        featured_image: (note as any).featured_image || undefined,
+        isShared: note.isShared,
+        permission: note.permission as 'read' | 'write',
+      }));
+
+      const allNotes = [...formattedOwnedNotes, ...formattedSharedNotes].sort((a, b) => 
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
+
+      setNotes(allNotes);
+      
+      // Save owned notes to offline storage for future offline access
+      await offlineStorage.saveNotes(formattedOwnedNotes, user!.id);
     } catch (error) {
       console.error('Error loading notes:', error);
       // Try to load offline notes as fallback

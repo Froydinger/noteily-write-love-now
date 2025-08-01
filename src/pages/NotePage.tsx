@@ -4,7 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus } from 'lucide-react';
+import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus, Users, Eye, Edit } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -155,6 +156,23 @@ const NotePage = () => {
               <ChevronLeft className="h-4 w-4" />
               Back
             </Button>
+            
+            {note.isShared && (
+              <Badge variant="secondary" className="ml-2 flex items-center gap-1">
+                <Users className="h-3 w-3" />
+                {note.permission === 'read' ? (
+                  <>
+                    <Eye className="h-3 w-3" />
+                    Shared (Read-only)
+                  </>
+                ) : (
+                  <>
+                    <Edit className="h-3 w-3" />
+                    Shared (Editable)
+                  </>
+                )}
+              </Badge>
+            )}
           </div>
           
           <div className="flex items-center gap-1">
