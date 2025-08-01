@@ -15,8 +15,13 @@ export default function RecentlyDeletedPage() {
   useEffect(() => {
     const loadDeleted = async () => {
       setIsLoading(true);
-      await loadDeletedNotes();
-      setIsLoading(false);
+      try {
+        await loadDeletedNotes();
+      } catch (error) {
+        console.error('Error loading deleted notes:', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     
     loadDeleted();

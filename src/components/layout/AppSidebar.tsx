@@ -149,17 +149,6 @@ export function AppSidebar() {
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton 
-                  asChild
-                  className={`px-4 py-2 rounded-full ${isActive('/recently-deleted') ? 'sidebar-nav-active' : ''}`}
-                >
-                  <a href="/recently-deleted" className="flex items-center gap-3 rounded-full">
-                    <Trash2 className="h-4 w-4" />
-                    <span className="font-medium">Recently Deleted</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -208,6 +197,19 @@ export function AppSidebar() {
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Recently Deleted Section */}
+        <div className="px-4 pb-2">
+          <SidebarMenuButton 
+            asChild
+            className={`w-full px-4 py-2 rounded-full ${isActive('/recently-deleted') ? 'sidebar-nav-active' : ''}`}
+          >
+            <a href="/recently-deleted" className="flex items-center gap-3 rounded-full">
+              <Trash2 className="h-4 w-4" />
+              <span className="font-medium">Recently Deleted</span>
+            </a>
+          </SidebarMenuButton>
+        </div>
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-border/40">
