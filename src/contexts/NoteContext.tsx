@@ -297,12 +297,25 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  // Set up real-time subscription for shared_notes changes
+  // Set up real-time subscriptions
   useEffect(() => {
     if (!user) return;
 
     const channel = supabase
-      .channel('shared-notes-changes')
+      .channel('db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notes'
+        },
+        (payload) => {
+          console.log('Notes table change:', payload);
+          // Reload notes for any change to notes table
+          loadNotes();
+        }
+      )
       .on(
         'postgres_changes',
         {
@@ -337,6 +350,24 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('New share access granted:', payload);
           // Reload notes to include the newly shared note
           loadNotes();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'shared_notes'
+        },
+        (payload) => {
+          console.log('Shared notes change:', payload);
+          // Reload notes for any change to shared notes that might affect the user
+          if ((payload.new as any)?.shared_with_user_id === user.id || 
+              (payload.old as any)?.shared_with_user_id === user.id ||
+              (payload.new as any)?.owner_id === user.id ||
+              (payload.old as any)?.owner_id === user.id) {
+            loadNotes();
+          }
         }
       )
       .subscribe();
