@@ -602,15 +602,21 @@
   }
 
   .checklist-text {
-    @apply flex-1 outline-none min-h-[1.5em] leading-relaxed text-foreground py-1;
+    @apply flex-1 outline-none min-h-[1.5em] leading-relaxed text-foreground py-1 bg-transparent border-none;
+    font-size: inherit;
+    font-family: inherit;
   }
 
   .checklist-text:focus {
-    @apply outline-none;
+    @apply outline-none ring-0;
   }
 
   .checklist-text.completed {
     @apply line-through text-muted-foreground;
+  }
+
+  .checklist-text::placeholder {
+    @apply text-muted-foreground/50;
   }
 
   /* Theme-specific checklist styles */

@@ -176,11 +176,11 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     const checklistItems = contentRef.current.querySelectorAll('.checklist-item');
     checklistItems.forEach((item) => {
       const checkbox = item.querySelector('.checklist-checkbox') as HTMLElement;
-      const textSpan = item.querySelector('.checklist-text') as HTMLElement;
+      const textInput = item.querySelector('.checklist-text') as HTMLInputElement;
       
-      if (checkbox && textSpan) {
+      if (checkbox && textInput) {
         // Re-attach event listeners
-        setupChecklistItemEvents(item as HTMLElement, checkbox, textSpan);
+        setupChecklistItemEvents(item as HTMLElement, checkbox, textInput);
       }
     });
   }, [note.content]);
@@ -260,26 +260,28 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       checkbox.innerHTML = '✓';
     }
 
-    const textSpan = document.createElement('div');
-    textSpan.className = 'checklist-text';
-    textSpan.contentEditable = 'true';
-    textSpan.textContent = text;
+    // Use input element instead of contentEditable div for better control
+    const textInput = document.createElement('input');
+    textInput.type = 'text';
+    textInput.className = 'checklist-text';
+    textInput.value = text;
+    textInput.placeholder = 'List item';
 
     if (checked) {
-      textSpan.classList.add('completed');
+      textInput.classList.add('completed');
     }
 
     // Setup event listeners
-    setupChecklistItemEvents(item, checkbox, textSpan);
+    setupChecklistItemEvents(item, checkbox, textInput);
 
     item.appendChild(checkbox);
-    item.appendChild(textSpan);
+    item.appendChild(textInput);
 
     return item;
   };
 
   // Setup checklist item event listeners
-  const setupChecklistItemEvents = (item: HTMLElement, checkbox: HTMLElement, textSpan: HTMLElement) => {
+  const setupChecklistItemEvents = (item: HTMLElement, checkbox: HTMLElement, textInput: HTMLInputElement) => {
     // Handle checkbox click
     const handleCheckboxClick = () => {
       const isChecked = checkbox.classList.contains('checked');
@@ -288,12 +290,12 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         // Uncheck
         checkbox.classList.remove('checked');
         checkbox.innerHTML = '';
-        textSpan.classList.remove('completed');
+        textInput.classList.remove('completed');
       } else {
         // Check
         checkbox.classList.add('checked');
         checkbox.innerHTML = '✓';
-        textSpan.classList.add('completed');
+        textInput.classList.add('completed');
       }
 
       // Trigger content change to save
@@ -312,7 +314,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         e.stopPropagation();
         
         // Check if this is a double enter (empty current item)
-        if (textSpan.textContent?.trim() === '') {
+        if (!textInput.value.trim()) {
           // Exit checklist mode - create normal paragraph after container
           const newParagraph = document.createElement('p');
           newParagraph.innerHTML = '<br>';
@@ -346,19 +348,9 @@ export default function NoteEditor({ note }: NoteEditorProps) {
             container.appendChild(newItem);
           }
           
-          const newTextInput = newItem.querySelector('.checklist-text') as HTMLElement;
+          const newTextInput = newItem.querySelector('.checklist-text') as HTMLInputElement;
           if (newTextInput) {
-            // Clear any existing content and focus
-            newTextInput.innerHTML = '';
             newTextInput.focus();
-            
-            // Set cursor at the beginning
-            const range = document.createRange();
-            const selection = window.getSelection();
-            range.setStart(newTextInput, 0);
-            range.collapse(true);
-            selection?.removeAllRanges();
-            selection?.addRange(range);
           }
         }
         
@@ -366,7 +358,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         if (contentRef.current) {
           contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
         }
-      } else if (e.key === 'Backspace' && textSpan.textContent === '' && window.getSelection()?.anchorOffset === 0) {
+      } else if (e.key === 'Backspace' && !textInput.value && textInput.selectionStart === 0) {
         e.preventDefault();
         
         // Don't remove if it's the only item in the container
@@ -377,16 +369,11 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         // Focus previous item if exists
         const prevItem = item.previousElementSibling;
         if (prevItem) {
-          const prevTextInput = prevItem.querySelector('.checklist-text') as HTMLElement;
+          const prevTextInput = prevItem.querySelector('.checklist-text') as HTMLInputElement;
           if (prevTextInput) {
             prevTextInput.focus();
             // Move cursor to end
-            const range = document.createRange();
-            const selection = window.getSelection();
-            range.selectNodeContents(prevTextInput);
-            range.collapse(false);
-            selection?.removeAllRanges();
-            selection?.addRange(range);
+            prevTextInput.setSelectionRange(prevTextInput.value.length, prevTextInput.value.length);
           }
         }
         
@@ -399,13 +386,22 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       }
     };
 
+    // Handle input changes to save content
+    const handleTextInput = () => {
+      if (contentRef.current) {
+        contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    };
+
     // Attach event listeners
     checkbox.addEventListener('click', handleCheckboxClick);
-    textSpan.addEventListener('keydown', handleTextKeydown);
+    textInput.addEventListener('keydown', handleTextKeydown);
+    textInput.addEventListener('input', handleTextInput);
 
     // Store event handlers for cleanup if needed
     (item as any)._checkboxHandler = handleCheckboxClick;
     (item as any)._textHandler = handleTextKeydown;
+    (item as any)._inputHandler = handleTextInput;
   };
 
   return (
