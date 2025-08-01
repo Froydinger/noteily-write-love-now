@@ -38,9 +38,22 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   useEffect(() => {
     setTitle(note.title);
     if (contentRef.current) {
-      // Sanitize content to prevent XSS attacks
-      const sanitizedContent = DOMPurify.sanitize(note.content);
-      contentRef.current.innerHTML = sanitizedContent;
+      // Only update content if it's actually different to avoid removing event handlers
+      const currentContent = contentRef.current.innerHTML;
+      if (currentContent !== note.content) {
+        // Preserve existing checklist containers before sanitizing
+        const existingChecklists = Array.from(contentRef.current.querySelectorAll('.checklist-container'));
+        
+        // Sanitize content to prevent XSS attacks
+        const sanitizedContent = DOMPurify.sanitize(note.content, {
+          ADD_TAGS: ['input'],
+          ADD_ATTR: ['type', 'placeholder', 'value']
+        });
+        contentRef.current.innerHTML = sanitizedContent;
+        
+        // Restore event handlers for any existing checklists
+        restoreChecklistHandlers();
+      }
     }
   }, [note.id]);
 
@@ -172,13 +185,9 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       }
     });
 
-    // Handle existing checklist items - they should be recreated on load
-    const checklistItems = contentRef.current.querySelectorAll('.checklist-item');
-    checklistItems.forEach((item) => {
-      // Remove old items and let them be recreated with proper event handlers
-      item.remove();
-    });
-  }, [note.content]);
+    // Don't automatically remove checklist items - they should persist
+    // Only handle this on initial load when the note ID changes
+  }, [note.id]);
 
 
   // Handle checklist insertion
@@ -408,6 +417,75 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     if (contentRef.current) {
       contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
     }
+  };
+
+  // Restore event handlers for existing checklists after content load
+  const restoreChecklistHandlers = () => {
+    if (!contentRef.current) return;
+    
+    const checklistContainers = contentRef.current.querySelectorAll('.checklist-container');
+    checklistContainers.forEach(container => {
+      const items = container.querySelectorAll('.checklist-item');
+      items.forEach(item => {
+        const checkbox = item.querySelector('.checklist-checkbox') as HTMLButtonElement;
+        const textInput = item.querySelector('.checklist-input') as HTMLInputElement;
+        
+        if (checkbox && textInput) {
+          // Re-attach event handlers
+          checkbox.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const isChecked = checkbox.style.background.includes('var(--primary)');
+            
+            if (isChecked) {
+              checkbox.style.background = 'transparent';
+              checkbox.style.color = 'transparent';
+              checkbox.innerHTML = '';
+              textInput.style.textDecoration = 'none';
+              textInput.style.color = 'hsl(var(--foreground))';
+            } else {
+              checkbox.style.background = 'hsl(var(--primary))';
+              checkbox.style.color = 'hsl(var(--primary-foreground))';
+              checkbox.innerHTML = '✓';
+              textInput.style.textDecoration = 'line-through';
+              textInput.style.color = 'hsl(var(--muted-foreground))';
+            }
+
+            if (contentRef.current) {
+              contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          };
+
+          textInput.onkeydown = (e) => {
+            const container = item.closest('.checklist-container');
+            if (!container) return;
+
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              if (!textInput.value.trim()) {
+                exitChecklistMode(container, item);
+              } else {
+                createNewChecklistItem(container, item);
+              }
+            } else if (e.key === 'Backspace' && !textInput.value && textInput.selectionStart === 0) {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              removeChecklistItem(container, item);
+            }
+          };
+
+          textInput.oninput = () => {
+            if (contentRef.current) {
+              contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          };
+        }
+      });
+    });
   };
 
 
