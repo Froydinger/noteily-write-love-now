@@ -110,6 +110,47 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
   };
 
+  // Handle paste events to strip formatting
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    
+    const text = e.clipboardData.getData('text/plain');
+    if (!text) return;
+    
+    // Split text by line breaks and create proper line breaks
+    const lines = text.split(/\r?\n/);
+    const selection = window.getSelection();
+    const range = selection?.getRangeAt(0);
+    
+    if (range) {
+      range.deleteContents();
+      
+      lines.forEach((line, index) => {
+        if (line.trim()) {
+          const textNode = document.createTextNode(line);
+          range.insertNode(textNode);
+        }
+        
+        // Add line break except for the last line
+        if (index < lines.length - 1) {
+          const br = document.createElement('br');
+          range.insertNode(br);
+          range.setStartAfter(br);
+        }
+      });
+      
+      // Move cursor to end of inserted content
+      range.collapse(false);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+    
+    // Trigger content change to save
+    if (contentRef.current) {
+      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  };
+
   // Handle existing images in loaded content
   useEffect(() => {
     if (!contentRef.current) return;
@@ -162,6 +203,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         className="note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert min-h-[50vh]"
         data-placeholder="Just start typing…"
         aria-label="Note content"
+        onPaste={handlePaste}
       />
       
       <ImageUploadButton onImageInsert={insertImageAtCursor} />
