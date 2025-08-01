@@ -13,6 +13,8 @@ export default function NoteCard({ note }: NoteCardProps) {
   
   const contentPreview = note.content 
     ? note.content
+        .replace(/<\/p>/gi, ' ') // Convert paragraph endings to spaces
+        .replace(/<\/div>/gi, ' ') // Convert div endings to spaces
         .replace(/<br\s*\/?>/gi, ' ') // Convert line breaks to spaces
         .replace(/<[^>]*>/g, '') // Remove HTML tags
         .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces to regular spaces
@@ -21,7 +23,7 @@ export default function NoteCard({ note }: NoteCardProps) {
         .replace(/&gt;/g, '>') // Convert encoded greater-than
         .replace(/&quot;/g, '"') // Convert encoded quotes
         .replace(/&#39;/g, "'") // Convert encoded apostrophes
-        .replace(/\s+/g, ' ') // Normalize whitespace
+        .replace(/\s{2,}/g, ' ') // Replace multiple spaces with single space
         .trim()
     : 'No content';
   

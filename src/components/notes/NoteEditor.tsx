@@ -172,16 +172,11 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       }
     });
 
-    // Handle existing checklist items
+    // Handle existing checklist items - they should be recreated on load
     const checklistItems = contentRef.current.querySelectorAll('.checklist-item');
     checklistItems.forEach((item) => {
-      const checkbox = item.querySelector('.checklist-checkbox') as HTMLElement;
-      const textInput = item.querySelector('.checklist-text') as HTMLInputElement;
-      
-      if (checkbox && textInput) {
-        // Re-attach event listeners
-        setupChecklistItemEvents(item as HTMLElement, checkbox, textInput);
-      }
+      // Remove old items and let them be recreated with proper event handlers
+      item.remove();
     });
   }, [note.content]);
 
@@ -205,42 +200,27 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     const selection = window.getSelection();
     const range = selection?.getRangeAt(0);
 
+    // Create checklist container that's completely separate from contentEditable
+    const checklistContainer = document.createElement('div');
+    checklistContainer.className = 'checklist-container';
+    checklistContainer.contentEditable = 'false'; // Disable contentEditable on container
+    checklistContainer.style.margin = '1rem 0';
+
+    // Create first checklist item
+    const checklistItem = createChecklistItem('');
+    checklistContainer.appendChild(checklistItem);
+
     if (range && contentRef.current.contains(range.commonAncestorContainer)) {
-      // Create checklist container
-      const checklistContainer = document.createElement('div');
-      checklistContainer.className = 'checklist-container';
-
-      // Create first checklist item
-      const checklistItem = createChecklistItem('');
-      checklistContainer.appendChild(checklistItem);
-
       range.deleteContents();
       range.insertNode(checklistContainer);
-      
-      // Focus on the text input of the first item
-      const textInput = checklistItem.querySelector('.checklist-text') as HTMLElement;
-      if (textInput) {
-        textInput.focus();
-        const newRange = document.createRange();
-        newRange.selectNodeContents(textInput);
-        newRange.collapse(false);
-        selection?.removeAllRanges();
-        selection?.addRange(newRange);
-      }
     } else {
-      // Fallback: append to end
-      const checklistContainer = document.createElement('div');
-      checklistContainer.className = 'checklist-container';
-
-      const checklistItem = createChecklistItem('');
-      checklistContainer.appendChild(checklistItem);
       contentRef.current.appendChild(checklistContainer);
+    }
 
-      // Focus on the text input
-      const textInput = checklistItem.querySelector('.checklist-text') as HTMLElement;
-      if (textInput) {
-        textInput.focus();
-      }
+    // Focus on the first input
+    const firstInput = checklistItem.querySelector('.checklist-input') as HTMLInputElement;
+    if (firstInput) {
+      firstInput.focus();
     }
 
     // Trigger content change to save
@@ -251,61 +231,76 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const createChecklistItem = (text: string = '', checked: boolean = false) => {
     const item = document.createElement('div');
     item.className = 'checklist-item';
+    item.style.display = 'flex';
+    item.style.alignItems = 'center';
+    item.style.gap = '12px';
+    item.style.marginBottom = '8px';
+    item.style.padding = '4px 0';
 
-    const checkbox = document.createElement('div');
+    // Checkbox
+    const checkbox = document.createElement('button');
     checkbox.className = 'checklist-checkbox';
+    checkbox.type = 'button';
+    checkbox.style.width = '18px';
+    checkbox.style.height = '18px';
+    checkbox.style.borderRadius = '50%';
+    checkbox.style.border = '2px solid hsl(var(--border))';
+    checkbox.style.background = checked ? 'hsl(var(--primary))' : 'transparent';
+    checkbox.style.color = checked ? 'hsl(var(--primary-foreground))' : 'transparent';
+    checkbox.style.cursor = 'pointer';
+    checkbox.style.flexShrink = '0';
+    checkbox.style.display = 'flex';
+    checkbox.style.alignItems = 'center';
+    checkbox.style.justifyContent = 'center';
+    checkbox.style.fontSize = '10px';
+    checkbox.style.fontWeight = '600';
+    checkbox.innerHTML = checked ? '✓' : '';
 
-    if (checked) {
-      checkbox.classList.add('checked');
-      checkbox.innerHTML = '✓';
-    }
-
-    // Use input element instead of contentEditable div for better control
+    // Text input
     const textInput = document.createElement('input');
     textInput.type = 'text';
-    textInput.className = 'checklist-text';
+    textInput.className = 'checklist-input';
     textInput.value = text;
     textInput.placeholder = 'List item';
+    textInput.style.flex = '1';
+    textInput.style.border = 'none';
+    textInput.style.outline = 'none';
+    textInput.style.background = 'transparent';
+    textInput.style.fontSize = 'inherit';
+    textInput.style.fontFamily = 'inherit';
+    textInput.style.color = checked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
+    textInput.style.textDecoration = checked ? 'line-through' : 'none';
 
-    if (checked) {
-      textInput.classList.add('completed');
-    }
-
-    // Setup event listeners
-    setupChecklistItemEvents(item, checkbox, textInput);
-
-    item.appendChild(checkbox);
-    item.appendChild(textInput);
-
-    return item;
-  };
-
-  // Setup checklist item event listeners
-  const setupChecklistItemEvents = (item: HTMLElement, checkbox: HTMLElement, textInput: HTMLInputElement) => {
-    // Handle checkbox click
-    const handleCheckboxClick = () => {
-      const isChecked = checkbox.classList.contains('checked');
+    // Event handlers
+    checkbox.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const isChecked = checkbox.style.background.includes('var(--primary)');
       
       if (isChecked) {
         // Uncheck
-        checkbox.classList.remove('checked');
+        checkbox.style.background = 'transparent';
+        checkbox.style.color = 'transparent';
         checkbox.innerHTML = '';
-        textInput.classList.remove('completed');
+        textInput.style.textDecoration = 'none';
+        textInput.style.color = 'hsl(var(--foreground))';
       } else {
         // Check
-        checkbox.classList.add('checked');
+        checkbox.style.background = 'hsl(var(--primary))';
+        checkbox.style.color = 'hsl(var(--primary-foreground))';
         checkbox.innerHTML = '✓';
-        textInput.classList.add('completed');
+        textInput.style.textDecoration = 'line-through';
+        textInput.style.color = 'hsl(var(--muted-foreground))';
       }
 
-      // Trigger content change to save
+      // Save changes
       if (contentRef.current) {
         contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
       }
-    };
+    });
 
-    // Handle text input events
-    const handleTextKeydown = (e: KeyboardEvent) => {
+    textInput.addEventListener('keydown', (e) => {
       const container = item.closest('.checklist-container');
       if (!container) return;
 
@@ -313,96 +308,108 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         e.preventDefault();
         e.stopPropagation();
         
-        // Check if this is a double enter (empty current item)
         if (!textInput.value.trim()) {
-          // Exit checklist mode - create normal paragraph after container
-          const newParagraph = document.createElement('p');
-          newParagraph.innerHTML = '<br>';
-          newParagraph.style.minHeight = '1.2em';
-          
-          // Insert after the checklist container
-          if (container.parentNode) {
-            container.parentNode.insertBefore(newParagraph, container.nextSibling);
-          }
-          
-          // Remove empty checklist item if it's the only one
-          if (container.children.length === 1) {
-            container.remove();
-          } else {
-            item.remove();
-          }
-          
-          // Focus the new paragraph
-          const range = document.createRange();
-          const selection = window.getSelection();
-          range.setStart(newParagraph, 0);
-          range.collapse(true);
-          selection?.removeAllRanges();
-          selection?.addRange(range);
+          // Exit checklist mode on empty item
+          exitChecklistMode(container, item);
         } else {
           // Create new checklist item
-          const newItem = createChecklistItem('');
-          if (item.nextSibling) {
-            container.insertBefore(newItem, item.nextSibling);
-          } else {
-            container.appendChild(newItem);
-          }
-          
-          const newTextInput = newItem.querySelector('.checklist-text') as HTMLInputElement;
-          if (newTextInput) {
-            newTextInput.focus();
-          }
-        }
-        
-        // Trigger content change to save
-        if (contentRef.current) {
-          contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+          createNewChecklistItem(container, item);
         }
       } else if (e.key === 'Backspace' && !textInput.value && textInput.selectionStart === 0) {
         e.preventDefault();
+        e.stopPropagation();
         
-        // Don't remove if it's the only item in the container
-        if (container.children.length === 1) {
-          return;
-        }
-        
-        // Focus previous item if exists
-        const prevItem = item.previousElementSibling;
-        if (prevItem) {
-          const prevTextInput = prevItem.querySelector('.checklist-text') as HTMLInputElement;
-          if (prevTextInput) {
-            prevTextInput.focus();
-            // Move cursor to end
-            prevTextInput.setSelectionRange(prevTextInput.value.length, prevTextInput.value.length);
-          }
-        }
-        
-        item.remove();
-        
-        // Trigger content change to save
-        if (contentRef.current) {
-          contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-        }
+        removeChecklistItem(container, item);
       }
-    };
+    });
 
-    // Handle input changes to save content
-    const handleTextInput = () => {
+    textInput.addEventListener('input', () => {
+      // Save changes
       if (contentRef.current) {
         contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
       }
-    };
+    });
 
-    // Attach event listeners
-    checkbox.addEventListener('click', handleCheckboxClick);
-    textInput.addEventListener('keydown', handleTextKeydown);
-    textInput.addEventListener('input', handleTextInput);
+    item.appendChild(checkbox);
+    item.appendChild(textInput);
 
-    // Store event handlers for cleanup if needed
-    (item as any)._checkboxHandler = handleCheckboxClick;
-    (item as any)._textHandler = handleTextKeydown;
-    (item as any)._inputHandler = handleTextInput;
+    return item;
   };
+
+  // Helper functions for checklist operations
+  const createNewChecklistItem = (container: Element, currentItem: Element) => {
+    const newItem = createChecklistItem('');
+    if (currentItem.nextSibling) {
+      container.insertBefore(newItem, currentItem.nextSibling);
+    } else {
+      container.appendChild(newItem);
+    }
+    
+    const newInput = newItem.querySelector('.checklist-input') as HTMLInputElement;
+    if (newInput) {
+      newInput.focus();
+    }
+
+    // Save changes
+    if (contentRef.current) {
+      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  };
+
+  const exitChecklistMode = (container: Element, currentItem: Element) => {
+    // Create a new paragraph after the checklist
+    const newParagraph = document.createElement('div');
+    newParagraph.innerHTML = '<br>';
+    newParagraph.contentEditable = 'true';
+    
+    if (container.parentNode) {
+      container.parentNode.insertBefore(newParagraph, container.nextSibling);
+    }
+    
+    // Remove empty item or whole container
+    if (container.children.length === 1) {
+      container.remove();
+    } else {
+      currentItem.remove();
+    }
+    
+    // Focus the new paragraph
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.setStart(newParagraph, 0);
+    range.collapse(true);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+
+    // Save changes
+    if (contentRef.current) {
+      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  };
+
+  const removeChecklistItem = (container: Element, currentItem: Element) => {
+    if (container.children.length === 1) {
+      return; // Don't remove the last item
+    }
+    
+    // Focus previous item if exists
+    const prevItem = currentItem.previousElementSibling;
+    if (prevItem) {
+      const prevInput = prevItem.querySelector('.checklist-input') as HTMLInputElement;
+      if (prevInput) {
+        prevInput.focus();
+        prevInput.setSelectionRange(prevInput.value.length, prevInput.value.length);
+      }
+    }
+    
+    currentItem.remove();
+
+    // Save changes
+    if (contentRef.current) {
+      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  };
+
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-96 animate-fade-in">
