@@ -116,6 +116,12 @@ const NotePage = () => {
       updateNote(note.id, { featured_image: imageUrl });
     }
   };
+
+  const handleInsertChecklist = () => {
+    // This will be handled by the NoteEditor component
+    const event = new CustomEvent('insertChecklist');
+    document.dispatchEvent(event);
+  };
   
   if (!note) {
     return <div className="p-8">Note not found</div>;
@@ -160,8 +166,8 @@ const NotePage = () => {
             
             <ExportMenu
               note={note}
-              onCopy={handleCopy}
               onShare={handleShare}
+              onInsertChecklist={handleInsertChecklist}
             />
             
             <AlertDialog>

@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Share, Copy, Loader2 } from 'lucide-react';
+import { Download, Share, ListChecks, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { exportNoteToPDF, type NoteForExport } from '@/lib/pdfExport';
 
 interface ExportMenuProps {
   note: NoteForExport;
-  onCopy: () => void;
   onShare: () => void;
+  onInsertChecklist: () => void;
 }
 
-export function ExportMenu({ note, onCopy, onShare }: ExportMenuProps) {
+export function ExportMenu({ note, onShare, onInsertChecklist }: ExportMenuProps) {
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
 
@@ -38,15 +38,15 @@ export function ExportMenu({ note, onCopy, onShare }: ExportMenuProps) {
 
   return (
     <>
-      {/* Copy button */}
+      {/* Checklist button */}
       <Button
         variant="ghost"
         size="sm"
-        onClick={onCopy}
+        onClick={onInsertChecklist}
         className="btn-accessible"
-        title="Copy note"
+        title="Insert checklist"
       >
-        <Copy className="h-4 w-4" />
+        <ListChecks className="h-4 w-4" />
       </Button>
       
       {/* Share button */}

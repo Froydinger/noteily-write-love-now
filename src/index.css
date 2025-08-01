@@ -579,4 +579,42 @@
   .sepia .btn-contrast {
     @apply text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-full;
   }
+
+  /* Checklist styles */
+  .checklist-container {
+    @apply my-4;
+  }
+
+  .checklist-item {
+    @apply flex items-start gap-2 mb-1 py-1;
+  }
+
+  .checklist-checkbox {
+    @apply w-4 h-4 rounded-full border-2 border-border cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-200;
+  }
+
+  .checklist-checkbox:hover {
+    @apply border-primary/50;
+  }
+
+  .checklist-text {
+    @apply flex-1 outline-none min-h-[1.2em] text-foreground;
+  }
+
+  .checklist-text:focus {
+    @apply outline-none;
+  }
+
+  /* Theme-specific checklist styles */
+  .dark .checklist-checkbox {
+    @apply border-border;
+  }
+
+  .navy .checklist-checkbox {
+    @apply border-border;
+  }
+
+  .sepia .checklist-checkbox {
+    @apply border-border;
+  }
 }

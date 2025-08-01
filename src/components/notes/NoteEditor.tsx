@@ -171,7 +171,268 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         img.className = 'note-image';
       }
     });
+
+    // Handle existing checklist items
+    const checklistItems = contentRef.current.querySelectorAll('.checklist-item');
+    checklistItems.forEach((item) => {
+      const checkbox = item.querySelector('.checklist-checkbox') as HTMLElement;
+      const textSpan = item.querySelector('.checklist-text') as HTMLElement;
+      
+      if (checkbox && textSpan) {
+        // Re-attach event listeners
+        setupChecklistItemEvents(item as HTMLElement, checkbox, textSpan);
+      }
+    });
   }, [note.content]);
+
+  // Setup checklist item event listeners
+  const setupChecklistItemEvents = (item: HTMLElement, checkbox: HTMLElement, textSpan: HTMLElement) => {
+    // Handle checkbox click
+    checkbox.addEventListener('click', () => {
+      const isChecked = checkbox.style.backgroundColor === 'hsl(var(--primary))';
+      
+      if (isChecked) {
+        // Uncheck
+        checkbox.style.backgroundColor = '';
+        checkbox.style.borderColor = 'hsl(var(--border))';
+        checkbox.innerHTML = '';
+        textSpan.style.textDecoration = '';
+        textSpan.style.color = '';
+      } else {
+        // Check
+        checkbox.style.backgroundColor = 'hsl(var(--primary))';
+        checkbox.style.borderColor = 'hsl(var(--primary))';
+        checkbox.innerHTML = '✓';
+        checkbox.style.color = 'hsl(var(--primary-foreground))';
+        checkbox.style.fontSize = '10px';
+        checkbox.style.display = 'flex';
+        checkbox.style.alignItems = 'center';
+        checkbox.style.justifyContent = 'center';
+        textSpan.style.textDecoration = 'line-through';
+        textSpan.style.color = 'hsl(var(--muted-foreground))';
+      }
+
+      // Trigger content change to save
+      if (contentRef.current) {
+        contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+
+    // Handle Enter key to create new checklist item
+    textSpan.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const container = item.closest('.checklist-container');
+        if (container) {
+          const newItem = createChecklistItem('');
+          container.insertBefore(newItem, item.nextSibling);
+          const newTextInput = newItem.querySelector('.checklist-text') as HTMLElement;
+          newTextInput?.focus();
+        }
+      } else if (e.key === 'Backspace' && textSpan.textContent === '') {
+        e.preventDefault();
+        const container = item.closest('.checklist-container');
+        if (container && container.children.length > 1) {
+          // Focus previous item if exists
+          const prevItem = item.previousElementSibling;
+          if (prevItem) {
+            const prevTextInput = prevItem.querySelector('.checklist-text') as HTMLElement;
+            prevTextInput?.focus();
+            // Move cursor to end
+            const range = document.createRange();
+            const selection = window.getSelection();
+            range.selectNodeContents(prevTextInput);
+            range.collapse(false);
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+          }
+          item.remove();
+          
+          // Trigger content change to save
+          if (contentRef.current) {
+            contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        }
+      }
+    });
+  };
+
+  // Handle checklist insertion
+  useEffect(() => {
+    const handleInsertChecklist = () => {
+      insertChecklistAtCursor();
+    };
+
+    document.addEventListener('insertChecklist', handleInsertChecklist);
+    return () => {
+      document.removeEventListener('insertChecklist', handleInsertChecklist);
+    };
+  }, []);
+
+  // Insert checklist at cursor position
+  const insertChecklistAtCursor = () => {
+    if (!contentRef.current) return;
+
+    const selection = window.getSelection();
+    const range = selection?.getRangeAt(0);
+
+    if (range && contentRef.current.contains(range.commonAncestorContainer)) {
+      // Create checklist container
+      const checklistContainer = document.createElement('div');
+      checklistContainer.className = 'checklist-container';
+      checklistContainer.style.margin = '1rem 0';
+
+      // Create first checklist item
+      const checklistItem = createChecklistItem('');
+      checklistContainer.appendChild(checklistItem);
+
+      range.deleteContents();
+      range.insertNode(checklistContainer);
+      
+      // Focus on the text input of the first item
+      const textInput = checklistItem.querySelector('.checklist-text') as HTMLElement;
+      if (textInput) {
+        textInput.focus();
+        const newRange = document.createRange();
+        newRange.selectNodeContents(textInput);
+        newRange.collapse(false);
+        selection?.removeAllRanges();
+        selection?.addRange(newRange);
+      }
+    } else {
+      // Fallback: append to end
+      const checklistContainer = document.createElement('div');
+      checklistContainer.className = 'checklist-container';
+      checklistContainer.style.margin = '1rem 0';
+
+      const checklistItem = createChecklistItem('');
+      checklistContainer.appendChild(checklistItem);
+      contentRef.current.appendChild(checklistContainer);
+    }
+
+    // Trigger content change to save
+    contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+
+  // Create a single checklist item
+  const createChecklistItem = (text: string = '', checked: boolean = false) => {
+    const item = document.createElement('div');
+    item.className = 'checklist-item';
+    item.style.display = 'flex';
+    item.style.alignItems = 'flex-start';
+    item.style.gap = '0.5rem';
+    item.style.marginBottom = '0.25rem';
+    item.style.padding = '0.25rem 0';
+
+    const checkbox = document.createElement('div');
+    checkbox.className = 'checklist-checkbox';
+    checkbox.style.width = '16px';
+    checkbox.style.height = '16px';
+    checkbox.style.borderRadius = '50%';
+    checkbox.style.border = '2px solid hsl(var(--border))';
+    checkbox.style.cursor = 'pointer';
+    checkbox.style.flexShrink = '0';
+    checkbox.style.marginTop = '2px';
+    checkbox.style.transition = 'all 0.2s ease';
+
+    if (checked) {
+      checkbox.style.backgroundColor = 'hsl(var(--primary))';
+      checkbox.style.borderColor = 'hsl(var(--primary))';
+      checkbox.innerHTML = '✓';
+      checkbox.style.color = 'hsl(var(--primary-foreground))';
+      checkbox.style.fontSize = '10px';
+      checkbox.style.display = 'flex';
+      checkbox.style.alignItems = 'center';
+      checkbox.style.justifyContent = 'center';
+    }
+
+    const textSpan = document.createElement('span');
+    textSpan.className = 'checklist-text';
+    textSpan.contentEditable = 'true';
+    textSpan.style.flex = '1';
+    textSpan.style.outline = 'none';
+    textSpan.style.minHeight = '1.2em';
+    textSpan.textContent = text;
+
+    if (checked) {
+      textSpan.style.textDecoration = 'line-through';
+      textSpan.style.color = 'hsl(var(--muted-foreground))';
+    }
+
+    // Handle checkbox click
+    checkbox.addEventListener('click', () => {
+      const isChecked = checkbox.style.backgroundColor === 'hsl(var(--primary))';
+      
+      if (isChecked) {
+        // Uncheck
+        checkbox.style.backgroundColor = '';
+        checkbox.style.borderColor = 'hsl(var(--border))';
+        checkbox.innerHTML = '';
+        textSpan.style.textDecoration = '';
+        textSpan.style.color = '';
+      } else {
+        // Check
+        checkbox.style.backgroundColor = 'hsl(var(--primary))';
+        checkbox.style.borderColor = 'hsl(var(--primary))';
+        checkbox.innerHTML = '✓';
+        checkbox.style.color = 'hsl(var(--primary-foreground))';
+        checkbox.style.fontSize = '10px';
+        checkbox.style.display = 'flex';
+        checkbox.style.alignItems = 'center';
+        checkbox.style.justifyContent = 'center';
+        textSpan.style.textDecoration = 'line-through';
+        textSpan.style.color = 'hsl(var(--muted-foreground))';
+      }
+
+      // Trigger content change to save
+      if (contentRef.current) {
+        contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+
+    // Handle Enter key to create new checklist item
+    textSpan.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const container = item.closest('.checklist-container');
+        if (container) {
+          const newItem = createChecklistItem('');
+          container.insertBefore(newItem, item.nextSibling);
+          const newTextInput = newItem.querySelector('.checklist-text') as HTMLElement;
+          newTextInput?.focus();
+        }
+      } else if (e.key === 'Backspace' && textSpan.textContent === '') {
+        e.preventDefault();
+        const container = item.closest('.checklist-container');
+        if (container && container.children.length > 1) {
+          // Focus previous item if exists
+          const prevItem = item.previousElementSibling;
+          if (prevItem) {
+            const prevTextInput = prevItem.querySelector('.checklist-text') as HTMLElement;
+            prevTextInput?.focus();
+            // Move cursor to end
+            const range = document.createRange();
+            const selection = window.getSelection();
+            range.selectNodeContents(prevTextInput);
+            range.collapse(false);
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+          }
+          item.remove();
+          
+          // Trigger content change to save
+          if (contentRef.current) {
+            contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        }
+      }
+    });
+
+    item.appendChild(checkbox);
+    item.appendChild(textSpan);
+
+    return item;
+  };
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-96 animate-fade-in">
