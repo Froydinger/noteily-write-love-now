@@ -720,12 +720,26 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (isSharedNote) {
         // If it's a shared note, remove the share record (user's access)
-        // Check both shared_with_user_id and shared_with_email for compatibility
-        const { error } = await supabase
+        console.log('Attempting to remove share access for note:', id, 'user:', user.id, 'email:', user.email);
+        
+        // First try by user_id, then by email if that fails
+        let { error } = await supabase
           .from('shared_notes')
           .delete()
           .eq('note_id', id)
-          .or(`shared_with_user_id.eq.${user.id},shared_with_email.eq.${user.email}`);
+          .eq('shared_with_user_id', user.id);
+
+        // If no rows were affected (user_id didn't match), try by email
+        if (error || error === null) {
+          const { error: emailError, count } = await supabase
+            .from('shared_notes')
+            .delete({ count: 'exact' })
+            .eq('note_id', id)
+            .eq('shared_with_email', user.email);
+          
+          error = emailError;
+          console.log('Delete by email result:', { error: emailError, count });
+        }
 
         if (error) {
           console.error('Error removing note access:', error);
