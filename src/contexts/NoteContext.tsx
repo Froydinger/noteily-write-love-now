@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -222,61 +221,41 @@ const defaultPrompts: WritingPrompt[] = [
   { id: '174', text: "What's something you need to forgive yourself for?", category: 'healing' },
   { id: '175', text: "Write about a time when you felt misunderstood.", category: 'healing' },
   { id: '176', text: "What's a pattern in your relationships you want to change?", category: 'healing' },
-  { id: '177', text: "Write about your relationship with anger.", category: 'healing' },
-  { id: '178', text: "What's something you've been ashamed of that you're ready to accept?", category: 'healing' },
-  { id: '179', text: "Write about a time when you felt abandoned.", category: 'healing' },
-  { id: '180', text: "What's a loss you're still processing?", category: 'healing' },
-  { id: '181', text: "Write about your relationship with control.", category: 'healing' },
-  { id: '182', text: "What's something you've been denying about yourself?", category: 'healing' },
-  { id: '183', text: "Write about a time when you felt betrayed.", category: 'healing' },
-  { id: '184', text: "What's a story you tell yourself that might not be true?", category: 'healing' },
-  { id: '185', text: "Write about your relationship with vulnerability.", category: 'healing' },
-  { id: '186', text: "What's something you're grieving?", category: 'healing' },
-  { id: '187', text: "Write about a time when you felt disappointed.", category: 'healing' },
-  { id: '188', text: "What's a part of your identity you're questioning?", category: 'healing' },
-  { id: '189', text: "Write about your relationship with perfectionism.", category: 'healing' },
-  { id: '190', text: "What's something you've been avoiding because it hurts?", category: 'healing' },
-  { id: '191', text: "Write about a time when you felt rejected.", category: 'healing' },
-  { id: '192', text: "What's a fear that's been controlling your life?", category: 'healing' },
-  { id: '193', text: "Write about your relationship with failure.", category: 'healing' },
-  { id: '194', text: "What's something you've been hiding from others?", category: 'healing' },
-  { id: '195', text: "Write about a time when you felt invisible.", category: 'healing' },
-  { id: '196', text: "What's a belief about yourself that causes you pain?", category: 'healing' },
-  { id: '197', text: "Write about your relationship with loneliness.", category: 'healing' },
-  { id: '198', text: "What's something you've been judging yourself for?", category: 'healing' },
-  { id: '199', text: "Write about a time when you felt powerless.", category: 'healing' },
-  { id: '200', text: "What's a truth about yourself you're ready to embrace?", category: 'healing' }
+  { id: '177', text: "Write about your relationship with your emotions.", category: 'healing' },
+  { id: '178', text: "What's something you've been avoiding that needs your attention?", category: 'healing' },
+  { id: '179', text: "Write about a time when you felt truly accepted.", category: 'healing' },
+  { id: '180', text: "What's a fear you're ready to examine?", category: 'healing' },
+  { id: '181', text: "Write about your relationship with change.", category: 'healing' },
+  { id: '182', text: "What's something you've learned about resilience?", category: 'healing' },
+  { id: '183', text: "Write about a time when you felt empowered.", category: 'healing' },
+  { id: '184', text: "What's something you want to be gentler with yourself about?", category: 'healing' },
+  { id: '185', text: "Write about your relationship with perfectionism.", category: 'healing' },
+  { id: '186', text: "What's a story you tell yourself that you're ready to change?", category: 'healing' },
+  { id: '187', text: "Write about a time when you showed yourself compassion.", category: 'healing' },
+  { id: '188', text: "What's something you've learned about boundaries?", category: 'healing' },
+  { id: '189', text: "Write about your relationship with asking for help.", category: 'healing' },
+  { id: '190', text: "What's something you want to celebrate about your journey?", category: 'healing' },
+  { id: '191', text: "Write about a time when you felt truly safe.", category: 'healing' },
+  { id: '192', text: "What's something you've learned about self-worth?", category: 'healing' },
+  { id: '193', text: "Write about your relationship with vulnerability.", category: 'healing' },
+  { id: '194', text: "What's a limiting belief you're ready to release?", category: 'healing' },
+  { id: '195', text: "Write about a time when you felt truly free.", category: 'healing' },
+  { id: '196', text: "What's something you want to honor about your past?", category: 'healing' },
+  { id: '197', text: "Write about your relationship with your intuition.", category: 'healing' },
+  { id: '198', text: "What's something you've learned about self-care?", category: 'healing' },
+  { id: '199', text: "Write about a time when you felt deeply connected to yourself.", category: 'healing' },
+  { id: '200', text: "What's a gift you want to give yourself?", category: 'healing' },
 ];
 
 const NoteContext = createContext<NoteContextType | undefined>(undefined);
-
-// Helper to check if we need new prompts for the day
-const shouldRefreshPrompts = (): boolean => {
-  const lastRefreshDate = localStorage.getItem('lastPromptsRefreshDate');
-  if (!lastRefreshDate) return true;
-  
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  const lastDate = new Date(lastRefreshDate);
-  lastDate.setHours(0, 0, 0, 0);
-  
-  return today.getTime() > lastDate.getTime();
-};
 
 export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [deletedNotes, setDeletedNotes] = useState<Note[]>([]);
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
   const [writingPrompts] = useState<WritingPrompt[]>(defaultPrompts);
-  const [dailyPrompts, setDailyPrompts] = useState<WritingPrompt[]>(() => {
-    const savedPrompts = localStorage.getItem('dailyPrompts');
-    if (savedPrompts && !shouldRefreshPrompts()) {
-      return JSON.parse(savedPrompts);
-    }
-    return getRandomPrompts(3);
-  });
-  const [loading, setLoading] = useState(true); // Start with loading true
+  const [dailyPrompts, setDailyPrompts] = useState<WritingPrompt[]>([]);
+  const [loading, setLoading] = useState(false);
   const [hasInitialLoad, setHasInitialLoad] = useState(false);
   
   const { user } = useAuth();
@@ -389,29 +368,34 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       console.log('loadNotes: Loading owned and shared notes...');
       
-      // Force a fresh load by clearing current notes first
-      setNotes([]);
-      
-      console.log('Current user ID:', user!.id, 'Email:', user!.email);
-      
-      // Fetch owned notes, shared notes, and shares for owned notes
+      // Load owned notes, shared notes, and owned notes shares in parallel
       const [ownedNotesResponse, sharedNotesResponse, ownedNotesSharesResponse] = await Promise.all([
-        // Get user's own notes
+        // Get notes owned by the user
         supabase
           .from('notes')
           .select('*')
           .eq('user_id', user!.id)
-          .order('created_at', { ascending: false }),
-        
-        // Get notes shared with user by user_id
+          .is('deleted_at', null)
+          .order('updated_at', { ascending: false }),
+          
+        // Get ALL shared notes for this user (both by user_id AND email)
         supabase
           .from('shared_notes')
           .select(`
             note_id,
             permission,
-            notes!inner(*)
+            notes!inner(
+              id,
+              title,
+              content,
+              created_at,
+              updated_at,
+              featured_image,
+              user_id
+            )
           `)
-          .eq('shared_with_user_id', user!.id),
+          .or(`shared_with_user_id.eq.${user!.id},shared_with_email.eq.${user!.email}`)
+          .is('notes.deleted_at', null),
           
         // Get all shares for notes owned by the user
         supabase
@@ -439,33 +423,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const ownedNotes = ownedNotesResponse.data || [];
       const sharedNotesData = sharedNotesResponse.data || [];
       
-      // Get shared notes from email OR user_id
-      const emailSharedNotesResponse = await supabase
-        .from('shared_notes')
-        .select(`
-          note_id,
-          permission,
-          notes!inner(*)
-        `)
-        .eq('shared_with_email', user!.email!);
-
-      const emailSharedNotes = emailSharedNotesResponse.data?.map(share => ({
-        ...share.notes,
-        isShared: true,
-        permission: share.permission as 'read' | 'write',
-      })) || [];
-
-      const userIdSharedNotes = sharedNotesData.map(share => ({
-        ...share.notes,
-        isShared: true,
-        permission: share.permission as 'read' | 'write',
-      }));
-
-      // Combine and deduplicate shared notes
-      const allSharedNotes = [...userIdSharedNotes, ...emailSharedNotes];
-      const uniqueSharedNotes = allSharedNotes.filter((note, index, self) => 
-        index === self.findIndex(n => n.id === note.id)
-      );
+      console.log('Shared notes data:', sharedNotesData);
 
       // Get the shares data for owned notes
       const ownedNotesShares = ownedNotesSharesResponse.data || [];
@@ -486,24 +444,24 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         content: note.content || '',
         createdAt: note.created_at,
         updatedAt: note.updated_at,
-        featured_image: (note as any).featured_image || undefined,
+        featured_image: note.featured_image || undefined,
         user_id: note.user_id,
         isOwnedByUser: true,
         isSharedWithUser: false,
         shares: sharesMap.get(note.id) || [], // Add shares data
       }));
 
-      const formattedSharedNotes: Note[] = uniqueSharedNotes.map(note => ({
-        id: note.id,
-        title: note.title,
-        content: note.content || '',
-        createdAt: note.created_at,
-        updatedAt: note.updated_at,
-        featured_image: (note as any).featured_image || undefined,
-        user_id: note.user_id, // Keep original user_id
+      const formattedSharedNotes: Note[] = sharedNotesData.map(share => ({
+        id: share.notes.id,
+        title: share.notes.title,
+        content: share.notes.content || '',
+        createdAt: share.notes.created_at,
+        updatedAt: share.notes.updated_at,
+        featured_image: share.notes.featured_image || undefined,
+        user_id: share.notes.user_id, // Keep original user_id
         isOwnedByUser: false,
         isSharedWithUser: true,
-        userPermission: note.permission,
+        userPermission: share.permission as 'read' | 'write',
       }));
 
       const allNotes = [...formattedOwnedNotes, ...formattedSharedNotes].sort((a, b) => 
@@ -532,6 +490,36 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setHasInitialLoad(true);
     }
   };
+  
+  const shouldRefreshPrompts = () => {
+    const lastRefreshDate = localStorage.getItem('lastPromptsRefreshDate');
+    if (!lastRefreshDate) return true;
+    
+    const lastRefresh = new Date(lastRefreshDate);
+    const today = new Date();
+    
+    // Check if it's a new day
+    return today.toDateString() !== lastRefresh.toDateString();
+  };
+
+  // Load daily prompts from localStorage on component mount
+  useEffect(() => {
+    const savedPrompts = localStorage.getItem('dailyPrompts');
+    if (savedPrompts && !shouldRefreshPrompts()) {
+      try {
+        const parsed = JSON.parse(savedPrompts);
+        if (Array.isArray(parsed) && parsed.length === 3) {
+          setDailyPrompts(parsed);
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing saved prompts:', error);
+      }
+    }
+    
+    // If no valid saved prompts or it's a new day, generate new ones
+    refreshDailyPrompts();
+  }, []);
   
   // Check at midnight if we need to refresh prompts
   useEffect(() => {
