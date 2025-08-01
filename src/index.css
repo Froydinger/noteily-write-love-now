@@ -586,23 +586,31 @@
   }
 
   .checklist-item {
-    @apply flex items-start gap-2 mb-1 py-1;
+    @apply flex items-center gap-3 mb-2 leading-relaxed;
   }
 
   .checklist-checkbox {
-    @apply w-4 h-4 rounded-full border-2 border-border cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-200;
+    @apply w-4 h-4 rounded-full border-2 border-border cursor-pointer flex-shrink-0 transition-all duration-200 flex items-center justify-center text-[10px] font-medium;
   }
 
   .checklist-checkbox:hover {
-    @apply border-primary/50;
+    @apply border-primary/50 scale-105;
+  }
+
+  .checklist-checkbox.checked {
+    @apply bg-primary border-primary text-primary-foreground;
   }
 
   .checklist-text {
-    @apply flex-1 outline-none min-h-[1.2em] text-foreground;
+    @apply flex-1 outline-none min-h-[1.5em] leading-relaxed text-foreground py-1;
   }
 
   .checklist-text:focus {
     @apply outline-none;
+  }
+
+  .checklist-text.completed {
+    @apply line-through text-muted-foreground;
   }
 
   /* Theme-specific checklist styles */
