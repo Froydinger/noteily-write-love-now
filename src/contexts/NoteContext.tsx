@@ -292,6 +292,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user]);
 
   const loadNotes = async () => {
+    setLoading(true);
     try {
       // First, try to load from offline storage immediately
       const offlineNotes = await offlineStorage.loadNotes(user!.id);
