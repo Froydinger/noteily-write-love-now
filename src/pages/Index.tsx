@@ -33,9 +33,9 @@ const Index = () => {
       // Then apply share filter
       switch (shareFilter) {
         case 'shared-with-me':
-          return note.isShared === true;
+          return note.isSharedWithUser === true;
         case 'shared-with-others':
-          return note.isShared !== true; // Only show owned notes when filtering for "my shared notes"
+          return note.isOwnedByUser === true; // Only show owned notes when filtering for "my shared notes"
         case 'all':
         default:
           return true;

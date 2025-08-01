@@ -157,10 +157,10 @@ const NotePage = () => {
               Back
             </Button>
             
-            {note.isShared && (
+            {note.isSharedWithUser && (
               <Badge variant="secondary" className="ml-2 flex items-center gap-1">
                 <Users className="h-3 w-3" />
-                {note.permission === 'read' ? (
+                {note.userPermission === 'read' ? (
                   <>
                     <Eye className="h-3 w-3" />
                     Shared (Read-only)

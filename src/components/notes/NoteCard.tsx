@@ -3,8 +3,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Users, Eye, Edit } from 'lucide-react';
+import { ShareStatus } from './ShareStatus';
 
 interface NoteCardProps {
   note: Note;
@@ -45,22 +44,7 @@ export default function NoteCard({ note }: NoteCardProps) {
       <CardContent className="p-4 transition-all duration-300 group-hover:translate-y-[-1px]">
         <div className="flex items-start justify-between mb-2">
           <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-primary transition-colors duration-300 flex-1">{note.title || "Untitled Note"}</h3>
-          {note.isShared && (
-            <Badge variant="secondary" className="ml-2 flex items-center gap-1 text-xs shrink-0">
-              <Users className="h-3 w-3" />
-              {note.permission === 'read' ? (
-                <>
-                  <Eye className="h-3 w-3" />
-                  Shared
-                </>
-              ) : (
-                <>
-                  <Edit className="h-3 w-3" />
-                  Editable
-                </>
-              )}
-            </Badge>
-          )}
+          <ShareStatus note={note} />
         </div>
         <p className="text-sm text-muted-foreground line-clamp-4 group-hover:text-foreground/80 transition-colors duration-300">{truncatedContent}</p>
       </CardContent>

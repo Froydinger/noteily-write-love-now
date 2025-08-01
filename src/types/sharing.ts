@@ -1,0 +1,41 @@
+export interface SharedNote {
+  id: string;
+  note_id: string;
+  owner_id: string;
+  shared_with_email: string;
+  shared_with_user_id: string | null;
+  permission: 'read' | 'write';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NoteWithSharing {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  featured_image?: string;
+  user_id: string;
+  
+  // Sharing properties
+  isOwnedByUser: boolean;
+  isSharedWithUser: boolean;
+  userPermission?: 'read' | 'write';
+  shares?: SharedNote[]; // For owned notes, list of who it's shared with
+}
+
+export interface ShareRequest {
+  noteId: string;
+  email: string;
+  permission: 'read' | 'write';
+}
+
+export interface ShareUpdateRequest {
+  shareId: string;
+  permission: 'read' | 'write';
+}
+
+export interface ShareDeleteRequest {
+  shareId: string;
+}

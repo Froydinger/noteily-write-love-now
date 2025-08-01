@@ -15,7 +15,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
-  const isReadOnly = note.isShared && note.permission === 'read';
+  const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
   
   // Apply iOS zoom prevention on mount
   useEffect(() => {

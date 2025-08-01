@@ -5,17 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { offlineStorage } from '@/lib/offlineStorage';
 
-export type Note = {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  featured_image?: string;
-  isShared?: boolean;
-  permission?: 'read' | 'write';
-  user_id?: string; // Add user_id for ownership detection
-};
+import type { NoteWithSharing } from '@/types/sharing';
+
+export type Note = NoteWithSharing;
 
 export type WritingPrompt = {
   id: string;
@@ -377,8 +369,9 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: note.created_at,
         updatedAt: note.updated_at,
         featured_image: (note as any).featured_image || undefined,
-        user_id: note.user_id, // Keep user_id for ownership detection
-        isShared: false, // Owned notes are not shared TO the user
+        user_id: note.user_id,
+        isOwnedByUser: true,
+        isSharedWithUser: false,
       }));
 
       const formattedSharedNotes: Note[] = uniqueSharedNotes.map(note => ({
@@ -388,9 +381,10 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: note.created_at,
         updatedAt: note.updated_at,
         featured_image: (note as any).featured_image || undefined,
-        isShared: note.isShared,
-        permission: note.permission,
         user_id: note.user_id, // Keep original user_id
+        isOwnedByUser: false,
+        isSharedWithUser: true,
+        userPermission: note.permission,
       }));
 
       const allNotes = [...formattedOwnedNotes, ...formattedSharedNotes].sort((a, b) => 
@@ -464,8 +458,9 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       content: '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      user_id: user.id, // Add user_id for ownership detection
-      isShared: false, // New notes are not shared
+      user_id: user.id,
+      isOwnedByUser: true,
+      isSharedWithUser: false,
     };
 
     // Optimistically add to local state
@@ -495,8 +490,9 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         content: tempNote.content, // Keep original plain text for UI
         createdAt: data.created_at,
         updatedAt: data.updated_at,
-        user_id: data.user_id, // Keep user_id from database
-        isShared: false, // New notes are not shared
+        user_id: data.user_id,
+        isOwnedByUser: true,
+        isSharedWithUser: false,
       };
 
       setNotes(prevNotes => 
