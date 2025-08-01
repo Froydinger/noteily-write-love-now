@@ -719,15 +719,21 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       if (isSharedNote) {
-        // If it's a shared note, only remove the share record (user's access)
+        // If it's a shared note, remove the share record (user's access)
+        // Check both shared_with_user_id and shared_with_email for compatibility
         const { error } = await supabase
           .from('shared_notes')
           .delete()
           .eq('note_id', id)
-          .eq('shared_with_user_id', user.id);
+          .or(`shared_with_user_id.eq.${user.id},shared_with_email.eq.${user.email}`);
 
         if (error) {
           console.error('Error removing note access:', error);
+          // Revert optimistic update if there's an error
+          const noteToRestore = noteToDelete;
+          setNotes(prevNotes => [noteToRestore, ...prevNotes]);
+        } else {
+          console.log('Successfully removed share access for note:', id);
         }
       } else if (isOwner) {
         // Use soft delete function for owned notes
