@@ -306,6 +306,8 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Force a fresh load by clearing current notes first
       setNotes([]);
       
+      console.log('Current user ID:', user!.id, 'Email:', user!.email);
+      
       // Fetch both owned notes and shared notes
       const [ownedNotesResponse, sharedNotesResponse] = await Promise.all([
         // Get user's own notes
