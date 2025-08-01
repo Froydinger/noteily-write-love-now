@@ -117,6 +117,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_share_with_user_link: {
+        Args: {
+          p_note_id: string
+          p_owner_id: string
+          p_shared_with_email: string
+          p_permission: string
+        }
+        Returns: {
+          id: string
+          note_id: string
+          owner_id: string
+          shared_with_email: string
+          shared_with_user_id: string
+          permission: string
+          created_at: string
+          updated_at: string
+        }[]
+      }
       cleanup_old_deleted_notes: {
         Args: Record<PropertyKey, never>
         Returns: number
