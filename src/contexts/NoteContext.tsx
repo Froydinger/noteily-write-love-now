@@ -288,6 +288,49 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) {
       console.log('NoteContext useEffect: calling loadNotes');
       loadNotes();
+      
+      // Set up real-time subscription for shared_notes changes
+      const channel = supabase
+        .channel('shared-notes-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'shared_notes',
+            filter: `shared_with_user_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('Share access removed:', payload);
+            // Remove the note from the current notes list
+            const noteId = payload.old.note_id;
+            setNotes(prevNotes => prevNotes.filter(note => note.id !== noteId));
+            
+            // If it's the current note, clear it
+            if (currentNote && currentNote.id === noteId) {
+              setCurrentNote(null);
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'shared_notes',
+            filter: `shared_with_user_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('New share access granted:', payload);
+            // Reload notes to include the newly shared note
+            loadNotes();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     } else {
       console.log('NoteContext useEffect: no user, clearing state');
       setNotes([]);
