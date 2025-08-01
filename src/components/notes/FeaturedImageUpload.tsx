@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import { isValidImageUrl } from "@/lib/sanitization";
 
 interface FeaturedImageUploadProps {
   noteId: string;
@@ -33,6 +34,17 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
       toast({
         title: "Invalid file",
         description: "Please select an image file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // File size validation (10MB limit)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      toast({
+        title: "File too large",
+        description: "Image size must be less than 10MB.",
         variant: "destructive",
       });
       return;
@@ -161,6 +173,16 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
       const { data: { publicUrl } } = supabase.storage
         .from('note-images')
         .getPublicUrl(fileName);
+
+      // Validate the generated URL before using it
+      if (!isValidImageUrl(publicUrl)) {
+        toast({
+          title: "Invalid URL",
+          description: "Generated image URL is not valid.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       onImageSet(publicUrl);
       setShowCrop(false);

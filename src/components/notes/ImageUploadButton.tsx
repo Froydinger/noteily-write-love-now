@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { isValidImageUrl } from "@/lib/sanitization";
 
 interface ImageUploadButtonProps {
   onImageInsert: (url: string) => void;
@@ -43,6 +44,13 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
     if (!file.type.startsWith('image/')) {
       console.error('Invalid file type:', file.type);
       toast.error('Please select an image file');
+      return;
+    }
+
+    // File size validation (10MB limit)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      toast.error("Image size must be less than 10MB");
       return;
     }
 
@@ -137,6 +145,13 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
         .getPublicUrl(filePath);
 
       console.log('Public URL:', publicUrl);
+      
+      // Validate the generated URL before using it
+      if (!isValidImageUrl(publicUrl)) {
+        toast.error("Generated image URL is not valid");
+        return;
+      }
+
       onImageInsert(publicUrl);
       toast.success('Image uploaded successfully');
     } catch (error) {

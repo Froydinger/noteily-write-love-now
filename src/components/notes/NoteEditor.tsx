@@ -4,6 +4,7 @@ import { useNotes, Note } from '@/contexts/NoteContext';
 import DOMPurify from 'dompurify';
 import { ImageUploadButton } from './ImageUploadButton';
 import { FeaturedImage } from './FeaturedImage';
+import { sanitizeContent, sanitizeForDisplay, sanitizeImageUrl, isValidImageUrl } from "@/lib/sanitization";
 
 interface NoteEditorProps {
   note: Note;
@@ -46,11 +47,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         // Preserve existing checklist containers before sanitizing
         const existingChecklists = Array.from(contentRef.current.querySelectorAll('.checklist-container'));
         
-        // Sanitize content to prevent XSS attacks
-        const sanitizedContent = DOMPurify.sanitize(note.content, {
-          ADD_TAGS: ['input'],
-          ADD_ATTR: ['type', 'placeholder', 'value']
-        });
+        // Sanitize content for display (includes checklist restoration)
+        const sanitizedContent = sanitizeForDisplay(note.content);
         contentRef.current.innerHTML = sanitizedContent;
         
         // Restore event handlers for any existing checklists
@@ -70,7 +68,9 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         
         clearTimeout(timeout);
         timeout = setTimeout(() => {
-          updateNote(note.id, { content });
+          // Sanitize content before saving to database
+          const sanitizedContent = sanitizeContent(content, { preserveChecklists: true });
+          updateNote(note.id, { content: sanitizedContent });
         }, 500);
       }
     };
@@ -89,40 +89,49 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     };
   }, [note.id, updateNote]);
 
-  // Handle image insertion at cursor position
+  // Handle image insertion at cursor position with validation
   const insertImageAtCursor = (imageUrl: string) => {
     if (!contentRef.current) return;
 
-    const img = document.createElement('img');
-    img.src = imageUrl;
-    img.style.width = '50%';
-    img.style.height = 'auto';
-    img.style.display = 'block';
-    img.style.margin = '1rem auto';
-    img.style.borderRadius = '8px';
-    img.className = 'note-image';
-    img.setAttribute('data-image-id', Date.now().toString());
-
-    const selection = window.getSelection();
-    const range = selection?.getRangeAt(0);
-
-    if (range && contentRef.current.contains(range.commonAncestorContainer)) {
-      range.deleteContents();
-      range.insertNode(img);
+    try {
+      // Validate and sanitize the image URL
+      const { url: sanitizedUrl, alt } = sanitizeImageUrl(imageUrl, 'Uploaded image');
       
-      // Move cursor after the image
-      const newRange = document.createRange();
-      newRange.setStartAfter(img);
-      newRange.collapse(true);
-      selection?.removeAllRanges();
-      selection?.addRange(newRange);
-    } else {
-      // Fallback: append to end
-      contentRef.current.appendChild(img);
-    }
+      const img = document.createElement('img');
+      img.src = sanitizedUrl;
+      img.alt = alt;
+      img.style.width = '50%';
+      img.style.height = 'auto';
+      img.style.display = 'block';
+      img.style.margin = '1rem auto';
+      img.style.borderRadius = '8px';
+      img.className = 'note-image';
+      img.setAttribute('data-image-id', Date.now().toString());
 
-    // Trigger content change to save
-    contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+      const selection = window.getSelection();
+      const range = selection?.getRangeAt(0);
+
+      if (range && contentRef.current.contains(range.commonAncestorContainer)) {
+        range.deleteContents();
+        range.insertNode(img);
+        
+        // Move cursor after the image
+        const newRange = document.createRange();
+        newRange.setStartAfter(img);
+        newRange.collapse(true);
+        selection?.removeAllRanges();
+        selection?.addRange(newRange);
+      } else {
+        // Fallback: append to end
+        contentRef.current.appendChild(img);
+      }
+
+      // Trigger content change to save
+      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+    } catch (error) {
+      console.error('Failed to insert image:', error);
+      // Could show a toast notification here
+    }
   };
 
   // Handle paste events to strip formatting and normalize line breaks
