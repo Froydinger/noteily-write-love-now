@@ -198,8 +198,8 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Recently Deleted Section */}
-        <div className="px-4 pb-2">
+        {/* Recently Deleted Section - positioned at bottom of content */}
+        <div className="mt-auto px-4 pb-4">
           <SidebarMenuButton 
             asChild
             className={`w-full px-4 py-2 rounded-full ${isActive('/recently-deleted') ? 'sidebar-nav-active' : ''}`}

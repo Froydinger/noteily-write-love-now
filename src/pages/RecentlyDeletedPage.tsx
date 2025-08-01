@@ -13,19 +13,26 @@ export default function RecentlyDeletedPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+    
     const loadDeleted = async () => {
-      setIsLoading(true);
       try {
         await loadDeletedNotes();
       } catch (error) {
         console.error('Error loading deleted notes:', error);
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
     
     loadDeleted();
-  }, [loadDeletedNotes]);
+    
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handleRestore = async (noteId: string, noteTitle: string) => {
     try {
