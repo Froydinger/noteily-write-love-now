@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteCard from '@/components/notes/NoteCard';
 import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
@@ -12,6 +13,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import PullToRefresh from 'react-simple-pull-to-refresh';
 
 const Index = () => {
+  const { user } = useAuth();
   const { notes, addNote, setCurrentNote, loading, syncNotes } = useNotes();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -50,7 +52,7 @@ const Index = () => {
     await syncNotes();
   };
 
-  if (!loading && notes.length === 0) {
+  if (!loading && notes.length === 0 && user) {
     return <EmptyNotesPlaceholder />;
   }
 
