@@ -77,17 +77,17 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
             {note.isOwnedByUser ? 'Manage Sharing' : 'Sharing Info'}
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6">
+        <div className="flex-1 overflow-y-auto space-y-4 px-1">
           {/* Note status */}
-          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg flex-shrink-0">
             <div>
               <h4 className="font-medium">{note.title || 'Untitled Note'}</h4>
               <p className="text-sm text-muted-foreground">
@@ -139,7 +139,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                     <RadioGroup 
                       value={permission} 
                       onValueChange={(value: 'read' | 'write') => setPermission(value)}
-                      className="flex gap-6 mt-2"
+                      className="flex flex-col sm:flex-row gap-4 mt-2"
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="read" id="read" />
@@ -178,13 +178,9 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                 </div>
               </div>
 
-              {/* Current shares list */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium">
-                    Shared with ({sharedUsers.length})
-                  </h3>
-                </div>
+              {/* Current shares list - scrollable */}
+              <div className="space-y-4 min-h-0">
+                <h3 className="font-medium">Shared with ({sharedUsers.length})</h3>
 
                 {loading ? (
                   <div className="flex items-center justify-center py-8">
@@ -196,23 +192,23 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                     <p>Not shared with anyone yet</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-3 max-h-60 overflow-y-auto">
                     {sharedUsers.map((share) => (
                       <div 
                         key={share.id}
-                        className="flex items-center justify-between p-3 border rounded-lg"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg gap-3"
                       >
-                        <div className="flex items-center gap-3">
-                          <Mail className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <div className="font-medium">{share.shared_with_email}</div>
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <div className="min-w-0">
+                            <div className="font-medium truncate">{share.shared_with_email}</div>
                             <div className="text-sm text-muted-foreground">
                               {share.shared_with_user_id ? 'Active user' : 'Pending invitation'}
                             </div>
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <Select
                             value={share.permission}
                             onValueChange={(value: 'read' | 'write') => 
@@ -254,13 +250,13 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
               </div>
             </>
           )}
+        </div>
 
-          {/* Dialog actions */}
-          <div className="flex justify-end pt-4">
-            <Button variant="outline" onClick={onClose}>
-              Close
-            </Button>
-          </div>
+        {/* Dialog actions */}
+        <div className="flex justify-end pt-4 border-t flex-shrink-0">
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
