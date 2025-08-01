@@ -14,6 +14,7 @@ export type Note = {
   featured_image?: string;
   isShared?: boolean;
   permission?: 'read' | 'write';
+  user_id?: string; // Add user_id for ownership detection
 };
 
 export type WritingPrompt = {
@@ -376,6 +377,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: note.created_at,
         updatedAt: note.updated_at,
         featured_image: (note as any).featured_image || undefined,
+        user_id: note.user_id, // Keep user_id for ownership detection
       }));
 
       const formattedSharedNotes: Note[] = uniqueSharedNotes.map(note => ({
@@ -387,11 +389,20 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         featured_image: (note as any).featured_image || undefined,
         isShared: note.isShared,
         permission: note.permission,
+        user_id: note.user_id, // Keep original user_id
       }));
 
       const allNotes = [...formattedOwnedNotes, ...formattedSharedNotes].sort((a, b) => 
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
+
+      console.log('NoteContext - Final notes data:', {
+        ownedNotesCount: formattedOwnedNotes.length,
+        sharedNotesCount: formattedSharedNotes.length,
+        totalNotes: allNotes.length,
+        sampleOwnedNote: formattedOwnedNotes[0],
+        sampleSharedNote: formattedSharedNotes[0]
+      });
 
       setNotes(allNotes);
       
