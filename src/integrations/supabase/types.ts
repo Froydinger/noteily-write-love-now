@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string
+          deleted_at: string | null
           featured_image: string | null
           id: string
           title: string
@@ -27,6 +28,7 @@ export type Database = {
         Insert: {
           content?: string | null
           created_at?: string
+          deleted_at?: string | null
           featured_image?: string | null
           id?: string
           title?: string
@@ -36,6 +38,7 @@ export type Database = {
         Update: {
           content?: string | null
           created_at?: string
+          deleted_at?: string | null
           featured_image?: string | null
           id?: string
           title?: string
@@ -114,9 +117,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_deleted_notes: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       link_existing_shared_notes: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      permanently_delete_note: {
+        Args: { note_id_param: string }
+        Returns: boolean
+      }
+      restore_note: {
+        Args: { note_id_param: string }
+        Returns: boolean
+      }
+      soft_delete_note: {
+        Args: { note_id_param: string }
+        Returns: boolean
       }
     }
     Enums: {
