@@ -14,9 +14,10 @@ interface ShareModalProps {
   onClose: () => void;
   noteId: string;
   noteTitle: string;
+  onSuccess?: () => void;
 }
 
-export function ShareModal({ isOpen, onClose, noteId, noteTitle }: ShareModalProps) {
+export function ShareModal({ isOpen, onClose, noteId, noteTitle, onSuccess }: ShareModalProps) {
   const [email, setEmail] = useState('');
   const [permission, setPermission] = useState<'read' | 'write'>('read');
   const [isSharing, setIsSharing] = useState(false);
@@ -64,6 +65,7 @@ export function ShareModal({ isOpen, onClose, noteId, noteTitle }: ShareModalPro
           description: `${noteTitle} has been shared with ${email}`,
         });
         setEmail('');
+        onSuccess?.();
         onClose();
       }
     } catch (error) {

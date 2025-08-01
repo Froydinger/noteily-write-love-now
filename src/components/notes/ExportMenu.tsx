@@ -5,6 +5,8 @@ import { Download, Share, ListChecks, Loader2, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { exportNoteToPDF, type NoteForExport } from '@/lib/pdfExport';
 import { ShareModal } from './ShareModal';
+import { SharedNotesManager } from './SharedNotesManager';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ExportMenuProps {
   note: NoteForExport;
@@ -14,8 +16,13 @@ interface ExportMenuProps {
 
 export function ExportMenu({ note, onShare, onInsertChecklist }: ExportMenuProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isExporting, setIsExporting] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showSharedManager, setShowSharedManager] = useState(false);
+  
+  const isOwner = user?.id === (note as any).user_id;
+  const isSharedNote = (note as any).isShared;
 
   const handlePDFExport = async () => {
     if (isExporting) return;
@@ -64,15 +71,36 @@ export function ExportMenu({ note, onShare, onInsertChecklist }: ExportMenuProps
             <Share className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setShowShareModal(true)}>
-            <Users className="h-4 w-4 mr-2" />
-            Share w/ Noteily
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={onShare}>
-            <Share className="h-4 w-4 mr-2" />
-            Share w/ Other
-          </DropdownMenuItem>
+        <DropdownMenuContent align="end" className="z-50 bg-popover border shadow-lg">
+          {isOwner ? (
+            <>
+              <DropdownMenuItem onClick={() => {
+                if (isSharedNote) {
+                  setShowSharedManager(true);
+                } else {
+                  setShowShareModal(true);
+                }
+              }}>
+                <Users className="h-4 w-4 mr-2" />
+                {isSharedNote ? 'Manage Sharing' : 'Share w/ Noteily'}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onShare}>
+                <Share className="h-4 w-4 mr-2" />
+                Share w/ Other
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <>
+              <DropdownMenuItem onClick={() => setShowSharedManager(true)}>
+                <Users className="h-4 w-4 mr-2" />
+                View Sharing Info
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onShare}>
+                <Share className="h-4 w-4 mr-2" />
+                Share w/ Other
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
       
@@ -98,6 +126,15 @@ export function ExportMenu({ note, onShare, onInsertChecklist }: ExportMenuProps
         onClose={() => setShowShareModal(false)}
         noteId={note.id}
         noteTitle={note.title}
+      />
+
+      {/* Shared Notes Manager */}
+      <SharedNotesManager
+        isOpen={showSharedManager}
+        onClose={() => setShowSharedManager(false)}
+        noteId={note.id}
+        noteTitle={note.title}
+        isOwner={isOwner}
       />
     </>
   );

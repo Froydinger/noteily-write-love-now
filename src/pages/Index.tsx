@@ -20,12 +20,29 @@ const Index = () => {
   const { state } = useSidebar();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('latest');
+  const [shareFilter, setShareFilter] = useState('all');
 
   const filteredAndSortedNotes = useMemo(() => {
-    let filtered = notes.filter(note => 
-      note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (note.content && note.content.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    let filtered = notes.filter(note => {
+      // First apply search filter
+      const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (note.content && note.content.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      if (!matchesSearch) return false;
+      
+      // Then apply share filter
+      switch (shareFilter) {
+        case 'shared-with-me':
+          return note.isShared === true;
+        case 'shared-with-others':
+          return note.isShared !== true && notes.some(n => 
+            n.id === note.id && !n.isShared // This note is owned by user and might be shared
+          );
+        case 'all':
+        default:
+          return true;
+      }
+    });
 
     switch (sortOrder) {
       case 'alphabetical':
@@ -36,7 +53,7 @@ const Index = () => {
       default:
         return filtered.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
     }
-  }, [notes, searchTerm, sortOrder]);
+  }, [notes, searchTerm, sortOrder, shareFilter]);
   
   const handleCreateNote = async () => {
     try {
@@ -98,12 +115,23 @@ const Index = () => {
                 className="pl-10"
               />
             </div>
-            <div className="flex-shrink-0">
+            <div className="flex gap-2">
+              <Select value={shareFilter} onValueChange={setShareFilter}>
+                <SelectTrigger className="w-full sm:w-44">
+                  <SelectValue placeholder="Filter" />
+                </SelectTrigger>
+                <SelectContent className="z-50 bg-popover border shadow-lg">
+                  <SelectItem value="all">All Notes</SelectItem>
+                  <SelectItem value="shared-with-me">Shared with Me</SelectItem>
+                  <SelectItem value="shared-with-others">My Shared Notes</SelectItem>
+                </SelectContent>
+              </Select>
+              
               <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger className="w-full sm:w-40">
+                <SelectTrigger className="w-full sm:w-32">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-50 bg-popover border shadow-lg">
                   <SelectItem value="latest">Latest</SelectItem>
                   <SelectItem value="oldest">Oldest</SelectItem>
                   <SelectItem value="alphabetical">A-Z</SelectItem>
