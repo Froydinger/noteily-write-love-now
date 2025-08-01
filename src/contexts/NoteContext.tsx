@@ -338,11 +338,35 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Combine owned and shared notes
       const ownedNotes = ownedNotesResponse.data || [];
-      const sharedNotes = sharedNotesResponse.data?.map(share => ({
+      const sharedNotesData = sharedNotesResponse.data || [];
+      
+      // Get shared notes from email OR user_id
+      const emailSharedNotesResponse = await supabase
+        .from('shared_notes')
+        .select(`
+          note_id,
+          permission,
+          notes!inner(*)
+        `)
+        .eq('shared_with_email', user!.email!);
+
+      const emailSharedNotes = emailSharedNotesResponse.data?.map(share => ({
         ...share.notes,
         isShared: true,
-        permission: share.permission
+        permission: share.permission as 'read' | 'write',
       })) || [];
+
+      const userIdSharedNotes = sharedNotesData.map(share => ({
+        ...share.notes,
+        isShared: true,
+        permission: share.permission as 'read' | 'write',
+      }));
+
+      // Combine and deduplicate shared notes
+      const allSharedNotes = [...userIdSharedNotes, ...emailSharedNotes];
+      const uniqueSharedNotes = allSharedNotes.filter((note, index, self) => 
+        index === self.findIndex(n => n.id === note.id)
+      );
 
       // Format notes from Supabase
       const formattedOwnedNotes: Note[] = ownedNotes.map(note => ({
@@ -354,7 +378,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         featured_image: (note as any).featured_image || undefined,
       }));
 
-      const formattedSharedNotes: Note[] = sharedNotes.map(note => ({
+      const formattedSharedNotes: Note[] = uniqueSharedNotes.map(note => ({
         id: note.id,
         title: note.title,
         content: note.content || '',
@@ -362,7 +386,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: note.updated_at,
         featured_image: (note as any).featured_image || undefined,
         isShared: note.isShared,
-        permission: note.permission as 'read' | 'write',
+        permission: note.permission,
       }));
 
       const allNotes = [...formattedOwnedNotes, ...formattedSharedNotes].sort((a, b) => 

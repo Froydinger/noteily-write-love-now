@@ -35,9 +35,7 @@ const Index = () => {
         case 'shared-with-me':
           return note.isShared === true;
         case 'shared-with-others':
-          return note.isShared !== true && notes.some(n => 
-            n.id === note.id && !n.isShared // This note is owned by user and might be shared
-          );
+          return note.isShared !== true; // Only show owned notes when filtering for "my shared notes"
         case 'all':
         default:
           return true;
