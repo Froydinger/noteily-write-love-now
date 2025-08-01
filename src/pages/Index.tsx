@@ -52,9 +52,15 @@ const Index = () => {
     await syncNotes();
   };
 
-  // Only show empty state when loading is complete AND notes are actually empty
-  if (!loading && notes.length === 0 && user) {
+  // Only show empty state when loading is complete AND notes are actually empty AND we have a user
+  // Add extra check to ensure this only shows when we're definitely done loading
+  if (!loading && notes.length === 0 && user && !loading) {
     return <EmptyNotesPlaceholder />;
+  }
+
+  // Don't render anything during loading to prevent flashing
+  if (loading) {
+    return null;
   }
 
   const content = (
