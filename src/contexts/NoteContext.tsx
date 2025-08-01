@@ -308,8 +308,8 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       console.log('Current user ID:', user!.id, 'Email:', user!.email);
       
-      // Fetch both owned notes and shared notes
-      const [ownedNotesResponse, sharedNotesResponse] = await Promise.all([
+      // Fetch owned notes, shared notes, and shares for owned notes
+      const [ownedNotesResponse, sharedNotesResponse, ownedNotesSharesResponse] = await Promise.all([
         // Get user's own notes
         supabase
           .from('notes')
@@ -325,7 +325,13 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
             permission,
             notes!inner(*)
           `)
-          .eq('shared_with_user_id', user!.id)
+          .eq('shared_with_user_id', user!.id),
+          
+        // Get all shares for notes owned by the user
+        supabase
+          .from('shared_notes')
+          .select('*')
+          .eq('owner_id', user!.id)
       ]);
 
       console.log('loadNotes: Responses received', {
@@ -375,6 +381,18 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         index === self.findIndex(n => n.id === note.id)
       );
 
+      // Get the shares data for owned notes
+      const ownedNotesShares = ownedNotesSharesResponse.data || [];
+      
+      // Create a map of note_id to shares for quick lookup
+      const sharesMap = new Map<string, any[]>();
+      ownedNotesShares.forEach(share => {
+        if (!sharesMap.has(share.note_id)) {
+          sharesMap.set(share.note_id, []);
+        }
+        sharesMap.get(share.note_id)!.push(share);
+      });
+
       // Format notes from Supabase
       const formattedOwnedNotes: Note[] = ownedNotes.map(note => ({
         id: note.id,
@@ -386,6 +404,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user_id: note.user_id,
         isOwnedByUser: true,
         isSharedWithUser: false,
+        shares: sharesMap.get(note.id) || [], // Add shares data
       }));
 
       const formattedSharedNotes: Note[] = uniqueSharedNotes.map(note => ({
