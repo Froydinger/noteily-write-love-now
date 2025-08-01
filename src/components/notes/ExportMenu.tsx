@@ -76,24 +76,16 @@ export function ExportMenu({ note, onShare, onInsertChecklist, onShareUpdate }: 
             <Share className="h-4 w-4 mr-2" />
             Share w/ Other
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={handlePDFExport} disabled={isExporting}>
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
+            Export as PDF
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      
-      {/* PDF Export button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handlePDFExport}
-        disabled={isExporting}
-        className="btn-accessible"
-        title="Export as PDF"
-      >
-        {isExporting ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Download className="h-4 w-4" />
-        )}
-      </Button>
 
       {/* Share Manager */}
       <ShareManager

@@ -48,10 +48,20 @@ const NotePage = () => {
   const handleDelete = () => {
     if (id) {
       deleteNote(id);
-      toast({
-        title: "Note deleted",
-        description: "Your note has been deleted.",
-      });
+      
+      if (note?.isSharedWithUser && !note?.isOwnedByUser) {
+        // It's a shared note - user is removing their access
+        toast({
+          title: "Access removed",
+          description: "You no longer have access to this shared note.",
+        });
+      } else {
+        // User owns the note - it's being permanently deleted
+        toast({
+          title: "Note deleted",
+          description: "Your note has been permanently deleted.",
+        });
+      }
       navigate('/');
     }
   };
@@ -194,18 +204,23 @@ const NotePage = () => {
                   <Trash className="h-4 w-4" />
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Note</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    {note.isSharedWithUser && !note.isOwnedByUser ? 'Remove Access' : 'Delete Note'}
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete this note? This action cannot be undone.
+                    {note.isSharedWithUser && !note.isOwnedByUser 
+                      ? 'Are you sure you want to remove your access to this shared note? You will no longer be able to view or edit it.'
+                      : 'Are you sure you want to permanently delete this note? This will delete it for everyone it has been shared with. This action cannot be undone.'
+                    }
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="btn-accessible">Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-                    Delete
-                  </AlertDialogAction>
+                 <AlertDialogFooter>
+                   <AlertDialogCancel className="btn-accessible">Cancel</AlertDialogCancel>
+                   <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                     {note.isSharedWithUser && !note.isOwnedByUser ? 'Remove Access' : 'Delete'}
+                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>

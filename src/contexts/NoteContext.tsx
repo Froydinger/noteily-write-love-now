@@ -611,6 +611,16 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    const noteToDelete = notes.find(note => note.id === id);
+    if (!noteToDelete) {
+      console.error('Note not found');
+      return;
+    }
+
+    // Check if user owns the note or if it's shared with them
+    const isOwner = noteToDelete.user_id === user.id;
+    const isSharedNote = noteToDelete.isSharedWithUser && !noteToDelete.isOwnedByUser;
+
     // Optimistically update local state
     setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
     if (currentNote && currentNote.id === id) {
@@ -618,13 +628,31 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const { error } = await supabase
-        .from('notes')
-        .delete()
-        .eq('id', id);
+      if (isSharedNote) {
+        // If it's a shared note, only remove the share record (user's access)
+        const { error } = await supabase
+          .from('shared_notes')
+          .delete()
+          .eq('note_id', id)
+          .eq('shared_with_user_id', user.id);
 
-      if (error) {
-        console.error('Error deleting note:', error);
+        if (error) {
+          console.error('Error removing note access:', error);
+        }
+      } else if (isOwner) {
+        // If user owns the note, delete the note entirely (this will cascade delete shares)
+        const { error } = await supabase
+          .from('notes')
+          .delete()
+          .eq('id', id)
+          .eq('user_id', user.id); // Extra safety check
+
+        if (error) {
+          console.error('Error deleting note:', error);
+        }
+      } else {
+        console.error('User does not have permission to delete this note');
+        return;
       }
       
       // Always delete from offline storage
