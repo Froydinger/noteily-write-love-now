@@ -24,15 +24,6 @@ export function ExportMenu({ note, onShare, onInsertChecklist }: ExportMenuProps
   
   const isOwner = user?.id === (note as any).user_id;
   const isSharedNote = (note as any).isShared;
-  
-  console.log('ExportMenu - Note analysis:', {
-    noteId: note.id,
-    userId: user?.id,
-    noteUserId: (note as any).user_id,
-    isOwner,
-    isSharedNote,
-    noteData: note
-  });
 
   const handlePDFExport = async () => {
     if (isExporting) return;

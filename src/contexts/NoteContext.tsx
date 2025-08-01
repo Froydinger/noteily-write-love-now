@@ -378,6 +378,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: note.updated_at,
         featured_image: (note as any).featured_image || undefined,
         user_id: note.user_id, // Keep user_id for ownership detection
+        isShared: false, // Owned notes are not shared TO the user
       }));
 
       const formattedSharedNotes: Note[] = uniqueSharedNotes.map(note => ({
@@ -395,14 +396,6 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const allNotes = [...formattedOwnedNotes, ...formattedSharedNotes].sort((a, b) => 
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
-
-      console.log('NoteContext - Final notes data:', {
-        ownedNotesCount: formattedOwnedNotes.length,
-        sharedNotesCount: formattedSharedNotes.length,
-        totalNotes: allNotes.length,
-        sampleOwnedNote: formattedOwnedNotes[0],
-        sampleSharedNote: formattedSharedNotes[0]
-      });
 
       setNotes(allNotes);
       
@@ -471,6 +464,8 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       content: '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      user_id: user.id, // Add user_id for ownership detection
+      isShared: false, // New notes are not shared
     };
 
     // Optimistically add to local state
@@ -493,13 +488,15 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw error;
       }
 
-      // Update with actual database data (keeping plain text for UI)
+      // Update with actual database data (keeping ownership info)
       const dbNote: Note = {
         id: data.id,
         title: tempNote.title, // Keep original plain text for UI
         content: tempNote.content, // Keep original plain text for UI
         createdAt: data.created_at,
         updatedAt: data.updated_at,
+        user_id: data.user_id, // Keep user_id from database
+        isShared: false, // New notes are not shared
       };
 
       setNotes(prevNotes => 
