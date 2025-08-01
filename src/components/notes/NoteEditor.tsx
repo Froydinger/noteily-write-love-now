@@ -117,10 +117,10 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     const text = e.clipboardData.getData('text/plain');
     if (!text) return;
     
-    // Normalize multiple line breaks to single line breaks and trim
+    // Normalize line breaks: allow single and double, but collapse 3+ to double
     const normalizedText = text
       .replace(/\r\n/g, '\n')  // Normalize Windows line endings
-      .replace(/\n{2,}/g, '\n') // Replace multiple line breaks with single
+      .replace(/\n{3,}/g, '\n\n') // Replace 3+ line breaks with double (paragraph break)
       .trim();
     
     // Get current selection
