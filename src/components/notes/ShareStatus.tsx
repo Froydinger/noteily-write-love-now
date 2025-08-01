@@ -9,13 +9,18 @@ interface ShareStatusProps {
 }
 
 export function ShareStatus({ note, showText = true }: ShareStatusProps) {
-  if (note.isOwnedByUser && (!note.shares || note.shares.length === 0)) {
-    // User owns this note and it's not shared with anyone
-    return null;
+  // If user owns this note and it's shared with others, show "Shared" badge
+  if (note.isOwnedByUser && note.shares && note.shares.length > 0) {
+    return (
+      <Badge variant="outline" className="flex items-center gap-1">
+        <Users className="h-3 w-3" />
+        {showText && `Shared with ${note.shares.length}`}
+      </Badge>
+    );
   }
 
+  // If this note is shared with the user (they don't own it), show shared status
   if (note.isSharedWithUser && !note.isOwnedByUser) {
-    // This note is shared with the user (they don't own it)
     return (
       <Badge variant="secondary" className="flex items-center gap-1">
         <Users className="h-3 w-3" />
@@ -34,16 +39,7 @@ export function ShareStatus({ note, showText = true }: ShareStatusProps) {
     );
   }
 
-  if (note.isOwnedByUser && note.shares && note.shares.length > 0) {
-    // User owns this note and it's shared with others
-    return (
-      <Badge variant="outline" className="flex items-center gap-1">
-        <Users className="h-3 w-3" />
-        {showText && `Shared with ${note.shares.length}`}
-      </Badge>
-    );
-  }
-
+  // User owns this note and it's not shared with anyone
   return null;
 }
 

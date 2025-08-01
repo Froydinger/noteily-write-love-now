@@ -77,20 +77,20 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="flex-shrink-0">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0 pb-4">
           <DialogTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
             {note.isOwnedByUser ? 'Manage Sharing' : 'Sharing Info'}
           </DialogTitle>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto space-y-4 px-1">
+        <div className="flex-1 overflow-y-auto space-y-6 px-1">
           {/* Note status */}
-          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg flex-shrink-0">
+          <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg flex-shrink-0">
             <div>
               <h4 className="font-medium">{note.title || 'Untitled Note'}</h4>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mt-1">
                 {note.isOwnedByUser ? 'You own this note' : 'Shared with you'}
               </p>
             </div>
@@ -99,9 +99,9 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
 
           {/* Content based on ownership */}
           {!note.isOwnedByUser ? (
-            <div className="text-center py-6">
-              <Users className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
-              <p className="text-muted-foreground mb-2">
+            <div className="text-center py-8">
+              <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+              <p className="text-muted-foreground mb-3">
                 This note has been shared with you
               </p>
               <div className="flex items-center justify-center gap-2">
@@ -114,12 +114,12 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
           ) : (
             <>
               {/* Add new share section */}
-              <div className="space-y-4 p-4 border rounded-lg">
-                <h3 className="font-medium">Share with someone new</h3>
+              <div className="space-y-5 p-5 border rounded-lg bg-background">
+                <h3 className="font-medium text-lg">Share with someone new</h3>
                 
-                <div className="space-y-3">
-                  <div>
-                    <Label htmlFor="email" className="flex items-center gap-2">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="flex items-center gap-2 text-sm font-medium">
                       <Mail className="h-4 w-4" />
                       Email Address
                     </Label>
@@ -131,24 +131,25 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                       onChange={(e) => setEmail(e.target.value)}
                       onKeyPress={handleKeyPress}
                       disabled={isAdding}
+                      className="h-11"
                     />
                   </div>
 
-                  <div>
-                    <Label>Permission Level</Label>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Permission Level</Label>
                     <RadioGroup 
                       value={permission} 
                       onValueChange={(value: 'read' | 'write') => setPermission(value)}
-                      className="flex flex-col sm:flex-row gap-4 mt-2"
+                      className="flex flex-col sm:flex-row gap-6 mt-3"
                     >
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-3">
                         <RadioGroupItem value="read" id="read" />
                         <Label htmlFor="read" className="cursor-pointer flex items-center gap-2">
                           <SharePermissionIcon permission="read" />
                           View Only
                         </Label>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-3">
                         <RadioGroupItem value="write" id="write" />
                         <Label htmlFor="write" className="cursor-pointer flex items-center gap-2">
                           <SharePermissionIcon permission="write" />
@@ -161,7 +162,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                   <Button 
                     onClick={handleAddShare} 
                     disabled={!email.trim() || isAdding}
-                    className="w-full"
+                    className="w-full h-11 mt-6"
                   >
                     {isAdding ? (
                       <>
@@ -180,7 +181,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
 
               {/* Current shares list - scrollable */}
               <div className="space-y-4 min-h-0">
-                <h3 className="font-medium">Shared with ({sharedUsers.length})</h3>
+                <h3 className="font-medium text-lg">Shared with ({sharedUsers.length})</h3>
 
                 {loading ? (
                   <div className="flex items-center justify-center py-8">
