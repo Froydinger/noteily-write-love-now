@@ -57,15 +57,6 @@ const Index = () => {
     return <EmptyNotesPlaceholder />;
   }
 
-  // Show loading state or normal content
-  if (loading) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading notes...</div>
-      </div>
-    );
-  }
-
   const content = (
     <div className="h-full">
       <div className="p-6 md:p-10 animate-fade-in"
