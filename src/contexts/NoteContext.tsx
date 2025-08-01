@@ -339,14 +339,11 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           table: 'shared_notes'
         },
         (payload) => {
-          console.log('Shared notes change:', payload);
-          // Reload notes for any change to shared notes that might affect the user
-          if ((payload.new as any)?.shared_with_user_id === user.id || 
-              (payload.old as any)?.shared_with_user_id === user.id ||
-              (payload.new as any)?.owner_id === user.id ||
-              (payload.old as any)?.owner_id === user.id) {
+          console.log('Shared notes change detected:', payload);
+          // Force immediate reload for any shared_notes change
+          setTimeout(() => {
             loadNotes();
-          }
+          }, 100);
         }
       )
       .subscribe();
