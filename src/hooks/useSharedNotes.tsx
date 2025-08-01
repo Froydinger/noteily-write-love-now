@@ -134,9 +134,7 @@ export function useSharedNotes(noteId?: string) {
       if (error) throw error;
 
       // Refresh shares list
-      if (noteId === noteId) {
-        await loadShares(noteId);
-      }
+      await loadShares(noteId);
 
       toast({
         title: "Note shared successfully",
