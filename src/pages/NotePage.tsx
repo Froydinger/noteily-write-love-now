@@ -56,10 +56,10 @@ const NotePage = () => {
           description: "You no longer have access to this shared note.",
         });
       } else {
-        // User owns the note - it's being permanently deleted
+        // User owns the note - it's being moved to recently deleted
         toast({
-          title: "Note deleted",
-          description: "Your note has been permanently deleted.",
+          title: "Note moved to Recently Deleted",
+          description: "You can restore this note within 7 days.",
         });
       }
       navigate('/');
@@ -205,7 +205,7 @@ const NotePage = () => {
                   <AlertDialogDescription>
                     {note.isSharedWithUser && !note.isOwnedByUser 
                       ? 'Are you sure you want to remove your access to this shared note? You will no longer be able to view or edit it.'
-                      : 'Are you sure you want to permanently delete this note? This will delete it for everyone it has been shared with. This action cannot be undone.'
+                      : 'Are you sure you want to delete this note? It will be moved to Recently Deleted where you can restore it within 7 days.'
                     }
                   </AlertDialogDescription>
                 </AlertDialogHeader>

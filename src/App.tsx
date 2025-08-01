@@ -19,6 +19,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import NotFound from "./pages/NotFound";
+import RecentlyDeletedPage from "./pages/RecentlyDeletedPage";
 import { PreferencesProvider } from "./contexts/PreferencesContext";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ const AppContent = () => {
           <Route path="/" element={<AppLayout><Index /></AppLayout>} />
           <Route path="/note/:id" element={<AppLayout><NotePage /></AppLayout>} />
           <Route path="/prompts" element={<AppLayout><PromptsPage /></AppLayout>} />
+          <Route path="/recently-deleted" element={<AppLayout><RecentlyDeletedPage /></AppLayout>} />
           <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
           <Route path="*" element={<NotFound />} />
         </Routes>

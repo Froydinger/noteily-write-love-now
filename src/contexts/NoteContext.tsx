@@ -17,6 +17,7 @@ export type WritingPrompt = {
 
 type NoteContextType = {
   notes: Note[];
+  deletedNotes: Note[];
   currentNote: Note | null;
   writingPrompts: WritingPrompt[];
   dailyPrompts: WritingPrompt[];
@@ -25,11 +26,14 @@ type NoteContextType = {
   addNote: () => Promise<Note>;
   updateNote: (id: string, updates: Partial<Note>) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
+  restoreNote: (id: string) => Promise<void>;
+  permanentlyDeleteNote: (id: string) => Promise<void>;
   getNote: (id: string) => Note | undefined;
   setCurrentNote: (note: Note | null) => void;
   getRandomPrompt: () => WritingPrompt;
   refreshDailyPrompts: () => void;
   syncNotes: () => Promise<void>;
+  loadDeletedNotes: () => Promise<void>;
 };
 
 const defaultPrompts: WritingPrompt[] = [
@@ -262,6 +266,7 @@ const shouldRefreshPrompts = (): boolean => {
 
 export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notes, setNotes] = useState<Note[]>([]);
+  const [deletedNotes, setDeletedNotes] = useState<Note[]>([]);
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
   const [writingPrompts] = useState<WritingPrompt[]>(defaultPrompts);
   const [dailyPrompts, setDailyPrompts] = useState<WritingPrompt[]>(() => {
@@ -286,6 +291,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       console.log('NoteContext useEffect: no user, clearing state');
       setNotes([]);
+      setDeletedNotes([]);
       setCurrentNote(null);
       setLoading(false);
     }
@@ -659,15 +665,16 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.error('Error removing note access:', error);
         }
       } else if (isOwner) {
-        // If user owns the note, delete the note entirely (this will cascade delete shares)
-        const { error } = await supabase
-          .from('notes')
-          .delete()
-          .eq('id', id)
-          .eq('user_id', user.id); // Extra safety check
+        // Use soft delete function for owned notes
+        const { data, error } = await supabase.rpc('soft_delete_note', {
+          note_id_param: id
+        });
 
         if (error) {
-          console.error('Error deleting note:', error);
+          console.error('Error soft deleting note:', error);
+        } else {
+          // Add to deleted notes if soft delete was successful
+          setDeletedNotes(prevDeleted => [noteToDelete, ...prevDeleted]);
         }
       } else {
         console.error('User does not have permission to delete this note');
@@ -681,6 +688,87 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Delete from offline storage even if online deletion fails
       await offlineStorage.deleteNote(id, user.id);
+    }
+  };
+
+  const restoreNote = async (id: string) => {
+    if (!user) {
+      console.error('User must be authenticated to restore notes');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.rpc('restore_note', {
+        note_id_param: id
+      });
+
+      if (error) {
+        console.error('Error restoring note:', error);
+        throw error;
+      }
+
+      // Refresh both active and deleted notes
+      await Promise.all([loadNotes(), loadDeletedNotes()]);
+    } catch (error) {
+      console.error('Error restoring note:', error);
+    }
+  };
+
+  const permanentlyDeleteNote = async (id: string) => {
+    if (!user) {
+      console.error('User must be authenticated to permanently delete notes');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.rpc('permanently_delete_note', {
+        note_id_param: id
+      });
+
+      if (error) {
+        console.error('Error permanently deleting note:', error);
+        throw error;
+      }
+
+      // Remove from deleted notes list
+      setDeletedNotes(prevDeleted => prevDeleted.filter(note => note.id !== id));
+    } catch (error) {
+      console.error('Error permanently deleting note:', error);
+    }
+  };
+
+  const loadDeletedNotes = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('user_id', user.id)
+        .not('deleted_at', 'is', null)
+        .order('deleted_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading deleted notes:', error);
+        return;
+      }
+
+      const formattedDeletedNotes: Note[] = (data || []).map(note => ({
+        id: note.id,
+        title: note.title,
+        content: note.content || '',
+        createdAt: note.created_at,
+        updatedAt: note.updated_at,
+        featured_image: note.featured_image || undefined,
+        user_id: note.user_id,
+        isOwnedByUser: true,
+        isSharedWithUser: false,
+        deleted_at: note.deleted_at,
+      }));
+
+      setDeletedNotes(formattedDeletedNotes);
+    } catch (error) {
+      console.error('Error loading deleted notes:', error);
     }
   };
 
@@ -705,6 +793,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <NoteContext.Provider 
       value={{ 
         notes, 
+        deletedNotes,
         currentNote, 
         writingPrompts,
         dailyPrompts,
@@ -712,12 +801,15 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         hasInitialLoad,
         addNote, 
         updateNote, 
-        deleteNote, 
+        deleteNote,
+        restoreNote,
+        permanentlyDeleteNote,
         getNote,
         setCurrentNote,
         getRandomPrompt,
         refreshDailyPrompts,
-        syncNotes
+        syncNotes,
+        loadDeletedNotes
       }}
     >
       {children}

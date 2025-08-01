@@ -9,7 +9,8 @@ import {
   Pencil,
   PanelLeftClose,
   PanelLeft,
-  RefreshCw
+  RefreshCw,
+  Trash2
 } from "lucide-react";
 import {
   Sidebar,
@@ -145,6 +146,17 @@ export function AppSidebar() {
                   <a href="/prompts" className="flex items-center gap-3 rounded-full">
                     <Pencil className="h-4 w-4" />
                     <span className="font-medium">Writing Prompts</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  asChild
+                  className={`px-4 py-2 rounded-full ${isActive('/recently-deleted') ? 'sidebar-nav-active' : ''}`}
+                >
+                  <a href="/recently-deleted" className="flex items-center gap-3 rounded-full">
+                    <Trash2 className="h-4 w-4" />
+                    <span className="font-medium">Recently Deleted</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>

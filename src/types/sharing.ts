@@ -23,6 +23,9 @@ export interface NoteWithSharing {
   isSharedWithUser: boolean;
   userPermission?: 'read' | 'write';
   shares?: SharedNote[]; // For owned notes, list of who it's shared with
+  
+  // Soft delete property
+  deleted_at?: string | null;
 }
 
 export interface ShareRequest {
