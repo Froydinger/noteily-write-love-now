@@ -140,9 +140,9 @@ const NotePage = () => {
   
   return (
     <div className="h-full flex flex-col">
-      <header className="border-b p-4">
+      <header className="border-b p-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {isMobile ? (
               <SidebarTrigger />
             ) : (
@@ -150,36 +150,29 @@ const NotePage = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={toggleSidebar}
-                className="btn-accessible"
+                className="btn-accessible p-2"
                 title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
               >
                 {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
-                <span className="ml-2">{state === "expanded" ? "Hide sidebar" : "Show sidebar"}</span>
               </Button>
             )}
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => navigate('/')}
-              className="gap-1 btn-accessible"
+              className="btn-accessible p-2"
+              title="Back to notes"
             >
               <ChevronLeft className="h-4 w-4" />
-              Back
             </Button>
             
             {note.isSharedWithUser && (
-              <Badge variant="secondary" className="ml-2 flex items-center gap-1">
+              <Badge variant="secondary" className="ml-1 flex items-center gap-1 px-2">
                 <Users className="h-3 w-3" />
                 {note.userPermission === 'read' ? (
-                  <>
-                    <Eye className="h-3 w-3" />
-                    Shared (Read-only)
-                  </>
+                  <Eye className="h-3 w-3" />
                 ) : (
-                  <>
-                    <Edit className="h-3 w-3" />
-                    Shared (Editable)
-                  </>
+                  <Edit className="h-3 w-3" />
                 )}
               </Badge>
             )}
