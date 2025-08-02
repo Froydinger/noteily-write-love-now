@@ -98,7 +98,7 @@ const Index = () => {
   }
 
   const content = (
-    <div className="h-full">
+    <div className="min-h-full">
       <div className="p-6 md:p-10 animate-fade-in"
            style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
         <div className="flex items-center justify-between mb-6">
