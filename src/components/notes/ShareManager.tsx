@@ -38,6 +38,19 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
     }
   }, [isOpen, note.id, note.isOwnedByUser, loadShares]);
 
+  // Prevent auto-focus on email input when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      // Small delay to ensure dialog is rendered, then blur any focused input
+      setTimeout(() => {
+        const emailInput = document.getElementById('email');
+        if (emailInput && document.activeElement === emailInput) {
+          (emailInput as HTMLInputElement).blur();
+        }
+      }, 50);
+    }
+  }, [isOpen]);
+
   const handleAddShare = async () => {
     if (!email.trim()) return;
 
