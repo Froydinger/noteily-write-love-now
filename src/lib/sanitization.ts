@@ -2,11 +2,11 @@ import DOMPurify from 'dompurify';
 
 // Strict DOMPurify configuration for enhanced security
 const SANITIZE_CONFIG = {
-  ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'img', 'div', 'span', 'button', 'input'],
-  ALLOWED_ATTR: ['src', 'alt', 'class', 'data-checklist', 'data-checklist-id', 'type', 'value', 'placeholder'],
+  ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'img', 'div', 'span'],
+  ALLOWED_ATTR: ['src', 'alt', 'class', 'data-checklist-id', 'data-checklist-item', 'data-checked'],
   ALLOW_DATA_ATTR: false, // We'll manually allow specific data attributes
-  FORBID_TAGS: ['script', 'object', 'embed', 'form', 'textarea'],
-  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
+  FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'button', 'textarea'],
+  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'style'],
   KEEP_CONTENT: true,
   SANITIZE_DOM: true,
 };
@@ -58,17 +58,9 @@ export function sanitizeImageUrl(url: string, alt?: string): { url: string; alt:
 }
 
 /**
- * Simple checklist data structure for storage
+ * Converts checklist HTML elements to safe data structure
  */
-export interface ChecklistData {
-  id: string;
-  items: Array<{ text: string; checked: boolean }>;
-}
-
-/**
- * Convert HTML checklist elements to JSON data for storage
- */
-export function extractChecklistsFromHtml(htmlContent: string): string {
+export function convertChecklistsToData(htmlContent: string): string {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = htmlContent;
   
@@ -76,117 +68,79 @@ export function extractChecklistsFromHtml(htmlContent: string): string {
   const checklistContainers = tempDiv.querySelectorAll('[data-checklist-id]');
   
   checklistContainers.forEach((container) => {
-    const checklistId = container.getAttribute('data-checklist-id') || '';
+    const checklistId = container.getAttribute('data-checklist-id');
     const items: Array<{ text: string; checked: boolean }> = [];
     
-    // Extract items from container
-    const itemElements = container.querySelectorAll('.checklist-item');
+    // Extract checklist items
+    const itemElements = container.querySelectorAll('[data-checklist-item]');
     itemElements.forEach((item) => {
-      const checkbox = item.querySelector('.checklist-checkbox') as HTMLElement;
-      const textInput = item.querySelector('.checklist-input') as HTMLInputElement;
-      
-      if (textInput) {
-        const text = textInput.value || textInput.textContent || '';
-        const isChecked = checkbox?.classList.contains('checked') || 
-                         checkbox?.style.background?.includes('primary') || false;
-        items.push({ text: text.trim(), checked: isChecked });
-      }
+      const textContent = item.textContent || '';
+      const isChecked = item.getAttribute('data-checked') === 'true';
+      items.push({ text: textContent.trim(), checked: isChecked });
     });
     
-    // Replace with data marker
-    const dataMarker = document.createElement('div');
-    dataMarker.setAttribute('data-checklist', JSON.stringify({ id: checklistId, items }));
-    dataMarker.className = 'checklist-data';
-    container.parentNode?.replaceChild(dataMarker, container);
+    // Replace with safe data structure
+    const newContainer = document.createElement('div');
+    newContainer.className = 'checklist-container';
+    newContainer.setAttribute('data-checklist', JSON.stringify(items));
+    newContainer.setAttribute('data-checklist-id', checklistId || '');
+    
+    // Create visual representation
+    items.forEach((item, index) => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'checklist-item';
+      itemDiv.innerHTML = `
+        <span class="checklist-checkbox ${item.checked ? 'checked' : ''}" data-index="${index}">
+          ${item.checked ? '✓' : ''}
+        </span>
+        <span class="checklist-text ${item.checked ? 'checked' : ''}">${DOMPurify.sanitize(item.text, { ALLOWED_TAGS: [], KEEP_CONTENT: true })}</span>
+      `;
+      newContainer.appendChild(itemDiv);
+    });
+    
+    container.parentNode?.replaceChild(newContainer, container);
   });
   
   return tempDiv.innerHTML;
 }
 
 /**
- * Convert JSON checklist data back to simple HTML for storage
+ * Restores checklist functionality from safe data structure
  */
-export function convertChecklistsToStorageFormat(htmlContent: string): string {
-  return extractChecklistsFromHtml(htmlContent);
-}
-
-/**
- * Convert stored checklist data back to interactive HTML
- */
-export function restoreChecklistsForDisplay(htmlContent: string): string {
+export function restoreChecklistsFromData(htmlContent: string): string {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = htmlContent;
   
-  // Find all checklist data markers
-  const dataMarkers = tempDiv.querySelectorAll('[data-checklist]');
+  // Find all checklist containers
+  const checklistContainers = tempDiv.querySelectorAll('[data-checklist]');
   
-  dataMarkers.forEach((marker) => {
-    const checklistDataStr = marker.getAttribute('data-checklist');
-    if (!checklistDataStr) return;
+  checklistContainers.forEach((container) => {
+    const checklistData = container.getAttribute('data-checklist');
+    const checklistId = container.getAttribute('data-checklist-id');
+    
+    if (!checklistData) return;
     
     try {
-      const checklistData: ChecklistData = JSON.parse(checklistDataStr);
+      const items: Array<{ text: string; checked: boolean }> = JSON.parse(checklistData);
       
-      // Create interactive checklist container
-      const container = document.createElement('div');
-      container.className = 'checklist-container';
-      container.contentEditable = 'false';
-      container.style.margin = '1rem 0';
-      container.style.padding = '0.75rem';
-      container.style.borderRadius = '0.5rem';
-      container.style.border = '1px solid hsl(var(--border) / 0.5)';
-      container.style.background = 'hsl(var(--card) / 0.5)';
-      container.setAttribute('data-checklist-id', checklistData.id);
+      // Create interactive checklist HTML
+      const newContainer = document.createElement('div');
+      newContainer.className = 'checklist-container';
+      newContainer.setAttribute('data-checklist-id', checklistId || '');
       
-      checklistData.items.forEach((item) => {
+      items.forEach((item, index) => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'checklist-item';
-        itemDiv.style.display = 'flex';
-        itemDiv.style.alignItems = 'center';
-        itemDiv.style.gap = '12px';
-        itemDiv.style.marginBottom = '8px';
-        itemDiv.style.padding = '4px 0';
-
-        // Create checkbox
-        const checkbox = document.createElement('button');
-        checkbox.className = `checklist-checkbox ${item.checked ? 'checked' : ''}`;
-        checkbox.type = 'button';
-        checkbox.style.width = '18px';
-        checkbox.style.height = '18px';
-        checkbox.style.borderRadius = '50%';
-        checkbox.style.border = '2px solid hsl(var(--border))';
-        checkbox.style.background = item.checked ? 'hsl(var(--primary))' : 'transparent';
-        checkbox.style.color = item.checked ? 'hsl(var(--primary-foreground))' : 'transparent';
-        checkbox.style.cursor = 'pointer';
-        checkbox.style.flexShrink = '0';
-        checkbox.style.display = 'flex';
-        checkbox.style.alignItems = 'center';
-        checkbox.style.justifyContent = 'center';
-        checkbox.style.fontSize = '10px';
-        checkbox.style.fontWeight = '600';
-        checkbox.innerHTML = item.checked ? '✓' : '';
-
-        // Create text input
-        const textInput = document.createElement('input');
-        textInput.className = 'checklist-input';
-        textInput.type = 'text';
-        textInput.value = item.text;
-        textInput.placeholder = 'List item';
-        textInput.style.flex = '1';
-        textInput.style.border = 'none';
-        textInput.style.outline = 'none';
-        textInput.style.background = 'transparent';
-        textInput.style.fontSize = '0.875rem';
-        textInput.style.fontFamily = 'inherit';
-        textInput.style.color = item.checked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
-        textInput.style.textDecoration = item.checked ? 'line-through' : 'none';
-
-        itemDiv.appendChild(checkbox);
-        itemDiv.appendChild(textInput);
-        container.appendChild(itemDiv);
+        itemDiv.setAttribute('data-checklist-item', 'true');
+        itemDiv.setAttribute('data-checked', item.checked.toString());
+        itemDiv.innerHTML = `
+          <input type="checkbox" ${item.checked ? 'checked' : ''} />
+          <span contenteditable="true">${DOMPurify.sanitize(item.text, { ALLOWED_TAGS: [], KEEP_CONTENT: true })}</span>
+        `;
+        newContainer.appendChild(itemDiv);
       });
       
-      marker.parentNode?.replaceChild(container, marker);
+      container.parentNode?.replaceChild(newContainer, container);
     } catch (e) {
       console.warn('Failed to parse checklist data:', e);
     }
@@ -203,30 +157,44 @@ export function sanitizeContent(content: string, options: { preserveChecklists?:
   
   let processedContent = content;
   
-  // Convert checklists to storage format if preserving them
+  // Convert checklists to safe data structure if preserving them
   if (options.preserveChecklists) {
-    processedContent = convertChecklistsToStorageFormat(processedContent);
+    processedContent = convertChecklistsToData(processedContent);
   }
   
   // Apply strict DOMPurify sanitization
   const sanitized = DOMPurify.sanitize(processedContent, SANITIZE_CONFIG);
   
-  return sanitized;
+  // Additional validation: remove any remaining script-like content
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = sanitized;
+  
+  // Remove any elements with javascript: URLs
+  const allElements = tempDiv.querySelectorAll('*');
+  allElements.forEach((element) => {
+    Array.from(element.attributes).forEach((attr) => {
+      if (attr.value.toLowerCase().includes('javascript:') || attr.value.toLowerCase().includes('data:text/html')) {
+        element.removeAttribute(attr.name);
+      }
+    });
+  });
+  
+  return tempDiv.innerHTML;
 }
 
 /**
- * Sanitize content for display (converts storage data back to interactive elements)
+ * Sanitize content for display (converts safe data back to interactive elements)
  */
 export function sanitizeForDisplay(content: string): string {
   if (!content) return '';
   
-  // First restore checklists from storage format
-  const withChecklists = restoreChecklistsForDisplay(content);
+  // First restore checklists from data
+  const withChecklists = restoreChecklistsFromData(content);
   
-  // Then apply permissive sanitization for display
+  // Then apply basic sanitization (more permissive for display)
   return DOMPurify.sanitize(withChecklists, {
     ...SANITIZE_CONFIG,
     ALLOWED_TAGS: [...SANITIZE_CONFIG.ALLOWED_TAGS, 'input'],
-    ALLOWED_ATTR: [...SANITIZE_CONFIG.ALLOWED_ATTR, 'type', 'checked', 'contenteditable', 'data-checklist-id'],
+    ALLOWED_ATTR: [...SANITIZE_CONFIG.ALLOWED_ATTR, 'type', 'checked', 'contenteditable'],
   });
 }
