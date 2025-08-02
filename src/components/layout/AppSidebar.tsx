@@ -314,7 +314,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="px-4 py-4 border-t border-border/40">
         {state !== "collapsed" ? (
-          <div className="flex justify-between w-full">
+          <div className="flex justify-between w-full px-4 md:px-6">
             <Button
               variant="ghost"
               size="sm"
