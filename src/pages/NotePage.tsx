@@ -23,6 +23,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { FeaturedImageUpload } from '@/components/notes/FeaturedImageUpload';
 import { ExportMenu } from '@/components/notes/ExportMenu';
 import { ShareManager } from '@/components/notes/ShareManager';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -31,6 +33,8 @@ const NotePage = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { state, toggleSidebar } = useSidebar();
+  const { user } = useAuth();
+  const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
   
   const note = getNote(id || '');
@@ -141,17 +145,31 @@ const NotePage = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             {isMobile ? (
-              <SidebarTrigger />
+              <div className="relative">
+                <SidebarTrigger />
+                {user && unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </div>
             ) : (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={toggleSidebar}
-                className="btn-accessible p-2"
-                title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
-              >
-                {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
-              </Button>
+              <div className="relative">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={toggleSidebar}
+                  className="btn-accessible p-2"
+                  title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
+                >
+                  {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
+                </Button>
+                {user && unreadCount > 0 && state === "collapsed" && (
+                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </div>
             )}
             <Button 
               variant="ghost" 
