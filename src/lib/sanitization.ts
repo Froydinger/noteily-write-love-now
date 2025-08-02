@@ -58,20 +58,28 @@ export function sanitizeImageUrl(url: string, alt?: string): { url: string; alt:
 }
 
 /**
- * Converts checklist HTML elements to safe data structure
+ * Simple checklist data structure for storage
  */
-export function convertChecklistsToData(htmlContent: string): string {
+export interface ChecklistData {
+  id: string;
+  items: Array<{ text: string; checked: boolean }>;
+}
+
+/**
+ * Convert HTML checklist elements to JSON data for storage
+ */
+export function extractChecklistsFromHtml(htmlContent: string): string {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = htmlContent;
   
   // Find all checklist containers
-  const checklistContainers = tempDiv.querySelectorAll('.checklist-container');
+  const checklistContainers = tempDiv.querySelectorAll('[data-checklist-id]');
   
   checklistContainers.forEach((container) => {
-    const checklistId = container.getAttribute('data-checklist-id') || Date.now().toString();
+    const checklistId = container.getAttribute('data-checklist-id') || '';
     const items: Array<{ text: string; checked: boolean }> = [];
     
-    // Extract checklist items from the actual structure
+    // Extract items from container
     const itemElements = container.querySelectorAll('.checklist-item');
     itemElements.forEach((item) => {
       const checkbox = item.querySelector('.checklist-checkbox') as HTMLElement;
@@ -79,64 +87,58 @@ export function convertChecklistsToData(htmlContent: string): string {
       
       if (textInput) {
         const text = textInput.value || textInput.textContent || '';
-        const isChecked = checkbox?.style.background?.includes('var(--primary)') || 
-                         checkbox?.classList.contains('checked') || false;
+        const isChecked = checkbox?.classList.contains('checked') || 
+                         checkbox?.style.background?.includes('primary') || false;
         items.push({ text: text.trim(), checked: isChecked });
       }
     });
     
-    // Replace with safe data structure
-    const newContainer = document.createElement('div');
-    newContainer.className = 'checklist-container';
-    newContainer.setAttribute('data-checklist', JSON.stringify(items));
-    newContainer.setAttribute('data-checklist-id', checklistId || '');
-    
-    // Create visual representation
-    items.forEach((item, index) => {
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'checklist-item';
-      itemDiv.innerHTML = `
-        <span class="checklist-checkbox ${item.checked ? 'checked' : ''}" data-index="${index}">
-          ${item.checked ? '✓' : ''}
-        </span>
-        <span class="checklist-text ${item.checked ? 'checked' : ''}">${DOMPurify.sanitize(item.text, { ALLOWED_TAGS: [], KEEP_CONTENT: true })}</span>
-      `;
-      newContainer.appendChild(itemDiv);
-    });
-    
-    container.parentNode?.replaceChild(newContainer, container);
+    // Replace with data marker
+    const dataMarker = document.createElement('div');
+    dataMarker.setAttribute('data-checklist', JSON.stringify({ id: checklistId, items }));
+    dataMarker.className = 'checklist-data';
+    container.parentNode?.replaceChild(dataMarker, container);
   });
   
   return tempDiv.innerHTML;
 }
 
 /**
- * Restores checklist functionality from safe data structure
+ * Convert JSON checklist data back to simple HTML for storage
  */
-export function restoreChecklistsFromData(htmlContent: string): string {
+export function convertChecklistsToStorageFormat(htmlContent: string): string {
+  return extractChecklistsFromHtml(htmlContent);
+}
+
+/**
+ * Convert stored checklist data back to interactive HTML
+ */
+export function restoreChecklistsForDisplay(htmlContent: string): string {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = htmlContent;
   
-  // Find all checklist containers
-  const checklistContainers = tempDiv.querySelectorAll('[data-checklist]');
+  // Find all checklist data markers
+  const dataMarkers = tempDiv.querySelectorAll('[data-checklist]');
   
-  checklistContainers.forEach((container) => {
-    const checklistData = container.getAttribute('data-checklist');
-    const checklistId = container.getAttribute('data-checklist-id');
-    
-    if (!checklistData) return;
+  dataMarkers.forEach((marker) => {
+    const checklistDataStr = marker.getAttribute('data-checklist');
+    if (!checklistDataStr) return;
     
     try {
-      const items: Array<{ text: string; checked: boolean }> = JSON.parse(checklistData);
+      const checklistData: ChecklistData = JSON.parse(checklistDataStr);
       
-      // Create interactive checklist HTML (exactly matching NoteEditor.tsx structure)
-      const newContainer = document.createElement('div');
-      newContainer.className = 'checklist-container';
-      newContainer.contentEditable = 'false';
-      newContainer.style.margin = '1rem 0';
-      newContainer.setAttribute('data-checklist-id', checklistId || '');
+      // Create interactive checklist container
+      const container = document.createElement('div');
+      container.className = 'checklist-container';
+      container.contentEditable = 'false';
+      container.style.margin = '1rem 0';
+      container.style.padding = '0.75rem';
+      container.style.borderRadius = '0.5rem';
+      container.style.border = '1px solid hsl(var(--border) / 0.5)';
+      container.style.background = 'hsl(var(--card) / 0.5)';
+      container.setAttribute('data-checklist-id', checklistData.id);
       
-      items.forEach((item) => {
+      checklistData.items.forEach((item) => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'checklist-item';
         itemDiv.style.display = 'flex';
@@ -145,9 +147,9 @@ export function restoreChecklistsFromData(htmlContent: string): string {
         itemDiv.style.marginBottom = '8px';
         itemDiv.style.padding = '4px 0';
 
-        // Create checkbox button (exactly matching NoteEditor structure)
+        // Create checkbox
         const checkbox = document.createElement('button');
-        checkbox.className = 'checklist-checkbox';
+        checkbox.className = `checklist-checkbox ${item.checked ? 'checked' : ''}`;
         checkbox.type = 'button';
         checkbox.style.width = '18px';
         checkbox.style.height = '18px';
@@ -164,7 +166,7 @@ export function restoreChecklistsFromData(htmlContent: string): string {
         checkbox.style.fontWeight = '600';
         checkbox.innerHTML = item.checked ? '✓' : '';
 
-        // Create text input (exactly matching NoteEditor structure)
+        // Create text input
         const textInput = document.createElement('input');
         textInput.className = 'checklist-input';
         textInput.type = 'text';
@@ -174,17 +176,17 @@ export function restoreChecklistsFromData(htmlContent: string): string {
         textInput.style.border = 'none';
         textInput.style.outline = 'none';
         textInput.style.background = 'transparent';
-        textInput.style.fontSize = 'inherit';
+        textInput.style.fontSize = '0.875rem';
         textInput.style.fontFamily = 'inherit';
         textInput.style.color = item.checked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
         textInput.style.textDecoration = item.checked ? 'line-through' : 'none';
 
         itemDiv.appendChild(checkbox);
         itemDiv.appendChild(textInput);
-        newContainer.appendChild(itemDiv);
+        container.appendChild(itemDiv);
       });
       
-      container.parentNode?.replaceChild(newContainer, container);
+      marker.parentNode?.replaceChild(container, marker);
     } catch (e) {
       console.warn('Failed to parse checklist data:', e);
     }
@@ -201,44 +203,30 @@ export function sanitizeContent(content: string, options: { preserveChecklists?:
   
   let processedContent = content;
   
-  // Convert checklists to safe data structure if preserving them
+  // Convert checklists to storage format if preserving them
   if (options.preserveChecklists) {
-    processedContent = convertChecklistsToData(processedContent);
+    processedContent = convertChecklistsToStorageFormat(processedContent);
   }
   
   // Apply strict DOMPurify sanitization
   const sanitized = DOMPurify.sanitize(processedContent, SANITIZE_CONFIG);
   
-  // Additional validation: remove any remaining script-like content
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = sanitized;
-  
-  // Remove any elements with javascript: URLs
-  const allElements = tempDiv.querySelectorAll('*');
-  allElements.forEach((element) => {
-    Array.from(element.attributes).forEach((attr) => {
-      if (attr.value.toLowerCase().includes('javascript:') || attr.value.toLowerCase().includes('data:text/html')) {
-        element.removeAttribute(attr.name);
-      }
-    });
-  });
-  
-  return tempDiv.innerHTML;
+  return sanitized;
 }
 
 /**
- * Sanitize content for display (converts safe data back to interactive elements)
+ * Sanitize content for display (converts storage data back to interactive elements)
  */
 export function sanitizeForDisplay(content: string): string {
   if (!content) return '';
   
-  // First restore checklists from data
-  const withChecklists = restoreChecklistsFromData(content);
+  // First restore checklists from storage format
+  const withChecklists = restoreChecklistsForDisplay(content);
   
-  // Then apply basic sanitization (more permissive for display)
+  // Then apply permissive sanitization for display
   return DOMPurify.sanitize(withChecklists, {
     ...SANITIZE_CONFIG,
     ALLOWED_TAGS: [...SANITIZE_CONFIG.ALLOWED_TAGS, 'input'],
-    ALLOWED_ATTR: [...SANITIZE_CONFIG.ALLOWED_ATTR, 'type', 'checked', 'contenteditable'],
+    ALLOWED_ATTR: [...SANITIZE_CONFIG.ALLOWED_ATTR, 'type', 'checked', 'contenteditable', 'data-checklist-id'],
   });
 }

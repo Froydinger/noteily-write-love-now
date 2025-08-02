@@ -222,7 +222,7 @@ const NotePage = () => {
       </header>
       
       <div className="flex-grow">
-        <NoteEditor note={note} />
+        <NoteEditor note={note} updateNote={updateNote} />
       </div>
     </div>
   );
