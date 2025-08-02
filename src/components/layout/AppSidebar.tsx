@@ -122,10 +122,15 @@ export function AppSidebar() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
+                  className="btn-accessible h-8 w-8 rounded-full flex-shrink-0 relative"
                   title="Notifications"
                 >
                   <Bell className="h-4 w-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </Button>
               </NotificationsPanel>
             )}
@@ -275,7 +280,7 @@ export function AppSidebar() {
 
       {state === "collapsed" && (
         <SidebarContent className="pt-2">
-          <div className="px-2 mb-4 flex justify-center">
+          <div className="px-2 mb-4 flex flex-col gap-2 items-center">
             <Button 
               variant="outline" 
               size="sm"
@@ -285,6 +290,24 @@ export function AppSidebar() {
             >
               <Plus className="h-4 w-4" />
             </Button>
+            
+            {user && (
+              <NotificationsPanel>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="btn-accessible h-10 w-10 rounded-full relative"
+                  title="Notifications"
+                >
+                  <Bell className="h-4 w-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </Button>
+              </NotificationsPanel>
+            )}
           </div>
         </SidebarContent>
       )}
