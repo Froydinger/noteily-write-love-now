@@ -36,6 +36,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
+import { useNotifications } from "@/hooks/useNotifications";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function AppSidebar() {
@@ -46,6 +47,7 @@ export function AppSidebar() {
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { unreadCount } = useNotifications();
   const { state, toggleSidebar } = useSidebar();
   
   // Get initial accordion state from localStorage, default to closed
@@ -127,17 +129,33 @@ export function AppSidebar() {
             </NotificationsPanel>
           )}
           {!isMobile && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleSidebar}
-              className="sidebar-toggle h-8 w-8 p-0 rounded-full"
-              title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
-            >
-              {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
-            </Button>
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleSidebar}
+                className="sidebar-toggle h-8 w-8 p-0 rounded-full"
+                title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
+              >
+                {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
+              </Button>
+              {user && unreadCount > 0 && state === "collapsed" && (
+                <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </div>
+              )}
+            </div>
           )}
-          {isMobile && <SidebarTrigger />}
+          {isMobile && (
+            <div className="relative">
+              <SidebarTrigger />
+              {user && unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </SidebarHeader>
       
