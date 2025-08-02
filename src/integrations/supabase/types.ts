@@ -47,6 +47,45 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string
+          from_user_email: string | null
+          id: string
+          message: string
+          note_id: string | null
+          read: boolean
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_user_email?: string | null
+          id?: string
+          message: string
+          note_id?: string | null
+          read?: boolean
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          from_user_email?: string | null
+          id?: string
+          message?: string
+          note_id?: string | null
+          read?: boolean
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       shared_notes: {
         Row: {
           created_at: string
@@ -92,8 +131,6 @@ export type Database = {
         Row: {
           created_at: string
           daily_prompt_time: string | null
-          email_digest_frequency: string | null
-          email_notifications_enabled: boolean | null
           id: string
           notification_daily_prompt: boolean | null
           notification_note_shared: boolean | null
@@ -105,8 +142,6 @@ export type Database = {
         Insert: {
           created_at?: string
           daily_prompt_time?: string | null
-          email_digest_frequency?: string | null
-          email_notifications_enabled?: boolean | null
           id?: string
           notification_daily_prompt?: boolean | null
           notification_note_shared?: boolean | null
@@ -118,8 +153,6 @@ export type Database = {
         Update: {
           created_at?: string
           daily_prompt_time?: string | null
-          email_digest_frequency?: string | null
-          email_notifications_enabled?: boolean | null
           id?: string
           notification_daily_prompt?: boolean | null
           notification_note_shared?: boolean | null

@@ -15,7 +15,6 @@ import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart } from 'lucide-r
 import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { Input } from '@/components/ui/input';
-import { EmailNotificationSettings } from '@/components/notifications/EmailNotificationSettings';
 
 const SettingsPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -302,8 +301,6 @@ ${note.content}
             </div>
           </div>
           
-          {/* Email Notifications Section */}
-          {user && <EmailNotificationSettings />}
           
           <div className="bg-card rounded-lg p-4 border">
             <h2 className="text-lg font-medium mb-3 font-serif">Account</h2>

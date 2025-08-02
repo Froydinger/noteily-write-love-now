@@ -34,6 +34,8 @@ import { formatDistanceToNow } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import ThemeToggle from "@/components/theme/ThemeToggle";
+import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function AppSidebar() {
   const { notes, addNote, setCurrentNote, syncNotes } = useNotes();
@@ -42,6 +44,7 @@ export function AppSidebar() {
   const [searchTerm, setSearchTerm] = useState("");
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const { user } = useAuth();
   const { state, toggleSidebar } = useSidebar();
   
   // Get initial accordion state from localStorage, default to closed
@@ -251,6 +254,20 @@ export function AppSidebar() {
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
+          
+          {user && (
+            <NotificationsPanel>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
+                title="Notifications"
+              >
+                <span className="text-base">🐝</span>
+              </Button>
+            </NotificationsPanel>
+          )}
+          
           <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
             <ThemeToggle variant="settings" />
           </div>
