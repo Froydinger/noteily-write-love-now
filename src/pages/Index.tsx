@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotes } from '@/contexts/NoteContext';
+import { Note } from '@/contexts/NoteContext';
 import NoteCard from '@/components/notes/NoteCard';
 import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import PullToRefresh from 'react-simple-pull-to-refresh';
+import { ShareManager } from '@/components/notes/ShareManager';
 
 const Index = () => {
   const { user } = useAuth();
@@ -21,6 +23,7 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('latest');
   const [shareFilter, setShareFilter] = useState('all');
+  const [shareManagerNote, setShareManagerNote] = useState<Note | null>(null);
 
   const filteredAndSortedNotes = useMemo(() => {
     let filtered = notes.filter(note => {
@@ -65,6 +68,16 @@ const Index = () => {
 
   const handleRefresh = async () => {
     await syncNotes();
+  };
+
+  const handleShareClick = (note: Note) => {
+    setShareManagerNote(note);
+  };
+
+  const handleShareClose = () => {
+    setShareManagerNote(null);
+    // Refresh notes to get updated sharing state
+    syncNotes();
   };
 
   // Debug logging to track the race condition
@@ -155,10 +168,20 @@ const Index = () => {
                 animationFillMode: 'both'
               }}
             >
-              <NoteCard note={note} />
+              <NoteCard note={note} onShareClick={handleShareClick} />
             </div>
           ))}
         </div>
+        
+        {/* Share Manager */}
+        {shareManagerNote && (
+          <ShareManager
+            isOpen={!!shareManagerNote}
+            onClose={handleShareClose}
+            note={shareManagerNote}
+            onShareUpdate={handleShareClose}
+          />
+        )}
       </div>
     </div>
   );

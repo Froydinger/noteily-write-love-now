@@ -6,13 +6,18 @@ import type { NoteWithSharing } from '@/types/sharing';
 interface ShareStatusProps {
   note: NoteWithSharing;
   showText?: boolean;
+  onClick?: () => void;
 }
 
-export function ShareStatus({ note, showText = true }: ShareStatusProps) {
+export function ShareStatus({ note, showText = true, onClick }: ShareStatusProps) {
   // If user owns this note and it's shared with others, show "Shared" badge
   if (note.isOwnedByUser && note.shares && note.shares.length > 0) {
     return (
-      <Badge variant="outline" className="flex items-center gap-1">
+      <Badge 
+        variant="outline" 
+        className={`flex items-center gap-1 ${onClick ? 'cursor-pointer hover:bg-accent' : ''}`}
+        onClick={onClick ? (e) => { e.stopPropagation(); onClick(); } : undefined}
+      >
         <Users className="h-3 w-3" />
         {showText && `Shared with ${note.shares.length}`}
       </Badge>
@@ -22,7 +27,11 @@ export function ShareStatus({ note, showText = true }: ShareStatusProps) {
   // If this note is shared with the user (they don't own it), show shared status
   if (note.isSharedWithUser && !note.isOwnedByUser) {
     return (
-      <Badge variant="secondary" className="flex items-center gap-1">
+      <Badge 
+        variant="secondary" 
+        className={`flex items-center gap-1 ${onClick ? 'cursor-pointer hover:bg-accent' : ''}`}
+        onClick={onClick ? (e) => { e.stopPropagation(); onClick(); } : undefined}
+      >
         <Users className="h-3 w-3" />
         {note.userPermission === 'read' ? (
           <>
@@ -40,12 +49,20 @@ export function ShareStatus({ note, showText = true }: ShareStatusProps) {
   }
 
   // User owns this note and it's not shared with anyone - show share icon
-  return (
-    <Badge variant="outline" className="flex items-center gap-1">
-      <Users className="h-3 w-3" />
-      {showText && "Share"}
-    </Badge>
-  );
+  if (onClick) {
+    return (
+      <Badge 
+        variant="outline" 
+        className="flex items-center gap-1 cursor-pointer hover:bg-accent"
+        onClick={(e) => { e.stopPropagation(); onClick(); }}
+      >
+        <Users className="h-3 w-3" />
+        {showText && "Share"}
+      </Badge>
+    );
+  }
+  
+  return null;
 }
 
 interface SharePermissionIconProps {

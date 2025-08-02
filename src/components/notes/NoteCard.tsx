@@ -7,9 +7,10 @@ import { ShareStatus } from './ShareStatus';
 
 interface NoteCardProps {
   note: Note;
+  onShareClick?: (note: Note) => void;
 }
 
-export default function NoteCard({ note }: NoteCardProps) {
+export default function NoteCard({ note, onShareClick }: NoteCardProps) {
   const navigate = useNavigate();
   
   const contentPreview = note.content 
@@ -44,7 +45,10 @@ export default function NoteCard({ note }: NoteCardProps) {
       <CardContent className="p-4 transition-all duration-300 group-hover:translate-y-[-1px]">
         <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-primary transition-colors duration-300 mb-2">{note.title || "Untitled Note"}</h3>
         <div className="mb-3">
-          <ShareStatus note={note} />
+          <ShareStatus 
+            note={note} 
+            onClick={onShareClick ? () => onShareClick(note) : undefined}
+          />
         </div>
         <p className="text-sm text-muted-foreground line-clamp-4 group-hover:text-foreground/80 transition-colors duration-300">{truncatedContent}</p>
       </CardContent>
