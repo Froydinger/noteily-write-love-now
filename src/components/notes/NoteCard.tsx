@@ -3,7 +3,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { ShareStatus } from './ShareStatus';
+import { Button } from '@/components/ui/button';
+import { Users } from 'lucide-react';
 
 interface NoteCardProps {
   note: Note;
@@ -39,17 +40,26 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
 
   return (
     <Card 
-      className="h-full cursor-pointer group hover:border-primary/40 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-lg animate-float-in"
+      className="h-full cursor-pointer group hover:border-primary/40 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-lg animate-float-in relative"
       onClick={handleClick}
     >
+      {/* Share button in top right corner */}
+      {onShareClick && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-accent z-10"
+          onClick={(e) => {
+            e.stopPropagation();
+            onShareClick(note);
+          }}
+        >
+          <Users className="h-4 w-4" />
+        </Button>
+      )}
+      
       <CardContent className="p-4 transition-all duration-300 group-hover:translate-y-[-1px]">
-        <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-primary transition-colors duration-300 mb-2">{note.title || "Untitled Note"}</h3>
-        <div className="mb-3">
-          <ShareStatus 
-            note={note} 
-            onClick={onShareClick ? () => onShareClick(note) : undefined}
-          />
-        </div>
+        <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-primary transition-colors duration-300 mb-3">{note.title || "Untitled Note"}</h3>
         <p className="text-sm text-muted-foreground line-clamp-4 group-hover:text-foreground/80 transition-colors duration-300">{truncatedContent}</p>
       </CardContent>
       <CardFooter className="p-4 pt-0 text-xs text-muted-foreground transition-all duration-300 group-hover:text-muted-foreground/80">
