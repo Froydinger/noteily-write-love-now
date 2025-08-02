@@ -4,15 +4,20 @@ import { useNavigate } from 'react-router-dom';
 import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Users, Eye, Edit } from 'lucide-react';
+import type { NoteWithSharing } from '@/types/sharing';
 
 interface NoteCardProps {
-  note: Note;
-  onShareClick?: (note: Note) => void;
+  note: Note | NoteWithSharing;
+  onShareClick?: (note: Note | NoteWithSharing) => void;
 }
 
 export default function NoteCard({ note, onShareClick }: NoteCardProps) {
   const navigate = useNavigate();
+  
+  // Check if this note is shared with the user (they don't own it)
+  const isSharedWithUser = 'isSharedWithUser' in note && note.isSharedWithUser && !note.isOwnedByUser;
   
   const contentPreview = note.content 
     ? note.content
@@ -43,6 +48,21 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
       className="h-full cursor-pointer group hover:border-primary/40 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-lg animate-float-in relative"
       onClick={handleClick}
     >
+      {/* Shared note tag in top left corner */}
+      {isSharedWithUser && (
+        <Badge 
+          variant="secondary" 
+          className="absolute top-2 left-2 h-6 px-2 text-xs flex items-center gap-1 z-10"
+        >
+          {('userPermission' in note && note.userPermission === 'read') ? (
+            <Eye className="h-3 w-3" />
+          ) : (
+            <Edit className="h-3 w-3" />
+          )}
+          Shared
+        </Badge>
+      )}
+      
       {/* Share button in top right corner */}
       {onShareClick && (
         <Button
