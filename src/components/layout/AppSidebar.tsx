@@ -171,7 +171,15 @@ export function AppSidebar() {
                     >
                       <h3 className="text-sm font-medium truncate">{note.title || "Untitled Note"}</h3>
                       <p className="text-xs text-muted-foreground truncate">
-                        {note.content ? note.content.replace(/<[^>]*>?/gm, '').substring(0, 60) : "No content"}
+                        {note.content ? 
+                          note.content
+                            .replace(/<[^>]*>?/gm, '') // Remove HTML tags
+                            .replace(/&nbsp;/g, ' ') // Replace &nbsp; with spaces
+                            .replace(/&[a-z]+;/gi, ' ') // Replace other HTML entities with spaces
+                            .trim()
+                            .substring(0, 60) 
+                          : "No content"
+                        }
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}

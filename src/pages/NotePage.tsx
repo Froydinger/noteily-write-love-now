@@ -128,11 +128,6 @@ const NotePage = () => {
     }
   };
 
-  const handleInsertChecklist = () => {
-    // This will be handled by the NoteEditor component
-    const event = new CustomEvent('insertChecklist');
-    document.dispatchEvent(event);
-  };
   
   if (!note) {
     return <div className="p-8">Note not found</div>;
@@ -188,7 +183,6 @@ const NotePage = () => {
             <ExportMenu
               note={note}
               onShare={handleShare}
-              onInsertChecklist={handleInsertChecklist}
             />
             
             <AlertDialog>

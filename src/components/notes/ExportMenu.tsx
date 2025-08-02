@@ -11,11 +11,10 @@ import type { NoteWithSharing } from '@/types/sharing';
 interface ExportMenuProps {
   note: NoteWithSharing;
   onShare: () => void;
-  onInsertChecklist: () => void;
   onShareUpdate?: () => void;
 }
 
-export function ExportMenu({ note, onShare, onInsertChecklist, onShareUpdate }: ExportMenuProps) {
+export function ExportMenu({ note, onShare, onShareUpdate }: ExportMenuProps) {
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
   const [showShareManager, setShowShareManager] = useState(false);
@@ -44,16 +43,6 @@ export function ExportMenu({ note, onShare, onInsertChecklist, onShareUpdate }: 
 
   return (
     <>
-      {/* Checklist button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onInsertChecklist}
-        className="btn-accessible"
-        title="Insert checklist"
-      >
-        <ListChecks className="h-4 w-4" />
-      </Button>
       
       {/* Share dropdown */}
       <DropdownMenu>

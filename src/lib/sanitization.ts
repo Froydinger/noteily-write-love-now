@@ -3,7 +3,7 @@ import DOMPurify from 'dompurify';
 // Strict DOMPurify configuration for enhanced security
 const SANITIZE_CONFIG = {
   ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'img', 'div', 'span'],
-  ALLOWED_ATTR: ['src', 'alt', 'class', 'data-checklist-id', 'data-checklist-item', 'data-checked'],
+  ALLOWED_ATTR: ['src', 'alt', 'class'],
   ALLOW_DATA_ATTR: false, // We'll manually allow specific data attributes
   FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'button', 'textarea'],
   FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'style'],
@@ -57,113 +57,16 @@ export function sanitizeImageUrl(url: string, alt?: string): { url: string; alt:
   };
 }
 
-/**
- * Converts checklist HTML elements to safe data structure
- */
-export function convertChecklistsToData(htmlContent: string): string {
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = htmlContent;
-  
-  // Find all checklist containers
-  const checklistContainers = tempDiv.querySelectorAll('[data-checklist-id]');
-  
-  checklistContainers.forEach((container) => {
-    const checklistId = container.getAttribute('data-checklist-id');
-    const items: Array<{ text: string; checked: boolean }> = [];
-    
-    // Extract checklist items
-    const itemElements = container.querySelectorAll('[data-checklist-item]');
-    itemElements.forEach((item) => {
-      const textContent = item.textContent || '';
-      const isChecked = item.getAttribute('data-checked') === 'true';
-      items.push({ text: textContent.trim(), checked: isChecked });
-    });
-    
-    // Replace with safe data structure
-    const newContainer = document.createElement('div');
-    newContainer.className = 'checklist-container';
-    newContainer.setAttribute('data-checklist', JSON.stringify(items));
-    newContainer.setAttribute('data-checklist-id', checklistId || '');
-    
-    // Create visual representation
-    items.forEach((item, index) => {
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'checklist-item';
-      itemDiv.innerHTML = `
-        <span class="checklist-checkbox ${item.checked ? 'checked' : ''}" data-index="${index}">
-          ${item.checked ? '✓' : ''}
-        </span>
-        <span class="checklist-text ${item.checked ? 'checked' : ''}">${DOMPurify.sanitize(item.text, { ALLOWED_TAGS: [], KEEP_CONTENT: true })}</span>
-      `;
-      newContainer.appendChild(itemDiv);
-    });
-    
-    container.parentNode?.replaceChild(newContainer, container);
-  });
-  
-  return tempDiv.innerHTML;
-}
 
-/**
- * Restores checklist functionality from safe data structure
- */
-export function restoreChecklistsFromData(htmlContent: string): string {
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = htmlContent;
-  
-  // Find all checklist containers
-  const checklistContainers = tempDiv.querySelectorAll('[data-checklist]');
-  
-  checklistContainers.forEach((container) => {
-    const checklistData = container.getAttribute('data-checklist');
-    const checklistId = container.getAttribute('data-checklist-id');
-    
-    if (!checklistData) return;
-    
-    try {
-      const items: Array<{ text: string; checked: boolean }> = JSON.parse(checklistData);
-      
-      // Create interactive checklist HTML
-      const newContainer = document.createElement('div');
-      newContainer.className = 'checklist-container';
-      newContainer.setAttribute('data-checklist-id', checklistId || '');
-      
-      items.forEach((item, index) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'checklist-item';
-        itemDiv.setAttribute('data-checklist-item', 'true');
-        itemDiv.setAttribute('data-checked', item.checked.toString());
-        itemDiv.innerHTML = `
-          <input type="checkbox" ${item.checked ? 'checked' : ''} />
-          <span contenteditable="true">${DOMPurify.sanitize(item.text, { ALLOWED_TAGS: [], KEEP_CONTENT: true })}</span>
-        `;
-        newContainer.appendChild(itemDiv);
-      });
-      
-      container.parentNode?.replaceChild(newContainer, container);
-    } catch (e) {
-      console.warn('Failed to parse checklist data:', e);
-    }
-  });
-  
-  return tempDiv.innerHTML;
-}
 
 /**
  * Main content sanitization function
  */
-export function sanitizeContent(content: string, options: { preserveChecklists?: boolean } = {}): string {
+export function sanitizeContent(content: string): string {
   if (!content) return '';
   
-  let processedContent = content;
-  
-  // Convert checklists to safe data structure if preserving them
-  if (options.preserveChecklists) {
-    processedContent = convertChecklistsToData(processedContent);
-  }
-  
   // Apply strict DOMPurify sanitization
-  const sanitized = DOMPurify.sanitize(processedContent, SANITIZE_CONFIG);
+  const sanitized = DOMPurify.sanitize(content, SANITIZE_CONFIG);
   
   // Additional validation: remove any remaining script-like content
   const tempDiv = document.createElement('div');
@@ -183,18 +86,10 @@ export function sanitizeContent(content: string, options: { preserveChecklists?:
 }
 
 /**
- * Sanitize content for display (converts safe data back to interactive elements)
+ * Sanitize content for display
  */
 export function sanitizeForDisplay(content: string): string {
   if (!content) return '';
   
-  // First restore checklists from data
-  const withChecklists = restoreChecklistsFromData(content);
-  
-  // Then apply basic sanitization (more permissive for display)
-  return DOMPurify.sanitize(withChecklists, {
-    ...SANITIZE_CONFIG,
-    ALLOWED_TAGS: [...SANITIZE_CONFIG.ALLOWED_TAGS, 'input'],
-    ALLOWED_ATTR: [...SANITIZE_CONFIG.ALLOWED_ATTR, 'type', 'checked', 'contenteditable'],
-  });
+  return DOMPurify.sanitize(content, SANITIZE_CONFIG);
 }
