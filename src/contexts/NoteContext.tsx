@@ -722,32 +722,24 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // If it's a shared note, remove the share record (user's access)
         console.log('Attempting to remove share access for note:', id, 'user:', user.id, 'email:', user.email);
         
-        // First try by user_id, then by email if that fails
-        let { error } = await supabase
+        const { error, count } = await supabase
           .from('shared_notes')
-          .delete()
+          .delete({ count: 'exact' })
           .eq('note_id', id)
-          .eq('shared_with_user_id', user.id);
+          .or(`shared_with_user_id.eq.${user.id},shared_with_email.eq.${user.email}`);
 
-        // If no rows were affected (user_id didn't match), try by email
-        if (error || error === null) {
-          const { error: emailError, count } = await supabase
-            .from('shared_notes')
-            .delete({ count: 'exact' })
-            .eq('note_id', id)
-            .eq('shared_with_email', user.email);
-          
-          error = emailError;
-          console.log('Delete by email result:', { error: emailError, count });
-        }
+        console.log('Delete result:', { error, count });
 
         if (error) {
           console.error('Error removing note access:', error);
           // Revert optimistic update if there's an error
-          const noteToRestore = noteToDelete;
-          setNotes(prevNotes => [noteToRestore, ...prevNotes]);
+          setNotes(prevNotes => [noteToDelete, ...prevNotes]);
+        } else if (count === 0) {
+          console.error('No share record found to delete');
+          // Revert optimistic update if no records were deleted
+          setNotes(prevNotes => [noteToDelete, ...prevNotes]);
         } else {
-          console.log('Successfully removed share access for note:', id);
+          console.log('Successfully removed share access, deleted', count, 'records');
         }
       } else if (isOwner) {
         // Use soft delete function for owned notes
