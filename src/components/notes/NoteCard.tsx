@@ -19,6 +19,9 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
   // Check if this note is shared with the user (they don't own it)
   const isSharedWithUser = 'isSharedWithUser' in note && note.isSharedWithUser && !note.isOwnedByUser;
   
+  // Check if this note is shared by the user (they own it and have shared it with others)
+  const isSharedByUser = 'shares' in note && note.shares && note.shares.length > 0;
+  
   const contentPreview = note.content 
     ? note.content
         .replace(/<\/p>/gi, ' ') // Convert paragraph endings to spaces
@@ -53,7 +56,9 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
         <Button
           variant="ghost"
           size="sm"
-          className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-accent z-10"
+          className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${
+            isSharedByUser ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`}
           onClick={(e) => {
             e.stopPropagation();
             onShareClick(note);
