@@ -10,7 +10,8 @@ import {
   PanelLeftClose,
   PanelLeft,
   RefreshCw,
-  Trash2
+  Trash2,
+  Bell
 } from "lucide-react";
 import {
   Sidebar,
@@ -263,7 +264,7 @@ export function AppSidebar() {
                 className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
                 title="Notifications"
               >
-                <span className="text-base">🐝</span>
+                <Bell className="h-4 w-4" />
               </Button>
             </NotificationsPanel>
           )}

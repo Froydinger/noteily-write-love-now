@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { CheckCheck, Share2, Edit3 } from 'lucide-react';
+import { CheckCheck, Share2, Edit3, Bell } from 'lucide-react';
 
 interface NotificationsPanelProps {
   children: React.ReactNode;
@@ -60,7 +60,8 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
         <SheetHeader className="pb-4">
           <div className="flex items-center justify-between">
             <SheetTitle className="flex items-center gap-2">
-              🐝 Notifications
+              <Bell className="h-5 w-5" />
+              Notifications
               {unreadCount > 0 && (
                 <Badge variant="secondary" className="ml-auto">
                   {unreadCount} new
@@ -84,7 +85,7 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
         <ScrollArea className="h-[calc(100vh-120px)]">
           {notifications.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-4xl mb-4">🐝</div>
+              <Bell className="h-8 w-8 mx-auto mb-4 opacity-50" />
               <p className="text-muted-foreground text-sm">
                 No notifications yet
               </p>
