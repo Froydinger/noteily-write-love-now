@@ -139,47 +139,49 @@ export function AppSidebar() {
 
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton 
-                  asChild
-                  className={`px-4 py-2 rounded-full ${isActive('/') ? 'sidebar-nav-active' : ''}`}
-                >
-                  <a href="/" className="flex items-center gap-3 rounded-full">
-                    <BookOpen className="h-4 w-4" />
-                    <span className="font-medium">All Notes</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton 
-                  asChild
-                  className={`px-4 py-2 rounded-full ${isActive('/prompts') ? 'sidebar-nav-active' : ''}`}
-                >
-                  <a href="/prompts" className="flex items-center gap-3 rounded-full">
-                    <Pencil className="h-4 w-4" />
-                    <span className="font-medium">Writing Prompts</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
+            {/* Horizontal navigation buttons */}
+            <div className="flex gap-2 px-3 mb-3">
+              <Button
+                variant={isActive('/') ? 'default' : 'outline'}
+                size="sm"
+                asChild
+                className="flex-1 h-9 rounded-full font-medium"
+              >
+                <a href="/" className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  <span className="text-xs sm:text-sm">My Notes</span>
+                </a>
+              </Button>
+              <Button
+                variant={isActive('/prompts') ? 'default' : 'outline'}
+                size="sm"
+                asChild
+                className="flex-1 h-9 rounded-full font-medium"
+              >
+                <a href="/prompts" className="flex items-center gap-2">
+                  <Pencil className="h-4 w-4" />
+                  <span className="text-xs sm:text-sm">Prompts</span>
+                </a>
+              </Button>
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup className="py-4">
-          <Accordion 
-            type="single" 
-            collapsible 
-            value={recentNotesOpen ? "recent-notes" : undefined}
-            onValueChange={(value) => handleRecentNotesToggle(value === "recent-notes")}
-          >
-            <AccordionItem value="recent-notes" className="border-none">
-              <AccordionTrigger className="px-4 py-2 rounded-full hover:no-underline hover:bg-accent/50 transition-colors duration-200 font-medium text-foreground data-[state=closed]:mb-0">
-                <div className="flex items-center gap-3">
-                  <BookOpen className="h-4 w-4" />
-                  Recent Notes
-                </div>
-              </AccordionTrigger>
+        <SidebarGroup className="py-2">
+          <div className="px-3">
+            <Accordion 
+              type="single" 
+              collapsible 
+              value={recentNotesOpen ? "recent-notes" : undefined}
+              onValueChange={(value) => handleRecentNotesToggle(value === "recent-notes")}
+            >
+              <AccordionItem value="recent-notes" className="border-none">
+                <AccordionTrigger className="w-full px-4 py-2.5 rounded-full hover:no-underline hover:bg-accent/50 transition-colors duration-200 font-medium text-foreground data-[state=closed]:mb-0 h-9">
+                  <div className="flex items-center justify-center gap-3 w-full">
+                    <BookOpen className="h-4 w-4" />
+                    <span className="text-sm">Recent Notes</span>
+                  </div>
+                </AccordionTrigger>
               <AccordionContent className="pb-0">
                 <SidebarGroupContent>
                   <div className="h-[calc(100vh-320px)] overflow-y-auto">
@@ -233,6 +235,7 @@ export function AppSidebar() {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
+          </div>
         </SidebarGroup>
 
       </SidebarContent>
