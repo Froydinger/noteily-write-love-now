@@ -9,7 +9,7 @@ import { useSharedNotes } from '@/hooks/useSharedNotes';
 import { ShareStatus, SharePermissionIcon, ShareStatusText } from './ShareStatus';
 import { Loader2, UserPlus, Mail, Trash2, Users, UserX, AlertCircle } from 'lucide-react';
 import type { NoteWithSharing } from '@/types/sharing';
-import { useNotificationTriggers } from '@/hooks/useNotificationTriggers';
+
 
 interface ShareManagerProps {
   isOpen: boolean;
@@ -32,7 +32,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
     removeShare,
   } = useSharedNotes(note.id);
 
-  const { triggerNoteSharedNotification } = useNotificationTriggers();
+  
 
   // Load shares when dialog opens
   useEffect(() => {
@@ -65,14 +65,8 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
         permission
       });
 
-      if (result.success && result.data?.[0]?.shared_with_user_id) {
-        // Trigger notification if the user is registered
-        await triggerNoteSharedNotification(
-          note.id,
-          result.data[0].shared_with_user_id,
-          note.title || 'Untitled Note'
-        );
-        
+      if (result.success) {
+        // Email notification will be automatically triggered by database trigger
         setEmail('');
         setPermission('read');
         onShareUpdate?.();
