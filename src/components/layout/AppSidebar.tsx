@@ -242,6 +242,15 @@ export function AppSidebar() {
 
       <SidebarFooter className="px-5 py-4 border-t border-border/40">
         <div className="grid grid-cols-4 gap-2 w-full">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSync}
+            className="btn-accessible h-8 rounded-full"
+            title="Sync notes"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
           <ThemeToggle variant="settings" />
           <Button 
             variant="ghost" 
@@ -253,15 +262,6 @@ export function AppSidebar() {
             <a href="/recently-deleted">
               <Trash2 className="h-4 w-4" />
             </a>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSync}
-            className="btn-accessible h-8 rounded-full"
-            title="Sync notes"
-          >
-            <RefreshCw className="h-4 w-4" />
           </Button>
           <Button 
             variant="ghost" 
