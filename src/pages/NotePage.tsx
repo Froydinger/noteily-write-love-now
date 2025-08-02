@@ -131,7 +131,7 @@ const NotePage = () => {
   const handleInsertChecklist = () => {
     // This will be handled by the NoteEditor component
     const event = new CustomEvent('insertChecklist');
-    document.dispatchEvent(event);
+    window.dispatchEvent(event);
   };
   
   if (!note) {

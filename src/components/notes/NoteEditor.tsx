@@ -2,7 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Note } from '@/contexts/NoteContext';
 import { FeaturedImage } from './FeaturedImage';
 import { ImageUploadButton } from './ImageUploadButton';
-import { sanitizeImageUrl, sanitizeContent, sanitizeForDisplay } from '@/lib/sanitization';
+import { ChecklistTile, ChecklistData, ChecklistItem } from './ChecklistTile';
+import { sanitizeImageUrl } from '@/lib/sanitization';
 
 interface NoteEditorProps {
   note: Note;
@@ -10,10 +11,39 @@ interface NoteEditorProps {
   isReadOnly?: boolean;
 }
 
+interface ContentBlock {
+  id: string;
+  type: 'text' | 'checklist' | 'image';
+  data: any;
+}
+
 export function NoteEditor({ note, updateNote, isReadOnly = false }: NoteEditorProps) {
   const [title, setTitle] = useState(note.title);
+  const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>([]);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Initialize content blocks from note content
+  useEffect(() => {
+    if (note.content) {
+      try {
+        const blocks = JSON.parse(note.content);
+        if (Array.isArray(blocks)) {
+          setContentBlocks(blocks);
+          return;
+        }
+      } catch (e) {
+        // If not JSON, treat as legacy HTML content
+      }
+    }
+    
+    // Default to single text block
+    setContentBlocks([{
+      id: `text-${Date.now()}`,
+      type: 'text',
+      data: { html: note.content || '' }
+    }]);
+  }, [note.id]);
 
   // Auto-resize title textarea
   useEffect(() => {
@@ -55,291 +85,103 @@ export function NoteEditor({ note, updateNote, isReadOnly = false }: NoteEditorP
     }
   }, []);
 
-  // Update content when note changes
+  // Save content when blocks change
   useEffect(() => {
-    if (note.content !== undefined && contentRef.current) {
-      const currentContent = contentRef.current.innerHTML;
-      if (currentContent !== note.content) {
-        // Sanitize content for display (includes checklist restoration)
-        const sanitizedContent = sanitizeForDisplay(note.content);
-        contentRef.current.innerHTML = sanitizedContent;
-        
-        // Restore event handlers for any existing checklists
-        restoreChecklistHandlers();
-      }
-    }
-  }, [note.id]);
+    const saveTimeout = setTimeout(() => {
+      const content = JSON.stringify(contentBlocks);
+      updateNote(note.id, { content });
+    }, 500);
 
-  // Handle content updates with debounce
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    
-    const handleContentChange = () => {
-      if (contentRef.current) {
-        const content = contentRef.current.innerHTML;
-        
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          // Sanitize content before saving to database
-          const sanitizedContent = sanitizeContent(content, { preserveChecklists: true });
-          
-          // Only update if the content actually changed to avoid unnecessary re-renders
-          if (sanitizedContent !== note.content) {
-            updateNote(note.id, { content: sanitizedContent });
-          }
-        }, 500);
-      }
+    return () => clearTimeout(saveTimeout);
+  }, [contentBlocks, note.id, updateNote]);
+
+  const updateContentBlock = (blockId: string, newData: any) => {
+    setContentBlocks(blocks => 
+      blocks.map(block => 
+        block.id === blockId ? { ...block, data: newData } : block
+      )
+    );
+  };
+
+  const deleteContentBlock = (blockId: string) => {
+    setContentBlocks(blocks => blocks.filter(block => block.id !== blockId));
+  };
+
+  const insertChecklist = () => {
+    const newChecklist: ChecklistData = {
+      id: `checklist-${Date.now()}`,
+      items: [{
+        id: `item-${Date.now()}`,
+        text: '',
+        checked: false
+      }]
     };
 
-    const currentRef = contentRef.current;
-    
-    if (currentRef) {
-      currentRef.addEventListener('input', handleContentChange);
-    }
-    
-    return () => {
-      clearTimeout(timeout);
-      if (currentRef) {
-        currentRef.removeEventListener('input', handleContentChange);
-      }
+    const newBlock: ContentBlock = {
+      id: `block-${Date.now()}`,
+      type: 'checklist',
+      data: newChecklist
     };
-  }, [note.id, updateNote]);
 
-  // Handle image insertion at cursor position with validation
+    setContentBlocks(blocks => [...blocks, newBlock]);
+  };
+
   const insertImageAtCursor = (imageUrl: string) => {
-    if (!contentRef.current) return;
-
     try {
-      // Validate and sanitize the image URL
       const { url: sanitizedUrl, alt } = sanitizeImageUrl(imageUrl, 'Uploaded image');
       
-      const img = document.createElement('img');
-      img.src = sanitizedUrl;
-      img.alt = alt;
-      img.style.width = '50%';
-      img.style.height = 'auto';
-      img.style.display = 'block';
-      img.style.margin = '1rem auto';
-      img.style.borderRadius = '8px';
-      img.className = 'note-image';
-      img.setAttribute('data-image-id', Date.now().toString());
+      const newBlock: ContentBlock = {
+        id: `block-${Date.now()}`,
+        type: 'image',
+        data: {
+          url: sanitizedUrl,
+          alt,
+          style: {
+            width: '50%',
+            height: 'auto',
+            display: 'block',
+            margin: '1rem auto',
+            borderRadius: '8px'
+          }
+        }
+      };
 
-      const selection = window.getSelection();
-      const range = selection?.getRangeAt(0);
-
-      if (range && contentRef.current.contains(range.commonAncestorContainer)) {
-        range.deleteContents();
-        range.insertNode(img);
-        
-        // Move cursor after the image
-        range.setStartAfter(img);
-        range.collapse(true);
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-      } else {
-        // No selection, append to end
-        contentRef.current.appendChild(img);
-      }
-
-      // Trigger content change to save
-      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+      setContentBlocks(blocks => [...blocks, newBlock]);
     } catch (error) {
       console.error('Failed to insert image:', error);
     }
   };
 
-  // Handle paste events and strip formatting
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    
     const clipboardData = e.clipboardData;
     const pastedText = clipboardData.getData('text/plain');
     
-    // Insert plain text only
+    // Insert plain text into the current text block
     document.execCommand('insertText', false, pastedText);
   };
 
-  // Simple checklist insertion at cursor
-  const insertChecklistAtCursor = () => {
-    if (!contentRef.current) return;
-
-    const checklistId = `checklist-${Date.now()}`;
-    const checklistData = {
-      id: checklistId,
-      items: [{ text: '', checked: false }]
+  // Handle custom format commands
+  useEffect(() => {
+    const handleFormatCommand = (event: CustomEvent) => {
+      const { command } = event.detail;
+      
+      if (command === 'insertChecklist') {
+        insertChecklist();
+      }
     };
 
-    // Create a simple data marker that will be restored to interactive checklist
-    const dataMarker = document.createElement('div');
-    dataMarker.setAttribute('data-checklist', JSON.stringify(checklistData));
-    dataMarker.className = 'checklist-data';
-    dataMarker.textContent = '[Checklist]'; // Temporary placeholder
-
-    const selection = window.getSelection();
-    const range = selection?.getRangeAt(0);
-
-    if (range && contentRef.current.contains(range.commonAncestorContainer)) {
-      range.deleteContents();
-      range.insertNode(dataMarker);
-      
-      // Trigger content update to convert to interactive checklist
-      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-      
-      // Wait for update, then focus first input
-      setTimeout(() => {
-        const restored = contentRef.current?.querySelector(`[data-checklist-id="${checklistId}"] .checklist-input`) as HTMLInputElement;
-        restored?.focus();
-      }, 100);
-    }
-  };
-
-  // Simplified event handlers restoration
-  const restoreChecklistHandlers = () => {
-    if (!contentRef.current) return;
-
-    const checklists = contentRef.current.querySelectorAll('.checklist-container');
+    window.addEventListener('formatCommand', handleFormatCommand as EventListener);
     
-    checklists.forEach((container) => {
-      const items = container.querySelectorAll('.checklist-item');
-      
-      items.forEach((item) => {
-        const checkbox = item.querySelector('.checklist-checkbox') as HTMLButtonElement;
-        const textInput = item.querySelector('.checklist-input') as HTMLInputElement;
-        
-        if (checkbox && textInput) {
-          // Remove existing handlers to prevent duplicates
-          checkbox.onclick = null;
-          textInput.onkeydown = null;
-          textInput.oninput = null;
-          
-          // Add fresh event handlers
-          checkbox.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const isChecked = checkbox.classList.contains('checked');
-            
-            if (isChecked) {
-              checkbox.classList.remove('checked');
-              checkbox.style.background = 'transparent';
-              checkbox.style.color = 'transparent';
-              checkbox.innerHTML = '';
-              textInput.style.textDecoration = 'none';
-              textInput.style.color = 'hsl(var(--foreground))';
-            } else {
-              checkbox.classList.add('checked');
-              checkbox.style.background = 'hsl(var(--primary))';
-              checkbox.style.color = 'hsl(var(--primary-foreground))';
-              checkbox.innerHTML = '✓';
-              textInput.style.textDecoration = 'line-through';
-              textInput.style.color = 'hsl(var(--muted-foreground))';
-            }
+    return () => {
+      window.removeEventListener('formatCommand', handleFormatCommand as EventListener);
+    };
+  }, []);
 
-            // Trigger save
-            contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
-          };
-
-          textInput.onkeydown = (e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              if (textInput.value.trim()) {
-                // Add new item
-                addChecklistItem(container as HTMLElement, item as HTMLElement);
-              } else {
-                // Remove empty item or exit checklist
-                removeChecklistItem(container as HTMLElement, item as HTMLElement);
-              }
-            } else if (e.key === 'Backspace' && !textInput.value && textInput.selectionStart === 0) {
-              e.preventDefault();
-              removeChecklistItem(container as HTMLElement, item as HTMLElement);
-            }
-          };
-
-          textInput.oninput = () => {
-            contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
-          };
-        }
-      });
-    });
-  };
-
-  const addChecklistItem = (container: HTMLElement, afterItem: HTMLElement) => {
-    const newItemDiv = document.createElement('div');
-    newItemDiv.className = 'checklist-item';
-    newItemDiv.style.display = 'flex';
-    newItemDiv.style.alignItems = 'center';
-    newItemDiv.style.gap = '12px';
-    newItemDiv.style.marginBottom = '8px';
-    newItemDiv.style.padding = '4px 0';
-
-    const checkbox = document.createElement('button');
-    checkbox.className = 'checklist-checkbox';
-    checkbox.type = 'button';
-    checkbox.style.width = '18px';
-    checkbox.style.height = '18px';
-    checkbox.style.borderRadius = '50%';
-    checkbox.style.border = '2px solid hsl(var(--border))';
-    checkbox.style.background = 'transparent';
-    checkbox.style.color = 'transparent';
-    checkbox.style.cursor = 'pointer';
-    checkbox.style.flexShrink = '0';
-    checkbox.style.display = 'flex';
-    checkbox.style.alignItems = 'center';
-    checkbox.style.justifyContent = 'center';
-    checkbox.style.fontSize = '10px';
-    checkbox.style.fontWeight = '600';
-
-    const textInput = document.createElement('input');
-    textInput.className = 'checklist-input';
-    textInput.type = 'text';
-    textInput.placeholder = 'List item';
-    textInput.style.flex = '1';
-    textInput.style.border = 'none';
-    textInput.style.outline = 'none';
-    textInput.style.background = 'transparent';
-    textInput.style.fontSize = '0.875rem';
-    textInput.style.fontFamily = 'inherit';
-    textInput.style.color = 'hsl(var(--foreground))';
-
-    newItemDiv.appendChild(checkbox);
-    newItemDiv.appendChild(textInput);
-    
-    afterItem.parentNode?.insertBefore(newItemDiv, afterItem.nextSibling);
-    textInput.focus();
-    
-    // Restore handlers for new item
-    restoreChecklistHandlers();
-  };
-
-  const removeChecklistItem = (container: HTMLElement, item: HTMLElement) => {
-    const items = container.querySelectorAll('.checklist-item');
-    
-    if (items.length === 1) {
-      // Remove entire checklist if last item
-      container.remove();
-    } else {
-      // Focus previous item if available
-      const prevItem = item.previousElementSibling as HTMLElement;
-      const nextItem = item.nextElementSibling as HTMLElement;
-      
-      item.remove();
-      
-      if (prevItem?.classList.contains('checklist-item')) {
-        const input = prevItem.querySelector('.checklist-input') as HTMLInputElement;
-        input?.focus();
-      } else if (nextItem?.classList.contains('checklist-item')) {
-        const input = nextItem.querySelector('.checklist-input') as HTMLInputElement;
-        input?.focus();
-      }
-    }
-    
-    contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
-  };
-
-  // Handle custom insert checklist event
+  // Handle legacy insertChecklist event
   useEffect(() => {
     const handleInsertChecklist = () => {
-      insertChecklistAtCursor();
+      insertChecklist();
     };
 
     window.addEventListener('insertChecklist', handleInsertChecklist);
@@ -361,7 +203,7 @@ export function NoteEditor({ note, updateNote, isReadOnly = false }: NoteEditorP
           updateNote(note.id, { title: newTitle });
         }}
         placeholder="Untitled Note"
-        className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 dark:focus:ring-neon-blue resize-none overflow-hidden ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+        className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 resize-none overflow-hidden ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
         readOnly={isReadOnly}
         style={{ 
           minHeight: 'auto',
@@ -384,14 +226,56 @@ export function NoteEditor({ note, updateNote, isReadOnly = false }: NoteEditorP
         />
       )}
       
-      <div
-        ref={contentRef}
-        contentEditable={!isReadOnly}
-        className={`note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert min-h-[50vh] ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
-        data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
-        aria-label="Note content"
-        onPaste={isReadOnly ? undefined : handlePaste}
-      />
+      <div className="note-content">
+        {contentBlocks.map((block) => {
+          switch (block.type) {
+            case 'text':
+              return (
+                <div
+                  key={block.id}
+                  ref={contentRef}
+                  contentEditable={!isReadOnly}
+                  className={`note-editor prose prose-sm md:prose-base max-w-none focus:outline-none min-h-[50vh] ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+                  data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
+                  aria-label="Note content"
+                  onPaste={isReadOnly ? undefined : handlePaste}
+                  onInput={(e) => {
+                    if (!isReadOnly) {
+                      updateContentBlock(block.id, { html: e.currentTarget.innerHTML });
+                    }
+                  }}
+                  dangerouslySetInnerHTML={{ __html: block.data.html || '' }}
+                />
+              );
+            
+            case 'checklist':
+              return (
+                <ChecklistTile
+                  key={block.id}
+                  data={block.data}
+                  onChange={(newData) => updateContentBlock(block.id, newData)}
+                  onDelete={() => deleteContentBlock(block.id)}
+                  isReadOnly={isReadOnly}
+                />
+              );
+            
+            case 'image':
+              return (
+                <div key={block.id} className="my-4">
+                  <img
+                    src={block.data.url}
+                    alt={block.data.alt}
+                    style={block.data.style}
+                    className="note-image"
+                  />
+                </div>
+              );
+            
+            default:
+              return null;
+          }
+        })}
+      </div>
       
       {!isReadOnly && <ImageUploadButton onImageInsert={insertImageAtCursor} />}
     </div>
