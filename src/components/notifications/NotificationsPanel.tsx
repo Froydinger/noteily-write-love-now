@@ -61,13 +61,13 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
       
       <SheetContent side="right" className="w-80 sm:w-96 p-0">
         <SheetHeader className="p-4 border-b border-border/40">
-          <div className="flex items-center justify-between">
+          <div className="space-y-3">
             <SheetTitle className="flex items-center gap-3 text-lg font-serif">
               <Bell className="h-5 w-5" />
               Notifications
             </SheetTitle>
             {unreadCount > 0 && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between">
                 <Badge variant="secondary" className="text-xs">
                   {unreadCount} new
                 </Badge>
