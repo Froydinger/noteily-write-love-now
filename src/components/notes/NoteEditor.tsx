@@ -47,6 +47,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         // Sanitize content for display
         const sanitizedContent = sanitizeForDisplay(note.content);
         contentRef.current.innerHTML = sanitizedContent;
+        // Scroll to top of the editor when content loads
+        contentRef.current.scrollTop = 0;
       }
     }
   }, [note.id]);
