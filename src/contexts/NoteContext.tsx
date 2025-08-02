@@ -857,9 +857,11 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const syncNotes = async () => {
     await loadNotes();
+    // Also sync preferences to ensure theme/color is up to date across devices
+    window.dispatchEvent(new CustomEvent('refresh-preferences'));
     toast({
       title: "Notes synced",
-      description: "Your notes have been refreshed from the server.",
+      description: "Your notes and preferences have been refreshed from the server.",
     });
   };
 

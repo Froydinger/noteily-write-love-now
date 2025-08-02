@@ -11,6 +11,7 @@ interface UserPreferences {
 interface PreferencesContextType {
   preferences: UserPreferences;
   updateTheme: (theme: ThemeType) => Promise<void>;
+  refreshPreferences: () => Promise<void>;
   loading: boolean;
 }
 
@@ -30,56 +31,67 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [loading, setLoading] = useState(false);
 
   // Load user preferences - prioritize localStorage, sync with Supabase
-  useEffect(() => {
-    const loadPreferences = async () => {
-      // Always start with localStorage as primary source
-      const localTheme = (localStorage.getItem('theme') as ThemeType) || 'navy';
-      setPreferences({ theme: localTheme });
-      
-      // Apply theme immediately if not already applied
-      const html = document.documentElement;
-      if (!html.classList.contains(localTheme)) {
-        applyTheme(localTheme);
-      } else {
-        updateBrowserThemeColor(localTheme);
-      }
+  const loadPreferences = async () => {
+    // Always start with localStorage as primary source
+    const localTheme = (localStorage.getItem('theme') as ThemeType) || 'navy';
+    setPreferences({ theme: localTheme });
+    
+    // Apply theme immediately if not already applied
+    const html = document.documentElement;
+    if (!html.classList.contains(localTheme)) {
+      applyTheme(localTheme);
+    } else {
+      updateBrowserThemeColor(localTheme);
+    }
 
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        // Try to sync with Supabase for authenticated users
-        const { data, error } = await supabase
-          .from('user_preferences')
-          .select('theme')
-          .eq('user_id', user.id)
-          .single();
-
-        if (error && error.code !== 'PGRST116') {
-          // Error other than "not found" - keep local theme
-          console.error('Error loading preferences:', error);
-        } else if (data) {
-          // Check if Supabase theme differs from local
-          if (data.theme !== localTheme) {
-            // Supabase has different theme - use it and update localStorage
-            setPreferences({ theme: data.theme as ThemeType });
-            applyTheme(data.theme as ThemeType);
-          }
-        } else {
-          // No preferences found in Supabase - sync local to Supabase
-          await createDefaultPreferences(localTheme);
-        }
-      } catch (error) {
-        console.error('Error syncing preferences:', error);
-        // Keep local theme on error
-      }
-
+    if (!user) {
       setLoading(false);
+      return;
+    }
+
+    try {
+      // Try to sync with Supabase for authenticated users
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('theme')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        // Error other than "not found" - keep local theme
+        console.error('Error loading preferences:', error);
+      } else if (data) {
+        // Check if Supabase theme differs from local
+        if (data.theme !== localTheme) {
+          // Supabase has different theme - use it and update localStorage
+          setPreferences({ theme: data.theme as ThemeType });
+          applyTheme(data.theme as ThemeType);
+        }
+      } else {
+        // No preferences found in Supabase - sync local to Supabase
+        await createDefaultPreferences(localTheme);
+      }
+    } catch (error) {
+      console.error('Error syncing preferences:', error);
+      // Keep local theme on error
+    }
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadPreferences();
+
+    // Listen for sync events from NoteContext
+    const handleRefreshPreferences = () => {
+      loadPreferences();
     };
 
-    loadPreferences();
+    window.addEventListener('refresh-preferences', handleRefreshPreferences);
+    
+    return () => {
+      window.removeEventListener('refresh-preferences', handleRefreshPreferences);
+    };
   }, [user]);
 
   const createDefaultPreferences = async (theme: ThemeType = 'navy') => {
@@ -134,6 +146,11 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   };
 
+  const refreshPreferences = async () => {
+    if (!user) return;
+    await loadPreferences();
+  };
+
   const applyTheme = (theme: ThemeType) => {
     const html = document.documentElement;
     
@@ -186,7 +203,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   return (
-    <PreferencesContext.Provider value={{ preferences, updateTheme, loading }}>
+    <PreferencesContext.Provider value={{ preferences, updateTheme, refreshPreferences, loading }}>
       {children}
     </PreferencesContext.Provider>
   );
