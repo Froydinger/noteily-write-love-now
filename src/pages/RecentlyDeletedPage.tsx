@@ -74,26 +74,26 @@ export default function RecentlyDeletedPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="flex items-center gap-4 mb-8">
+    <div className="container mx-auto px-4 py-4 sm:py-8 max-w-4xl min-h-screen">
+      <div className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-8">
         <Link to="/">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
+            <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </Link>
-        <div>
-          <h1 className="text-3xl font-bold">Recently Deleted</h1>
-          <p className="text-muted-foreground mt-1">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-3xl font-bold truncate">Recently Deleted</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Notes are automatically deleted after 7 days
           </p>
         </div>
       </div>
 
       {deletedNotes.length === 0 ? (
-        <div className="text-center py-12">
-          <Trash2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-xl font-medium mb-2">No deleted notes</h3>
-          <p className="text-muted-foreground">
+        <div className="text-center py-8 sm:py-12">
+          <Trash2 className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg sm:text-xl font-medium mb-2">No deleted notes</h3>
+          <p className="text-muted-foreground text-sm sm:text-base px-4">
             When you delete notes, they'll appear here for 7 days before being permanently removed.
           </p>
         </div>
@@ -105,45 +105,46 @@ export default function RecentlyDeletedPage() {
             
             return (
               <Card key={note.id} className="transition-all hover:shadow-md">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
+                <CardHeader className="pb-3 p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg truncate">
+                      <CardTitle className="text-base sm:text-lg truncate">
                         {note.title || 'Untitled Note'}
                       </CardTitle>
-                      <CardDescription className="mt-1">
+                      <CardDescription className="mt-1 text-sm">
                         Deleted {deletedAgo} • {daysRemaining} day{daysRemaining !== 1 ? 's' : ''} remaining
                       </CardDescription>
                     </div>
-                    <div className="flex items-center gap-2 ml-4">
+                    <div className="flex items-center gap-2 sm:ml-4 flex-shrink-0">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleRestore(note.id, note.title)}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm h-8 sm:h-9"
                       >
-                        <RotateCcw className="h-4 w-4" />
-                        Restore
+                        <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Restore</span>
+                        <span className="sm:hidden">↺</span>
                       </Button>
                       
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
-                            <Trash2 className="h-4 w-4" />
+                          <Button variant="outline" size="sm" className="text-destructive hover:text-destructive h-8 w-8 sm:h-9 sm:w-9 p-0">
+                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="max-w-[90vw] sm:max-w-md">
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete permanently?</AlertDialogTitle>
-                            <AlertDialogDescription>
+                            <AlertDialogTitle className="text-base sm:text-lg">Delete permanently?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-sm">
                               This will permanently delete "{note.title || 'Untitled Note'}" and it cannot be recovered.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                            <AlertDialogCancel className="text-sm">Cancel</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handlePermanentDelete(note.id, note.title)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 text-sm"
                             >
                               Delete permanently
                             </AlertDialogAction>
@@ -155,9 +156,9 @@ export default function RecentlyDeletedPage() {
                 </CardHeader>
                 
                 {note.content && (
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {truncateContent(note.content.replace(/<[^>]*>/g, ''))}
+                  <CardContent className="pt-0 p-4 sm:p-6">
+                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3">
+                      {truncateContent(note.content.replace(/<[^>]*>/g, ''), 120)}
                     </p>
                   </CardContent>
                 )}
@@ -168,12 +169,12 @@ export default function RecentlyDeletedPage() {
       )}
       
       {deletedNotes.length > 0 && (
-        <div className="mt-8 p-4 bg-muted/50 rounded-lg">
-          <div className="flex items-start gap-3">
-            <div className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5">
+        <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-muted/50 rounded-lg">
+          <div className="flex items-start gap-2 sm:gap-3">
+            <div className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0 mt-0.5">
               ℹ️
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xs sm:text-sm text-muted-foreground">
               <p className="font-medium mb-1">About recently deleted notes:</p>
               <ul className="space-y-1 list-disc list-inside">
                 <li>Notes are kept for 7 days after deletion</li>

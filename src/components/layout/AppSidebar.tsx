@@ -240,22 +240,24 @@ export function AppSidebar() {
 
       </SidebarContent>
 
-      <SidebarFooter className="px-5 py-4 border-t border-border/40">
-        <div className="grid grid-cols-4 gap-2 w-full">
+      <SidebarFooter className="px-4 py-4 border-t border-border/40">
+        <div className="flex justify-between w-full">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleSync}
-            className="btn-accessible h-8 rounded-full"
+            className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
             title="Sync notes"
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
-          <ThemeToggle variant="settings" />
+          <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
+            <ThemeToggle variant="settings" />
+          </div>
           <Button 
             variant="ghost" 
             size="sm"
-            className={`btn-accessible h-8 rounded-full ${isActive('/recently-deleted') ? 'sidebar-menu-active' : ''}`}
+            className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/recently-deleted') ? 'sidebar-menu-active' : ''}`}
             asChild
             title="Recently Deleted"
           >
@@ -266,7 +268,7 @@ export function AppSidebar() {
           <Button 
             variant="ghost" 
             size="sm"
-            className={`btn-accessible h-8 rounded-full ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
+            className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
             asChild
             title="Settings"
           >
