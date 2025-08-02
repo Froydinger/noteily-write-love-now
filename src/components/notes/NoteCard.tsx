@@ -48,21 +48,6 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
       className="h-full cursor-pointer group hover:border-primary/40 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-lg animate-float-in relative"
       onClick={handleClick}
     >
-      {/* Shared note tag in top left corner */}
-      {isSharedWithUser && (
-        <Badge 
-          variant="secondary" 
-          className="absolute top-2 left-2 h-6 px-2 text-xs flex items-center gap-1 z-10"
-        >
-          {('userPermission' in note && note.userPermission === 'read') ? (
-            <Eye className="h-3 w-3" />
-          ) : (
-            <Edit className="h-3 w-3" />
-          )}
-          Shared
-        </Badge>
-      )}
-      
       {/* Share button in top right corner */}
       {onShareClick && (
         <Button
@@ -79,6 +64,20 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
       )}
       
       <CardContent className="p-4 transition-all duration-300 group-hover:translate-y-[-1px]">
+        {/* Shared note tag at top of content */}
+        {isSharedWithUser && (
+          <Badge 
+            variant="secondary" 
+            className="h-6 px-2 text-xs flex items-center gap-1 mb-3 w-fit"
+          >
+            {('userPermission' in note && note.userPermission === 'read') ? (
+              <Eye className="h-3 w-3" />
+            ) : (
+              <Edit className="h-3 w-3" />
+            )}
+            Shared
+          </Badge>
+        )}
         <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-primary transition-colors duration-300 mb-3">{note.title || "Untitled Note"}</h3>
         <p className="text-sm text-muted-foreground line-clamp-4 group-hover:text-foreground/80 transition-colors duration-300">{truncatedContent}</p>
       </CardContent>
