@@ -176,15 +176,14 @@ const NotePage = () => {
           </div>
           
           <div className="flex items-center gap-1">
-            {/* Show persistent people icon when note is shared */}
-            {((note.isOwnedByUser && note.shares && note.shares.length > 0) || 
-              (note.isSharedWithUser && !note.isOwnedByUser)) && (
+            {/* Show people icon for owned notes (to share) or shared notes (to manage) */}
+            {(note.isOwnedByUser || (note.isSharedWithUser && !note.isOwnedByUser)) && (
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setShowShareManager(true)}
                 className="btn-accessible p-2"
-                title="Manage sharing"
+                title={note.isOwnedByUser ? "Share note" : "Manage sharing"}
               >
                 <Users className="h-4 w-4" />
               </Button>
