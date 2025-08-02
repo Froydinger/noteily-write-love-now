@@ -42,8 +42,8 @@ export default function NoteCard({ note }: NoteCardProps) {
       onClick={handleClick}
     >
       <CardContent className="p-4 transition-all duration-300 group-hover:translate-y-[-1px]">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-primary transition-colors duration-300 flex-1">{note.title || "Untitled Note"}</h3>
+        <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-primary transition-colors duration-300 mb-2">{note.title || "Untitled Note"}</h3>
+        <div className="mb-3">
           <ShareStatus note={note} />
         </div>
         <p className="text-sm text-muted-foreground line-clamp-4 group-hover:text-foreground/80 transition-colors duration-300">{truncatedContent}</p>
