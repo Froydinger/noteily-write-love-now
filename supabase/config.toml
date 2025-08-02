@@ -1,1 +1,10 @@
 project_id = "viidccjyjeipulbqqwua"
+
+[functions.push-notifications]
+verify_jwt = false
+
+[functions.manage-push-subscription]
+verify_jwt = false
+
+[functions.trigger-share-notification]
+verify_jwt = false

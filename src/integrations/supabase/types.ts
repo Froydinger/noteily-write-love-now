@@ -47,6 +47,42 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth_key: string
+          created_at: string
+          device_name: string | null
+          endpoint: string
+          id: string
+          p256dh_key: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth_key: string
+          created_at?: string
+          device_name?: string | null
+          endpoint: string
+          id?: string
+          p256dh_key: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth_key?: string
+          created_at?: string
+          device_name?: string | null
+          endpoint?: string
+          id?: string
+          p256dh_key?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       shared_notes: {
         Row: {
           created_at: string
@@ -91,21 +127,33 @@ export type Database = {
       user_preferences: {
         Row: {
           created_at: string
+          daily_prompt_time: string | null
           id: string
+          notification_daily_prompt: boolean | null
+          notification_note_shared: boolean | null
+          notification_note_updated: boolean | null
           theme: string
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          daily_prompt_time?: string | null
           id?: string
+          notification_daily_prompt?: boolean | null
+          notification_note_shared?: boolean | null
+          notification_note_updated?: boolean | null
           theme?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          daily_prompt_time?: string | null
           id?: string
+          notification_daily_prompt?: boolean | null
+          notification_note_shared?: boolean | null
+          notification_note_updated?: boolean | null
           theme?: string
           updated_at?: string
           user_id?: string

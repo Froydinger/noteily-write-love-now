@@ -77,7 +77,11 @@ export default defineConfig(({ mode }) => ({
               }
             }
           }
-        ]
+        ],
+        additionalManifestEntries: [
+          { url: '/sw-push.js', revision: '1' }
+        ],
+        importScripts: ['/sw-push.js']
       }
     })
   ].filter(Boolean),
