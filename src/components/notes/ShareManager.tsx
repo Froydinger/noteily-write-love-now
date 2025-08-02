@@ -90,7 +90,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg w-[95vw] max-h-[85vh] overflow-hidden flex flex-col p-4 sm:p-6">
+      <DialogContent className="sm:max-w-lg w-[95vw] max-h-[85vh] overflow-hidden flex flex-col p-4 sm:p-6 rounded-xl">
         <DialogHeader className="flex-shrink-0 pb-3">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Users className="h-5 w-5" />
