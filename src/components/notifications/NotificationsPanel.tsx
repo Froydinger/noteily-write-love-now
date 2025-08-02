@@ -95,40 +95,44 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
                 </p>
               </div>
             ) : (
-              <div className="space-y-1">
+              <div className="space-y-3">
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm ${
-                      !notification.read ? 'sidebar-menu-active' : 'hover:bg-accent/50'
+                    className={`p-4 rounded-xl cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm border ${
+                      !notification.read 
+                        ? 'bg-primary/5 border-primary/20 shadow-sm' 
+                        : 'bg-background border-border/60 hover:bg-accent/30'
                     }`}
                     onClick={() => handleNotificationClick(notification)}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 mt-0.5">
+                      <div className="flex-shrink-0 mt-1">
                         {getNotificationIcon(notification.type)}
                       </div>
                       
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-sm font-medium truncate">{notification.title}</h3>
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="text-sm font-semibold text-foreground leading-tight">
+                            {notification.title}
+                          </h3>
                           {!notification.read && (
-                            <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
+                            <div className="w-2.5 h-2.5 bg-primary rounded-full flex-shrink-0 mt-1" />
                           )}
                         </div>
                         
-                        <p className="text-xs text-muted-foreground truncate mb-2">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
                           {notification.message}
                         </p>
                         
-                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <span>
+                        <div className="flex items-center justify-between pt-1">
+                          <span className="text-xs text-muted-foreground font-medium">
                             {formatDistanceToNow(new Date(notification.created_at), { 
                               addSuffix: true 
                             })}
                           </span>
                           {notification.from_user_email && (
-                            <span className="truncate max-w-24">
+                            <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-md truncate max-w-32">
                               {notification.from_user_email}
                             </span>
                           )}
