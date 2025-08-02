@@ -132,6 +132,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                       onKeyPress={handleKeyPress}
                       disabled={isAdding}
                       className="h-10"
+                      autoFocus={false}
                     />
                   </div>
 
