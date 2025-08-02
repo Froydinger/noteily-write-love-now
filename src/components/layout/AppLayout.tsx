@@ -83,7 +83,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <SidebarProvider>
         <div className="flex min-h-screen w-full">
           <AppSidebar />
-          <main className="flex-1 overflow-y-auto md:pl-6">
+          <main className="flex-1 overflow-y-auto md:pl-6 lg:pl-8 xl:pl-10">
             {children}
           </main>
         </div>
