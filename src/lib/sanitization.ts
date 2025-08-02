@@ -129,12 +129,14 @@ export function restoreChecklistsFromData(htmlContent: string): string {
     try {
       const items: Array<{ text: string; checked: boolean }> = JSON.parse(checklistData);
       
-      // Create interactive checklist HTML
+      // Create interactive checklist HTML (exactly matching NoteEditor.tsx structure)
       const newContainer = document.createElement('div');
       newContainer.className = 'checklist-container';
+      newContainer.contentEditable = 'false';
+      newContainer.style.margin = '1rem 0';
       newContainer.setAttribute('data-checklist-id', checklistId || '');
       
-      items.forEach((item, index) => {
+      items.forEach((item) => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'checklist-item';
         itemDiv.style.display = 'flex';
@@ -143,7 +145,7 @@ export function restoreChecklistsFromData(htmlContent: string): string {
         itemDiv.style.marginBottom = '8px';
         itemDiv.style.padding = '4px 0';
 
-        // Create checkbox button (matching NoteEditor structure)
+        // Create checkbox button (exactly matching NoteEditor structure)
         const checkbox = document.createElement('button');
         checkbox.className = 'checklist-checkbox';
         checkbox.type = 'button';
@@ -155,30 +157,27 @@ export function restoreChecklistsFromData(htmlContent: string): string {
         checkbox.style.color = item.checked ? 'hsl(var(--primary-foreground))' : 'transparent';
         checkbox.style.cursor = 'pointer';
         checkbox.style.flexShrink = '0';
-        checkbox.style.transition = 'all 0.2s ease';
         checkbox.style.display = 'flex';
         checkbox.style.alignItems = 'center';
         checkbox.style.justifyContent = 'center';
         checkbox.style.fontSize = '10px';
-        checkbox.style.fontWeight = '500';
+        checkbox.style.fontWeight = '600';
         checkbox.innerHTML = item.checked ? '✓' : '';
 
-        // Create text input (matching NoteEditor structure)
+        // Create text input (exactly matching NoteEditor structure)
         const textInput = document.createElement('input');
         textInput.className = 'checklist-input';
         textInput.type = 'text';
         textInput.value = item.text;
+        textInput.placeholder = 'List item';
         textInput.style.flex = '1';
-        textInput.style.outline = 'none';
-        textInput.style.minHeight = '1.5em';
-        textInput.style.lineHeight = '1.5';
-        textInput.style.color = item.checked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
-        textInput.style.backgroundColor = 'transparent';
         textInput.style.border = 'none';
+        textInput.style.outline = 'none';
+        textInput.style.background = 'transparent';
         textInput.style.fontSize = 'inherit';
         textInput.style.fontFamily = 'inherit';
+        textInput.style.color = item.checked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
         textInput.style.textDecoration = item.checked ? 'line-through' : 'none';
-        textInput.placeholder = 'Add checklist item...';
 
         itemDiv.appendChild(checkbox);
         itemDiv.appendChild(textInput);
