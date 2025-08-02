@@ -51,7 +51,7 @@ export const PWAUpdateNotification = () => {
     
     toast({
       title: "Updating...",
-      description: "The app is being updated to the latest version.",
+      description: "Close and reopen the web app or refresh your browser to finish the update.",
     });
     
     setShowUpdatePrompt(false);
@@ -78,7 +78,7 @@ export const PWAUpdateNotification = () => {
           </Button>
         </div>
         <CardDescription>
-          A new version of Noteily is available. Update now to get the latest features.
+          A new version of Noteily is available. Click update, then close and reopen the app or refresh your browser to finish.
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">

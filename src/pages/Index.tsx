@@ -89,7 +89,7 @@ const Index = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             {(isMobile || state === "collapsed") && <SidebarTrigger />}
-            <h1 className="text-2xl font-serif font-medium">All Notes</h1>
+            <h1 className="text-2xl font-serif font-medium">My Notes</h1>
           </div>
           
           <Button 
