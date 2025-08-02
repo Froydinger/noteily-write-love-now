@@ -126,10 +126,10 @@ export function AppSidebar() {
       </SidebarHeader>
       
       <SidebarContent className="pt-2">
-        <div className="px-4 py-2 mb-2">
+        <div className="px-4 mb-4">
           <Button 
             variant="outline" 
-            className="w-full justify-start gap-3 py-5 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md rounded-full"
+            className="w-full justify-start gap-3 h-10 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md rounded-full"
             onClick={handleCreateNote}
           >
             <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
@@ -140,7 +140,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             {/* Horizontal navigation buttons */}
-            <div className="flex gap-2 px-3 mb-3">
+            <div className="flex gap-2 px-4 mb-4">
               <Button
                 variant={isActive('/') ? 'default' : 'outline'}
                 size="sm"
@@ -168,7 +168,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup className="py-2">
-          <div className="px-3">
+          <div className="px-4">
             <Accordion 
               type="single" 
               collapsible 
