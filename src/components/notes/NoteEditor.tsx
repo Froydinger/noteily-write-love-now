@@ -42,14 +42,17 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     setTitle(note.title);
     if (contentRef.current) {
       // Only update content if it's actually different to avoid removing event handlers
-      // Always restore content with proper sanitization and checklist formatting
-      const sanitizedContent = sanitizeForDisplay(note.content);
-      contentRef.current.innerHTML = sanitizedContent;
-      
-      // Restore event handlers for any existing checklists
-      restoreChecklistHandlers();
+      const currentContent = contentRef.current.innerHTML;
+      if (currentContent !== note.content) {
+        // Sanitize content for display (includes checklist restoration)
+        const sanitizedContent = sanitizeForDisplay(note.content);
+        contentRef.current.innerHTML = sanitizedContent;
+        
+        // Restore event handlers for any existing checklists
+        restoreChecklistHandlers();
+      }
     }
-  }, [note.id, note.content]);
+  }, [note.id]);
 
 
   // Handle content updates with debounce
