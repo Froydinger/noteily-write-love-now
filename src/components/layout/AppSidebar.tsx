@@ -143,7 +143,7 @@ export function AppSidebar() {
             {isMobile && <SidebarTrigger />}
           </div>
         )}
-        {state === "collapsed" && !isMobile && (
+        {state === "collapsed" && isMobile && (
           <Button
             variant="ghost"
             size="sm"
