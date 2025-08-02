@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
@@ -22,6 +22,7 @@ import {
 import { useIsMobile } from '@/hooks/use-mobile';
 import { FeaturedImageUpload } from '@/components/notes/FeaturedImageUpload';
 import { ExportMenu } from '@/components/notes/ExportMenu';
+import { ShareManager } from '@/components/notes/ShareManager';
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,6 +31,7 @@ const NotePage = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { state, toggleSidebar } = useSidebar();
+  const [showShareManager, setShowShareManager] = useState(false);
   
   const note = getNote(id || '');
   
@@ -174,6 +176,20 @@ const NotePage = () => {
           </div>
           
           <div className="flex items-center gap-1">
+            {/* Show persistent people icon when note is shared */}
+            {((note.isOwnedByUser && note.shares && note.shares.length > 0) || 
+              (note.isSharedWithUser && !note.isOwnedByUser)) && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowShareManager(true)}
+                className="btn-accessible p-2"
+                title="Manage sharing"
+              >
+                <Users className="h-4 w-4" />
+              </Button>
+            )}
+            
             <FeaturedImageUpload 
               noteId={note.id}
               onImageSet={handleFeaturedImageSet}
@@ -218,6 +234,20 @@ const NotePage = () => {
       <div className="flex-grow">
         <NoteEditor note={note} />
       </div>
+      
+      {/* Share Manager - now accessible from persistent people icon */}
+      {showShareManager && (
+        <ShareManager
+          isOpen={showShareManager}
+          onClose={() => setShowShareManager(false)}
+          note={note}
+          onShareUpdate={() => {
+            setShowShareManager(false);
+            // Force re-render to update note sharing state
+            window.location.reload();
+          }}
+        />
+      )}
     </div>
   );
 };
