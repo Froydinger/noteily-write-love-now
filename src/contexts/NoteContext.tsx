@@ -722,24 +722,35 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // If it's a shared note, remove the share record (user's access)
         console.log('Attempting to remove share access for note:', id, 'user:', user.id, 'email:', user.email);
         
-        const { error, count } = await supabase
+        // Get the specific share record first to debug
+        const { data: shareRecords } = await supabase
           .from('shared_notes')
-          .delete({ count: 'exact' })
+          .select('*')
           .eq('note_id', id)
           .or(`shared_with_user_id.eq.${user.id},shared_with_email.eq.${user.email}`);
+        
+        console.log('Found share records to delete:', shareRecords);
+        
+        if (shareRecords && shareRecords.length > 0) {
+          // Delete by specific ID to be precise
+          const { error, count } = await supabase
+            .from('shared_notes')
+            .delete({ count: 'exact' })
+            .eq('id', shareRecords[0].id);
 
-        console.log('Delete result:', { error, count });
+          console.log('Delete result:', { error, count, deletedId: shareRecords[0].id });
 
-        if (error) {
-          console.error('Error removing note access:', error);
-          // Revert optimistic update if there's an error
-          setNotes(prevNotes => [noteToDelete, ...prevNotes]);
-        } else if (count === 0) {
-          console.error('No share record found to delete');
-          // Revert optimistic update if no records were deleted
-          setNotes(prevNotes => [noteToDelete, ...prevNotes]);
+          if (error || count === 0) {
+            console.error('Error removing note access:', error);
+            // Revert optimistic update
+            setNotes(prevNotes => [noteToDelete, ...prevNotes]);
+          } else {
+            console.log('Successfully removed share access');
+          }
         } else {
-          console.log('Successfully removed share access, deleted', count, 'records');
+          console.log('No share records found for this user and note');
+          // Revert optimistic update
+          setNotes(prevNotes => [noteToDelete, ...prevNotes]);
         }
       } else if (isOwner) {
         // Use soft delete function for owned notes
