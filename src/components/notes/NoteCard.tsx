@@ -56,9 +56,7 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
         <Button
           variant="ghost"
           size="sm"
-          className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${
-            isSharedByUser ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-          }`}
+          className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-accent z-10"
           onClick={(e) => {
             e.stopPropagation();
             onShareClick(note);
@@ -69,7 +67,7 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
       )}
       
       <CardContent className="p-4 transition-all duration-300 group-hover:translate-y-[-1px]">
-        {/* Shared note tag at top of content */}
+        {/* Shared note tags at top of content */}
         {isSharedWithUser && (
           <Badge 
             variant="secondary" 
@@ -80,7 +78,17 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
             ) : (
               <Edit className="h-3 w-3" />
             )}
-            Shared
+            Shared with me
+          </Badge>
+        )}
+        
+        {isSharedByUser && (
+          <Badge 
+            variant="secondary" 
+            className="h-6 px-2 text-xs flex items-center gap-1 mb-3 w-fit"
+          >
+            <Users className="h-3 w-3" />
+            I shared
           </Badge>
         )}
         <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-primary transition-colors duration-300 mb-3">{note.title || "Untitled Note"}</h3>
