@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Download, Share, ListChecks, Loader2, Users } from 'lucide-react';
+import { Download, Share, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { exportNoteToPDF, type NoteForExport } from '@/lib/pdfExport';
-import { ShareManager } from './ShareManager';
 import { useAuth } from '@/contexts/AuthContext';
 import type { NoteWithSharing } from '@/types/sharing';
 
@@ -17,7 +16,6 @@ interface ExportMenuProps {
 export function ExportMenu({ note, onShare, onShareUpdate }: ExportMenuProps) {
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
-  const [showShareManager, setShowShareManager] = useState(false);
 
   const handlePDFExport = async () => {
     if (isExporting) return;
@@ -57,13 +55,9 @@ export function ExportMenu({ note, onShare, onShareUpdate }: ExportMenuProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="z-50 bg-popover border shadow-lg">
-          <DropdownMenuItem onClick={() => setShowShareManager(true)}>
-            <Users className="h-4 w-4 mr-2" />
-            {note.isOwnedByUser ? 'Manage Sharing' : 'View Sharing Info'}
-          </DropdownMenuItem>
           <DropdownMenuItem onClick={onShare}>
             <Share className="h-4 w-4 mr-2" />
-            Share w/ Other
+            Copy & Share
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handlePDFExport} disabled={isExporting}>
             {isExporting ? (
@@ -76,13 +70,6 @@ export function ExportMenu({ note, onShare, onShareUpdate }: ExportMenuProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Share Manager */}
-      <ShareManager
-        isOpen={showShareManager}
-        onClose={() => setShowShareManager(false)}
-        note={note}
-        onShareUpdate={onShareUpdate}
-      />
     </>
   );
 }
