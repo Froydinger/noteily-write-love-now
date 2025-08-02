@@ -109,8 +109,8 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar>
-      <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 md:pt-6 gap-0">
+    <Sidebar className="w-80 border-r">
+      <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0">
         <div className="flex items-center space-x-3 flex-1">
           <Heart className="h-5 w-5 text-neon-blue" />
           <h1 className="text-xl font-serif font-medium">Noteily</h1>
@@ -127,17 +127,6 @@ export function AppSidebar() {
                 <Bell className="h-4 w-4" />
               </Button>
             </NotificationsPanel>
-          )}
-          {!isMobile && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleSidebar}
-              className="sidebar-toggle h-8 w-8 p-0 rounded-full"
-              title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
-            >
-              {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
-            </Button>
           )}
           {isMobile && <SidebarTrigger />}
         </div>
