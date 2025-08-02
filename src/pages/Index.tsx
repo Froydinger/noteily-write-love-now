@@ -11,12 +11,14 @@ import { Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useNotifications } from '@/hooks/useNotifications';
 import PullToRefresh from 'react-simple-pull-to-refresh';
 import { ShareManager } from '@/components/notes/ShareManager';
 
 const Index = () => {
   const { user } = useAuth();
   const { notes, addNote, setCurrentNote, loading, syncNotes, hasInitialLoad } = useNotes();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { state } = useSidebar();
@@ -101,7 +103,16 @@ const Index = () => {
            style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            {(isMobile || state === "collapsed") && <SidebarTrigger />}
+            {(isMobile || state === "collapsed") && (
+              <div className="relative">
+                <SidebarTrigger />
+                {user && unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </div>
+            )}
             <h1 className="text-2xl font-serif font-medium">My Notes</h1>
           </div>
           

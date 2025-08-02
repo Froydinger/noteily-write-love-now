@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotes } from '@/contexts/NoteContext';
 import { usePreferences } from '@/contexts/PreferencesContext';
+import { useNotifications } from '@/hooks/useNotifications';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,6 +28,7 @@ const SettingsPage = () => {
   const { user, signOut } = useAuth();
   const { notes } = useNotes();
   const { preferences } = usePreferences();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
 
 
@@ -275,7 +277,16 @@ ${note.content}
     <div className="h-full">
       <div className="p-3 md:p-6 pb-32 animate-fade-in min-h-screen">
         <div className="flex items-center gap-2 mb-6">
-          {(isMobile || state === "collapsed") && <SidebarTrigger />}
+          {(isMobile || state === "collapsed") && (
+            <div className="relative">
+              <SidebarTrigger />
+              {user && unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </div>
+              )}
+            </div>
+          )}
           <h1 className="text-xl md:text-2xl font-serif font-medium">Settings</h1>
         </div>
         

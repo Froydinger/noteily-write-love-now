@@ -75,7 +75,7 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
                   className="h-8 text-xs btn-accessible rounded-full"
                 >
                   <CheckCheck className="h-3 w-3 mr-1" />
-                  Mark all read
+                  Read all
                 </Button>
               </div>
             )}

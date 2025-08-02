@@ -6,10 +6,14 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNotifications } from '@/hooks/useNotifications';
 import { RefreshCw } from 'lucide-react';
 
 const PromptsPage = () => {
   const { dailyPrompts, addNote, updateNote, setCurrentNote, refreshDailyPrompts } = useNotes();
+  const { user } = useAuth();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { state } = useSidebar();
@@ -33,7 +37,16 @@ const PromptsPage = () => {
       <div className="p-4 md:p-8 animate-fade-in">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            {(isMobile || state === "collapsed") && <SidebarTrigger />}
+            {(isMobile || state === "collapsed") && (
+              <div className="relative">
+                <SidebarTrigger />
+                {user && unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </div>
+            )}
             <h1 className="text-2xl font-serif font-medium">Daily Writing Prompts</h1>
           </div>
           
