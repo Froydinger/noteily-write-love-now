@@ -60,15 +60,9 @@ export function sanitizeImageUrl(url: string, alt?: string): { url: string; alt:
 /**
  * Simple checklist data structure for storage
  */
-export interface ChecklistItem {
-  id: string;
-  text: string;
-  checked: boolean;
-}
-
 export interface ChecklistData {
   id: string;
-  items: ChecklistItem[];
+  items: Array<{ text: string; checked: boolean }>;
 }
 
 /**

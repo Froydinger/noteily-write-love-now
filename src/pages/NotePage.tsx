@@ -131,7 +131,7 @@ const NotePage = () => {
   const handleInsertChecklist = () => {
     // This will be handled by the NoteEditor component
     const event = new CustomEvent('insertChecklist');
-    window.dispatchEvent(event);
+    document.dispatchEvent(event);
   };
   
   if (!note) {
@@ -222,11 +222,7 @@ const NotePage = () => {
       </header>
       
       <div className="flex-grow">
-        <NoteEditor 
-          note={note} 
-          updateNote={updateNote} 
-          isReadOnly={note.userPermission === 'read'}
-        />
+        <NoteEditor note={note} updateNote={updateNote} />
       </div>
     </div>
   );
