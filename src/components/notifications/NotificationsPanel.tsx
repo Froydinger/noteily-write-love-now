@@ -56,50 +56,51 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
         </div>
       </SheetTrigger>
       
-      <SheetContent side="right" className="w-80 sm:w-96">
-        <SheetHeader className="pb-4">
+      <SheetContent side="right" className="w-80 sm:w-96 p-0">
+        <SheetHeader className="p-4 border-b border-border/40">
           <div className="flex items-center justify-between">
-            <SheetTitle className="flex items-center gap-2">
+            <SheetTitle className="flex items-center gap-3 text-lg font-serif">
               <Bell className="h-5 w-5" />
               Notifications
-              {unreadCount > 0 && (
-                <Badge variant="secondary" className="ml-auto">
-                  {unreadCount} new
-                </Badge>
-              )}
             </SheetTitle>
             {unreadCount > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={markAllAsRead}
-                className="h-8 text-xs"
-              >
-                <CheckCheck className="h-3 w-3 mr-1" />
-                Mark all read
-              </Button>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs">
+                  {unreadCount} new
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={markAllAsRead}
+                  className="h-8 text-xs btn-accessible rounded-full"
+                >
+                  <CheckCheck className="h-3 w-3 mr-1" />
+                  Mark all read
+                </Button>
+              </div>
             )}
           </div>
         </SheetHeader>
 
-        <ScrollArea className="h-[calc(100vh-120px)]">
-          {notifications.length === 0 ? (
-            <div className="text-center py-8">
-              <Bell className="h-8 w-8 mx-auto mb-4 opacity-50" />
-              <p className="text-muted-foreground text-sm">
-                No notifications yet
-              </p>
-              <p className="text-muted-foreground text-xs mt-1">
-                You'll see updates when notes are shared with you
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {notifications.map((notification, index) => (
-                <div key={notification.id}>
+        <div className="p-4">
+          <ScrollArea className="h-[calc(100vh-140px)]">
+            {notifications.length === 0 ? (
+              <div className="text-center py-8">
+                <Bell className="h-8 w-8 mx-auto mb-4 opacity-50" />
+                <p className="text-muted-foreground text-sm font-medium">
+                  No notifications yet
+                </p>
+                <p className="text-muted-foreground text-xs mt-1">
+                  You'll see updates when notes are shared with you
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {notifications.map((notification) => (
                   <div
-                    className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted/50 ${
-                      !notification.read ? 'bg-muted/30 border-l-2 border-primary' : 'hover:bg-muted/30'
+                    key={notification.id}
+                    className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm ${
+                      !notification.read ? 'sidebar-menu-active' : 'hover:bg-accent/50'
                     }`}
                     onClick={() => handleNotificationClick(notification)}
                   >
@@ -110,15 +111,13 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="text-sm font-medium truncate">
-                            {notification.title}
-                          </p>
+                          <h3 className="text-sm font-medium truncate">{notification.title}</h3>
                           {!notification.read && (
                             <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
                           )}
                         </div>
                         
-                        <p className="text-xs text-muted-foreground mb-2">
+                        <p className="text-xs text-muted-foreground truncate mb-2">
                           {notification.message}
                         </p>
                         
@@ -137,15 +136,11 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
                       </div>
                     </div>
                   </div>
-                  
-                  {index < notifications.length - 1 && (
-                    <Separator className="my-2" />
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </div>
       </SheetContent>
     </Sheet>
   );
