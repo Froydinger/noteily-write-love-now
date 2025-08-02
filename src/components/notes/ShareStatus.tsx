@@ -41,7 +41,7 @@ export function ShareStatus({ note, showText = true }: ShareStatusProps) {
 
   // User owns this note and it's not shared with anyone - show share icon
   return (
-    <Badge variant="outline" className="flex items-center gap-1 text-muted-foreground">
+    <Badge variant="outline" className="flex items-center gap-1">
       <Users className="h-3 w-3" />
       {showText && "Share"}
     </Badge>
