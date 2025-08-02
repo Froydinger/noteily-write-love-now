@@ -147,6 +147,10 @@ export type Database = {
         Args: { note_id_param: string }
         Returns: boolean
       }
+      remove_shared_note_access: {
+        Args: { note_id_param: string }
+        Returns: boolean
+      }
       restore_note: {
         Args: { note_id_param: string }
         Returns: boolean
