@@ -78,7 +78,7 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
             ) : (
               <Edit className="h-3 w-3" />
             )}
-            Shared with me
+            Shared With Me
           </Badge>
         )}
         
@@ -88,7 +88,7 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
             className="h-6 px-2 text-xs flex items-center gap-1 mb-3 w-fit"
           >
             <Users className="h-3 w-3" />
-            I shared
+            I Shared
           </Badge>
         )}
         <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-primary transition-colors duration-300 mb-3">{note.title || "Untitled Note"}</h3>
