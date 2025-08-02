@@ -26,6 +26,7 @@ import {
   SidebarTrigger,
   useSidebar
 } from "@/components/ui/sidebar";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 import { Button } from "@/components/ui/button";
 import { useNotes, Note } from "@/contexts/NoteContext";
@@ -42,6 +43,18 @@ export function AppSidebar() {
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const { state, toggleSidebar } = useSidebar();
+  
+  // Get initial accordion state from localStorage, default to open
+  const [recentNotesOpen, setRecentNotesOpen] = useState(() => {
+    const saved = localStorage.getItem('sidebar-recent-notes-open');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  // Save accordion state to localStorage
+  const handleRecentNotesToggle = (isOpen: boolean) => {
+    setRecentNotesOpen(isOpen);
+    localStorage.setItem('sidebar-recent-notes-open', JSON.stringify(isOpen));
+  };
 
   const filteredNotes = searchTerm 
     ? notes.filter(note => 
@@ -154,56 +167,69 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup className="py-4">
-          <SidebarGroupLabel className="px-4 text-sm uppercase tracking-wider font-medium text-muted-foreground mb-1">Recent Notes</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <div className="h-[calc(100vh-280px)] overflow-y-auto">
-              <div className="px-3 py-1">
-                {filteredNotes.length > 0 ? (
-                  filteredNotes.map((note) => (
-                    <div 
-                      key={note.id}
-                      className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
-                      onClick={() => handleSelectNote(note)}
-                      style={{ 
-                        animationDelay: `${notes.indexOf(note) * 0.05}s`,
-                        animationFillMode: 'both'
-                      }}
-                    >
-                      <h3 className="text-sm font-medium truncate">{note.title || "Untitled Note"}</h3>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {note.content ? 
-                          note.content
-                            .replace(/<[^>]*>?/gm, '') // Remove HTML tags
-                            .replace(/&nbsp;/g, ' ') // Replace &nbsp; with spaces
-                            .replace(/&[a-z]+;/gi, ' ') // Replace other HTML entities with spaces
-                            .trim()
-                            .substring(0, 60) 
-                          : "No content"
-                        }
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
-                      </p>
+          <Accordion 
+            type="single" 
+            collapsible 
+            value={recentNotesOpen ? "recent-notes" : undefined}
+            onValueChange={(value) => handleRecentNotesToggle(value === "recent-notes")}
+          >
+            <AccordionItem value="recent-notes" className="border-none">
+              <AccordionTrigger className="px-4 py-2 hover:no-underline text-sm uppercase tracking-wider font-medium text-muted-foreground data-[state=closed]:mb-0">
+                Recent Notes
+              </AccordionTrigger>
+              <AccordionContent className="pb-0">
+                <SidebarGroupContent>
+                  <div className="h-[calc(100vh-320px)] overflow-y-auto">
+                    <div className="px-3 py-1">
+                      {filteredNotes.length > 0 ? (
+                        filteredNotes.map((note) => (
+                          <div 
+                            key={note.id}
+                            className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
+                            onClick={() => handleSelectNote(note)}
+                            style={{ 
+                              animationDelay: `${notes.indexOf(note) * 0.05}s`,
+                              animationFillMode: 'both'
+                            }}
+                          >
+                            <h3 className="text-sm font-medium truncate">{note.title || "Untitled Note"}</h3>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {note.content ? 
+                                note.content
+                                  .replace(/<[^>]*>?/gm, '') // Remove HTML tags
+                                  .replace(/&nbsp;/g, ' ') // Replace &nbsp; with spaces
+                                  .replace(/&[a-z]+;/gi, ' ') // Replace other HTML entities with spaces
+                                  .trim()
+                                  .substring(0, 60) 
+                                : "No content"
+                              }
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-2 py-4 text-center text-muted-foreground">
+                          <p>No notes found</p>
+                          {searchTerm && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="mt-2 btn-accessible rounded-full"
+                              onClick={() => setSearchTerm("")}
+                            >
+                              Clear search
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  ))
-                ) : (
-                  <div className="px-2 py-4 text-center text-muted-foreground">
-                    <p>No notes found</p>
-                    {searchTerm && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="mt-2 btn-accessible rounded-full"
-                        onClick={() => setSearchTerm("")}
-                      >
-                        Clear search
-                      </Button>
-                    )}
                   </div>
-                )}
-              </div>
-            </div>
-          </SidebarGroupContent>
+                </SidebarGroupContent>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </SidebarGroup>
 
       </SidebarContent>
