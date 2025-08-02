@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useNavigate } from 'react-router-dom';
+import { useSidebar } from '@/components/ui/sidebar';
 import { formatDistanceToNow } from 'date-fns';
 import { CheckCheck, Share2, Edit3, Bell } from 'lucide-react';
 
@@ -17,6 +18,7 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const { setOpenMobile } = useSidebar();
 
   const handleNotificationClick = async (notification: any) => {
     if (!notification.read) {
@@ -25,7 +27,8 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
     
     if (notification.note_id) {
       navigate(`/note/${notification.note_id}`);
-      setOpen(false);
+      setOpen(false); // Close notification panel
+      setOpenMobile(false); // Close main sidebar on mobile
     }
   };
 
