@@ -174,8 +174,8 @@ export function AppSidebar() {
             onValueChange={(value) => handleRecentNotesToggle(value === "recent-notes")}
           >
             <AccordionItem value="recent-notes" className="border-none">
-              <AccordionTrigger className="px-3 mx-1 py-2 rounded-md hover:no-underline hover:bg-accent/50 transition-colors duration-200 text-sm font-medium text-foreground border border-transparent hover:border-border/40 bg-background/50">
-                <div className="flex items-center gap-2">
+              <AccordionTrigger className="px-4 py-2 rounded-full hover:no-underline hover:bg-accent/50 transition-colors duration-200 font-medium text-foreground data-[state=closed]:mb-0">
+                <div className="flex items-center gap-3">
                   <BookOpen className="h-4 w-4" />
                   Recent Notes
                 </div>
