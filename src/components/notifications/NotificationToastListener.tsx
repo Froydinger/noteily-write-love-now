@@ -53,7 +53,7 @@ export const NotificationToastListener = () => {
           toast({
             title: `${getNotificationIcon(notification.type)} ${notification.title}`,
             description: notification.message,
-            duration: 6000, // 6 seconds
+            duration: 2500, // 2.5 seconds - quick read
             action: notification.note_id ? (
               <button
                 onClick={() => handleToastClick(notification.note_id)}
