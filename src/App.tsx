@@ -21,6 +21,7 @@ import TermsPage from "./pages/TermsPage";
 import NotFound from "./pages/NotFound";
 import RecentlyDeletedPage from "./pages/RecentlyDeletedPage";
 import { PreferencesProvider } from "./contexts/PreferencesContext";
+import { NotificationToastListener } from "./components/notifications/NotificationToastListener";
 
 const queryClient = new QueryClient();
 
@@ -48,7 +49,8 @@ const AppContent = () => {
   return (
     <>
       <Toaster />
-      <Sonner position="bottom-right" duration={3000} />
+      <Sonner position="top-right" duration={3000} />
+      <NotificationToastListener />
       <PreferencesProvider>
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
