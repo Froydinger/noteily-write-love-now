@@ -111,191 +111,262 @@ export function AppSidebar() {
   return (
     <Sidebar className="w-64 md:w-72" collapsible="icon">
       <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0">
-        <div className="flex items-center space-x-3 flex-1">
+        <div className={`flex items-center space-x-3 flex-1 ${state === "collapsed" ? "justify-center" : ""}`}>
           <Heart className="h-5 w-5 text-neon-blue" />
-          <h1 className="text-xl font-serif font-medium">Noteily</h1>
+          {state !== "collapsed" && <h1 className="text-xl font-serif font-medium">Noteily</h1>}
         </div>
-        <div className="flex items-center gap-2">
-          {user && (
-            <NotificationsPanel>
+        {state !== "collapsed" && (
+          <div className="flex items-center gap-2">
+            {user && (
+              <NotificationsPanel>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
+                  title="Notifications"
+                >
+                  <Bell className="h-4 w-4" />
+                </Button>
+              </NotificationsPanel>
+            )}
+            {!isMobile && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
-                title="Notifications"
+                onClick={toggleSidebar}
+                className="sidebar-toggle h-8 w-8 p-0 rounded-full"
+                title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
               >
-                <Bell className="h-4 w-4" />
+                {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
               </Button>
-            </NotificationsPanel>
-          )}
-          {!isMobile && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleSidebar}
-              className="sidebar-toggle h-8 w-8 p-0 rounded-full"
-              title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
-            >
-              {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
-            </Button>
-          )}
-          {isMobile && <SidebarTrigger />}
-        </div>
-      </SidebarHeader>
-      
-      <SidebarContent className="pt-2">
-        <div className="px-4 mb-4">
-          <Button 
-            variant="outline" 
-            className="w-full justify-start gap-3 h-10 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md rounded-full"
-            onClick={handleCreateNote}
-          >
-            <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-            <span className="font-medium">New Note</span>
-          </Button>
-        </div>
-
-        <SidebarGroup>
-          <SidebarGroupContent>
-            {/* Horizontal navigation buttons */}
-            <div className="flex gap-2 px-4 mb-4">
-              <Button
-                variant={isActive('/') ? 'default' : 'outline'}
-                size="sm"
-                asChild
-                className="flex-1 h-9 rounded-full font-medium"
-              >
-                <a href="/" className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  <span className="text-xs sm:text-sm">My Notes</span>
-                </a>
-              </Button>
-              <Button
-                variant={isActive('/prompts') ? 'default' : 'outline'}
-                size="sm"
-                asChild
-                className="flex-1 h-9 rounded-full font-medium"
-              >
-                <a href="/prompts" className="flex items-center gap-2">
-                  <Pencil className="h-4 w-4" />
-                  <span className="text-xs sm:text-sm">Prompts</span>
-                </a>
-              </Button>
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup className="py-2">
-          <div className="px-4">
-            <Accordion 
-              type="single" 
-              collapsible 
-              value={recentNotesOpen ? "recent-notes" : undefined}
-              onValueChange={(value) => handleRecentNotesToggle(value === "recent-notes")}
-            >
-              <AccordionItem value="recent-notes" className="border-none">
-                <AccordionTrigger className="w-full px-4 py-2.5 rounded-full hover:no-underline hover:bg-accent/50 transition-colors duration-200 font-medium text-foreground data-[state=closed]:mb-0 h-9">
-                  <div className="flex items-center justify-center gap-3 w-full">
-                    <BookOpen className="h-4 w-4" />
-                    <span className="text-sm">Recent Notes</span>
-                  </div>
-                </AccordionTrigger>
-              <AccordionContent className="pb-0">
-                <SidebarGroupContent>
-                  <div className="h-[calc(100vh-320px)] overflow-y-auto">
-                    <div className="px-3 py-1">
-                      {filteredNotes.length > 0 ? (
-                        filteredNotes.map((note) => (
-                          <div 
-                            key={note.id}
-                            className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
-                            onClick={() => handleSelectNote(note)}
-                            style={{ 
-                              animationDelay: `${notes.indexOf(note) * 0.05}s`,
-                              animationFillMode: 'both'
-                            }}
-                          >
-                            <h3 className="text-sm font-medium truncate">{note.title || "Untitled Note"}</h3>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {note.content ? 
-                                note.content
-                                  .replace(/<[^>]*>?/gm, '') // Remove HTML tags
-                                  .replace(/&nbsp;/g, ' ') // Replace &nbsp; with spaces
-                                  .replace(/&[a-z]+;/gi, ' ') // Replace other HTML entities with spaces
-                                  .trim()
-                                  .substring(0, 60) 
-                                : "No content"
-                              }
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
-                            </p>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="px-2 py-4 text-center text-muted-foreground">
-                          <p>No notes found</p>
-                          {searchTerm && (
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="mt-2 btn-accessible rounded-full"
-                              onClick={() => setSearchTerm("")}
-                            >
-                              Clear search
-                            </Button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </SidebarGroupContent>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+            )}
+            {isMobile && <SidebarTrigger />}
           </div>
-        </SidebarGroup>
-
-      </SidebarContent>
-
-      <SidebarFooter className="px-4 py-4 border-t border-border/40">
-        <div className="flex justify-between w-full">
+        )}
+        {state === "collapsed" && !isMobile && (
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleSync}
-            className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
-            title="Sync notes"
+            onClick={toggleSidebar}
+            className="sidebar-toggle h-8 w-8 p-0 rounded-full"
+            title="Expand sidebar"
           >
-            <RefreshCw className="h-4 w-4" />
+            <PanelLeft size={16} />
           </Button>
-          
-          <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
-            <ThemeToggle variant="settings" />
+        )}
+      </SidebarHeader>
+      
+      {state !== "collapsed" && (
+        <SidebarContent className="pt-2">
+          <div className="px-4 mb-4">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start gap-3 h-10 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md rounded-full"
+              onClick={handleCreateNote}
+            >
+              <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+              <span className="font-medium">New Note</span>
+            </Button>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/recently-deleted') ? 'sidebar-menu-active' : ''}`}
-            asChild
-            title="Recently Deleted"
-          >
-            <a href="/recently-deleted">
-              <Trash2 className="h-4 w-4" />
-            </a>
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
-            asChild
-            title="Settings"
-          >
-            <a href="/settings">
-              <Settings className="h-4 w-4" />
-            </a>
-          </Button>
-        </div>
+
+          <SidebarGroup>
+            <SidebarGroupContent>
+              {/* Horizontal navigation buttons */}
+              <div className="flex gap-2 px-4 mb-4">
+                <Button
+                  variant={isActive('/') ? 'default' : 'outline'}
+                  size="sm"
+                  asChild
+                  className="flex-1 h-9 rounded-full font-medium"
+                >
+                  <a href="/" className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">My Notes</span>
+                  </a>
+                </Button>
+                <Button
+                  variant={isActive('/prompts') ? 'default' : 'outline'}
+                  size="sm"
+                  asChild
+                  className="flex-1 h-9 rounded-full font-medium"
+                >
+                  <a href="/prompts" className="flex items-center gap-2">
+                    <Pencil className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Prompts</span>
+                  </a>
+                </Button>
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          <SidebarGroup className="py-2">
+            <div className="px-4">
+              <Accordion 
+                type="single" 
+                collapsible 
+                value={recentNotesOpen ? "recent-notes" : undefined}
+                onValueChange={(value) => handleRecentNotesToggle(value === "recent-notes")}
+              >
+                <AccordionItem value="recent-notes" className="border-none">
+                  <AccordionTrigger className="w-full px-4 py-2.5 rounded-full hover:no-underline hover:bg-accent/50 transition-colors duration-200 font-medium text-foreground data-[state=closed]:mb-0 h-9">
+                    <div className="flex items-center justify-center gap-3 w-full">
+                      <BookOpen className="h-4 w-4" />
+                      <span className="text-sm">Recent Notes</span>
+                    </div>
+                  </AccordionTrigger>
+                <AccordionContent className="pb-0">
+                  <SidebarGroupContent>
+                    <div className="h-[calc(100vh-320px)] overflow-y-auto">
+                      <div className="px-3 py-1">
+                        {filteredNotes.length > 0 ? (
+                          filteredNotes.map((note) => (
+                            <div 
+                              key={note.id}
+                              className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
+                              onClick={() => handleSelectNote(note)}
+                              style={{ 
+                                animationDelay: `${notes.indexOf(note) * 0.05}s`,
+                                animationFillMode: 'both'
+                              }}
+                            >
+                              <h3 className="text-sm font-medium truncate">{note.title || "Untitled Note"}</h3>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {note.content ? 
+                                  note.content
+                                    .replace(/<[^>]*>?/gm, '') // Remove HTML tags
+                                    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with spaces
+                                    .replace(/&[a-z]+;/gi, ' ') // Replace other HTML entities with spaces
+                                    .trim()
+                                    .substring(0, 60) 
+                                  : "No content"
+                                }
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
+                              </p>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="px-2 py-4 text-center text-muted-foreground">
+                            <p>No notes found</p>
+                            {searchTerm && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="mt-2 btn-accessible rounded-full"
+                                onClick={() => setSearchTerm("")}
+                              >
+                                Clear search
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </SidebarGroupContent>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            </div>
+          </SidebarGroup>
+
+        </SidebarContent>
+      )}
+
+      {state === "collapsed" && (
+        <SidebarContent className="pt-2">
+          <div className="px-2 mb-4 flex justify-center">
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="h-10 w-10 p-0 rounded-full"
+              onClick={handleCreateNote}
+              title="New Note"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        </SidebarContent>
+      )}
+
+      <SidebarFooter className="px-4 py-4 border-t border-border/40">
+        {state !== "collapsed" ? (
+          <div className="flex justify-between w-full">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSync}
+              className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
+              title="Sync notes"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            
+            <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
+              <ThemeToggle variant="settings" />
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/recently-deleted') ? 'sidebar-menu-active' : ''}`}
+              asChild
+              title="Recently Deleted"
+            >
+              <a href="/recently-deleted">
+                <Trash2 className="h-4 w-4" />
+              </a>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
+              asChild
+              title="Settings"
+            >
+              <a href="/settings">
+                <Settings className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2 items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSync}
+              className="btn-accessible h-8 w-8 rounded-full"
+              title="Sync notes"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            
+            <div className="h-8 w-8 flex items-center justify-center">
+              <ThemeToggle variant="settings" />
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className={`btn-accessible h-8 w-8 rounded-full ${isActive('/recently-deleted') ? 'sidebar-menu-active' : ''}`}
+              asChild
+              title="Recently Deleted"
+            >
+              <a href="/recently-deleted">
+                <Trash2 className="h-4 w-4" />
+              </a>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className={`btn-accessible h-8 w-8 rounded-full ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
+              asChild
+              title="Settings"
+            >
+              <a href="/settings">
+                <Settings className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   );
