@@ -44,10 +44,10 @@ export function AppSidebar() {
   const { toast } = useToast();
   const { state, toggleSidebar } = useSidebar();
   
-  // Get initial accordion state from localStorage, default to open
+  // Get initial accordion state from localStorage, default to closed
   const [recentNotesOpen, setRecentNotesOpen] = useState(() => {
     const saved = localStorage.getItem('sidebar-recent-notes-open');
-    return saved !== null ? JSON.parse(saved) : true;
+    return saved !== null ? JSON.parse(saved) : false;
   });
 
   // Save accordion state to localStorage
@@ -174,8 +174,11 @@ export function AppSidebar() {
             onValueChange={(value) => handleRecentNotesToggle(value === "recent-notes")}
           >
             <AccordionItem value="recent-notes" className="border-none">
-              <AccordionTrigger className="px-4 py-2 hover:no-underline text-sm uppercase tracking-wider font-medium text-muted-foreground data-[state=closed]:mb-0">
-                Recent Notes
+              <AccordionTrigger className="px-3 mx-1 py-2 rounded-md hover:no-underline hover:bg-accent/50 transition-colors duration-200 text-sm font-medium text-foreground border border-transparent hover:border-border/40 bg-background/50">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Recent Notes
+                </div>
               </AccordionTrigger>
               <AccordionContent className="pb-0">
                 <SidebarGroupContent>
