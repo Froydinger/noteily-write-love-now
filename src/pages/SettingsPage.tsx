@@ -15,6 +15,7 @@ import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart } from 'lucide-r
 import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { Input } from '@/components/ui/input';
+import { EmailNotificationSettings } from '@/components/notifications/EmailNotificationSettings';
 
 const SettingsPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -302,24 +303,7 @@ ${note.content}
           </div>
           
           {/* Email Notifications Section */}
-          {user && (
-            <div className="bg-card rounded-lg p-4 border">
-              <h2 className="text-lg font-medium mb-3 font-serif">Email Notifications</h2>
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Email notifications are automatically sent through Supabase when:
-                </p>
-                <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                  <li>Someone shares a note with you</li>
-                  <li>A shared note is updated</li>
-                  <li>Daily writing prompts (coming soon)</li>
-                </ul>
-                <p className="text-xs text-muted-foreground mt-3">
-                  Email preferences can be managed in your account settings.
-                </p>
-              </div>
-            </div>
-          )}
+          {user && <EmailNotificationSettings />}
           
           <div className="bg-card rounded-lg p-4 border">
             <h2 className="text-lg font-medium mb-3 font-serif">Account</h2>
