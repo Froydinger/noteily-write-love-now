@@ -78,6 +78,43 @@ export const useNotifications = () => {
     }
   };
 
+  const deleteNotification = async (notificationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId);
+
+      if (error) throw error;
+
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      setUnreadCount(prev => {
+        const deletedNotification = notifications.find(n => n.id === notificationId);
+        return deletedNotification && !deletedNotification.read ? Math.max(0, prev - 1) : prev;
+      });
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
+  };
+
+  const deleteAllNotifications = async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setNotifications([]);
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Error deleting all notifications:', error);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
 
@@ -128,6 +165,8 @@ export const useNotifications = () => {
     loading,
     markAsRead,
     markAllAsRead,
+    deleteNotification,
+    deleteAllNotifications,
     refetch: fetchNotifications
   };
 };

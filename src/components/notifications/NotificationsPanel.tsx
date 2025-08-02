@@ -8,14 +8,14 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
 import { formatDistanceToNow } from 'date-fns';
-import { CheckCheck, Share2, Edit3, Bell } from 'lucide-react';
+import { CheckCheck, Share2, Edit3, Bell, Trash2, X } from 'lucide-react';
 
 interface NotificationsPanelProps {
   children: React.ReactNode;
 }
 
 export function NotificationsPanel({ children }: NotificationsPanelProps) {
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications } = useNotifications();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { setOpenMobile } = useSidebar();
@@ -30,6 +30,15 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
       setOpen(false); // Close notification panel
       setOpenMobile(false); // Close main sidebar on mobile
     }
+  };
+
+  const handleDeleteNotification = async (e: React.MouseEvent, notificationId: string) => {
+    e.stopPropagation(); // Prevent the notification click
+    await deleteNotification(notificationId);
+  };
+
+  const handleDeleteAll = async () => {
+    await deleteAllNotifications();
   };
 
   const getNotificationIcon = (type: string) => {
@@ -71,15 +80,28 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
                 <Badge variant="secondary" className="text-xs">
                   {unreadCount} new
                 </Badge>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={markAllAsRead}
-                  className="h-8 text-xs btn-accessible rounded-full"
-                >
-                  <CheckCheck className="h-3 w-3 mr-1" />
-                  Read all
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={markAllAsRead}
+                    className="h-8 text-xs btn-accessible rounded-full"
+                  >
+                    <CheckCheck className="h-3 w-3 mr-1" />
+                    Read all
+                  </Button>
+                  {notifications.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleDeleteAll}
+                      className="h-8 text-xs btn-accessible rounded-full text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Delete all
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -119,9 +141,19 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
                           <h3 className="text-sm font-semibold text-foreground leading-tight">
                             {notification.title}
                           </h3>
-                          {!notification.read && (
-                            <div className="w-2.5 h-2.5 bg-primary rounded-full flex-shrink-0 mt-1" />
-                          )}
+                          <div className="flex items-center gap-2">
+                            {!notification.read && (
+                              <div className="w-2.5 h-2.5 bg-primary rounded-full flex-shrink-0 mt-1" />
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => handleDeleteNotification(e, notification.id)}
+                              className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
                         
                         <p className="text-sm text-muted-foreground leading-relaxed">
