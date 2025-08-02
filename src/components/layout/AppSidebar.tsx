@@ -113,7 +113,19 @@ export function AppSidebar() {
           <Heart className="h-5 w-5 text-neon-blue" />
           <h1 className="text-xl font-serif font-medium">Noteily</h1>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
+          {user && (
+            <NotificationsPanel>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
+                title="Notifications"
+              >
+                <Bell className="h-4 w-4" />
+              </Button>
+            </NotificationsPanel>
+          )}
           {!isMobile && (
             <Button
               variant="ghost"
@@ -255,19 +267,6 @@ export function AppSidebar() {
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
-          
-          {user && (
-            <NotificationsPanel>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
-                title="Notifications"
-              >
-                <Bell className="h-4 w-4" />
-              </Button>
-            </NotificationsPanel>
-          )}
           
           <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
             <ThemeToggle variant="settings" />
