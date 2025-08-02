@@ -69,8 +69,13 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           // Sanitize content before saving to database
+          // For checklists, we need to preserve the current state
           const sanitizedContent = sanitizeContent(content, { preserveChecklists: true });
-          updateNote(note.id, { content: sanitizedContent });
+          
+          // Only update if the content actually changed to avoid unnecessary re-renders
+          if (sanitizedContent !== note.content) {
+            updateNote(note.id, { content: sanitizedContent });
+          }
         }, 500);
       }
     };
@@ -225,6 +230,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     checklistContainer.className = 'checklist-container';
     checklistContainer.contentEditable = 'false'; // Disable contentEditable on container
     checklistContainer.style.margin = '1rem 0';
+    checklistContainer.setAttribute('data-checklist-id', Date.now().toString());
 
     // Create first checklist item
     const checklistItem = createChecklistItem('');

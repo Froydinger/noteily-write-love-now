@@ -2,11 +2,11 @@ import DOMPurify from 'dompurify';
 
 // Strict DOMPurify configuration for enhanced security
 const SANITIZE_CONFIG = {
-  ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'img', 'div', 'span'],
-  ALLOWED_ATTR: ['src', 'alt', 'class', 'data-checklist-id', 'data-checklist-item', 'data-checked'],
+  ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'img', 'div', 'span', 'button', 'input'],
+  ALLOWED_ATTR: ['src', 'alt', 'class', 'data-checklist', 'data-checklist-id', 'type', 'value', 'placeholder'],
   ALLOW_DATA_ATTR: false, // We'll manually allow specific data attributes
-  FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'button', 'textarea'],
-  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'style'],
+  FORBID_TAGS: ['script', 'object', 'embed', 'form', 'textarea'],
+  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
   KEEP_CONTENT: true,
   SANITIZE_DOM: true,
 };
@@ -65,18 +65,24 @@ export function convertChecklistsToData(htmlContent: string): string {
   tempDiv.innerHTML = htmlContent;
   
   // Find all checklist containers
-  const checklistContainers = tempDiv.querySelectorAll('[data-checklist-id]');
+  const checklistContainers = tempDiv.querySelectorAll('.checklist-container');
   
   checklistContainers.forEach((container) => {
-    const checklistId = container.getAttribute('data-checklist-id');
+    const checklistId = container.getAttribute('data-checklist-id') || Date.now().toString();
     const items: Array<{ text: string; checked: boolean }> = [];
     
-    // Extract checklist items
-    const itemElements = container.querySelectorAll('[data-checklist-item]');
+    // Extract checklist items from the actual structure
+    const itemElements = container.querySelectorAll('.checklist-item');
     itemElements.forEach((item) => {
-      const textContent = item.textContent || '';
-      const isChecked = item.getAttribute('data-checked') === 'true';
-      items.push({ text: textContent.trim(), checked: isChecked });
+      const checkbox = item.querySelector('.checklist-checkbox') as HTMLElement;
+      const textInput = item.querySelector('.checklist-input') as HTMLInputElement;
+      
+      if (textInput) {
+        const text = textInput.value || textInput.textContent || '';
+        const isChecked = checkbox?.style.background?.includes('var(--primary)') || 
+                         checkbox?.classList.contains('checked') || false;
+        items.push({ text: text.trim(), checked: isChecked });
+      }
     });
     
     // Replace with safe data structure
@@ -131,12 +137,51 @@ export function restoreChecklistsFromData(htmlContent: string): string {
       items.forEach((item, index) => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'checklist-item';
-        itemDiv.setAttribute('data-checklist-item', 'true');
-        itemDiv.setAttribute('data-checked', item.checked.toString());
-        itemDiv.innerHTML = `
-          <input type="checkbox" ${item.checked ? 'checked' : ''} />
-          <span contenteditable="true">${DOMPurify.sanitize(item.text, { ALLOWED_TAGS: [], KEEP_CONTENT: true })}</span>
-        `;
+        itemDiv.style.display = 'flex';
+        itemDiv.style.alignItems = 'center';
+        itemDiv.style.gap = '12px';
+        itemDiv.style.marginBottom = '8px';
+        itemDiv.style.padding = '4px 0';
+
+        // Create checkbox button (matching NoteEditor structure)
+        const checkbox = document.createElement('button');
+        checkbox.className = 'checklist-checkbox';
+        checkbox.type = 'button';
+        checkbox.style.width = '18px';
+        checkbox.style.height = '18px';
+        checkbox.style.borderRadius = '50%';
+        checkbox.style.border = '2px solid hsl(var(--border))';
+        checkbox.style.background = item.checked ? 'hsl(var(--primary))' : 'transparent';
+        checkbox.style.color = item.checked ? 'hsl(var(--primary-foreground))' : 'transparent';
+        checkbox.style.cursor = 'pointer';
+        checkbox.style.flexShrink = '0';
+        checkbox.style.transition = 'all 0.2s ease';
+        checkbox.style.display = 'flex';
+        checkbox.style.alignItems = 'center';
+        checkbox.style.justifyContent = 'center';
+        checkbox.style.fontSize = '10px';
+        checkbox.style.fontWeight = '500';
+        checkbox.innerHTML = item.checked ? '✓' : '';
+
+        // Create text input (matching NoteEditor structure)
+        const textInput = document.createElement('input');
+        textInput.className = 'checklist-input';
+        textInput.type = 'text';
+        textInput.value = item.text;
+        textInput.style.flex = '1';
+        textInput.style.outline = 'none';
+        textInput.style.minHeight = '1.5em';
+        textInput.style.lineHeight = '1.5';
+        textInput.style.color = item.checked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
+        textInput.style.backgroundColor = 'transparent';
+        textInput.style.border = 'none';
+        textInput.style.fontSize = 'inherit';
+        textInput.style.fontFamily = 'inherit';
+        textInput.style.textDecoration = item.checked ? 'line-through' : 'none';
+        textInput.placeholder = 'Add checklist item...';
+
+        itemDiv.appendChild(checkbox);
+        itemDiv.appendChild(textInput);
         newContainer.appendChild(itemDiv);
       });
       
