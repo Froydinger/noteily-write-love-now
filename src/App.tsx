@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppLayout } from "./components/layout/AppLayout";
 import { SplashScreen } from "./components/layout/SplashScreen";
+import { MarketingSplashScreen } from "./components/layout/MarketingSplashScreen";
 import { PWAInstall } from "./components/pwa/PWAInstall";
 import { PWAUpdateNotification } from "./components/pwa/PWAUpdateNotification";
 import Index from "./pages/Index";
@@ -22,6 +23,7 @@ import NotFound from "./pages/NotFound";
 import RecentlyDeletedPage from "./pages/RecentlyDeletedPage";
 import { PreferencesProvider } from "./contexts/PreferencesContext";
 import { NotificationToastListener } from "./components/notifications/NotificationToastListener";
+import { useAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -41,9 +43,23 @@ const App = () => {
 
 const AppContent = () => {
   const [showSplash, setShowSplash] = useState(true);
+  const [showMarketingSplash, setShowMarketingSplash] = useState(false);
+  const { user } = useAuth();
 
+  // Show regular splash screen first
   if (showSplash) {
-    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+    return <SplashScreen onComplete={() => {
+      setShowSplash(false);
+      // Show marketing splash for non-authenticated users
+      if (!user) {
+        setShowMarketingSplash(true);
+      }
+    }} />;
+  }
+
+  // Show marketing splash for unregistered users
+  if (showMarketingSplash && !user) {
+    return <MarketingSplashScreen onClose={() => setShowMarketingSplash(false)} />;
   }
 
   return (
