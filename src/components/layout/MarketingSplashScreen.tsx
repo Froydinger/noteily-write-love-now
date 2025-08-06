@@ -71,7 +71,10 @@ export function MarketingSplashScreen() {
                 <p className="text-muted-foreground">Ready to start writing what you love?</p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button 
-                    onClick={() => navigate('/auth')} 
+                    onClick={() => {
+                      console.log('Features popup button clicked, navigating to /auth');
+                      navigate('/auth');
+                    }} 
                     className="bg-accent hover:bg-accent/90 text-accent-foreground w-full sm:w-auto"
                   >
                     Get Started Free
@@ -152,7 +155,10 @@ export function MarketingSplashScreen() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center px-4">
             <Button 
-              onClick={() => navigate('/auth')} 
+              onClick={() => {
+                console.log('Main splash button clicked, navigating to /auth');
+                navigate('/auth');
+              }} 
               size="lg"
               className="bg-accent hover:bg-accent/90 text-accent-foreground w-full sm:w-auto"
             >
@@ -161,7 +167,10 @@ export function MarketingSplashScreen() {
             <Button 
               variant="outline" 
               size="lg"
-              onClick={() => setShowFeatures(true)}
+              onClick={() => {
+                console.log('Learn More button clicked');
+                setShowFeatures(true);
+              }}
               className="w-full sm:w-auto"
             >
               Learn More
