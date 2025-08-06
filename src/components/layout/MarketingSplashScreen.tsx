@@ -169,7 +169,7 @@ export function MarketingSplashScreen() {
           </div>
 
           <div className="text-sm text-muted-foreground space-y-2 px-4">
-            <p>✨ Free to start • 🔒 Private & secure • 📱 Works everywhere</p>
+            <p>✨ Always free • 🔒 Private & secure • 📱 Works everywhere</p>
             <p>
               Questions? Contact us at{' '}
               <a href="mailto:help@noteily.app" className="text-accent hover:underline">
