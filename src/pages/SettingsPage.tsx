@@ -43,11 +43,19 @@ const SettingsPage = () => {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    toast({
-      title: "Signed out",
-      description: "You have been signed out successfully.",
-    });
+    try {
+      await signOut();
+      toast({
+        title: "Signed out",
+        description: "You have been signed out successfully.",
+      });
+      // Force navigation to ensure user sees they're logged out
+      navigate('/');
+    } catch (error) {
+      console.error('Settings page sign out error:', error);
+      // Even if signOut fails, navigate to home
+      navigate('/');
+    }
   };
 
   const handleSignIn = () => {

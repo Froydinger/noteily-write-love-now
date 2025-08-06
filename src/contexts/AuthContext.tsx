@@ -101,11 +101,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      // First attempt normal sign out
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Initial sign out failed:', error);
+        
+        // If normal sign out fails, force clear the session
+        try {
+          // Force sign out with scope 'local' to clear just this browser
+          await supabase.auth.signOut({ scope: 'local' });
+        } catch (forceError) {
+          console.error('Force sign out also failed:', forceError);
+        }
+      }
+      
+      // Always clear local state regardless of API response
+      setSession(null);
+      setUser(null);
+      
+      // Clear any auth-related localStorage items
+      try {
+        const authKeys = Object.keys(localStorage).filter(key => 
+          key.startsWith('sb-') || 
+          key.includes('supabase') || 
+          key.includes('auth')
+        );
+        authKeys.forEach(key => localStorage.removeItem(key));
+      } catch (storageError) {
+        console.error('Error clearing auth storage:', storageError);
+      }
+      
+      console.log('Sign out completed successfully');
+      
+    } catch (globalError) {
+      console.error('Sign out failed completely:', globalError);
+      
+      // Even if everything fails, clear local state
+      setSession(null);
+      setUser(null);
+      
       toast({
         title: "Sign out failed",
-        description: error.message,
+        description: "There was an issue signing out, but you've been logged out locally.",
         variant: "destructive",
       });
     }
