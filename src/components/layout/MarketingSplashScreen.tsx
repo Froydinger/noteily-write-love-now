@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart, PenTool, Shield, Users, Smartphone, Cloud, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { LoginDialog } from '@/components/auth/LoginDialog';
 
 export function MarketingSplashScreen() {
   const [showFeatures, setShowFeatures] = useState(false);
-  const navigate = useNavigate();
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   const features = [
     {
@@ -72,8 +72,8 @@ export function MarketingSplashScreen() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button 
                     onClick={() => {
-                      console.log('Features popup button clicked, navigating to /auth');
-                      navigate('/auth');
+                      console.log('Features popup button clicked, opening login dialog');
+                      setShowLoginDialog(true);
                     }} 
                     className="bg-accent hover:bg-accent/90 text-accent-foreground w-full sm:w-auto"
                   >
@@ -156,8 +156,8 @@ export function MarketingSplashScreen() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center px-4">
             <Button 
               onClick={() => {
-                console.log('Main splash button clicked, navigating to /auth');
-                navigate('/auth');
+                console.log('Main splash button clicked, opening login dialog');
+                setShowLoginDialog(true);
               }} 
               size="lg"
               className="bg-accent hover:bg-accent/90 text-accent-foreground w-full sm:w-auto"
@@ -187,6 +187,11 @@ export function MarketingSplashScreen() {
             </p>
           </div>
         </div>
+
+        <LoginDialog 
+          open={showLoginDialog} 
+          onOpenChange={setShowLoginDialog} 
+        />
       </div>
     </div>
   );
