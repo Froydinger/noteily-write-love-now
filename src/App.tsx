@@ -59,7 +59,7 @@ const AppContent = () => {
 
   // Show marketing splash for unregistered users
   if (showMarketingSplash && !user) {
-    return <MarketingSplashScreen onClose={() => setShowMarketingSplash(false)} />;
+    return <MarketingSplashScreen />;
   }
 
   return (

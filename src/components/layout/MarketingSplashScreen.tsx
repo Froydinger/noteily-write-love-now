@@ -4,11 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Heart, PenTool, Shield, Users, Smartphone, Cloud, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-interface MarketingSplashScreenProps {
-  onClose: () => void;
-}
-
-export function MarketingSplashScreen({ onClose }: MarketingSplashScreenProps) {
+export function MarketingSplashScreen() {
   const [showFeatures, setShowFeatures] = useState(false);
   const navigate = useNavigate();
 
@@ -79,9 +75,6 @@ export function MarketingSplashScreen({ onClose }: MarketingSplashScreenProps) {
                     className="bg-accent hover:bg-accent/90 text-accent-foreground w-full sm:w-auto"
                   >
                     Get Started Free
-                  </Button>
-                  <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
-                    Continue as Guest
                   </Button>
                 </div>
               </div>
@@ -184,12 +177,6 @@ export function MarketingSplashScreen({ onClose }: MarketingSplashScreenProps) {
               </a>
             </p>
           </div>
-        </div>
-
-        <div className="pt-4 sm:pt-8">
-          <Button variant="ghost" onClick={onClose} className="text-muted-foreground">
-            Continue without account
-          </Button>
         </div>
       </div>
     </div>
