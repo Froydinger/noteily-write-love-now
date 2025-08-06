@@ -72,7 +72,8 @@ export function MarketingSplashScreen() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button 
                     onClick={() => {
-                      console.log('Features popup button clicked, opening login dialog');
+                      console.log('Features popup Get Started Free button clicked, opening login dialog');
+                      setShowFeatures(false); // Close features popup first
                       setShowLoginDialog(true);
                     }} 
                     className="bg-accent hover:bg-accent/90 text-accent-foreground w-full sm:w-auto"
@@ -188,6 +189,7 @@ export function MarketingSplashScreen() {
           </div>
         </div>
 
+        {/* LoginDialog should be accessible from anywhere */}
         <LoginDialog 
           open={showLoginDialog} 
           onOpenChange={setShowLoginDialog} 
