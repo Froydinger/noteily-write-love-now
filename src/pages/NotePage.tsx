@@ -36,6 +36,7 @@ const NotePage = () => {
   const { user } = useAuth();
   const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
+  const [entered, setEntered] = useState(false);
   
   const note = getNote(id || '');
   
@@ -50,9 +51,13 @@ const NotePage = () => {
     return () => setCurrentNote(null);
   }, [id, note, navigate, setCurrentNote]);
 
-  // Always start at top when opening a note
+  // Always start at top when opening a note + play enter transition
   useEffect(() => {
+    setEntered(false);
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setEntered(true));
+    });
   }, [id]);
 
   const handleDelete = () => {
@@ -144,7 +149,7 @@ const NotePage = () => {
   }
   
   return (
-    <div key={id} className="h-full flex flex-col animate-slide-in-right">
+    <div key={id} className={`h-full flex flex-col transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}>
       <header className="border-b p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
