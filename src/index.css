@@ -281,6 +281,35 @@
   .dark a:focus {
     @apply outline-neon-blue;
   }
+
+  /* Text selection highlight */
+  :root ::selection {
+    background: hsl(0 0% 25%);
+    color: hsl(var(--primary-foreground));
+  }
+  :root ::-moz-selection {
+    background: hsl(0 0% 25%);
+    color: hsl(var(--primary-foreground));
+  }
+
+  .sepia ::selection {
+    background: hsl(20 25% 10%);
+    color: hsl(20 15% 94%);
+  }
+  .sepia ::-moz-selection {
+    background: hsl(20 25% 10%);
+    color: hsl(20 15% 94%);
+  }
+
+  /* Marked text highlight */
+  :root mark {
+    background-color: hsl(0 0% 25% / 0.16);
+    color: inherit;
+  }
+  .sepia mark {
+    background-color: hsl(20 25% 10% / 0.16);
+    color: inherit;
+  }
 }
 
 @layer components {

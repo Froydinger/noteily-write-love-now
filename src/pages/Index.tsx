@@ -113,7 +113,7 @@ const Index = () => {
                 )}
               </div>
             )}
-            <h1 className="text-2xl font-serif font-medium">My Notes</h1>
+            <h1 className="text-2xl font-serif font-medium text-accent-foreground">My Notes</h1>
           </div>
           
           <Button 

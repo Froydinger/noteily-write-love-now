@@ -54,9 +54,9 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
       {/* Share button in top right corner */}
       {onShareClick && (
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-accent z-10"
+          className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-accent text-accent-foreground z-10"
           onClick={(e) => {
             e.stopPropagation();
             onShareClick(note);
@@ -91,7 +91,7 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
             I Shared
           </Badge>
         )}
-        <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-accent transition-colors duration-300 mb-3">{note.title || "Untitled Note"}</h3>
+        <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight text-accent-foreground transition-colors duration-300 mb-3">{note.title || "Untitled Note"}</h3>
         <p className="text-sm text-muted-foreground line-clamp-4 group-hover:text-foreground/90 transition-colors duration-300 leading-relaxed">{truncatedContent}</p>
       </CardContent>
       <CardFooter className="p-4 pt-0 text-xs text-muted-foreground transition-all duration-300 group-hover:text-muted-foreground/80">
