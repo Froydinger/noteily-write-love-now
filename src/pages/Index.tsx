@@ -26,6 +26,7 @@ const Index = () => {
   const [sortOrder, setSortOrder] = useState('latest');
   const [shareFilter, setShareFilter] = useState('all');
   const [shareManagerNote, setShareManagerNote] = useState<Note | null>(null);
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
 
   const filteredAndSortedNotes = useMemo(() => {
     let filtered = notes.filter(note => {
@@ -82,6 +83,15 @@ const Index = () => {
     syncNotes();
   };
 
+  const handleCardPress = (note: Note) => {
+    if (selectedNoteId === note.id) {
+      setSelectedNoteId(null);
+      navigate(`/note/${note.id}`);
+    } else {
+      setSelectedNoteId(note.id);
+    }
+  };
+
   // Debug logging to track the race condition
   console.log('Index render state:', { loading, notesLength: notes.length, hasUser: !!user, hasInitialLoad });
 
@@ -100,7 +110,8 @@ const Index = () => {
   const content = (
     <div className="min-h-full">
       <div className="p-6 md:p-10 animate-fade-in"
-           style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
+           style={{ animationDelay: '0.1s', animationFillMode: 'both' }}
+           onClick={() => setSelectedNoteId(null)}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             {(isMobile || state === "collapsed") && (
@@ -179,7 +190,7 @@ const Index = () => {
                 animationFillMode: 'both'
               }}
             >
-              <NoteCard note={note} onShareClick={handleShareClick} />
+              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} />
             </div>
           ))}
         </div>

@@ -1,6 +1,6 @@
 
 import { formatDistanceToNow } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
+
 import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,10 +11,11 @@ import type { NoteWithSharing } from '@/types/sharing';
 interface NoteCardProps {
   note: Note | NoteWithSharing;
   onShareClick?: (note: Note | NoteWithSharing) => void;
+  isSelected?: boolean;
+  onPress?: (note: Note | NoteWithSharing) => void;
 }
 
-export default function NoteCard({ note, onShareClick }: NoteCardProps) {
-  const navigate = useNavigate();
+export default function NoteCard({ note, onShareClick, isSelected = false, onPress }: NoteCardProps) {
   
   // Check if this note is shared with the user (they don't own it)
   const isSharedWithUser = 'isSharedWithUser' in note && note.isSharedWithUser && !note.isOwnedByUser;
@@ -42,21 +43,19 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
     ? contentPreview.substring(0, 120) + '...'
     : contentPreview;
 
-  const handleClick = () => {
-    navigate(`/note/${note.id}`);
-  };
+  const selectedStyles = isSelected ? 'ring-2 ring-primary/40 border-primary/40' : '';
 
   return (
     <Card 
-      className="h-full cursor-pointer group interactive-card hover:border-accent/50 animate-float-in relative backdrop-blur-sm bg-card/95"
-      onClick={handleClick}
+      className={`h-full cursor-pointer group interactive-card hover:border-accent/50 animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles}`}
+      onClick={(e) => { e.stopPropagation(); onPress?.(note); }}
     >
       {/* Share button in top right corner */}
       {onShareClick && (
         <Button
           variant="ghost"
           size="sm"
-          className="absolute top-2 right-2 h-8 w-8 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-accent z-10"
+          className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
           onClick={(e) => {
             e.stopPropagation();
             onShareClick(note);
