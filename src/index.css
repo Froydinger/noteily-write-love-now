@@ -304,6 +304,24 @@
     }
   }
 
+  @keyframes shimmer {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: calc(200px + 100%) 0;
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 5px hsl(var(--accent) / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 20px hsl(var(--accent) / 0.6), 0 0 30px hsl(var(--accent) / 0.4);
+    }
+  }
+
   @keyframes bounce-out {
     0% {
       transform: translateX(0) scale(1);
@@ -427,6 +445,35 @@
   .note-editor:empty:before {
     content: attr(data-placeholder);
     @apply text-muted-foreground italic;
+  }
+
+  /* Loading shimmer effect */
+  .loading-shimmer {
+    background: linear-gradient(90deg, transparent, hsl(var(--muted) / 0.4), transparent);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Enhanced interactive elements */
+  .interactive-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .interactive-card:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 10px 25px -5px hsl(var(--foreground) / 0.1);
+  }
+
+  /* Floating animation for special elements */
+  .float {
+    animation: gentle-bounce 3s ease-in-out infinite;
+  }
+
+  /* Enhanced focus states */
+  .enhanced-focus:focus-visible {
+    outline: 2px solid hsl(var(--accent));
+    outline-offset: 2px;
+    animation: glow-pulse 2s ease-in-out infinite;
   }
 
   /* Image editing styles */

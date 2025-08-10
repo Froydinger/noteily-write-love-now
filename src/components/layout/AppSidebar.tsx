@@ -166,10 +166,10 @@ export function AppSidebar() {
           <div className="px-4 mb-4">
             <Button 
               variant="outline" 
-              className="w-full justify-start gap-3 h-10 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md rounded-full"
+              className="w-full justify-start gap-3 h-10 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md rounded-full bg-gradient-to-r from-accent/5 to-accent/10 hover:from-accent/10 hover:to-accent/20 border-accent/20 hover:border-accent/40"
               onClick={handleCreateNote}
             >
-              <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+              <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-90" />
               <span className="font-medium">New Note</span>
             </Button>
           </div>

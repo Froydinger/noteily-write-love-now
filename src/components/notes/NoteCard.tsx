@@ -48,7 +48,7 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
 
   return (
     <Card 
-      className="h-full cursor-pointer group hover:border-primary/40 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-lg animate-float-in relative"
+      className="h-full cursor-pointer group interactive-card hover:border-accent/50 animate-float-in relative backdrop-blur-sm bg-card/95"
       onClick={handleClick}
     >
       {/* Share button in top right corner */}
@@ -91,8 +91,8 @@ export default function NoteCard({ note, onShareClick }: NoteCardProps) {
             I Shared
           </Badge>
         )}
-        <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-primary transition-colors duration-300 mb-3">{note.title || "Untitled Note"}</h3>
-        <p className="text-sm text-muted-foreground line-clamp-4 group-hover:text-foreground/80 transition-colors duration-300">{truncatedContent}</p>
+        <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight group-hover:text-accent transition-colors duration-300 mb-3">{note.title || "Untitled Note"}</h3>
+        <p className="text-sm text-muted-foreground line-clamp-4 group-hover:text-foreground/90 transition-colors duration-300 leading-relaxed">{truncatedContent}</p>
       </CardContent>
       <CardFooter className="p-4 pt-0 text-xs text-muted-foreground transition-all duration-300 group-hover:text-muted-foreground/80">
         Last modified {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}

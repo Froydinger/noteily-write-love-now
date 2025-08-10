@@ -1,6 +1,6 @@
 
 import { Plus, Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useNotes } from '@/contexts/NoteContext';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
@@ -30,21 +30,16 @@ export default function EmptyNotesPlaceholder() {
             <SidebarTrigger />
           </div>
         )}
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-          <Heart className="h-16 w-16 mb-6 text-accent" />
-          <h2 className="text-2xl font-serif font-medium mb-3">Welcome to Noteily</h2>
-          <p className="text-muted-foreground max-w-md mb-8 animate-fade-in" style={{ animationDelay: '0.4s', animationFillMode: 'both' }}>
-            Create your first note to start your journey of self-expression and reflection.
-          </p>
-          <Button 
-            onClick={handleCreateFirstNote} 
-            className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-lg animate-scale-in group rounded-full"
-            style={{ animationDelay: '0.6s', animationFillMode: 'both' }}
-          >
-            <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-            Create Your First Note
-          </Button>
-        </div>
+        <EmptyState
+          icon={Heart}
+          title="Welcome to Noteily"
+          description="Create your first note to start your journey of self-expression and reflection."
+          action={{
+            label: "Create Your First Note",
+            onClick: handleCreateFirstNote
+          }}
+          className="min-h-[60vh] animate-fade-in"
+        />
       </div>
     </div>
   );

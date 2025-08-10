@@ -196,7 +196,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-96 animate-fade-in">
+    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-96 animate-fade-in relative">
       <textarea
         ref={titleRef}
         value={title}
@@ -207,7 +207,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
           updateNote(note.id, { title: newTitle });
         }}
         placeholder="Untitled Note"
-        className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 dark:focus:ring-neon-blue resize-none overflow-hidden ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+        className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 resize-none overflow-hidden enhanced-focus transition-all duration-200 ${isReadOnly ? 'cursor-not-allowed opacity-70' : 'hover:text-accent/90'}`}
         readOnly={isReadOnly}
         style={{ 
           minHeight: 'auto',
@@ -233,7 +233,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       <div
         ref={contentRef}
         contentEditable={!isReadOnly}
-        className={`note-editor prose prose-sm md:prose-base max-w-none focus:outline-none dark:focus:ring-neon-blue dark:prose-invert min-h-[50vh] ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+        className={`note-editor prose prose-sm md:prose-base max-w-none focus:outline-none enhanced-focus dark:prose-invert min-h-[50vh] transition-all duration-200 ${isReadOnly ? 'cursor-not-allowed opacity-70' : 'prose-headings:text-accent prose-a:text-accent hover:prose-headings:text-accent/90'}`}
         data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
         aria-label="Note content"
         onPaste={isReadOnly ? undefined : handlePaste}
