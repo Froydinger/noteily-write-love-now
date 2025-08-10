@@ -469,6 +469,8 @@
 
   .note-editor {
     @apply min-h-[60vh] w-full outline-none font-opensans text-lg;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
   
   .note-editor:empty:before {
@@ -476,9 +478,9 @@
     @apply text-muted-foreground italic;
   }
 
-  /* Use default scroll anchoring to avoid jumps during typing */
+  /* Prevent browser repositioning during dynamic edits */
   .editor-anchor {
-    overflow-anchor: auto;
+    overflow-anchor: none;
   }
 
 

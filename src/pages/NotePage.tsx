@@ -42,8 +42,6 @@ const NotePage = () => {
   useEffect(() => {
     if (note) {
       setCurrentNote(note);
-      // Scroll to top when note opens
-      window.scrollTo(0, 0);
     } else if (id) {
       // Navigate home if note doesn't exist
       navigate('/');
