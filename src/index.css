@@ -476,9 +476,9 @@
     @apply text-muted-foreground italic;
   }
 
-  /* Prevent scroll anchoring jumps in dynamic editors */
+  /* Use default scroll anchoring to avoid jumps during typing */
   .editor-anchor {
-    overflow-anchor: none;
+    overflow-anchor: auto;
   }
 
 

@@ -47,8 +47,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         // Sanitize content for display
         const sanitizedContent = sanitizeForDisplay(note.content);
         contentRef.current.innerHTML = sanitizedContent;
-        // Scroll to top of the editor when content loads
-        contentRef.current.scrollTop = 0;
       }
     }
   }, [note.id]);
@@ -196,7 +194,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-96 animate-fade-in relative">
+    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24 relative">
       <textarea
         ref={titleRef}
         value={title}
@@ -207,7 +205,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
           updateNote(note.id, { title: newTitle });
         }}
         placeholder="Untitled Note"
-        className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden editor-anchor ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+        className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
         readOnly={isReadOnly}
         style={{ 
           minHeight: 'auto',
@@ -233,7 +231,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       <div
         ref={contentRef}
         contentEditable={!isReadOnly}
-        className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none min-h-[50vh] transition-none editor-anchor ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+        className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none min-h-[50vh] transition-none ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
         data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
         aria-label="Note content"
         onPaste={isReadOnly ? undefined : handlePaste}
