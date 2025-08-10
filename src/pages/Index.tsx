@@ -27,6 +27,7 @@ const Index = () => {
   const [shareFilter, setShareFilter] = useState('all');
   const [shareManagerNote, setShareManagerNote] = useState<Note | null>(null);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+  const [shareChanged, setShareChanged] = useState(false);
 
   const filteredAndSortedNotes = useMemo(() => {
     let filtered = notes.filter(note => {
@@ -74,13 +75,20 @@ const Index = () => {
   };
 
   const handleShareClick = (note: Note) => {
+    setShareChanged(false);
     setShareManagerNote(note);
   };
 
   const handleShareClose = () => {
     setShareManagerNote(null);
-    // Refresh notes to get updated sharing state
-    syncNotes();
+    if (shareChanged) {
+      syncNotes();
+    }
+    setShareChanged(false);
+  };
+
+  const handleShareUpdated = () => {
+    setShareChanged(true);
   };
 
   const handleCardPress = (note: Note) => {
@@ -201,7 +209,7 @@ const Index = () => {
             isOpen={!!shareManagerNote}
             onClose={handleShareClose}
             note={shareManagerNote}
-            onShareUpdate={handleShareClose}
+            onShareUpdate={handleShareUpdated}
           />
         )}
       </div>
