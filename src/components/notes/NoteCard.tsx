@@ -1,5 +1,4 @@
 
-import { useRef } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 
 import { Note } from '@/contexts/NoteContext';
@@ -17,8 +16,8 @@ interface NoteCardProps {
 }
 
 export default function NoteCard({ note, onShareClick, isSelected = false, onPress }: NoteCardProps) {
-  const touchTriggered = useRef(false);
   
+  // Check if this note is shared with the user (they don't own it)
   const isSharedWithUser = 'isSharedWithUser' in note && note.isSharedWithUser && !note.isOwnedByUser;
   
   // Check if this note is shared by the user (they own it and have shared it with others)
@@ -46,26 +45,10 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
 
   const selectedStyles = isSelected ? 'ring-2 ring-primary/40 border-primary/40' : '';
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (touchTriggered.current) {
-      touchTriggered.current = false;
-      return;
-    }
-    onPress?.(note);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    e.stopPropagation();
-    touchTriggered.current = true;
-    onPress?.(note);
-  };
-
   return (
     <Card 
       className={`h-full cursor-pointer group interactive-card hover:border-accent/50 animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles}`}
-      onClick={handleCardClick}
-      onTouchEnd={handleTouchEnd}
+      onClick={(e) => { e.stopPropagation(); onPress?.(note); }}
     >
       {/* Share button in top right corner */}
       {onShareClick && (

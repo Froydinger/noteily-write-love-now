@@ -118,7 +118,8 @@ const Index = () => {
   const content = (
     <div className="min-h-full">
       <div className="p-6 md:p-10 animate-fade-in"
-           style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
+           style={{ animationDelay: '0.1s', animationFillMode: 'both' }}
+           onClick={() => setSelectedNoteId(null)}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             {(isMobile || state === "collapsed") && (
