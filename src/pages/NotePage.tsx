@@ -50,7 +50,11 @@ const NotePage = () => {
     return () => setCurrentNote(null);
   }, [id, note, navigate, setCurrentNote]);
 
-  
+  // Always start at top when opening a note
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [id]);
+
   const handleDelete = () => {
     if (id) {
       deleteNote(id);
