@@ -144,7 +144,7 @@ const NotePage = () => {
   }
   
   return (
-    <div className="h-full flex flex-col">
+    <div key={id} className="h-full flex flex-col animate-slide-in-right">
       <header className="border-b p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
