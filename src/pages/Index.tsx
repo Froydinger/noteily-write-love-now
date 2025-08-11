@@ -198,7 +198,7 @@ const Index = () => {
                 animationFillMode: 'both'
               }}
             >
-              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} />
+              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} />
             </div>
           ))}
         </div>

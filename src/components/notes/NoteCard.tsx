@@ -5,7 +5,7 @@ import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Eye, Edit } from 'lucide-react';
+import { Users, Eye, Edit, ArrowUpRight } from 'lucide-react';
 import type { NoteWithSharing } from '@/types/sharing';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -14,9 +14,10 @@ interface NoteCardProps {
   onShareClick?: (note: Note | NoteWithSharing) => void;
   isSelected?: boolean;
   onPress?: (note: Note | NoteWithSharing) => void;
+  onOpen?: (note: Note | NoteWithSharing) => void;
 }
 
-export default function NoteCard({ note, onShareClick, isSelected = false, onPress }: NoteCardProps) {
+export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen }: NoteCardProps) {
   
   const isMobile = useIsMobile();
   
@@ -68,6 +69,19 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         </Button>
       )}
       
+      {/* Quick open arrow */}
+      <Button
+        variant="secondary"
+        size="sm"
+        className={`absolute bottom-2 right-2 h-7 w-7 rounded-full p-0 shadow-sm z-10 ${isMobile ? '' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
+        aria-label="Open note"
+        onClick={(e) => {
+          e.stopPropagation();
+          onOpen?.(note);
+        }}
+      >
+        <ArrowUpRight className="h-3.5 w-3.5" />
+      </Button>
       <CardContent className={`p-4 transition-all duration-300 ${!isMobile ? 'group-hover:translate-y-[-1px]' : ''} select-none`}>
         {/* Shared note tags at top of content */}
         {isSharedWithUser && (
