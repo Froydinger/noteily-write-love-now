@@ -5,7 +5,7 @@ import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Eye, Edit, ArrowUpRight } from 'lucide-react';
+import { Users, Eye, Edit, ArrowUpRight, Pin } from 'lucide-react';
 import type { NoteWithSharing } from '@/types/sharing';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -15,9 +15,11 @@ interface NoteCardProps {
   isSelected?: boolean;
   onPress?: (note: Note | NoteWithSharing) => void;
   onOpen?: (note: Note | NoteWithSharing) => void;
+  isPinned?: boolean;
+  onTogglePin?: (note: Note | NoteWithSharing) => void;
 }
 
-export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen }: NoteCardProps) {
+export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen, isPinned = false, onTogglePin }: NoteCardProps) {
   
   const isMobile = useIsMobile();
   
@@ -69,6 +71,20 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         </Button>
       )}
       
+      {/* Pin toggle */}
+      <Button
+        variant="secondary"
+        size="sm"
+        className={`absolute bottom-2 right-11 h-7 w-7 rounded-full p-0 shadow-sm z-10 ${isMobile ? '' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'} ${isPinned ? 'text-primary border-primary/30 bg-primary/10' : ''}`}
+        aria-label={isPinned ? 'Unpin note' : 'Pin note'}
+        onClick={(e) => {
+          e.stopPropagation();
+          onTogglePin?.(note);
+        }}
+      >
+        <Pin className="h-3.5 w-3.5" />
+      </Button>
+
       {/* Quick open arrow */}
       <Button
         variant="secondary"

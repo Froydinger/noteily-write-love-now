@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotes } from '@/contexts/NoteContext';
 import { Note } from '@/contexts/NoteContext';
@@ -14,6 +14,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useNotifications } from '@/hooks/useNotifications';
 import PullToRefresh from 'react-simple-pull-to-refresh';
 import { ShareManager } from '@/components/notes/ShareManager';
+import { toast } from '@/components/ui/sonner';
 
 const Index = () => {
   const { user } = useAuth();
@@ -28,6 +29,22 @@ const Index = () => {
   const [shareManagerNote, setShareManagerNote] = useState<Note | null>(null);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [shareChanged, setShareChanged] = useState(false);
+  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const key = `pinned:${user?.id || 'guest'}`;
+      const raw = localStorage.getItem(key);
+      setPinnedIds(raw ? JSON.parse(raw) : []);
+    } catch {}
+  }, [user?.id]);
+
+  useEffect(() => {
+    try {
+      const key = `pinned:${user?.id || 'guest'}`;
+      localStorage.setItem(key, JSON.stringify(pinnedIds.slice(0, 2)));
+    } catch {}
+  }, [pinnedIds, user?.id]);
 
   const filteredAndSortedNotes = useMemo(() => {
     let filtered = notes.filter(note => {
@@ -49,16 +66,26 @@ const Index = () => {
       }
     });
 
+    let sorted: Note[] = [];
     switch (sortOrder) {
       case 'alphabetical':
-        return filtered.sort((a, b) => a.title.localeCompare(b.title));
+        sorted = filtered.sort((a, b) => a.title.localeCompare(b.title));
+        break;
       case 'oldest':
-        return filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        sorted = filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        break;
       case 'latest':
       default:
-        return filtered.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+        sorted = filtered.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+        break;
     }
-  }, [notes, searchTerm, sortOrder, shareFilter]);
+
+    // Place pinned notes first, keeping sort order within each group
+    const pinnedSet = new Set(pinnedIds);
+    const pinned = sorted.filter(n => pinnedSet.has(n.id));
+    const unpinned = sorted.filter(n => !pinnedSet.has(n.id));
+    return [...pinned, ...unpinned];
+  }, [notes, searchTerm, sortOrder, shareFilter, pinnedIds]);
   
   const handleCreateNote = async () => {
     try {
@@ -98,6 +125,19 @@ const Index = () => {
     } else {
       setSelectedNoteId(note.id);
     }
+  };
+
+  const handleTogglePin = (note: Note) => {
+    setPinnedIds((prev) => {
+      if (prev.includes(note.id)) {
+        return prev.filter((id) => id !== note.id);
+      }
+      if (prev.length >= 2) {
+        toast.error('You can pin up to 2 notes');
+        return prev;
+      }
+      return [...prev, note.id];
+    });
   };
 
   // Debug logging to track the race condition
@@ -198,7 +238,7 @@ const Index = () => {
                 animationFillMode: 'both'
               }}
             >
-              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} />
+              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} isPinned={pinnedIds.includes(note.id)} onTogglePin={handleTogglePin} />
             </div>
           ))}
         </div>
