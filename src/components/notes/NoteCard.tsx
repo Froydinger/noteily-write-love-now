@@ -65,7 +65,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         </Button>
       )}
       
-      <CardContent className="p-4 transition-all duration-300 group-hover:translate-y-[-1px]">
+      <CardContent className="p-4 transition-all duration-300 group-hover:translate-y-[-1px] select-none">
         {/* Shared note tags at top of content */}
         {isSharedWithUser && (
           <Badge 

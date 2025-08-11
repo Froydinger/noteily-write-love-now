@@ -51,9 +51,13 @@ const NotePage = () => {
     return () => setCurrentNote(null);
   }, [id, note, navigate, setCurrentNote]);
 
-  // Always start at top when opening a note + play enter transition
+  // Always start at top when opening a note + play enter transition (no autofocus)
   useEffect(() => {
     setEntered(false);
+    // Blur any focused element to prevent iOS jumping to inputs
+    if (document.activeElement && document.activeElement !== document.body) {
+      (document.activeElement as HTMLElement).blur();
+    }
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     requestAnimationFrame(() => {
       requestAnimationFrame(() => setEntered(true));
