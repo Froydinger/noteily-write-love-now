@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, Eye, Edit } from 'lucide-react';
 import type { NoteWithSharing } from '@/types/sharing';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface NoteCardProps {
   note: Note | NoteWithSharing;
@@ -16,6 +17,8 @@ interface NoteCardProps {
 }
 
 export default function NoteCard({ note, onShareClick, isSelected = false, onPress }: NoteCardProps) {
+  
+  const isMobile = useIsMobile();
   
   // Check if this note is shared with the user (they don't own it)
   const isSharedWithUser = 'isSharedWithUser' in note && note.isSharedWithUser && !note.isOwnedByUser;
@@ -47,7 +50,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
 
   return (
     <Card 
-      className={`h-full cursor-pointer group interactive-card hover:border-accent/50 animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles}`}
+      className={`h-full cursor-pointer group interactive-card ${!isMobile ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles}`}
       onClick={(e) => { e.stopPropagation(); onPress?.(note); }}
     >
       {/* Share button in top right corner */}
@@ -55,7 +58,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         <Button
           variant="ghost"
           size="sm"
-          className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+          className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : (!isMobile ? 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto' : 'opacity-0 pointer-events-none')}`}
           onClick={(e) => {
             e.stopPropagation();
             onShareClick(note);
@@ -65,7 +68,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         </Button>
       )}
       
-      <CardContent className="p-4 transition-all duration-300 group-hover:translate-y-[-1px] select-none">
+      <CardContent className={`p-4 transition-all duration-300 ${!isMobile ? 'group-hover:translate-y-[-1px]' : ''} select-none`}>
         {/* Shared note tags at top of content */}
         {isSharedWithUser && (
           <Badge 
@@ -91,9 +94,9 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
           </Badge>
         )}
         <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight text-foreground transition-colors duration-300 mb-3">{note.title || "Untitled Note"}</h3>
-        <p className="text-sm text-muted-foreground line-clamp-4 group-hover:text-foreground/90 transition-colors duration-300 leading-relaxed">{truncatedContent}</p>
+        <p className={`text-sm text-muted-foreground line-clamp-4 ${!isMobile ? 'group-hover:text-foreground/90' : ''} transition-colors duration-300 leading-relaxed`}>{truncatedContent}</p>
       </CardContent>
-      <CardFooter className="p-4 pt-0 text-xs text-muted-foreground transition-all duration-300 group-hover:text-muted-foreground/80">
+      <CardFooter className={`p-4 pt-0 text-xs text-muted-foreground transition-all duration-300 ${!isMobile ? 'group-hover:text-muted-foreground/80' : ''}`}>
         Last modified {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
       </CardFooter>
     </Card>
