@@ -472,6 +472,22 @@
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* Checklist styling */
+  .note-editor ul.checklist {
+    list-style: none;
+    padding-left: 1.25rem;
+  }
+  .note-editor ul.checklist li {
+    position: relative;
+    padding-left: 1.25rem;
+  }
+  .note-editor ul.checklist li::before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    color: hsl(var(--muted-foreground));
+  }
   
   .note-editor:empty:before {
     content: attr(data-placeholder);
