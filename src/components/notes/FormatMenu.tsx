@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect } from 'react';
-import { Bold, Italic, Quote, ListChecks } from 'lucide-react';
+import { Bold, Italic, Quote } from 'lucide-react';
 import { CommandGroup, CommandItem } from '@/components/ui/command';
 
 interface FormatMenuProps {
@@ -38,8 +38,6 @@ const FormatMenu = ({ position, onFormatSelect, onClose }: FormatMenuProps) => {
   const formatCommands = [
     { id: 'h1', name: 'Heading 1', execute: () => onFormatSelect('formatBlock', '<h1>') },
     { id: 'h2', name: 'Heading 2', execute: () => onFormatSelect('formatBlock', '<h2>') },
-    { id: 'paragraph', name: 'Paragraph', execute: () => onFormatSelect('formatBlock', '<p>') },
-    { id: 'checklist', name: 'Checklist', icon: ListChecks, execute: () => onFormatSelect('checklist') },
     { id: 'bold', name: 'Bold', icon: Bold, execute: () => onFormatSelect('bold') },
     { id: 'italic', name: 'Italic', icon: Italic, execute: () => onFormatSelect('italic') },
     { id: 'quote', name: 'Blockquote', icon: Quote, execute: () => onFormatSelect('formatBlock', '<blockquote>') }
@@ -66,7 +64,7 @@ const FormatMenu = ({ position, onFormatSelect, onClose }: FormatMenuProps) => {
             {command.icon && <command.icon size={16} className="dark:text-neon-blue" />}
             {!command.icon && (
               <span className="w-4 h-4 flex items-center justify-center font-bold dark:text-neon-blue">
-                {command.id === 'h1' ? 'H1' : command.id === 'h2' ? 'H2' : command.id === 'paragraph' ? 'P' : ''}
+                {command.id === 'h1' ? 'H1' : command.id === 'h2' ? 'H2' : ''}
               </span>
             )}
             <span>{command.name}</span>

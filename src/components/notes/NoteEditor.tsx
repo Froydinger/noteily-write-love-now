@@ -4,9 +4,6 @@ import { useNotes, Note } from '@/contexts/NoteContext';
 import DOMPurify from 'dompurify';
 import { ImageUploadButton } from './ImageUploadButton';
 import { FeaturedImage } from './FeaturedImage';
-import FormatMenu from './FormatMenu';
-import { Button } from '@/components/ui/button';
-import { Type } from 'lucide-react';
 import { sanitizeContent, sanitizeForDisplay, sanitizeImageUrl, isValidImageUrl } from "@/lib/sanitization";
 
 interface NoteEditorProps {
@@ -18,10 +15,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const [title, setTitle] = useState(note.title);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  
-  const [isEditorFocused, setIsEditorFocused] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const blurTimer = useRef<number | null>(null);
   
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
   
@@ -185,47 +178,10 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     }
   };
 
-  // Focus/blur handlers to control floating formatting button visibility
-  const handleFocus = () => {
-    if (blurTimer.current) window.clearTimeout(blurTimer.current);
-    setIsEditorFocused(true);
-  };
-  const handleBlur = () => {
-    if (blurTimer.current) window.clearTimeout(blurTimer.current);
-    blurTimer.current = window.setTimeout(() => {
-      if (!isMenuOpen) setIsEditorFocused(false);
-    }, 150);
-  };
-
-  const handleFormatSelect = (command: string, value?: string) => {
-    if (!contentRef.current) return;
-    contentRef.current.focus();
-
-    if (command === 'checklist') {
-      document.execCommand('insertUnorderedList');
-      const sel = window.getSelection();
-      const anchor = sel?.anchorNode || null;
-      let ul: Element | null = null;
-      if (anchor) {
-        const container = (anchor as Node).nodeType === 1 ? (anchor as Element) : (anchor as Node).parentElement;
-        ul = container ? container.closest('ul') : null;
-      }
-      if (ul) {
-        ul.classList.add('checklist');
-      }
-    } else if (command === 'formatBlock' && value) {
-      document.execCommand('formatBlock', false, value);
-    } else {
-      document.execCommand(command, false, value);
-    }
-
-    // Trigger content change to save
-    contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-    setIsMenuOpen(false);
-  };
   // Handle existing images in loaded content
   useEffect(() => {
     if (!contentRef.current) return;
+    
     const images = contentRef.current.querySelectorAll('img');
     images.forEach((img) => {
       if (!img.hasAttribute('data-image-id')) {
@@ -233,34 +189,12 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         img.className = 'note-image';
       }
     });
+
   }, [note.id]);
+
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24 relative">
-      {!isReadOnly && isEditorFocused && (
-        <div className="absolute left-2 top-2 z-50 formatting-controls">
-          <Button
-            size="icon"
-            variant="secondary"
-            aria-label="Formatting"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => setIsMenuOpen((o) => !o)}
-          >
-            <Type size={18} />
-          </Button>
-        </div>
-      )}
-      {!isReadOnly && isMenuOpen && (
-        <FormatMenu
-          position={{ top: 48, left: 8 }}
-          onFormatSelect={handleFormatSelect}
-          onClose={() => {
-            setIsMenuOpen(false);
-            // keep focus state so button remains if still editing
-            setIsEditorFocused(true);
-          }}
-        />
-      )}
       <textarea
         ref={titleRef}
         value={title}
@@ -270,8 +204,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
           setTitle(newTitle);
           updateNote(note.id, { title: newTitle });
         }}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
         placeholder="Untitled Note"
         className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
         readOnly={isReadOnly}
@@ -303,8 +235,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
         aria-label="Note content"
         onPaste={isReadOnly ? undefined : handlePaste}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
       />
       
       {!isReadOnly && <ImageUploadButton onImageInsert={insertImageAtCursor} />}
