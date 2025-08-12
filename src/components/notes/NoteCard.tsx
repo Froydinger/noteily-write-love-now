@@ -31,17 +31,17 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
   
   const contentPreview = note.content 
     ? note.content
-        .replace(/<\/p>/gi, ' ') // Convert paragraph endings to spaces
-        .replace(/<\/div>/gi, ' ') // Convert div endings to spaces
-        .replace(/<br\s*\/?>/gi, ' ') // Convert line breaks to spaces
-        .replace(/<[^>]*>/g, '') // Remove HTML tags
-        .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces to regular spaces
-        .replace(/&amp;/g, '&') // Convert encoded ampersands
-        .replace(/&lt;/g, '<') // Convert encoded less-than
-        .replace(/&gt;/g, '>') // Convert encoded greater-than
-        .replace(/&quot;/g, '"') // Convert encoded quotes
-        .replace(/&#39;/g, "'") // Convert encoded apostrophes
-        .replace(/\s{2,}/g, ' ') // Replace multiple spaces with single space
+        .replace(/<\/p>/gi, ' ')
+        .replace(/<\/div>/gi, ' ')
+        .replace(/<br\s*\/>?/gi, ' ')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&lt;[^&]*&gt;/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        // Intentionally do not decode &lt; or &gt; to avoid showing fake tags
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\s{2,}/g, ' ')
         .trim()
     : 'No content';
   
