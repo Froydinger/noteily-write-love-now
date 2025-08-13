@@ -59,7 +59,8 @@ const Index = () => {
         case 'shared-with-me':
           return note.isSharedWithUser === true;
         case 'shared-with-others':
-          return note.isOwnedByUser === true; // Only show owned notes when filtering for "my shared notes"
+          // Only include notes you own that have been explicitly shared with someone
+          return note.isOwnedByUser === true && (note.shares?.length ?? 0) > 0;
         case 'all':
         default:
           return true;
@@ -80,7 +81,11 @@ const Index = () => {
         break;
     }
 
-    // Place pinned notes first, keeping sort order within each group
+    // Place pinned notes first unless using a shared-only view
+    if (shareFilter === 'shared-with-me' || shareFilter === 'shared-with-others') {
+      return sorted;
+    }
+
     const pinnedSet = new Set(pinnedIds);
     const pinned = sorted.filter(n => pinnedSet.has(n.id));
     const unpinned = sorted.filter(n => !pinnedSet.has(n.id));
