@@ -5,7 +5,6 @@ import DOMPurify from 'dompurify';
 import { ImageUploadButton } from './ImageUploadButton';
 import { FeaturedImage } from './FeaturedImage';
 import { sanitizeContent, sanitizeForDisplay, sanitizeImageUrl, isValidImageUrl } from "@/lib/sanitization";
-import { BlockHandle, BlockType } from './BlockHandle';
 
 interface NoteEditorProps {
   note: Note;
@@ -16,10 +15,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const [title, setTitle] = useState(note.title);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [handleTop, setHandleTop] = useState(0);
-  const [showHandle, setShowHandle] = useState(false);
-  const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
   
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
   
@@ -197,57 +192,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
   }, [note.id]);
 
-  // Block handle positioning and block type detection
-  useEffect(() => {
-    if (isReadOnly) return;
-    const updateHandle = () => {
-      const editor = contentRef.current;
-      if (!editor) return;
-      const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) { setShowHandle(false); return; }
-      const range = selection.getRangeAt(0);
-      if (!editor.contains(range.commonAncestorContainer)) { setShowHandle(false); return; }
-      let node: Node | null = range.commonAncestorContainer;
-      if (node.nodeType === Node.TEXT_NODE) { node = (node as Text).parentElement; }
-      let element: Element | null = (node as Element) || null;
-      const blockquote = element ? element.closest('blockquote') : null;
-      let anchorEl: Element | null = null;
-      if (blockquote && editor.contains(blockquote)) {
-        anchorEl = blockquote;
-        setCurrentBlockType('blockquote');
-      } else {
-        anchorEl = element ? element.closest('h1, p, div') : null;
-        const tag = anchorEl?.tagName;
-        if (tag === 'H1') setCurrentBlockType('h1');
-        else setCurrentBlockType('p');
-      }
-      if (!anchorEl) { setShowHandle(false); return; }
-      const anchorRect = anchorEl.getBoundingClientRect();
-      const containerRect = editor.getBoundingClientRect();
-      setHandleTop(anchorRect.top - containerRect.top + 4);
-      setShowHandle(true);
-    };
-    document.addEventListener('selectionchange', updateHandle);
-    window.addEventListener('resize', updateHandle);
-    window.addEventListener('scroll', updateHandle, true);
-    updateHandle();
-    return () => {
-      document.removeEventListener('selectionchange', updateHandle);
-      window.removeEventListener('resize', updateHandle);
-      window.removeEventListener('scroll', updateHandle, true);
-    };
-  }, [isReadOnly]);
-
-  const handleBlockTypeSelect = (type: BlockType) => {
-    if (!contentRef.current) return;
-    contentRef.current.focus();
-    try {
-      document.execCommand('formatBlock', false, type === 'p' ? 'p' : type);
-    } catch (e) {
-      // no-op
-    }
-    contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-  };
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24 relative">
@@ -294,15 +238,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       />
       
       {!isReadOnly && <ImageUploadButton onImageInsert={insertImageAtCursor} />}
-
-      {!isReadOnly && (
-        <BlockHandle
-          top={handleTop}
-          visible={showHandle}
-          currentType={currentBlockType}
-          onSelect={handleBlockTypeSelect}
-        />
-      )}
     </div>
   );
 }
