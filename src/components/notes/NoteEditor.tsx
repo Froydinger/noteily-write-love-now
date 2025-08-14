@@ -340,7 +340,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       
       {!isReadOnly && <ImageUploadButton onImageInsert={insertImageAtCursor} />}
 
-      {!isReadOnly && (
+      {!isReadOnly && false && (
         <BlockHandle
           top={handleTop}
           visible={showHandle}
