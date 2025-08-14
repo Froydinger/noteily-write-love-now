@@ -294,7 +294,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24 relative">
+    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24 relative overflow-visible">
       <textarea
         ref={titleRef}
         value={title}
@@ -331,10 +331,11 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       <div
         ref={contentRef}
         contentEditable={!isReadOnly}
-        className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none min-h-[50vh] transition-none editor-anchor ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+        className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none min-h-[50vh] transition-none editor-anchor relative ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
         data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
         aria-label="Note content"
         onPaste={isReadOnly ? undefined : handlePaste}
+        onFocus={() => !isReadOnly && setShowHandle(true)}
       />
       
       {!isReadOnly && <ImageUploadButton onImageInsert={insertImageAtCursor} />}

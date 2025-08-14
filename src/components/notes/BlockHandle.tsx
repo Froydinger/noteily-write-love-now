@@ -17,8 +17,12 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
 
   return (
     <div
-      className="absolute z-10"
-      style={{ top: Math.max(top, 0), right: -60, zIndex: 50 }}
+      className="absolute z-50"
+      style={{ 
+        top: Math.max(top, 0), 
+        right: -80,
+        transform: 'translateY(-50%)'
+      }}
       aria-hidden={!visible}
     >
       <Popover>
