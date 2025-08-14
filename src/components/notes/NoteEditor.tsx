@@ -200,41 +200,85 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   // Block handle positioning and block type detection
   useEffect(() => {
     if (isReadOnly) return;
+    
     const updateHandle = () => {
       const editor = contentRef.current;
-      if (!editor) return;
+      if (!editor) {
+        setShowHandle(false);
+        return;
+      }
+
       const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) { setShowHandle(false); return; }
+      if (!selection || selection.rangeCount === 0) {
+        setShowHandle(false);
+        return;
+      }
+
       const range = selection.getRangeAt(0);
-      if (!editor.contains(range.commonAncestorContainer)) { setShowHandle(false); return; }
-      let node: Node | null = range.commonAncestorContainer;
-      if (node.nodeType === Node.TEXT_NODE) { node = (node as Text).parentElement; }
-      let element: Element | null = (node as Element) || null;
-      const blockquote = element ? element.closest('blockquote') : null;
-      let anchorEl: Element | null = null;
-      if (blockquote && editor.contains(blockquote)) {
-        anchorEl = blockquote;
+      
+      // Check if selection is within the editor
+      if (!editor.contains(range.commonAncestorContainer)) {
+        setShowHandle(false);
+        return;
+      }
+
+      // Find the current line/block element
+      let element = range.commonAncestorContainer;
+      if (element.nodeType === Node.TEXT_NODE) {
+        element = element.parentElement!;
+      }
+
+      // Find the closest block element (div is the editor's main container)
+      let blockElement = (element as Element).closest('h1, blockquote, p, div');
+      
+      // If we're in the main editor div, treat it as a paragraph
+      if (blockElement === editor) {
+        blockElement = element as Element;
+      }
+
+      if (!blockElement) {
+        setShowHandle(false);
+        return;
+      }
+
+      // Determine block type
+      const tagName = blockElement.tagName.toLowerCase();
+      if (tagName === 'h1') {
+        setCurrentBlockType('h1');
+      } else if (tagName === 'blockquote') {
         setCurrentBlockType('blockquote');
       } else {
-        anchorEl = element ? element.closest('h1, p, div') : null;
-        const tag = anchorEl?.tagName;
-        if (tag === 'H1') setCurrentBlockType('h1');
-        else setCurrentBlockType('p');
+        setCurrentBlockType('p');
       }
-      if (!anchorEl) { setShowHandle(false); return; }
-      const anchorRect = anchorEl.getBoundingClientRect();
-      const containerRect = editor.getBoundingClientRect();
-      setHandleTop(anchorRect.top - containerRect.top + 4);
+
+      // Calculate position relative to the editor
+      const blockRect = blockElement.getBoundingClientRect();
+      const editorRect = editor.getBoundingClientRect();
+      const relativeTop = blockRect.top - editorRect.top + editor.scrollTop;
+      
+      setHandleTop(relativeTop);
       setShowHandle(true);
     };
+
+    // Add event listeners
+    const editor = contentRef.current;
+    if (editor) {
+      editor.addEventListener('focus', updateHandle);
+      editor.addEventListener('input', updateHandle);
+      editor.addEventListener('keyup', updateHandle);
+      editor.addEventListener('click', updateHandle);
+    }
+    
     document.addEventListener('selectionchange', updateHandle);
-    window.addEventListener('resize', updateHandle);
-    window.addEventListener('scroll', updateHandle, true);
-    updateHandle();
+    
     return () => {
+      if (editor) {
+        editor.removeEventListener('focus', updateHandle);
+        editor.removeEventListener('input', updateHandle);
+        editor.removeEventListener('keyup', updateHandle);
+        editor.removeEventListener('click', updateHandle);
+      }
       document.removeEventListener('selectionchange', updateHandle);
-      window.removeEventListener('resize', updateHandle);
-      window.removeEventListener('scroll', updateHandle, true);
     };
   }, [isReadOnly]);
 
