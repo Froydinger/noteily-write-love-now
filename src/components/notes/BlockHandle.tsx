@@ -17,7 +17,7 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
 
   return (
     <div
-      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+      className="fixed top-1/2 right-4 transform -translate-y-1/2 z-50 opacity-30"
       aria-hidden={!visible}
     >
       <Popover>
