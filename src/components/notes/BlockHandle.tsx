@@ -17,8 +17,8 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
     <div
       className={`fixed right-4 z-50 transition-all duration-300 ease-out ${
         visible 
-          ? 'opacity-30 animate-fade-in' 
-          : 'opacity-0 pointer-events-none animate-fade-out'
+          ? 'opacity-60' 
+          : 'opacity-0 pointer-events-none'
       }`}
       style={{ top: `${top}px` }}
       aria-hidden={!visible}
