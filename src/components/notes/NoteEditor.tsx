@@ -249,12 +249,11 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         setCurrentBlockType('p');
       }
 
-      // Calculate position relative to the editor
+      // Calculate absolute position on screen
       const blockRect = blockElement.getBoundingClientRect();
-      const editorRect = editor.getBoundingClientRect();
-      const relativeTop = blockRect.top - editorRect.top + editor.scrollTop;
+      const absoluteTop = blockRect.top;
       
-      setHandleTop(relativeTop);
+      setHandleTop(absoluteTop);
       setShowHandle(true);
     };
 
@@ -340,7 +339,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
       {!isReadOnly && (
         <BlockHandle
-          top={0}
+          top={handleTop}
           visible={showHandle}
           currentType={currentBlockType}
           onSelect={handleBlockTypeSelect}
