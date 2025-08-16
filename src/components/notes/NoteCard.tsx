@@ -82,7 +82,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
           onTogglePin?.(note);
         }}
       >
-        <Pin className="h-3.5 w-3.5" />
+        <Pin className="h-3.5 w-3.5" fill={isPinned ? "currentColor" : "none"} />
       </Button>
 
       {/* Quick open arrow */}
