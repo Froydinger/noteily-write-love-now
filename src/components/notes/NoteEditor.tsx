@@ -245,8 +245,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       const tagName = blockElement.tagName.toLowerCase();
       if (tagName === 'h1') {
         setCurrentBlockType('h1');
-      } else if (tagName === 'blockquote') {
-        setCurrentBlockType('blockquote');
       } else {
         setCurrentBlockType('p');
       }
@@ -340,9 +338,9 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       
       {!isReadOnly && <ImageUploadButton onImageInsert={insertImageAtCursor} />}
 
-      {!isReadOnly && false && (
+      {!isReadOnly && (
         <BlockHandle
-          top={handleTop}
+          top={0}
           visible={showHandle}
           currentType={currentBlockType}
           onSelect={handleBlockTypeSelect}

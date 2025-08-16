@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Heading1, Quote, Pilcrow, GripVertical } from "lucide-react";
 
-export type BlockType = "p" | "h1" | "blockquote";
+export type BlockType = "p" | "h1";
 
 interface BlockHandleProps {
   top: number;
@@ -17,12 +17,7 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
 
   return (
     <div
-      className="absolute z-50"
-      style={{ 
-        top: Math.max(top, 0), 
-        right: -80,
-        transform: 'translateY(-50%)'
-      }}
+      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
       aria-hidden={!visible}
     >
       <Popover>
@@ -31,7 +26,7 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
             <GripVertical className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-48 p-2" align="start">
+        <PopoverContent className="w-40 p-2" align="center">
           <div className="flex flex-col gap-1">
             <Button
               variant={currentType === "h1" ? "default" : "ghost"}
@@ -45,14 +40,7 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
               className="justify-start"
               onClick={() => onSelect("p")}
             >
-              <Pilcrow className="h-4 w-4 mr-2" /> Paragraph
-            </Button>
-            <Button
-              variant={currentType === "blockquote" ? "default" : "ghost"}
-              className="justify-start"
-              onClick={() => onSelect("blockquote")}
-            >
-              <Quote className="h-4 w-4 mr-2" /> Quote
+              <Pilcrow className="h-4 w-4 mr-2" /> Body
             </Button>
           </div>
         </PopoverContent>
