@@ -13,16 +13,25 @@ interface BlockHandleProps {
 }
 
 export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentType, onSelect }) => {
-  if (!visible) return null;
-
   return (
     <div
-      className="fixed top-1/2 right-4 transform -translate-y-1/2 z-50 opacity-30"
+      className={`fixed right-4 z-50 transition-all duration-300 ease-out ${
+        visible 
+          ? 'opacity-30 animate-fade-in' 
+          : 'opacity-0 pointer-events-none animate-fade-out'
+      }`}
+      style={{ top: `${top}px` }}
       aria-hidden={!visible}
     >
       <Popover>
         <PopoverTrigger asChild>
-          <Button size="icon" variant="secondary" className="rounded-full shadow-sm" aria-label="Change block type">
+          <Button 
+            size="icon" 
+            variant="secondary" 
+            className="rounded-full shadow-sm" 
+            aria-label="Change block type"
+            onPointerDown={(e) => e.preventDefault()}
+          >
             <GripVertical className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
@@ -31,6 +40,7 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
             <Button
               variant={currentType === "h1" ? "default" : "ghost"}
               className="justify-start"
+              onPointerDown={(e) => e.preventDefault()}
               onClick={() => onSelect("h1")}
             >
               <Heading1 className="h-4 w-4 mr-2" /> Header
@@ -38,6 +48,7 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
             <Button
               variant={currentType === "p" ? "default" : "ghost"}
               className="justify-start"
+              onPointerDown={(e) => e.preventDefault()}
               onClick={() => onSelect("p")}
             >
               <Pilcrow className="h-4 w-4 mr-2" /> Body
