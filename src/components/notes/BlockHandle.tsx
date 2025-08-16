@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Heading1, Quote, Pilcrow, GripVertical } from "lucide-react";
+import { Heading1, Quote, Pilcrow, Type } from "lucide-react";
 
 export type BlockType = "p" | "h1";
 
@@ -32,7 +32,7 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
             aria-label="Change block type"
             onPointerDown={(e) => e.preventDefault()}
           >
-            <GripVertical className="h-4 w-4" />
+            <Type className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-40 p-2" align="center">
