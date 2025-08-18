@@ -76,7 +76,7 @@ export function MarketingSplashScreen() {
                       setShowFeatures(false); // Close features popup first
                       setShowLoginDialog(true);
                     }} 
-                    className="bg-accent hover:bg-accent/90 text-accent-foreground w-full sm:w-auto"
+                    className="bg-slate-800 hover:bg-slate-700 text-white w-full sm:w-auto google-shimmer"
                   >
                     Get Started Free
                   </Button>
@@ -161,7 +161,7 @@ export function MarketingSplashScreen() {
                 setShowLoginDialog(true);
               }} 
               size="lg"
-              className="bg-accent hover:bg-accent/90 text-accent-foreground w-full sm:w-auto"
+              className="bg-slate-800 hover:bg-slate-700 text-white w-full sm:w-auto google-shimmer"
             >
               Start Writing Today
             </Button>
