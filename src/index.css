@@ -252,16 +252,21 @@
 
 }
 
-/* Frosted Glass Sidebar */
+/* Ultra Frosted Glass Sidebar */
 .frosted-glass-sidebar {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02) !important;
+  backdrop-filter: blur(40px) saturate(200%) brightness(110%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(110%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
   position: relative;
   overflow: hidden;
+  box-shadow: 
+    inset 1px 0 0 rgba(255, 255, 255, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.05) !important;
 }
 
+/* Enhanced glass reflection effect */
 .frosted-glass-sidebar::before {
   content: '';
   position: absolute;
@@ -270,93 +275,130 @@
   right: 0;
   bottom: 0;
   background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.02) 50%,
-    rgba(255, 255, 255, 0.05) 100%
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.02) 25%,
+    rgba(255, 255, 255, 0.001) 50%,
+    rgba(255, 255, 255, 0.02) 75%,
+    rgba(255, 255, 255, 0.1) 100%
   );
   pointer-events: none;
-  z-index: -1;
+  z-index: 1;
+  mix-blend-mode: overlay;
 }
 
+/* Glass edge highlight */
 .frosted-glass-sidebar::after {
   content: '';
   position: absolute;
   top: 0;
   right: 0;
-  width: 2px;
+  width: 3px;
   height: 100%;
   background: linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.4) 0%,
     rgba(255, 255, 255, 0.1) 20%,
-    rgba(255, 255, 255, 0.05) 40%,
+    rgba(255, 255, 255, 0.02) 40%,
     rgba(255, 255, 255, 0.1) 60%,
-    rgba(255, 255, 255, 0.2) 80%,
-    rgba(255, 255, 255, 0.3) 100%
+    rgba(255, 255, 255, 0.3) 80%,
+    rgba(255, 255, 255, 0.5) 100%
   );
-  border-radius: 0 2px 2px 0;
+  border-radius: 0 3px 3px 0;
   box-shadow: 
-    inset 1px 0 0 rgba(255, 255, 255, 0.2),
-    0 0 10px rgba(255, 255, 255, 0.1);
+    inset 2px 0 0 rgba(255, 255, 255, 0.3),
+    0 0 20px rgba(255, 255, 255, 0.15),
+    -1px 0 8px rgba(255, 255, 255, 0.1);
   pointer-events: none;
+  z-index: 2;
 }
 
-/* Dark mode adjustments */
+/* Dark mode - more transparent and glassy */
 .dark .frosted-glass-sidebar {
-  background: rgba(0, 0, 0, 0.1);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: blur(50px) saturate(150%) brightness(120%) !important;
+  -webkit-backdrop-filter: blur(50px) saturate(150%) brightness(120%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.03) !important;
 }
 
 .dark .frosted-glass-sidebar::before {
   background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.03) 0%,
-    rgba(255, 255, 255, 0.01) 50%,
-    rgba(255, 255, 255, 0.02) 100%
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.01) 25%,
+    rgba(255, 255, 255, 0.001) 50%,
+    rgba(255, 255, 255, 0.01) 75%,
+    rgba(255, 255, 255, 0.05) 100%
   );
 }
 
 .dark .frosted-glass-sidebar::after {
   background: linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.2) 0%,
     rgba(255, 255, 255, 0.05) 20%,
-    rgba(255, 255, 255, 0.02) 40%,
+    rgba(255, 255, 255, 0.01) 40%,
     rgba(255, 255, 255, 0.05) 60%,
-    rgba(255, 255, 255, 0.1) 80%,
-    rgba(255, 255, 255, 0.15) 100%
+    rgba(255, 255, 255, 0.15) 80%,
+    rgba(255, 255, 255, 0.25) 100%
   );
 }
 
-/* Navy theme adjustments */
+/* Navy theme - ultra glassy */
 .navy .frosted-glass-sidebar {
-  background: rgba(15, 23, 42, 0.15);
-  border-right: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.03) !important;
+  backdrop-filter: blur(45px) saturate(180%) brightness(115%) !important;
+  -webkit-backdrop-filter: blur(45px) saturate(180%) brightness(115%) !important;
+  border-right: 1px solid rgba(148, 163, 184, 0.15) !important;
 }
 
 .navy .frosted-glass-sidebar::before {
   background: linear-gradient(
-    145deg,
-    rgba(148, 163, 184, 0.04) 0%,
-    rgba(148, 163, 184, 0.01) 50%,
-    rgba(148, 163, 184, 0.03) 100%
+    135deg,
+    rgba(148, 163, 184, 0.1) 0%,
+    rgba(148, 163, 184, 0.02) 25%,
+    rgba(148, 163, 184, 0.001) 50%,
+    rgba(148, 163, 184, 0.02) 75%,
+    rgba(148, 163, 184, 0.06) 100%
   );
 }
 
-/* Sepia theme adjustments */
+/* Sepia theme - warm glass */
 .sepia .frosted-glass-sidebar {
-  background: rgba(41, 37, 28, 0.12);
-  border-right: 1px solid rgba(180, 150, 120, 0.1);
+  background: rgba(41, 37, 28, 0.04) !important;
+  backdrop-filter: blur(42px) saturate(170%) brightness(112%) !important;
+  -webkit-backdrop-filter: blur(42px) saturate(170%) brightness(112%) !important;
+  border-right: 1px solid rgba(180, 150, 120, 0.18) !important;
 }
 
 .sepia .frosted-glass-sidebar::before {
   background: linear-gradient(
-    145deg,
-    rgba(180, 150, 120, 0.05) 0%,
-    rgba(180, 150, 120, 0.02) 50%,
-    rgba(180, 150, 120, 0.04) 100%
+    135deg,
+    rgba(180, 150, 120, 0.12) 0%,
+    rgba(180, 150, 120, 0.03) 25%,
+    rgba(180, 150, 120, 0.001) 50%,
+    rgba(180, 150, 120, 0.03) 75%,
+    rgba(180, 150, 120, 0.08) 100%
   );
+}
+
+/* Mobile-specific enhancements */
+@media (max-width: 768px) {
+  .frosted-glass-sidebar {
+    backdrop-filter: blur(60px) saturate(220%) brightness(115%) !important;
+    -webkit-backdrop-filter: blur(60px) saturate(220%) brightness(115%) !important;
+    background: rgba(255, 255, 255, 0.01) !important;
+  }
+  
+  .dark .frosted-glass-sidebar {
+    backdrop-filter: blur(65px) saturate(180%) brightness(125%) !important;
+    -webkit-backdrop-filter: blur(65px) saturate(180%) brightness(125%) !important;
+    background: rgba(0, 0, 0, 0.02) !important;
+  }
 }
 
 @layer base {
