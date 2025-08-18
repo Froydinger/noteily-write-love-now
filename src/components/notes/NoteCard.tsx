@@ -130,15 +130,13 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
   const selectedStyles = isSelected ? 'ring-2 ring-primary/40 border-primary/40' : '';
 
   return (
-    <div className="relative overflow-hidden rounded-lg">
+    <div className="relative rounded-lg">
       {/* Delete button that appears behind the card */}
-      {isMobile && (
+      {isMobile && swipeOffset > 0 && (
         <div 
-          className="absolute inset-y-0 right-0 flex items-center justify-center bg-destructive rounded-r-lg z-0"
+          className="absolute inset-y-0 right-0 w-20 flex items-center justify-center bg-destructive rounded-r-lg"
           style={{ 
-            width: `${MAX_SWIPE}px`,
-            transform: `translateX(${MAX_SWIPE - swipeOffset}px)`,
-            opacity: swipeOffset > 10 ? 1 : 0
+            right: `-${80 - swipeOffset}px`
           }}
         >
           <Button
@@ -155,7 +153,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       
       <Card 
         ref={cardRef}
-        className={`h-full cursor-pointer group interactive-card ${!isMobile ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles} z-10`}
+        className={`h-full cursor-pointer group interactive-card ${!isMobile ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles} ${isSelected ? 'ring-2 ring-primary/60 border-primary/60 shadow-lg shadow-primary/20' : ''} z-10`}
         style={isMobile ? { 
           transform: `translateX(${swipeOffset}px)`,
           transition: isDragging ? 'none' : 'transform 0.2s ease-out'
