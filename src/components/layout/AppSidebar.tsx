@@ -109,7 +109,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className="w-64 md:w-72 transition-all duration-300 ease-in-out" collapsible="icon">
+    <Sidebar className="w-64 md:w-72 transition-all duration-300 ease-in-out bg-background/80 backdrop-blur-md border-r border-border/50" collapsible="icon">
       <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0">
         <div className={`flex items-center space-x-3 flex-1 ${state === "collapsed" ? "justify-center" : ""}`}>
           <Heart className="h-5 w-5 text-neon-blue" />
