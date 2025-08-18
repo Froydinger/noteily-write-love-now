@@ -31,6 +31,7 @@ const Index = () => {
   const [shareChanged, setShareChanged] = useState(false);
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
   const [showSearch, setShowSearch] = useState(false);
+  const [openSelect, setOpenSelect] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -195,10 +196,11 @@ const Index = () => {
           <div className="flex items-center gap-3 mb-4">
             {/* Search Bubble */}
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="h-10 w-10 p-0 rounded-full bg-background/20 border border-white/20 text-white hover:bg-white/10 active:scale-95 transition-all duration-150"
+              className="h-10 w-10 p-0 rounded-full hover:scale-105 active:scale-95 transition-all duration-150"
               onClick={() => {
+                setOpenSelect(null); // Close any open selects
                 setShowSearch(true);
                 setTimeout(() => {
                   const input = document.getElementById('search-input') as HTMLInputElement;
@@ -211,8 +213,19 @@ const Index = () => {
             </Button>
 
             {/* Sort Bubble */}
-            <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-background/20 border border-white/20 text-white hover:bg-white/10 active:scale-95 transition-all duration-150 [&>svg]:hidden">
+            <Select 
+              value={sortOrder} 
+              onValueChange={setSortOrder}
+              open={openSelect === 'sort'}
+              onOpenChange={(open) => setOpenSelect(open ? 'sort' : null)}
+            >
+              <SelectTrigger 
+                className="h-10 w-10 p-0 rounded-full hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden"
+                onClick={() => {
+                  setShowSearch(false);
+                  setOpenSelect(openSelect === 'sort' ? null : 'sort');
+                }}
+              >
                 <SortAsc className="h-4 w-4" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-popover border shadow-lg">
@@ -223,8 +236,19 @@ const Index = () => {
             </Select>
 
             {/* Share Filter Bubble */}
-            <Select value={shareFilter} onValueChange={setShareFilter}>
-              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-background/20 border border-white/20 text-white hover:bg-white/10 active:scale-95 transition-all duration-150 [&>svg]:hidden">
+            <Select 
+              value={shareFilter} 
+              onValueChange={setShareFilter}
+              open={openSelect === 'filter'}
+              onOpenChange={(open) => setOpenSelect(open ? 'filter' : null)}
+            >
+              <SelectTrigger 
+                className="h-10 w-10 p-0 rounded-full hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden"
+                onClick={() => {
+                  setShowSearch(false);
+                  setOpenSelect(openSelect === 'filter' ? null : 'filter');
+                }}
+              >
                 {shareFilter === 'shared-with-me' ? <Users className="h-4 w-4" /> : 
                  shareFilter === 'shared-with-others' ? <Share2 className="h-4 w-4" /> : 
                  <Filter className="h-4 w-4" />}
