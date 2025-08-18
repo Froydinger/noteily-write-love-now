@@ -59,7 +59,9 @@ export const PWAUpdateNotification = () => {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            window.location.reload();
+            setTimeout(() => {
+              window.location.reload();
+            }, 0);
           }}
           className="ml-2"
         >
