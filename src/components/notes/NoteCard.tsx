@@ -75,16 +75,16 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       {/* Delete button - shows when selected, positioned top right */}
       {onDelete && isSelected && (
         <Button
-          variant="destructive"
+          variant="ghost"
           size="sm"
-          className="absolute top-2 right-11 h-8 w-8 rounded-full p-0 shadow-sm z-10 animate-fade-in-half"
+          className="absolute top-2 right-11 h-8 w-8 rounded-full p-0 shadow-sm z-10 animate-fade-in-half hover:bg-destructive/10"
           aria-label="Delete note"
           onClick={(e) => {
             e.stopPropagation();
             onDelete(note);
           }}
         >
-          <Trash2 className="h-4 w-4" />
+          <Trash2 className="h-4 w-4 text-destructive" />
         </Button>
       )}
 
