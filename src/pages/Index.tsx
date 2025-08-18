@@ -197,12 +197,14 @@ const Index = () => {
             <Button
               variant="ghost"
               size="sm"
-              className="h-10 w-10 p-0 rounded-full bg-background/60 border border-border/50 hover:bg-background/80 hover:scale-105 transition-all duration-200 backdrop-blur-sm"
+              className="h-10 w-10 p-0 rounded-full bg-background/60 border border-border/50 hover:bg-background/80 hover:scale-105 active:scale-95 transition-all duration-200 backdrop-blur-sm"
               onClick={() => {
                 setShowSearch(true);
                 setTimeout(() => {
-                  document.getElementById('search-input')?.focus();
-                }, 100);
+                  const input = document.getElementById('search-input') as HTMLInputElement;
+                  input?.focus();
+                  input?.click();
+                }, 150);
               }}
             >
               <Search className="h-4 w-4" />
@@ -210,7 +212,7 @@ const Index = () => {
 
             {/* Sort Bubble */}
             <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-background/60 border border-border/50 hover:bg-background/80 hover:scale-105 transition-all duration-200 backdrop-blur-sm">
+              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-background/60 border border-border/50 hover:bg-background/80 hover:scale-105 active:scale-95 transition-all duration-200 backdrop-blur-sm [&>svg]:hidden">
                 <SortAsc className="h-4 w-4" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-popover border shadow-lg">
@@ -222,7 +224,7 @@ const Index = () => {
 
             {/* Share Filter Bubble */}
             <Select value={shareFilter} onValueChange={setShareFilter}>
-              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-background/60 border border-border/50 hover:bg-background/80 hover:scale-105 transition-all duration-200 backdrop-blur-sm">
+              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-background/60 border border-border/50 hover:bg-background/80 hover:scale-105 active:scale-95 transition-all duration-200 backdrop-blur-sm [&>svg]:hidden">
                 {shareFilter === 'shared-with-me' ? <Users className="h-4 w-4" /> : 
                  shareFilter === 'shared-with-others' ? <Share2 className="h-4 w-4" /> : 
                  <Filter className="h-4 w-4" />}
