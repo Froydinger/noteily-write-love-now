@@ -109,7 +109,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className="w-64 md:w-72 transition-all duration-300 ease-in-out bg-black/20 dark:bg-white/10 backdrop-blur-2xl border-r border-white/20 dark:border-white/10" collapsible={isMobile ? "offcanvas" : "none"}>
+    <Sidebar className="w-64 md:w-72 transition-all duration-300 ease-in-out bg-black/20 dark:bg-white/10 backdrop-blur-2xl border-r border-white/20 dark:border-white/10 supports-[backdrop-filter]:bg-black/20 supports-[backdrop-filter]:dark:bg-white/10" collapsible="offcanvas">
       <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0">
         <div className={`flex items-center space-x-3 flex-1 ${state === "collapsed" ? "justify-center" : ""}`}>
           <Heart className="h-5 w-5 text-neon-blue" />
