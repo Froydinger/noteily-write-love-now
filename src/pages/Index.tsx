@@ -146,7 +146,13 @@ const Index = () => {
   };
 
   // Debug logging to track the race condition
-  console.log('Index render state:', { loading, notesLength: notes.length, hasUser: !!user, hasInitialLoad });
+  console.log('Index render state:', { 
+    loading, 
+    notesLength: notes.length, 
+    hasUser: !!user, 
+    hasInitialLoad,
+    userAuthLoading: !user && !hasInitialLoad // This might be the issue
+  });
 
   // Only show empty state when we've completed the initial load AND notes are actually empty AND we have a user
   if (hasInitialLoad && !loading && notes.length === 0 && user) {
