@@ -377,14 +377,38 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loadNotes = async () => {
     console.log('loadNotes: Starting, setting loading to true');
     setLoading(true);
+    
+    if (!user) {
+      console.log('loadNotes: No user, returning early');
+      setLoading(false);
+      return;
+    }
+
     try {
-      // First, try to load from offline storage immediately
-      const offlineNotes = await offlineStorage.loadNotes(user!.id);
+      // First, always load from offline storage immediately
+      const offlineNotes = await offlineStorage.loadNotes(user.id);
+      console.log('loadNotes: Loaded offline notes:', offlineNotes.length);
+      
       if (offlineNotes.length > 0) {
         setNotes(offlineNotes);
+        console.log('loadNotes: Set notes from offline storage');
       }
 
-      console.log('loadNotes: Loading owned and shared notes...');
+      // If offline, just use the cached notes and stop here
+      if (!isOnline) {
+        console.log('loadNotes: Offline mode, using cached notes only');
+        if (offlineNotes.length > 0) {
+          toast({
+            title: "Working offline",
+            description: "Showing cached notes. Changes will sync when online.",
+          });
+        }
+        setLoading(false);
+        setHasInitialLoad(true);
+        return;
+      }
+
+      console.log('loadNotes: Online mode, loading from Supabase...');
       
       // Load owned notes, shared notes, and owned notes shares in parallel
       const [ownedNotesResponse, sharedNotesResponse, ownedNotesSharesResponse] = await Promise.all([
