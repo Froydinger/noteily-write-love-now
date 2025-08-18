@@ -136,7 +136,7 @@ const AuthPage = () => {
             <div className="space-y-4">
               <Button 
                 type="button"
-                className="w-full bg-white text-black hover:bg-gray-100 border-0 animate-super-slow-breathing"
+                className="w-full bg-slate-800 text-white hover:bg-slate-700 border-0 google-shimmer"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
               >
