@@ -189,10 +189,10 @@ export default {
 					'20%, 40%, 60%, 80%': { transform: 'translateX(3px)' }
 				},
 				'gentle-sway': {
-					'0%, 85%, 100%': { transform: 'translateX(0)' },
-					'5%': { transform: 'translateX(3px)' },
-					'10%': { transform: 'translateX(-3px)' },
-					'15%': { transform: 'translateX(0)' }
+					'0%, 75%, 100%': { transform: 'translateX(0)' },
+					'8%': { transform: 'translateX(2px)' },
+					'16%': { transform: 'translateX(-2px)' },
+					'25%': { transform: 'translateX(0)' }
 				}
 			},
 			animation: {
