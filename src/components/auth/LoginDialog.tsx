@@ -124,7 +124,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
             <div className="space-y-4">
               <Button 
                 type="button"
-                className="w-full bg-white text-black hover:bg-gray-100 border-0"
+                className="w-full bg-white text-black hover:bg-gray-100 border-0 animate-wiggle"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
               >
@@ -143,11 +143,12 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 </span>
               </div>
 
-              <div className="flex space-x-3">
+              <div className="flex flex-col space-y-2">
                 <Button 
                   type="button"
                   onClick={() => handleChoiceSelection('signin')}
-                  className="flex-1 bg-black text-white hover:bg-gray-800 border-0" 
+                  size="sm"
+                  className="w-full bg-black text-white hover:bg-gray-800 border-0" 
                   disabled={isLoading}
                 >
                   Sign in
@@ -156,7 +157,8 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 <Button 
                   type="button"
                   onClick={() => handleChoiceSelection('signup')}
-                  className="flex-1 bg-black text-white hover:bg-gray-800 border-0" 
+                  size="sm"
+                  className="w-full bg-black text-white hover:bg-gray-800 border-0" 
                   disabled={isLoading}
                 >
                   Create account

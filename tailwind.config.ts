@@ -187,6 +187,11 @@ export default {
 					'0%, 100%': { transform: 'translateX(0)' },
 					'10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-3px)' },
 					'20%, 40%, 60%, 80%': { transform: 'translateX(3px)' }
+				},
+				'wiggle': {
+					'0%, 100%': { transform: 'rotate(0deg)' },
+					'25%': { transform: 'rotate(1deg)' },
+					'75%': { transform: 'rotate(-1deg)' }
 				}
 			},
 			animation: {
@@ -198,7 +203,8 @@ export default {
 				'scale-in': 'scale-in 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'gentle-bounce': 'gentle-bounce 2s ease-in-out infinite',
 				'slide-up-smooth': 'slide-up-smooth 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-				'shake': 'shake 0.6s ease-in-out'
+				'shake': 'shake 0.6s ease-in-out',
+				'wiggle': 'wiggle 0.8s ease-in-out infinite'
 			}
 		}
 	},
