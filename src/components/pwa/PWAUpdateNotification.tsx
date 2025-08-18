@@ -52,6 +52,17 @@ export const PWAUpdateNotification = () => {
     toast({
       title: "Updating...",
       description: "Close and reopen the web app or refresh your browser to finish the update.",
+      action: (
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => window.location.reload()}
+          className="ml-2"
+        >
+          <RefreshCw className="h-4 w-4 mr-1" />
+          Refresh
+        </Button>
+      ),
     });
     
     setShowUpdatePrompt(false);
