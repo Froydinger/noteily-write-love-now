@@ -167,8 +167,10 @@ const Index = () => {
       <div className="p-6 md:p-10 animate-fade-in"
            style={{ animationDelay: '0.1s', animationFillMode: 'both' }}
            onClick={() => setSelectedNoteId(null)}>
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
+        {/* Header with centered layout */}
+        <div className="flex flex-col items-center mb-6">
+          {/* Top row: hamburger + title + new note button */}
+          <div className="flex items-center justify-between w-full mb-4">
             <div className="flex items-center gap-2">
               {(isMobile || state === "collapsed") && (
                 <div className="relative">
@@ -192,8 +194,8 @@ const Index = () => {
             </Button>
           </div>
 
-          {/* Control Bubbles */}
-          <div className="flex items-center gap-3 mb-4">
+          {/* Control bubbles centered under the new note button */}
+          <div className="flex items-center gap-3">
             {/* Search Bubble */}
             <Button
               size="sm"
@@ -224,7 +226,7 @@ const Index = () => {
               }}
             >
               <SelectTrigger 
-                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'sort' ? null : 'sort');
@@ -252,7 +254,7 @@ const Index = () => {
               }}
             >
               <SelectTrigger 
-                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'filter' ? null : 'filter');
@@ -267,32 +269,32 @@ const Index = () => {
               </SelectContent>
             </Select>
           </div>
-
-          {/* Search Input - appears when search bubble is clicked */}
-          {showSearch && (
-            <div className="relative mb-4 animate-in slide-in-from-top-2 duration-200">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                id="search-input"
-                placeholder="Search notes by title or content..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onBlur={() => {
-                  if (!searchTerm) {
-                    setShowSearch(false);
-                  }
-                }}
-                className="pl-10"
-              />
-            </div>
-          )}
-          
-          {searchTerm && (
-            <div className="text-sm text-muted-foreground mb-4">
-              {filteredAndSortedNotes.length} of {notes.length} notes shown
-            </div>
-          )}
         </div>
+
+        {/* Search Input - appears when search bubble is clicked */}
+        {showSearch && (
+          <div className="relative mb-4 animate-in slide-in-from-top-2 duration-200">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              id="search-input"
+              placeholder="Search notes by title or content..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onBlur={() => {
+                if (!searchTerm) {
+                  setShowSearch(false);
+                }
+              }}
+              className="pl-10"
+            />
+          </div>
+        )}
+        
+        {searchTerm && (
+          <div className="text-sm text-muted-foreground mb-4">
+            {filteredAndSortedNotes.length} of {notes.length} notes shown
+          </div>
+        )}
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-24">
           {filteredAndSortedNotes.map((note, index) => (
