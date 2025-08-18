@@ -1,5 +1,5 @@
 
-import { Plus, Heart, Copyright } from 'lucide-react';
+import { Plus, Heart } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useNotes } from '@/contexts/NoteContext';
 import { useNavigate } from 'react-router-dom';
@@ -33,9 +33,8 @@ export default function EmptyNotesPlaceholder() {
         <EmptyState
           icon={Heart}
           title={
-            <div className="flex items-center gap-1 justify-center">
-              Welcome to Noteily
-              <Copyright className="h-4 w-4 text-muted-foreground" />
+            <div className="flex items-center justify-center">
+              Welcome to Noteily<span className="text-xs text-muted-foreground ml-0.5 -mt-1">™</span>
             </div>
           }
           description="Create your first note to start your journey of self-expression and reflection."

@@ -12,7 +12,7 @@ import {
   RefreshCw,
   Trash2,
   Bell,
-  Copyright
+  
 } from "lucide-react";
 import {
   Sidebar,
@@ -115,9 +115,9 @@ export function AppSidebar() {
         <div className={`flex items-center space-x-3 flex-1 ${state === "collapsed" ? "justify-center" : ""}`}>
           <Heart className="h-5 w-5 text-neon-blue" />
           {state !== "collapsed" && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center">
               <h1 className="text-xl font-serif font-medium">Noteily</h1>
-              <Copyright className="h-3 w-3 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground ml-0.5 -mt-2">™</span>
             </div>
           )}
         </div>
