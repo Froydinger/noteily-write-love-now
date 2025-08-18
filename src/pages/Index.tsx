@@ -7,7 +7,7 @@ import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, MoreVertical, Grid3X3 } from 'lucide-react';
+import { Plus, Search, ArrowUpDown, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -224,13 +224,13 @@ const Index = () => {
               }}
             >
               <SelectTrigger 
-                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden data-[state=open]:bg-primary/90"
+                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'sort' ? null : 'sort');
                 }}
               >
-                <MoreVertical className="h-4 w-4" />
+                <ArrowUpDown className="h-4 w-4" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-popover border shadow-lg">
                 <SelectItem value="latest">Latest</SelectItem>
@@ -252,13 +252,13 @@ const Index = () => {
               }}
             >
               <SelectTrigger 
-                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden data-[state=open]:bg-primary/90"
+                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'filter' ? null : 'filter');
                 }}
               >
-                <Grid3X3 className="h-4 w-4" />
+                <Filter className="h-4 w-4" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-popover border shadow-lg">
                 <SelectItem value="all">All Notes</SelectItem>

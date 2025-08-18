@@ -143,7 +143,7 @@ const NotePage = () => {
 
   const handleFeaturedImageSet = (imageUrl: string) => {
     if (note) {
-      updateNote(note.id, { featured_image: imageUrl });
+      updateNote(note.id, { featured_image: imageUrl }, true);
     }
   };
 

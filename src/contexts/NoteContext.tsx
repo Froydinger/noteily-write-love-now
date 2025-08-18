@@ -23,7 +23,7 @@ type NoteContextType = {
   loading: boolean;
   hasInitialLoad: boolean;
   addNote: () => Promise<Note>;
-  updateNote: (id: string, updates: Partial<Note>) => Promise<void>;
+  updateNote: (id: string, updates: Partial<Note>, silent?: boolean) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
   restoreNote: (id: string) => Promise<void>;
   permanentlyDeleteNote: (id: string) => Promise<void>;
@@ -631,7 +631,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateNote = async (id: string, updates: Partial<Note>) => {
+  const updateNote = async (id: string, updates: Partial<Note>, silent = true) => {
     if (!user) {
       console.error('User must be authenticated to update notes');
       return;

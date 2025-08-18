@@ -6,6 +6,7 @@ import { ImageUploadButton } from './ImageUploadButton';
 import { FeaturedImage } from './FeaturedImage';
 import { sanitizeContent, sanitizeForDisplay, sanitizeImageUrl, isValidImageUrl } from "@/lib/sanitization";
 import { BlockHandle, BlockType } from './BlockHandle';
+import { usePageLeave } from '@/hooks/usePageLeave';
 
 interface NoteEditorProps {
   note: Note;
@@ -14,6 +15,7 @@ interface NoteEditorProps {
 export default function NoteEditor({ note }: NoteEditorProps) {
   const { updateNote } = useNotes();
   const [title, setTitle] = useState(note.title);
+  const [lastSavedContent, setLastSavedContent] = useState(note.content);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -22,6 +24,19 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
   
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
+
+  // Handle page leave - save with notification
+  const handlePageLeave = () => {
+    if (contentRef.current) {
+      const content = contentRef.current.innerHTML;
+      const sanitizedContent = sanitizeContent(content);
+      if (sanitizedContent !== lastSavedContent) {
+        updateNote(note.id, { content: sanitizedContent }, false); // Non-silent save on page leave
+      }
+    }
+  };
+
+  usePageLeave({ onPageLeave: handlePageLeave });
   
   // Apply iOS zoom prevention on mount
   useEffect(() => {
@@ -69,7 +84,8 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         timeout = setTimeout(() => {
           // Sanitize content before saving to database
           const sanitizedContent = sanitizeContent(content);
-          updateNote(note.id, { content: sanitizedContent });
+          updateNote(note.id, { content: sanitizedContent }, true); // Silent auto-save
+          setLastSavedContent(sanitizedContent);
         }, 500);
       }
     };
@@ -299,7 +315,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
           if (isReadOnly) return;
           const newTitle = e.target.value;
           setTitle(newTitle);
-          updateNote(note.id, { title: newTitle });
+          updateNote(note.id, { title: newTitle }, true); // Silent title update
         }}
         placeholder="Untitled Note"
         className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
@@ -321,7 +337,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         <FeaturedImage 
           imageUrl={note.featured_image} 
           alt={note.title}
-          onDelete={() => updateNote(note.id, { featured_image: null })}
+          onDelete={() => updateNote(note.id, { featured_image: null }, true)}
         />
       )}
       
