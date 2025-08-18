@@ -167,10 +167,111 @@ const Index = () => {
       <div className="p-6 md:p-10 animate-fade-in"
            style={{ animationDelay: '0.1s', animationFillMode: 'both' }}
            onClick={() => setSelectedNoteId(null)}>
-        {/* Simplified header - menu button left, everything else right */}
-        <div className="flex items-center justify-between mb-6">
-          {/* Left side: Menu button only */}
-          <div className="flex items-center">
+        {/* Mobile layout: My Notes text on far right, buttons underneath */}
+        <div className="md:hidden mb-6">
+          {/* Top row: Menu button left, My Notes text far right */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              {(isMobile || state === "collapsed") && (
+                <div className="relative">
+                  <SidebarTrigger />
+                  {user && unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <h1 className="text-2xl font-serif font-medium">My Notes</h1>
+          </div>
+
+          {/* Bottom row: All buttons */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2">
+            <Button 
+              onClick={handleCreateNote} 
+              className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full whitespace-nowrap"
+            >
+              <Plus className="h-4 w-4" />
+              New Note
+            </Button>
+
+            <Button
+              size="sm"
+              className="h-10 px-3 rounded-full hover:scale-105 active:scale-95 transition-all duration-150"
+              onClick={() => {
+                setOpenSelect(null);
+                setShowSearch(true);
+                setTimeout(() => {
+                  const input = document.getElementById('search-input') as HTMLInputElement;
+                  input?.focus();
+                  input?.click();
+                }, 150);
+              }}
+            >
+              <Search className="h-4 w-4" />
+            </Button>
+
+            <Select 
+              value={sortOrder} 
+              onValueChange={(value) => {
+                setSortOrder(value);
+                setOpenSelect(null);
+              }}
+              open={openSelect === 'sort'}
+              onOpenChange={(open) => {
+                if (!open) setOpenSelect(null);
+              }}
+            >
+              <SelectTrigger 
+                className="h-10 px-3 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
+                onClick={() => {
+                  setShowSearch(false);
+                  setOpenSelect(openSelect === 'sort' ? null : 'sort');
+                }}
+              >
+                <ArrowUpDown className="h-4 w-4" />
+              </SelectTrigger>
+              <SelectContent className="z-50 bg-popover border shadow-lg" side="bottom" align="center" sideOffset={5}>
+                <SelectItem value="latest">Latest</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
+                <SelectItem value="alphabetical">A-Z</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select 
+              value={shareFilter} 
+              onValueChange={(value) => {
+                setShareFilter(value);
+                setOpenSelect(null);
+              }}
+              open={openSelect === 'filter'}
+              onOpenChange={(open) => {
+                if (!open) setOpenSelect(null);
+              }}
+            >
+              <SelectTrigger 
+                className="h-10 px-3 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
+                onClick={() => {
+                  setShowSearch(false);
+                  setOpenSelect(openSelect === 'filter' ? null : 'filter');
+                }}
+              >
+                <Filter className="h-4 w-4" />
+              </SelectTrigger>
+              <SelectContent className="z-50 bg-popover border shadow-lg" side="bottom" align="center" sideOffset={5}>
+                <SelectItem value="all">All Notes</SelectItem>
+                <SelectItem value="shared-with-me">Shared with Me</SelectItem>
+                <SelectItem value="shared-with-others">My Shared Notes</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Desktop layout: Menu button, buttons with space, My Notes text far right */}
+        <div className="hidden md:flex items-center justify-between mb-6">
+          {/* Left side: Menu button + buttons */}
+          <div className="flex items-center gap-4">
             {(isMobile || state === "collapsed") && (
               <div className="relative">
                 <SidebarTrigger />
@@ -181,26 +282,16 @@ const Index = () => {
                 )}
               </div>
             )}
-          </div>
 
-          {/* Right side: Title + New Note + Control bubbles all in one line */}
-          <div className="flex items-center gap-4">
-            {/* Title */}
-            <h1 className="text-2xl font-serif font-medium">My Notes</h1>
-            
-            {/* New Note Button */}
-            <Button 
-              onClick={handleCreateNote} 
-              className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full"
-            >
-              <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-              <span className="hidden sm:inline">New Note</span>
-              <span className="sm:hidden">New</span>
-            </Button>
-
-            {/* Control bubbles */}
             <div className="flex items-center gap-2">
-              {/* Search Bubble */}
+              <Button 
+                onClick={handleCreateNote} 
+                className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full"
+              >
+                <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                New Note
+              </Button>
+
               <Button
                 size="sm"
                 className="h-10 px-3 rounded-full hover:scale-105 active:scale-95 transition-all duration-150"
@@ -217,7 +308,6 @@ const Index = () => {
                 <Search className="h-4 w-4" />
               </Button>
 
-              {/* Sort Bubble */}
               <Select 
                 value={sortOrder} 
                 onValueChange={(value) => {
@@ -245,7 +335,6 @@ const Index = () => {
                 </SelectContent>
               </Select>
 
-              {/* Share Filter Bubble */}
               <Select 
                 value={shareFilter} 
                 onValueChange={(value) => {
@@ -274,6 +363,9 @@ const Index = () => {
               </Select>
             </div>
           </div>
+
+          {/* Right side: My Notes text */}
+          <h1 className="text-2xl font-serif font-medium">My Notes</h1>
         </div>
 
         {/* Search Input - appears when search bubble is clicked */}
