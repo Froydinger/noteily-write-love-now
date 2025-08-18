@@ -7,7 +7,7 @@ import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Filter, SortAsc, Users, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -165,69 +165,89 @@ const Index = () => {
       <div className="p-6 md:p-10 animate-fade-in"
            style={{ animationDelay: '0.1s', animationFillMode: 'both' }}
            onClick={() => setSelectedNoteId(null)}>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            {(isMobile || state === "collapsed") && (
-              <div className="relative">
-                <SidebarTrigger />
-                {user && unreadCount > 0 && (
-                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </div>
-                )}
-              </div>
-            )}
-            <h1 className="text-2xl font-serif font-medium">My Notes</h1>
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              {(isMobile || state === "collapsed") && (
+                <div className="relative">
+                  <SidebarTrigger />
+                  {user && unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </div>
+                  )}
+                </div>
+              )}
+              <h1 className="text-2xl font-serif font-medium">My Notes</h1>
+            </div>
+            
+            <Button 
+              onClick={handleCreateNote} 
+              className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full"
+            >
+              <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+              New Note
+            </Button>
           </div>
-          
-          <Button 
-            onClick={handleCreateNote} 
-            className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full"
-          >
-            <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-            New Note
-          </Button>
-        </div>
 
-        {/* Search and Filter Controls */}
-        <div className="mb-6 space-y-4">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search notes by title or content..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+          {/* Control Bubbles */}
+          <div className="flex items-center gap-2 mb-4">
+            {/* Search Bubble */}
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0 rounded-full hover:scale-105 transition-all duration-200"
+                onClick={() => {
+                  const searchInput = document.getElementById('search-input');
+                  searchInput?.focus();
+                }}
+              >
+                <Search className="h-4 w-4" />
+              </Button>
             </div>
-            <div className="flex gap-2">
-              <Select value={shareFilter} onValueChange={setShareFilter}>
-                <SelectTrigger className="w-full sm:w-44">
-                  <SelectValue placeholder="Filter" />
-                </SelectTrigger>
-                <SelectContent className="z-50 bg-popover border shadow-lg">
-                  <SelectItem value="all">All Notes</SelectItem>
-                  <SelectItem value="shared-with-me">Shared with Me</SelectItem>
-                  <SelectItem value="shared-with-others">My Shared Notes</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger className="w-full sm:w-32">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent className="z-50 bg-popover border shadow-lg">
-                  <SelectItem value="latest">Latest</SelectItem>
-                  <SelectItem value="oldest">Oldest</SelectItem>
-                  <SelectItem value="alphabetical">A-Z</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+
+            {/* Sort Bubble */}
+            <Select value={sortOrder} onValueChange={setSortOrder}>
+              <SelectTrigger className="h-8 w-8 p-0 rounded-full border hover:scale-105 transition-all duration-200">
+                <SortAsc className="h-4 w-4" />
+              </SelectTrigger>
+              <SelectContent className="z-50 bg-popover border shadow-lg">
+                <SelectItem value="latest">Latest</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
+                <SelectItem value="alphabetical">A-Z</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Share Filter Bubble */}
+            <Select value={shareFilter} onValueChange={setShareFilter}>
+              <SelectTrigger className="h-8 w-8 p-0 rounded-full border hover:scale-105 transition-all duration-200">
+                {shareFilter === 'shared-with-me' ? <Users className="h-4 w-4" /> : 
+                 shareFilter === 'shared-with-others' ? <Share2 className="h-4 w-4" /> : 
+                 <Filter className="h-4 w-4" />}
+              </SelectTrigger>
+              <SelectContent className="z-50 bg-popover border shadow-lg">
+                <SelectItem value="all">All Notes</SelectItem>
+                <SelectItem value="shared-with-me">Shared with Me</SelectItem>
+                <SelectItem value="shared-with-others">My Shared Notes</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Hidden Search Input - appears when search bubble is clicked */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              id="search-input"
+              placeholder="Search notes by title or content..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
           
           {searchTerm && (
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground mb-4">
               {filteredAndSortedNotes.length} of {notes.length} notes shown
             </div>
           )}
