@@ -198,10 +198,12 @@ export default {
 				},
 				'background-breathe': {
 					'0%, 100%': { 
-						filter: 'brightness(1) contrast(1)',
+						filter: 'brightness(1) contrast(1) saturate(1)',
+						transform: 'scale(1)',
 					},
 					'50%': { 
-						filter: 'brightness(1.02) contrast(1.01)',
+						filter: 'brightness(1.05) contrast(1.03) saturate(1.02)',
+						transform: 'scale(1.001)',
 					}
 				}
 			},
