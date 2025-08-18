@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -172,23 +172,31 @@ export type Database = {
         Args: {
           p_note_id: string
           p_owner_id: string
-          p_shared_with_email: string
           p_permission: string
+          p_shared_with_email: string
         }
         Returns: {
+          created_at: string
           id: string
           note_id: string
           owner_id: string
+          permission: string
           shared_with_email: string
           shared_with_user_id: string
-          permission: string
-          created_at: string
           updated_at: string
         }[]
       }
       cleanup_old_deleted_notes: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      get_note_sharing_info: {
+        Args: { note_id_param: string }
+        Returns: {
+          share_count: number
+          user_has_access: boolean
+          user_permission: string
+        }[]
       }
       link_existing_shared_notes: {
         Args: Record<PropertyKey, never>
