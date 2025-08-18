@@ -35,9 +35,9 @@ const PromptsPage = () => {
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-4 md:p-8 animate-fade-in">
-        {/* Mobile layout: Daily Writing Prompts text on far right, buttons underneath */}
+        {/* Mobile layout: Daily Writing Prompts text on far right, refresh icon next to it */}
         <div className="md:hidden mb-6">
-          {/* Top row: Menu button left, title far right */}
+          {/* Top row: Menu button left, refresh icon + title far right */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               {(isMobile || state === "collapsed") && (
@@ -51,28 +51,25 @@ const PromptsPage = () => {
                 </div>
               )}
             </div>
-            <h1 className="text-2xl font-serif font-medium">Daily Writing Prompts</h1>
-          </div>
-
-          {/* Bottom row: Buttons with overflow protection */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 mt-6 px-2 py-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="btn-accessible rounded-full whitespace-nowrap"
-              onClick={refreshDailyPrompts}
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-              <span className="text-xs ml-1 text-muted-foreground">(resets at midnight)</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="rounded-full hover:scale-105 transition-all duration-150 px-2 py-2"
+                onClick={refreshDailyPrompts}
+                title="Refresh prompts"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+              <h1 className="text-2xl font-serif font-medium">Daily Writing Prompts</h1>
+            </div>
           </div>
         </div>
 
-        {/* Desktop layout: Menu button, buttons with space, title far right */}
+        {/* Desktop layout: Menu button left, refresh icon + title far right */}
         <div className="hidden md:flex items-center justify-between mb-6">
-          {/* Left side: Menu button + buttons */}
-          <div className="flex items-center gap-4">
+          {/* Left side: Menu button */}
+          <div className="flex items-center gap-4 px-2 py-2">
             {(isMobile || state === "collapsed") && (
               <div className="relative">
                 <SidebarTrigger />
@@ -83,22 +80,21 @@ const PromptsPage = () => {
                 )}
               </div>
             )}
-
-            <div className="flex items-center gap-2 px-2 py-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="btn-accessible rounded-full"
-                onClick={refreshDailyPrompts}
-              >
-                Refresh
-                <span className="text-xs ml-1 text-muted-foreground">(resets at midnight)</span>
-              </Button>
-            </div>
           </div>
 
-          {/* Right side: Title */}
-          <h1 className="text-2xl font-serif font-medium">Daily Writing Prompts</h1>
+          {/* Right side: Refresh icon + Title */}
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="rounded-full hover:scale-105 transition-all duration-150 px-2 py-2"
+              onClick={refreshDailyPrompts}
+              title="Refresh prompts"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            <h1 className="text-2xl font-serif font-medium">Daily Writing Prompts</h1>
+          </div>
         </div>
         
         <div className="mb-6">
