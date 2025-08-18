@@ -7,7 +7,7 @@ import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, Filter, SortAsc, Users, Share2 } from 'lucide-react';
+import { Plus, Search, ArrowUpDown, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -214,18 +214,23 @@ const Index = () => {
             {/* Sort Bubble */}
             <Select 
               value={sortOrder} 
-              onValueChange={setSortOrder}
+              onValueChange={(value) => {
+                setSortOrder(value);
+                setOpenSelect(null); // Close immediately after selection
+              }}
               open={openSelect === 'sort'}
-              onOpenChange={(open) => setOpenSelect(open ? 'sort' : null)}
+              onOpenChange={(open) => {
+                if (!open) setOpenSelect(null);
+              }}
             >
               <SelectTrigger 
-                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden"
+                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden data-[state=open]:bg-primary/90"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'sort' ? null : 'sort');
                 }}
               >
-                <SortAsc className="h-4 w-4" />
+                <ArrowUpDown className="h-4 w-4" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-popover border shadow-lg">
                 <SelectItem value="latest">Latest</SelectItem>
@@ -237,20 +242,23 @@ const Index = () => {
             {/* Share Filter Bubble */}
             <Select 
               value={shareFilter} 
-              onValueChange={setShareFilter}
+              onValueChange={(value) => {
+                setShareFilter(value);
+                setOpenSelect(null); // Close immediately after selection
+              }}
               open={openSelect === 'filter'}
-              onOpenChange={(open) => setOpenSelect(open ? 'filter' : null)}
+              onOpenChange={(open) => {
+                if (!open) setOpenSelect(null);
+              }}
             >
               <SelectTrigger 
-                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden"
+                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden data-[state=open]:bg-primary/90"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'filter' ? null : 'filter');
                 }}
               >
-                {shareFilter === 'shared-with-me' ? <Users className="h-4 w-4" /> : 
-                 shareFilter === 'shared-with-others' ? <Share2 className="h-4 w-4" /> : 
-                 <Filter className="h-4 w-4" />}
+                <Filter className="h-4 w-4" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-popover border shadow-lg">
                 <SelectItem value="all">All Notes</SelectItem>
