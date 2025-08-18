@@ -375,8 +375,23 @@
     }
   }
 
+  @keyframes fade-in-half {
+    0% {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 0.5;
+    }
+  }
+
   .animate-heartbeat {
     animation: heartbeat 2s ease-in-out infinite;
+  }
+
+  .animate-fade-in-half {
+    animation: fade-in-half 0.3s ease-out forwards;
   }
 
   @keyframes card-hover {
