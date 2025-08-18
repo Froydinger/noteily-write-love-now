@@ -11,7 +11,8 @@ import {
   PanelLeft,
   RefreshCw,
   Trash2,
-  Bell
+  Bell,
+  Copyright
 } from "lucide-react";
 import {
   Sidebar,
@@ -113,7 +114,12 @@ export function AppSidebar() {
       <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0 [@media(display-mode:standalone)]:lg:pt-11">{/* Added standalone PWA padding for large devices */}
         <div className={`flex items-center space-x-3 flex-1 ${state === "collapsed" ? "justify-center" : ""}`}>
           <Heart className="h-5 w-5 text-neon-blue" />
-          {state !== "collapsed" && <h1 className="text-xl font-serif font-medium">Noteily</h1>}
+          {state !== "collapsed" && (
+            <div className="flex items-center gap-1">
+              <h1 className="text-xl font-serif font-medium">Noteily</h1>
+              <Copyright className="h-3 w-3 text-muted-foreground" />
+            </div>
+          )}
         </div>
         {state !== "collapsed" && (
           <div className="flex items-center gap-2">
