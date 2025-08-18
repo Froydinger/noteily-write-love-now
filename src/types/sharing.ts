@@ -30,7 +30,7 @@ export interface NoteWithSharing {
 
 export interface ShareRequest {
   noteId: string;
-  email: string;
+  emailOrUsername: string;
   permission: 'read' | 'write';
 }
 

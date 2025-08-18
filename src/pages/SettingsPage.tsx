@@ -11,17 +11,20 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNotes } from '@/contexts/NoteContext';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useNavigate } from 'react-router-dom';
-import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart, AtSign, Check, X, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { Input } from '@/components/ui/input';
+import { useUsername } from '@/hooks/useUsername';
 
 const SettingsPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [isDisconnectingGoogle, setIsDisconnectingGoogle] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
   const isMobile = useIsMobile();
   const { state } = useSidebar();
   const { toast } = useToast();
@@ -30,6 +33,11 @@ const SettingsPage = () => {
   const { preferences } = usePreferences();
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { username, loading: usernameLoading, setUsername, removeUsername } = useUsername();
+
+  // Check if we should show username section expanded
+  const shouldShowUsernameSection = searchParams.get('section') === 'username';
 
 
   const getThemeLabel = (theme: string) => {
@@ -281,6 +289,40 @@ ${note.content}
     }
   };
 
+  const handleUsernameSubmit = async () => {
+    if (!newUsername.trim()) {
+      toast({
+        title: "Username required",
+        description: "Please enter a username.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const success = await setUsername(newUsername.trim());
+    if (success) {
+      setNewUsername('');
+      setIsEditingUsername(false);
+    }
+  };
+
+  const handleUsernameRemove = async () => {
+    const success = await removeUsername();
+    if (success) {
+      setIsEditingUsername(false);
+    }
+  };
+
+  const startEditingUsername = () => {
+    setNewUsername(username || '');
+    setIsEditingUsername(true);
+  };
+
+  const cancelEditingUsername = () => {
+    setNewUsername('');
+    setIsEditingUsername(false);
+  };
+
   return (
     <div className="h-full">
       <div className="p-3 md:p-6 pb-32 animate-fade-in min-h-screen">
@@ -357,6 +399,89 @@ ${note.content}
                     <p className="text-sm font-medium truncate">{user.email}</p>
                     <p className="text-xs text-muted-foreground">Signed in</p>
                   </div>
+                </div>
+
+                {/* Username section */}
+                <div className="space-y-3 border-t pt-3">
+                  <div className="flex items-center gap-2">
+                    <AtSign className="h-4 w-4 text-muted-foreground" />
+                    <Label className="text-sm font-medium">Username for Easy Sharing</Label>
+                  </div>
+                  
+                  {!isEditingUsername ? (
+                    <div className="flex items-center justify-between">
+                      <div className="min-w-0 flex-1">
+                        {username ? (
+                          <div>
+                            <p className="text-sm font-medium">@{username}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Others can share notes with @{username}
+                            </p>
+                          </div>
+                        ) : (
+                          <div>
+                            <p className="text-sm text-muted-foreground">No username set</p>
+                            <p className="text-xs text-muted-foreground">
+                              Set a username for easy sharing
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={startEditingUsername}
+                        disabled={usernameLoading}
+                      >
+                        {username ? 'Change' : 'Set Username'}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">@</span>
+                          <Input
+                            value={newUsername}
+                            onChange={(e) => setNewUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                            placeholder="username"
+                            className="pl-8"
+                            disabled={usernameLoading}
+                            onKeyPress={(e) => e.key === 'Enter' && handleUsernameSubmit()}
+                          />
+                        </div>
+                        <Button 
+                          size="sm" 
+                          onClick={handleUsernameSubmit}
+                          disabled={usernameLoading || !newUsername.trim()}
+                        >
+                          {usernameLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={cancelEditingUsername}
+                          disabled={usernameLoading}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      {username && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={handleUsernameRemove}
+                          disabled={usernameLoading}
+                          className="text-destructive hover:text-destructive w-full"
+                        >
+                          Remove Username
+                        </Button>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        3-20 characters, lowercase letters, numbers, and underscores only
+                      </p>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-3">

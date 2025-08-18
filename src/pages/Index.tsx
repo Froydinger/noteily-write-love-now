@@ -16,6 +16,8 @@ import PullToRefresh from 'react-simple-pull-to-refresh';
 import { ShareManager } from '@/components/notes/ShareManager';
 import { toast } from '@/components/ui/sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { UsernamePrompt } from '@/components/notes/UsernamePrompt';
+import { useUsername } from '@/hooks/useUsername';
 
 const Index = () => {
   const { user } = useAuth();
@@ -33,6 +35,8 @@ const Index = () => {
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const [openSelect, setOpenSelect] = useState<string | null>(null);
+  const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
+  const { username } = useUsername();
 
   useEffect(() => {
     try {
@@ -48,6 +52,23 @@ const Index = () => {
       localStorage.setItem(key, JSON.stringify(pinnedIds.slice(0, 2)));
     } catch {}
   }, [pinnedIds, user?.id]);
+
+  // Show username prompt for logged in users without a username
+  useEffect(() => {
+    if (user && username === null && !showUsernamePrompt) {
+      const dismissed = localStorage.getItem(`username-prompt-dismissed-${user.id}`);
+      if (!dismissed) {
+        setShowUsernamePrompt(true);
+      }
+    }
+  }, [user, username, showUsernamePrompt]);
+
+  const handleDismissUsernamePrompt = () => {
+    if (user) {
+      localStorage.setItem(`username-prompt-dismissed-${user.id}`, 'true');
+    }
+    setShowUsernamePrompt(false);
+  };
 
   const filteredAndSortedNotes = useMemo(() => {
     let filtered = notes.filter(note => {
@@ -402,6 +423,13 @@ const Index = () => {
         {searchTerm && (
           <div className="text-sm text-muted-foreground mb-4">
             {filteredAndSortedNotes.length} of {notes.length} notes shown
+          </div>
+        )}
+
+        {/* Username Prompt */}
+        {showUsernamePrompt && user && (
+          <div className="mb-6">
+            <UsernamePrompt onDismiss={handleDismissUsernamePrompt} />
           </div>
         )}
         

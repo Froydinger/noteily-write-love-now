@@ -138,6 +138,7 @@ export type Database = {
           theme: string
           updated_at: string
           user_id: string
+          username: string | null
         }
         Insert: {
           created_at?: string
@@ -149,6 +150,7 @@ export type Database = {
           theme?: string
           updated_at?: string
           user_id: string
+          username?: string | null
         }
         Update: {
           created_at?: string
@@ -160,6 +162,7 @@ export type Database = {
           theme?: string
           updated_at?: string
           user_id?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -173,7 +176,7 @@ export type Database = {
           p_note_id: string
           p_owner_id: string
           p_permission: string
-          p_shared_with_email: string
+          p_shared_with_email_or_username: string
         }
         Returns: {
           created_at: string
@@ -186,6 +189,10 @@ export type Database = {
           updated_at: string
         }[]
       }
+      check_username_exists: {
+        Args: { p_username: string }
+        Returns: boolean
+      }
       cleanup_old_deleted_notes: {
         Args: Record<PropertyKey, never>
         Returns: number
@@ -197,6 +204,10 @@ export type Database = {
           user_has_access: boolean
           user_permission: string
         }[]
+      }
+      get_user_id_by_username: {
+        Args: { p_username: string }
+        Returns: string
       }
       link_existing_shared_notes: {
         Args: Record<PropertyKey, never>

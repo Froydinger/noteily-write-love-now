@@ -86,7 +86,7 @@ export function useSharedNotes(noteId?: string) {
   }, [user]);
 
   // Add a new share
-  const addShare = useCallback(async ({ noteId, email, permission }: ShareRequest) => {
+  const addShare = useCallback(async ({ noteId, emailOrUsername, permission }: ShareRequest) => {
     if (!user) return { success: false, error: 'Not authenticated' };
 
     try {
@@ -102,28 +102,58 @@ export function useSharedNotes(noteId?: string) {
         return { success: false, error: 'Note not found or access denied' };
       }
 
-      // Check if already shared with this email
-      const { data: existingShare } = await supabase
-        .from('shared_notes')
-        .select('id')
-        .eq('note_id', noteId)
-        .eq('shared_with_email', email.toLowerCase().trim())
-        .single();
+      const trimmedInput = emailOrUsername.toLowerCase().trim();
 
-      if (existingShare) {
-        return { success: false, error: 'Already shared with this email' };
+      // If it's an email, check if already shared with this email
+      if (trimmedInput.includes('@')) {
+        const { data: existingShare } = await supabase
+          .from('shared_notes')
+          .select('id')
+          .eq('note_id', noteId)
+          .eq('shared_with_email', trimmedInput)
+          .single();
+
+        if (existingShare) {
+          return { success: false, error: 'Already shared with this email' };
+        }
+
+        // Prevent sharing with self
+        if (trimmedInput === user.email?.toLowerCase()) {
+          return { success: false, error: 'Cannot share with yourself' };
+        }
+      } else {
+        // For username, we need to get the email first to check for existing shares
+        const { data: userPrefs } = await supabase
+          .from('user_preferences')
+          .select('user_id')
+          .eq('username', trimmedInput)
+          .single();
+
+        if (userPrefs) {
+          // Check if already shared with this user
+          const { data: existingShare } = await supabase
+            .from('shared_notes')
+            .select('id')
+            .eq('note_id', noteId)
+            .eq('shared_with_user_id', userPrefs.user_id)
+            .single();
+
+          if (existingShare) {
+            return { success: false, error: 'Already shared with this user' };
+          }
+
+          // Prevent sharing with self
+          if (userPrefs.user_id === user.id) {
+            return { success: false, error: 'Cannot share with yourself' };
+          }
+        }
       }
 
-      // Prevent sharing with self
-      if (email.toLowerCase().trim() === user.email?.toLowerCase()) {
-        return { success: false, error: 'Cannot share with yourself' };
-      }
-
-      // Create the share using the database function that auto-links users
+      // Create the share using the database function that handles both emails and usernames
       const { data, error } = await supabase.rpc('add_share_with_user_link', {
         p_note_id: noteId,
         p_owner_id: user.id,
-        p_shared_with_email: email.toLowerCase().trim(),
+        p_shared_with_email_or_username: trimmedInput,
         p_permission: permission
       });
 
@@ -134,7 +164,7 @@ export function useSharedNotes(noteId?: string) {
 
       toast({
         title: "Note shared successfully",
-        description: `Shared with ${email}`,
+        description: `Shared with ${trimmedInput}`,
       });
 
       return { success: true, data };

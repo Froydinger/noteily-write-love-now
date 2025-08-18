@@ -19,7 +19,7 @@ interface ShareManagerProps {
 }
 
 export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareManagerProps) {
-  const [email, setEmail] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [permission, setPermission] = useState<'read' | 'write'>('read');
   const [isAdding, setIsAdding] = useState(false);
   
@@ -41,33 +41,33 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
     }
   }, [isOpen, note.id, note.isOwnedByUser, loadShares]);
 
-  // Prevent auto-focus on email input when dialog opens
+  // Prevent auto-focus on input when dialog opens
   useEffect(() => {
     if (isOpen) {
       // Small delay to ensure dialog is rendered, then blur any focused input
       setTimeout(() => {
-        const emailInput = document.getElementById('email');
-        if (emailInput && document.activeElement === emailInput) {
-          (emailInput as HTMLInputElement).blur();
+        const input = document.getElementById('email-or-username');
+        if (input && document.activeElement === input) {
+          (input as HTMLInputElement).blur();
         }
       }, 50);
     }
   }, [isOpen]);
 
   const handleAddShare = async () => {
-    if (!email.trim()) return;
+    if (!emailOrUsername.trim()) return;
 
     setIsAdding(true);
     try {
       const result = await addShare({
         noteId: note.id,
-        email: email.trim(),
+        emailOrUsername: emailOrUsername.trim(),
         permission
       });
 
       if (result.success) {
         // Email notification will be automatically triggered by database trigger
-        setEmail('');
+        setEmailOrUsername('');
         setPermission('read');
         onShareUpdate?.();
       }
@@ -87,7 +87,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !isAdding && email.trim()) {
+    if (e.key === 'Enter' && !isAdding && emailOrUsername.trim()) {
       handleAddShare();
     }
   };
@@ -136,21 +136,24 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                 
                 <div className="space-y-3">
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-2 text-sm font-medium">
-                      <Mail className="h-4 w-4" />
-                      Email Address
+                    <Label htmlFor="email-or-username" className="flex items-center gap-2 text-sm font-medium">
+                      <Users className="h-4 w-4" />
+                      Email or Username
                     </Label>
                     <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter email address"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      id="email-or-username"
+                      type="text"
+                      placeholder="email@example.com or @username"
+                      value={emailOrUsername}
+                      onChange={(e) => setEmailOrUsername(e.target.value)}
                       onKeyPress={handleKeyPress}
                       disabled={isAdding}
                       className="h-10"
                       autoFocus={false}
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Enter an email address or username (@username)
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -179,7 +182,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
 
                   <Button 
                     onClick={handleAddShare} 
-                    disabled={!email.trim() || isAdding}
+                    disabled={!emailOrUsername.trim() || isAdding}
                     className="w-full h-10 mt-4"
                   >
                     {isAdding ? (
