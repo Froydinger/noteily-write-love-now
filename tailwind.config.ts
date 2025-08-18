@@ -195,6 +195,14 @@ export default {
 					'100%': { 
 						transform: 'translateX(100%)',
 					}
+				},
+				'background-breathe': {
+					'0%, 100%': { 
+						filter: 'brightness(1) contrast(1)',
+					},
+					'50%': { 
+						filter: 'brightness(1.02) contrast(1.01)',
+					}
 				}
 			},
 			animation: {
@@ -207,7 +215,8 @@ export default {
 				'gentle-bounce': 'gentle-bounce 2s ease-in-out infinite',
 				'slide-up-smooth': 'slide-up-smooth 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'shake': 'shake 0.6s ease-in-out',
-				'shimmer': 'shimmer 2s ease-in-out infinite'
+				'shimmer': 'shimmer 2s ease-in-out infinite',
+				'background-breathe': 'background-breathe 30s ease-in-out infinite'
 			}
 		}
 	},

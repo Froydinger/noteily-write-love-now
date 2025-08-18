@@ -54,6 +54,7 @@
       hsl(0, 0%, 94%) 100%
     );
     background-attachment: fixed;
+    animation: background-breathe 30s ease-in-out infinite;
   }
 
   .dark {
@@ -102,6 +103,7 @@
       hsl(0, 0%, 4%) 100%
     );
     background-attachment: fixed;
+    animation: background-breathe 30s ease-in-out infinite;
   }
 
   .navy {
@@ -150,6 +152,7 @@
       hsl(222, 60%, 7%) 100%
     );
     background-attachment: fixed;
+    animation: background-breathe 30s ease-in-out infinite;
   }
 
 
@@ -189,6 +192,7 @@
       hsl(222, 60%, 7%) 100%
     );
     background-attachment: fixed;
+    animation: background-breathe 30s ease-in-out infinite;
   }
   
   body {
