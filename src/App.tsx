@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -44,49 +44,23 @@ const App = () => {
 const AppContent = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showMarketingSplash, setShowMarketingSplash] = useState(false);
-  const { user, loading: authLoading } = useAuth();
-
-  console.log('AppContent render - showSplash:', showSplash, 'showMarketingSplash:', showMarketingSplash, 'user:', !!user, 'authLoading:', authLoading);
-
-  // Effect to handle auth state changes after splash is done
-  useEffect(() => {
-    if (!showSplash && !authLoading) {
-      if (user && showMarketingSplash) {
-        // User logged in, hide marketing splash
-        setShowMarketingSplash(false);
-      } else if (!user && !showMarketingSplash) {
-        // No user and no marketing splash showing, show it
-        setShowMarketingSplash(true);
-      }
-    }
-  }, [user, authLoading, showSplash, showMarketingSplash]);
+  const { user } = useAuth();
 
   // Show regular splash screen first
   if (showSplash) {
-    console.log('Showing splash screen');
     return <SplashScreen onComplete={() => {
-      console.log('Splash complete, user exists:', !!user, 'authLoading:', authLoading);
       setShowSplash(false);
+      // Show marketing splash for non-authenticated users
+      if (!user) {
+        setShowMarketingSplash(true);
+      }
     }} />;
-  }
-
-  // If auth is still loading after splash, wait
-  if (authLoading) {
-    console.log('Auth still loading, showing loading state');
-    return (
-      <div className="fixed inset-0 bg-background flex items-center justify-center z-50">
-        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
-      </div>
-    );
   }
 
   // Show marketing splash for unregistered users
   if (showMarketingSplash && !user) {
-    console.log('Showing marketing splash');
     return <MarketingSplashScreen />;
   }
-
-  console.log('Showing main app content');
 
   return (
     <>

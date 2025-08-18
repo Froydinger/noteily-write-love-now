@@ -7,7 +7,7 @@ import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, SlidersHorizontal, Filter } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -146,13 +146,7 @@ const Index = () => {
   };
 
   // Debug logging to track the race condition
-  console.log('Index render state:', { 
-    loading, 
-    notesLength: notes.length, 
-    hasUser: !!user, 
-    hasInitialLoad,
-    userAuthLoading: !user && !hasInitialLoad // This might be the issue
-  });
+  console.log('Index render state:', { loading, notesLength: notes.length, hasUser: !!user, hasInitialLoad });
 
   // Only show empty state when we've completed the initial load AND notes are actually empty AND we have a user
   if (hasInitialLoad && !loading && notes.length === 0 && user) {
@@ -186,40 +180,31 @@ const Index = () => {
             <h1 className="text-2xl font-serif font-medium">My Notes</h1>
           </div>
           
-          <div className="flex flex-col items-end gap-3">
-            <Button 
-              onClick={handleCreateNote} 
-              className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full"
-            >
-              <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-              New Note
-            </Button>
-            
-            {/* Icon bubbles under the new note button */}
+          <Button 
+            onClick={handleCreateNote} 
+            className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full"
+          >
+            <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+            New Note
+          </Button>
+        </div>
+
+        {/* Search and Filter Controls */}
+        <div className="mb-6 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search notes by title or content..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
             <div className="flex gap-2">
-              <div className="relative">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm border-border/40 hover:bg-accent"
-                  onClick={() => {
-                    const searchInput = document.querySelector('input[placeholder*="Search"]') as HTMLInputElement;
-                    searchInput?.focus();
-                  }}
-                >
-                  <Search className="h-4 w-4" />
-                </Button>
-              </div>
-              
               <Select value={shareFilter} onValueChange={setShareFilter}>
-                <SelectTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm border-border/40 hover:bg-accent"
-                  >
-                    <Filter className="h-4 w-4" />
-                  </Button>
+                <SelectTrigger className="w-full sm:w-44">
+                  <SelectValue placeholder="Filter" />
                 </SelectTrigger>
                 <SelectContent className="z-50 bg-popover border shadow-lg">
                   <SelectItem value="all">All Notes</SelectItem>
@@ -229,14 +214,8 @@ const Index = () => {
               </Select>
               
               <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm border-border/40 hover:bg-accent"
-                  >
-                    <SlidersHorizontal className="h-4 w-4" />
-                  </Button>
+                <SelectTrigger className="w-full sm:w-32">
+                  <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent className="z-50 bg-popover border shadow-lg">
                   <SelectItem value="latest">Latest</SelectItem>
@@ -246,22 +225,9 @@ const Index = () => {
               </Select>
             </div>
           </div>
-        </div>
-
-        {/* Hidden search input for functionality */}
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search notes by title or content..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={`pl-10 transition-all duration-200 ${searchTerm ? 'opacity-100' : 'opacity-0 h-0 py-0 border-0'}`}
-            />
-          </div>
           
           {searchTerm && (
-            <div className="text-sm text-muted-foreground mt-2">
+            <div className="text-sm text-muted-foreground">
               {filteredAndSortedNotes.length} of {notes.length} notes shown
             </div>
           )}
