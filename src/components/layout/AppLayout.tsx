@@ -2,6 +2,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { NoteProvider } from "@/contexts/NoteContext";
+import { OfflineIndicator } from "@/components/notifications/OfflineIndicator";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -87,6 +88,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             {children}
           </main>
         </div>
+        <OfflineIndicator />
       </SidebarProvider>
     </NoteProvider>
   );

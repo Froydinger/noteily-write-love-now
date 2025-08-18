@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { offlineStorage } from '@/lib/offlineStorage';
+import { useOfflineStatus } from '@/hooks/useOfflineStatus';
 
 import type { NoteWithSharing } from '@/types/sharing';
 
@@ -260,6 +261,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const { user } = useAuth();
   const { toast } = useToast();
+  const { isOnline } = useOfflineStatus();
 
   // Load notes when user changes
   useEffect(() => {
@@ -352,6 +354,25 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       supabase.removeChannel(channel);
     };
   }, [user]);
+
+  // Listen for sync-after-offline event
+  useEffect(() => {
+    const handleSyncAfterOffline = () => {
+      if (user && isOnline) {
+        console.log('Syncing notes after coming back online...');
+        loadNotes();
+        toast({
+          title: "Notes synced",
+          description: "Your notes have been synced with the server.",
+        });
+      }
+    };
+
+    window.addEventListener('sync-after-offline', handleSyncAfterOffline);
+    return () => {
+      window.removeEventListener('sync-after-offline', handleSyncAfterOffline);
+    };
+  }, [user, isOnline]);
 
   const loadNotes = async () => {
     console.log('loadNotes: Starting, setting loading to true');
