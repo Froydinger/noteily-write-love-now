@@ -224,14 +224,13 @@ const Index = () => {
               }}
             >
               <SelectTrigger 
-                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden"
+                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'sort' ? null : 'sort');
                 }}
               >
                 <ArrowUpDown className="h-4 w-4" />
-                <SelectValue className="sr-only" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-popover border shadow-lg">
                 <SelectItem value="latest">Latest</SelectItem>
@@ -253,14 +252,13 @@ const Index = () => {
               }}
             >
               <SelectTrigger 
-                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden"
+                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'filter' ? null : 'filter');
                 }}
               >
                 <Filter className="h-4 w-4" />
-                <SelectValue className="sr-only" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-popover border shadow-lg">
                 <SelectItem value="all">All Notes</SelectItem>
