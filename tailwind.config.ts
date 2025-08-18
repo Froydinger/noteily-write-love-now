@@ -188,9 +188,15 @@ export default {
 					'10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-3px)' },
 					'20%, 40%, 60%, 80%': { transform: 'translateX(3px)' }
 				},
-				'gentle-breathing': {
-					'0%, 100%': { transform: 'scale(1)' },
-					'50%': { transform: 'scale(1.02)' }
+				'super-slow-breathing': {
+					'0%, 100%': { 
+						transform: 'scale(1)',
+						animationTimingFunction: 'ease-in-out'
+					},
+					'50%': { 
+						transform: 'scale(1.015)',
+						animationTimingFunction: 'ease-in-out'
+					}
 				}
 			},
 			animation: {
@@ -203,7 +209,7 @@ export default {
 				'gentle-bounce': 'gentle-bounce 2s ease-in-out infinite',
 				'slide-up-smooth': 'slide-up-smooth 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'shake': 'shake 0.6s ease-in-out',
-				'gentle-breathing': 'gentle-breathing 32s ease-in-out infinite'
+				'super-slow-breathing': 'super-slow-breathing 30000ms ease-in-out infinite'
 			}
 		}
 	},

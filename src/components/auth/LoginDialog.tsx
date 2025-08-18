@@ -124,7 +124,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
             <div className="space-y-4">
               <Button 
                 type="button"
-                className="w-full bg-white text-black hover:bg-gray-100 border-0 animate-gentle-breathing"
+                className="w-full bg-white text-black hover:bg-gray-100 border-0 animate-super-slow-breathing"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
               >
