@@ -91,7 +91,7 @@ export default function RecentlyDeletedPage() {
           </div>
         </div>
         
-        {/* Bottom row: Description with overflow protection */}
+        {/* Bottom row: Description */}
         <div className="px-2 py-2">
           <p className="text-muted-foreground text-sm">
             Notes are automatically deleted after 7 days

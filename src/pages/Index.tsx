@@ -186,8 +186,8 @@ const Index = () => {
             <h1 className="text-2xl font-serif font-medium">My Notes</h1>
           </div>
 
-          {/* Bottom row: All buttons with more spacing and proper overflow */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 mt-6 px-2 py-2">
+          {/* Bottom row: All buttons */}
+          <div className="flex items-center gap-2 mt-6 px-2 py-2">
             <Button 
               onClick={handleCreateNote} 
               className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full whitespace-nowrap"
