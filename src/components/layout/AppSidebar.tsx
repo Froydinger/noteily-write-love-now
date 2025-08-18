@@ -109,7 +109,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className="w-64 md:w-72 transition-all duration-300 ease-in-out bg-background/80 backdrop-blur-md border-r border-border/50" collapsible="icon">
+    <Sidebar className="w-64 md:w-72 transition-all duration-300 ease-in-out bg-background/20 backdrop-blur-xl border-r border-white/10" collapsible={isMobile ? "offcanvas" : "none"}>
       <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0">
         <div className={`flex items-center space-x-3 flex-1 ${state === "collapsed" ? "justify-center" : ""}`}>
           <Heart className="h-5 w-5 text-neon-blue" />
@@ -287,134 +287,53 @@ export function AppSidebar() {
         </SidebarContent>
       )}
 
-      {state === "collapsed" && (
-        <SidebarContent className="pt-2">
-          <div className="px-2 mb-4 flex flex-col gap-2 items-center">
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="h-10 w-10 p-0 rounded-full"
-              onClick={handleCreateNote}
-              title="New Note"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-            
-            {user && (
-              <NotificationsPanel>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="btn-accessible h-10 w-10 rounded-full relative"
-                  title="Notifications"
-                >
-                  <Bell className="h-4 w-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                  )}
-                </Button>
-              </NotificationsPanel>
-            )}
-          </div>
-        </SidebarContent>
-      )}
 
-      <SidebarFooter className="px-4 py-4 border-t border-border/40">
-        {state !== "collapsed" ? (
-          <div className="flex justify-between w-full px-4 md:px-6">
-            <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSync}
-                className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
-                title="Sync notes"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
-              <ThemeToggle variant="settings" />
-            </div>
-            
-            <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/recently-deleted') ? 'sidebar-menu-active' : ''}`}
-                asChild
-                title="Recently Deleted"
-              >
-                <a href="/recently-deleted">
-                  <Trash2 className="h-4 w-4" />
-                </a>
-              </Button>
-            </div>
-            
-            <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
-                asChild
-                title="Settings"
-              >
-                <a href="/settings">
-                  <Settings className="h-4 w-4" />
-                </a>
-              </Button>
-            </div>
+      <SidebarFooter className="px-4 py-4 border-t border-white/10">
+        <div className="flex justify-between w-full px-4 md:px-6">
+          <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSync}
+              className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
+              title="Sync notes"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
           </div>
-        ) : (
-          <div className="flex flex-col gap-2 items-center">
-            <div className="h-8 w-8 flex items-center justify-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSync}
-                className="btn-accessible h-8 w-8 rounded-full"
-                title="Sync notes"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            <div className="h-8 w-8 flex items-center justify-center">
-              <ThemeToggle variant="settings" />
-            </div>
-            
-            <div className="h-8 w-8 flex items-center justify-center">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className={`btn-accessible h-8 w-8 rounded-full ${isActive('/recently-deleted') ? 'sidebar-menu-active' : ''}`}
-                asChild
-                title="Recently Deleted"
-              >
-                <a href="/recently-deleted">
-                  <Trash2 className="h-4 w-4" />
-                </a>
-              </Button>
-            </div>
-            
-            <div className="h-8 w-8 flex items-center justify-center">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className={`btn-accessible h-8 w-8 rounded-full ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
-                asChild
-                title="Settings"
-              >
-                <a href="/settings">
-                  <Settings className="h-4 w-4" />
-                </a>
-              </Button>
-            </div>
+          
+          <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
+            <ThemeToggle variant="settings" />
           </div>
-        )}
+          
+          <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/recently-deleted') ? 'sidebar-menu-active' : ''}`}
+              asChild
+              title="Recently Deleted"
+            >
+              <a href="/recently-deleted">
+                <Trash2 className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+          
+          <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
+              asChild
+              title="Settings"
+            >
+              <a href="/settings">
+                <Settings className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
