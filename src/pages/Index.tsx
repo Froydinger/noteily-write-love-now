@@ -186,8 +186,8 @@ const Index = () => {
             <h1 className="text-2xl font-serif font-medium">My Notes</h1>
           </div>
 
-          {/* Bottom row: All buttons */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2">
+          {/* Bottom row: All buttons with more spacing */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 mt-6">
             <Button 
               onClick={handleCreateNote} 
               className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full whitespace-nowrap"
@@ -218,7 +218,7 @@ const Index = () => {
                 setSortOrder(value);
                 setOpenSelect(null);
               }}
-              open={openSelect === 'sort'}
+              open={openSelect === 'sort-mobile'}
               onOpenChange={(open) => {
                 if (!open) setOpenSelect(null);
               }}
@@ -227,7 +227,7 @@ const Index = () => {
                 className="h-10 px-3 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
                 onClick={() => {
                   setShowSearch(false);
-                  setOpenSelect(openSelect === 'sort' ? null : 'sort');
+                  setOpenSelect(openSelect === 'sort-mobile' ? null : 'sort-mobile');
                 }}
               >
                 <ArrowUpDown className="h-4 w-4" />
@@ -245,7 +245,7 @@ const Index = () => {
                 setShareFilter(value);
                 setOpenSelect(null);
               }}
-              open={openSelect === 'filter'}
+              open={openSelect === 'filter-mobile'}
               onOpenChange={(open) => {
                 if (!open) setOpenSelect(null);
               }}
@@ -254,7 +254,7 @@ const Index = () => {
                 className="h-10 px-3 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
                 onClick={() => {
                   setShowSearch(false);
-                  setOpenSelect(openSelect === 'filter' ? null : 'filter');
+                  setOpenSelect(openSelect === 'filter-mobile' ? null : 'filter-mobile');
                 }}
               >
                 <Filter className="h-4 w-4" />
@@ -314,7 +314,7 @@ const Index = () => {
                   setSortOrder(value);
                   setOpenSelect(null);
                 }}
-                open={openSelect === 'sort'}
+                open={openSelect === 'sort-desktop'}
                 onOpenChange={(open) => {
                   if (!open) setOpenSelect(null);
                 }}
@@ -323,7 +323,7 @@ const Index = () => {
                   className="h-10 px-3 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
                   onClick={() => {
                     setShowSearch(false);
-                    setOpenSelect(openSelect === 'sort' ? null : 'sort');
+                    setOpenSelect(openSelect === 'sort-desktop' ? null : 'sort-desktop');
                   }}
                 >
                   <ArrowUpDown className="h-4 w-4" />
@@ -341,7 +341,7 @@ const Index = () => {
                   setShareFilter(value);
                   setOpenSelect(null);
                 }}
-                open={openSelect === 'filter'}
+                open={openSelect === 'filter-desktop'}
                 onOpenChange={(open) => {
                   if (!open) setOpenSelect(null);
                 }}
@@ -350,7 +350,7 @@ const Index = () => {
                   className="h-10 px-3 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
                   onClick={() => {
                     setShowSearch(false);
-                    setOpenSelect(openSelect === 'filter' ? null : 'filter');
+                    setOpenSelect(openSelect === 'filter-desktop' ? null : 'filter-desktop');
                   }}
                 >
                   <Filter className="h-4 w-4" />
