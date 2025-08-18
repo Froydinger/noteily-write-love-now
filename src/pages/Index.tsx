@@ -403,19 +403,7 @@ const Index = () => {
                 animationFillMode: 'both'
               }}
             >
-              <NoteCard 
-                note={note} 
-                onShareClick={handleShareClick} 
-                isSelected={selectedNoteId === note.id} 
-                onPress={handleCardPress} 
-                onOpen={(n) => navigate(`/note/${n.id}`)} 
-                isPinned={pinnedIds.includes(note.id)} 
-                onTogglePin={handleTogglePin} 
-                onDelete={() => {
-                  // Optionally handle additional cleanup here
-                  setSelectedNoteId(null);
-                }}
-              />
+              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} isPinned={pinnedIds.includes(note.id)} onTogglePin={handleTogglePin} />
             </div>
           ))}
         </div>
