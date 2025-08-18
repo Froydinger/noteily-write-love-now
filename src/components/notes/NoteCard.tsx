@@ -92,9 +92,9 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Delete Note</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you would like to delete this note? This action cannot be undone.
-              </AlertDialogDescription>
+            <AlertDialogDescription>
+              Are you sure you would like to delete this note? It will be moved to recently deleted for 7 days before being permanently removed.
+            </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
