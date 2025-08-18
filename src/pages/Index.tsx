@@ -30,6 +30,7 @@ const Index = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [shareChanged, setShareChanged] = useState(false);
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => {
     try {
@@ -191,25 +192,25 @@ const Index = () => {
           </div>
 
           {/* Control Bubbles */}
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-3 mb-4">
             {/* Search Bubble */}
-            <div className="relative">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 w-8 p-0 rounded-full hover:scale-105 transition-all duration-200"
-                onClick={() => {
-                  const searchInput = document.getElementById('search-input');
-                  searchInput?.focus();
-                }}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-10 w-10 p-0 rounded-full bg-background/60 border border-border/50 hover:bg-background/80 hover:scale-105 transition-all duration-200 backdrop-blur-sm"
+              onClick={() => {
+                setShowSearch(true);
+                setTimeout(() => {
+                  document.getElementById('search-input')?.focus();
+                }, 100);
+              }}
+            >
+              <Search className="h-4 w-4" />
+            </Button>
 
             {/* Sort Bubble */}
             <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="h-8 w-8 p-0 rounded-full border hover:scale-105 transition-all duration-200">
+              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-background/60 border border-border/50 hover:bg-background/80 hover:scale-105 transition-all duration-200 backdrop-blur-sm">
                 <SortAsc className="h-4 w-4" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-popover border shadow-lg">
@@ -221,7 +222,7 @@ const Index = () => {
 
             {/* Share Filter Bubble */}
             <Select value={shareFilter} onValueChange={setShareFilter}>
-              <SelectTrigger className="h-8 w-8 p-0 rounded-full border hover:scale-105 transition-all duration-200">
+              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-background/60 border border-border/50 hover:bg-background/80 hover:scale-105 transition-all duration-200 backdrop-blur-sm">
                 {shareFilter === 'shared-with-me' ? <Users className="h-4 w-4" /> : 
                  shareFilter === 'shared-with-others' ? <Share2 className="h-4 w-4" /> : 
                  <Filter className="h-4 w-4" />}
@@ -234,17 +235,24 @@ const Index = () => {
             </Select>
           </div>
 
-          {/* Hidden Search Input - appears when search bubble is clicked */}
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              id="search-input"
-              placeholder="Search notes by title or content..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+          {/* Search Input - appears when search bubble is clicked */}
+          {showSearch && (
+            <div className="relative mb-4 animate-in slide-in-from-top-2 duration-200">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                id="search-input"
+                placeholder="Search notes by title or content..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onBlur={() => {
+                  if (!searchTerm) {
+                    setShowSearch(false);
+                  }
+                }}
+                className="pl-10"
+              />
+            </div>
+          )}
           
           {searchTerm && (
             <div className="text-sm text-muted-foreground mb-4">
