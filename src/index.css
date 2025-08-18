@@ -152,56 +152,9 @@
     background-attachment: fixed;
   }
 
-  .sepia {
-    --background: 20 15% 94%;
-    --foreground: 15 10% 20%;
-
-    --card: 20 12% 96%;
-    --card-foreground: 15 10% 20%;
-
-    --popover: 20 12% 96%;
-    --popover-foreground: 15 10% 20%;
-
-    --primary: 15 10% 20%;
-    --primary-foreground: 20 15% 94%;
-
-    --secondary: 20 12% 90%;
-    --secondary-foreground: 15 10% 20%;
-
-    --muted: 20 12% 90%;
-    --muted-foreground: 15 10% 50%;
-
-    --accent: 20 25% 65%;
-    --accent-foreground: 15 10% 20%;
-
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 20 15% 94%;
-
-    --border: 20 12% 85%;
-    --input: 20 12% 85%;
-    --ring: 20 25% 65%;
-
-    --sidebar-background: 20 15% 92%;
-    --sidebar-foreground: 15 10% 30%;
-    --sidebar-primary: 15 10% 20%;
-    --sidebar-primary-foreground: 20 15% 92%;
-    --sidebar-accent: 20 12% 88%;
-    --sidebar-accent-foreground: 15 10% 20%;
-    --sidebar-border: 20 12% 85%;
-    --sidebar-ring: 20 25% 65%;
-
-    /* Beautiful gradient background */
-    background: linear-gradient(180deg, 
-      hsl(20, 20%, 96%) 0%, 
-      hsl(18, 15%, 94%) 30%, 
-      hsl(16, 12%, 92%) 70%, 
-      hsl(14, 10%, 90%) 100%
-    );
-    background-attachment: fixed;
-  }
 
   /* Apply navy mode by default only if no theme class exists */
-  html:not(.light):not(.dark):not(.navy):not(.sepia) {
+  html:not(.light):not(.dark):not(.navy) {
     --background: 215 45% 12%;
     --foreground: 210 40% 95%;
     --card: 215 45% 14%;
@@ -292,22 +245,10 @@
     color: hsl(var(--primary-foreground));
   }
 
-  .sepia ::selection {
-    background: hsl(20 25% 10%);
-    color: hsl(20 15% 94%);
-  }
-  .sepia ::-moz-selection {
-    background: hsl(20 25% 10%);
-    color: hsl(20 15% 94%);
-  }
 
   /* Marked text highlight */
   :root mark {
     background-color: hsl(0 0% 25% / 0.16);
-    color: inherit;
-  }
-  .sepia mark {
-    background-color: hsl(20 25% 10% / 0.16);
     color: inherit;
   }
 }
@@ -579,10 +520,6 @@
     border-radius: 0.375rem !important; /* rounded-md */
   }
 
-  .sepia .sidebar-menu-active {
-    @apply border border-foreground/20 text-foreground bg-transparent;
-    border-radius: 0.375rem !important; /* rounded-md */
-  }
 
   /* Main navigation active states - fully rounded for all themes */
   .dark .sidebar-nav-active {
@@ -595,10 +532,6 @@
     border-radius: 9999px !important; /* rounded-full */
   }
 
-  .sepia .sidebar-nav-active {
-    @apply border border-foreground/20 text-foreground bg-transparent;
-    border-radius: 9999px !important; /* rounded-full */
-  }
 
   /* Button accessibility improvements */
   .btn-accessible {
@@ -620,10 +553,6 @@
     @apply text-foreground hover:text-foreground hover:bg-secondary/60 rounded-full;
   }
 
-  /* Sepia theme button styles */
-  .sepia .btn-accessible {
-    @apply text-foreground hover:text-foreground hover:bg-secondary/80 rounded-full;
-  }
 
   /* Sidebar toggle button specific styles */
   .sidebar-toggle {
@@ -642,9 +571,6 @@
     @apply text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-full;
   }
 
-  .sepia .sidebar-toggle {
-    @apply text-muted-foreground hover:text-foreground hover:bg-secondary/80 rounded-full;
-  }
 
   /* General button contrast improvements */
   .btn-contrast {
@@ -663,8 +589,5 @@
     @apply text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-full;
   }
 
-  .sepia .btn-contrast {
-    @apply text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-full;
-  }
 
 }

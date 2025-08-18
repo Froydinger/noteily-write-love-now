@@ -13,7 +13,7 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   
   const toggleTheme = async () => {
-    const themeOrder: ThemeType[] = ['navy', 'dark', 'light', 'sepia'];
+    const themeOrder: ThemeType[] = ['navy', 'dark', 'light'];
     const currentIndex = themeOrder.indexOf(preferences.theme);
     const nextTheme = themeOrder[(currentIndex + 1) % themeOrder.length];
     
@@ -32,8 +32,6 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
         return <Monitor className="h-4 w-4" />;
       case 'navy':
         return <Moon className="h-4 w-4" />;
-      case 'sepia':
-        return <FileText className="h-4 w-4 text-amber-600" />;
       default:
         return <Moon className="h-4 w-4" />;
     }
@@ -47,8 +45,6 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
         return 'Dark Mode';
       case 'navy':
         return 'Night Mode';
-      case 'sepia':
-        return 'Fresh Page';
       default:
         return 'Night Mode';
     }

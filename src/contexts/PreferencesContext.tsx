@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 
-export type ThemeType = 'light' | 'dark' | 'navy' | 'sepia';
+export type ThemeType = 'light' | 'dark' | 'navy';
 
 interface UserPreferences {
   theme: ThemeType;
@@ -155,7 +155,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const html = document.documentElement;
     
     // Remove all theme classes
-    html.classList.remove('light', 'dark', 'navy', 'sepia');
+    html.classList.remove('light', 'dark', 'navy');
     
     // Add the new theme class
     html.classList.add(theme);
@@ -171,8 +171,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const themeColors = {
       light: '#ffffff',
       dark: '#0a0a0a',
-      navy: '#192028',
-      sepia: '#f5f1eb'
+      navy: '#192028'
     };
 
     const color = themeColors[theme];
