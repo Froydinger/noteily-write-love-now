@@ -110,7 +110,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar className={`transition-all duration-300 ease-in-out bg-black/20 dark:bg-white/10 backdrop-blur-2xl border-r border-white/20 dark:border-white/10 supports-[backdrop-filter]:bg-black/20 supports-[backdrop-filter]:dark:bg-white/10 ${state === "collapsed" ? "w-0 opacity-0 pointer-events-none -translate-x-full" : "w-64 md:w-72"}`} collapsible="offcanvas">
-      <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0 md:pt-16">{/* Added md:pt-16 for internal padding */}
+      <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0 md:pt-11">{/* Added md:pt-11 for internal padding */}
         <div className={`flex items-center space-x-3 flex-1 ${state === "collapsed" ? "justify-center" : ""}`}>
           <Heart className="h-5 w-5 text-neon-blue" />
           {state !== "collapsed" && <h1 className="text-xl font-serif font-medium">Noteily</h1>}
