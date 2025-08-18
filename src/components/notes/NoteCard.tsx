@@ -69,7 +69,8 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
     }
   };
   
-  const handleDeleteClick = async () => {
+  const handleDeleteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsDeleting(true);
     try {
       await deleteNote(note.id);
@@ -82,11 +83,15 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
   };
   
   const handleCardClick = (e: React.MouseEvent) => {
-    // If swiped, first click should reset, second click should open
+    e.stopPropagation();
+    
+    // If swiped, first click should reset
     if (swipeOffset > 0) {
       setSwipeOffset(0);
       return;
     }
+    
+    // Normal click behavior
     onPress?.(note);
   };
   
@@ -125,21 +130,21 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
   const selectedStyles = isSelected ? 'ring-2 ring-primary/40 border-primary/40' : '';
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden rounded-lg">
       {/* Delete button that appears behind the card */}
       {isMobile && (
         <div 
-          className="absolute inset-y-0 right-0 flex items-center justify-center bg-destructive text-destructive-foreground transition-all duration-200 ease-out rounded-r-lg"
+          className="absolute inset-y-0 right-0 flex items-center justify-center bg-destructive rounded-r-lg z-0"
           style={{ 
             width: `${MAX_SWIPE}px`,
             transform: `translateX(${MAX_SWIPE - swipeOffset}px)`,
-            opacity: swipeOffset > 20 ? 1 : 0
+            opacity: swipeOffset > 10 ? 1 : 0
           }}
         >
           <Button
             variant="ghost"
             size="sm"
-            className="h-full w-full rounded-none text-white hover:bg-destructive/80 disabled:opacity-50"
+            className="h-full w-full rounded-none text-white hover:bg-destructive/80 disabled:opacity-50 flex items-center justify-center"
             onClick={handleDeleteClick}
             disabled={isDeleting}
           >
@@ -150,12 +155,15 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       
       <Card 
         ref={cardRef}
-        className={`h-full cursor-pointer group interactive-card ${!isMobile ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles} transition-transform duration-200 ease-out`}
-        style={isMobile ? { transform: `translateX(${swipeOffset}px)` } : {}}
+        className={`h-full cursor-pointer group interactive-card ${!isMobile ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles} z-10`}
+        style={isMobile ? { 
+          transform: `translateX(${swipeOffset}px)`,
+          transition: isDragging ? 'none' : 'transform 0.2s ease-out'
+        } : {}}
         onClick={handleCardClick}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        onTouchStart={isMobile ? handleTouchStart : undefined}
+        onTouchMove={isMobile ? handleTouchMove : undefined}
+        onTouchEnd={isMobile ? handleTouchEnd : undefined}
       >
       {/* Share button in top right corner */}
       {onShareClick && (
