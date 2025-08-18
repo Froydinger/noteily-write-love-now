@@ -197,7 +197,7 @@ const Index = () => {
             <Button
               variant="ghost"
               size="sm"
-              className="h-10 w-10 p-0 rounded-full bg-card border border-border text-foreground shadow-sm active:scale-95 transition-transform duration-150 ease-out @media(hover:hover):hover:bg-accent @media(hover:hover):hover:scale-105"
+              className="h-10 w-10 p-0 rounded-full bg-background/20 border border-white/20 text-white hover:bg-white/10 active:scale-95 transition-all duration-150"
               onClick={() => {
                 setShowSearch(true);
                 setTimeout(() => {
@@ -212,7 +212,7 @@ const Index = () => {
 
             {/* Sort Bubble */}
             <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-card border border-border text-foreground shadow-sm active:scale-95 transition-transform duration-150 ease-out @media(hover:hover):hover:bg-accent @media(hover:hover):hover:scale-105 [&>svg]:hidden">
+              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-background/20 border border-white/20 text-white hover:bg-white/10 active:scale-95 transition-all duration-150 [&>svg]:hidden">
                 <SortAsc className="h-4 w-4" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-popover border shadow-lg">
@@ -224,7 +224,7 @@ const Index = () => {
 
             {/* Share Filter Bubble */}
             <Select value={shareFilter} onValueChange={setShareFilter}>
-              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-card border border-border text-foreground shadow-sm active:scale-95 transition-transform duration-150 ease-out @media(hover:hover):hover:bg-accent @media(hover:hover):hover:scale-105 [&>svg]:hidden">
+              <SelectTrigger className="h-10 w-10 p-0 rounded-full bg-background/20 border border-white/20 text-white hover:bg-white/10 active:scale-95 transition-all duration-150 [&>svg]:hidden">
                 {shareFilter === 'shared-with-me' ? <Users className="h-4 w-4" /> : 
                  shareFilter === 'shared-with-others' ? <Share2 className="h-4 w-4" /> : 
                  <Filter className="h-4 w-4" />}
