@@ -149,18 +149,18 @@ const AuthPage = () => {
                 Continue with Google
               </Button>
               
-              <div className="my-4 flex justify-center">
+              <div className="my-6 flex justify-center">
                 <span className="text-xs uppercase text-gray-300">
                   Or
                 </span>
               </div>
 
-              <div className="flex flex-col space-y-2">
+              <div className="flex flex-col items-center space-y-2">
                 <Button 
                   type="button"
                   onClick={() => handleChoiceSelection('signin')}
                   size="sm"
-                  className="w-full bg-black text-white hover:bg-gray-800 border-0" 
+                  className="w-48 bg-black text-white hover:bg-gray-800 border-0" 
                   disabled={isLoading}
                 >
                   Sign in
@@ -170,7 +170,7 @@ const AuthPage = () => {
                   type="button"
                   onClick={() => handleChoiceSelection('signup')}
                   size="sm"
-                  className="w-full bg-black text-white hover:bg-gray-800 border-0" 
+                  className="w-48 bg-black text-white hover:bg-gray-800 border-0" 
                   disabled={isLoading}
                 >
                   Create account
