@@ -1,13 +1,15 @@
 
 import { formatDistanceToNow } from 'date-fns';
+import { useState, useRef, useEffect } from 'react';
 
 import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Eye, Edit, ArrowUpRight, Pin } from 'lucide-react';
+import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2 } from 'lucide-react';
 import type { NoteWithSharing } from '@/types/sharing';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useNotes } from '@/contexts/NoteContext';
 
 interface NoteCardProps {
   note: Note | NoteWithSharing;
@@ -17,12 +19,83 @@ interface NoteCardProps {
   onOpen?: (note: Note | NoteWithSharing) => void;
   isPinned?: boolean;
   onTogglePin?: (note: Note | NoteWithSharing) => void;
+  onDelete?: (note: Note | NoteWithSharing) => void;
 }
 
-export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen, isPinned = false, onTogglePin }: NoteCardProps) {
-  
+export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen, isPinned = false, onTogglePin, onDelete }: NoteCardProps) {
+  const { deleteNote } = useNotes();
   const isMobile = useIsMobile();
   
+  // Swipe-to-delete state
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const SWIPE_THRESHOLD = 60; // How far user needs to swipe to reveal delete
+  const MAX_SWIPE = 80; // Maximum swipe distance
+  
+  // Swipe gesture handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isMobile) return;
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+  };
+  
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isMobile || !isDragging) return;
+    
+    const currentX = e.touches[0].clientX;
+    const deltaX = currentX - startX;
+    
+    // Only allow rightward swipe (positive deltaX)
+    if (deltaX > 0) {
+      const newOffset = Math.min(deltaX, MAX_SWIPE);
+      setSwipeOffset(newOffset);
+    }
+  };
+  
+  const handleTouchEnd = () => {
+    if (!isMobile) return;
+    setIsDragging(false);
+    
+    // If not swiped far enough, snap back
+    if (swipeOffset < SWIPE_THRESHOLD) {
+      setSwipeOffset(0);
+    } else {
+      // Snap to the revealed position
+      setSwipeOffset(MAX_SWIPE);
+    }
+  };
+  
+  const handleDeleteClick = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteNote(note.id);
+      onDelete?.(note);
+    } catch (error) {
+      console.error('Failed to delete note:', error);
+      setIsDeleting(false);
+      setSwipeOffset(0);
+    }
+  };
+  
+  const handleCardClick = (e: React.MouseEvent) => {
+    // If swiped, first click should reset, second click should open
+    if (swipeOffset > 0) {
+      setSwipeOffset(0);
+      return;
+    }
+    onPress?.(note);
+  };
+  
+  // Reset swipe when note changes or component updates
+  useEffect(() => {
+    setSwipeOffset(0);
+    setIsDeleting(false);
+  }, [note.id]);
+
   // Check if this note is shared with the user (they don't own it)
   const isSharedWithUser = 'isSharedWithUser' in note && note.isSharedWithUser && !note.isOwnedByUser;
   
@@ -52,10 +125,38 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
   const selectedStyles = isSelected ? 'ring-2 ring-primary/40 border-primary/40' : '';
 
   return (
-    <Card 
-      className={`h-full cursor-pointer group interactive-card ${!isMobile ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles}`}
-      onClick={(e) => { e.stopPropagation(); onPress?.(note); }}
-    >
+    <div className="relative overflow-hidden">
+      {/* Delete button that appears behind the card */}
+      {isMobile && (
+        <div 
+          className="absolute inset-y-0 right-0 flex items-center justify-center bg-destructive text-destructive-foreground transition-all duration-200 ease-out rounded-r-lg"
+          style={{ 
+            width: `${MAX_SWIPE}px`,
+            transform: `translateX(${MAX_SWIPE - swipeOffset}px)`,
+            opacity: swipeOffset > 20 ? 1 : 0
+          }}
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-full w-full rounded-none text-white hover:bg-destructive/80 disabled:opacity-50"
+            onClick={handleDeleteClick}
+            disabled={isDeleting}
+          >
+            <Trash2 className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
+      
+      <Card 
+        ref={cardRef}
+        className={`h-full cursor-pointer group interactive-card ${!isMobile ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles} transition-transform duration-200 ease-out`}
+        style={isMobile ? { transform: `translateX(${swipeOffset}px)` } : {}}
+        onClick={handleCardClick}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
       {/* Share button in top right corner */}
       {onShareClick && (
         <Button
@@ -129,6 +230,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       <CardFooter className={`p-4 pt-0 text-xs text-muted-foreground transition-all duration-300 ${!isMobile ? 'group-hover:text-muted-foreground/80' : ''}`}>
         Last modified {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
       </CardFooter>
-    </Card>
+      </Card>
+    </div>
   );
 }
