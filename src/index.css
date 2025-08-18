@@ -417,8 +417,9 @@
   .note-editor h1 {
     @apply text-4xl font-bold font-serif mb-4 mt-6;
     line-height: 1.2;
-    margin-left: 0;
-    padding-left: 0;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    text-indent: 0 !important;
   }
   
   .note-editor:empty:before {
