@@ -117,33 +117,6 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
         <div className="space-y-4">
           {currentStep === 'choice' ? (
             <div className="space-y-4">
-              <div className="space-y-3">
-                <Button 
-                  type="button"
-                  onClick={() => handleChoiceSelection('signin')}
-                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" 
-                  disabled={isLoading}
-                >
-                  Sign in
-                </Button>
-                
-                <Button 
-                  type="button"
-                  onClick={() => handleChoiceSelection('signup')}
-                  variant="outline"
-                  className="w-full" 
-                  disabled={isLoading}
-                >
-                  Create account
-                </Button>
-              </div>
-              
-              <div className="my-4 flex justify-center">
-                <span className="text-xs uppercase text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-
               <Button 
                 type="button"
                 variant="outline"
@@ -159,6 +132,33 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 </svg>
                 Continue with Google
               </Button>
+              
+              <div className="my-4 flex justify-center">
+                <span className="text-xs uppercase text-muted-foreground">
+                  Or
+                </span>
+              </div>
+
+              <div className="flex space-x-3">
+                <Button 
+                  type="button"
+                  onClick={() => handleChoiceSelection('signin')}
+                  className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground" 
+                  disabled={isLoading}
+                >
+                  Sign in
+                </Button>
+                
+                <Button 
+                  type="button"
+                  onClick={() => handleChoiceSelection('signup')}
+                  variant="outline"
+                  className="flex-1" 
+                  disabled={isLoading}
+                >
+                  Create account
+                </Button>
+              </div>
             </div>
           ) : currentStep === 'email' ? (
             <div className="space-y-4">

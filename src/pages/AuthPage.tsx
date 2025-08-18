@@ -130,32 +130,6 @@ const AuthPage = () => {
           {currentStep === 'choice' ? (
             // Step 1: Choice between Sign in and Create account
             <div className="space-y-4">
-              <div className="space-y-3">
-                <Button 
-                  type="button"
-                  onClick={() => handleChoiceSelection('signin')}
-                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground border-accent" 
-                  disabled={isLoading}
-                >
-                  Sign in
-                </Button>
-                
-                <Button 
-                  type="button"
-                  onClick={() => handleChoiceSelection('signup')}
-                  className="w-full bg-transparent border border-accent text-accent hover:bg-accent/10" 
-                  disabled={isLoading}
-                >
-                  Create account
-                </Button>
-              </div>
-              
-              <div className="my-4 flex justify-center">
-                <span className="text-xs uppercase text-gray-300">
-                  Or continue with
-                </span>
-              </div>
-
               <Button 
                 type="button"
                 className="w-full border-0 bg-transparent text-white hover:bg-secondary/50"
@@ -170,6 +144,32 @@ const AuthPage = () => {
                 </svg>
                 Continue with Google
               </Button>
+              
+              <div className="my-4 flex justify-center">
+                <span className="text-xs uppercase text-gray-300">
+                  Or
+                </span>
+              </div>
+
+              <div className="flex space-x-3">
+                <Button 
+                  type="button"
+                  onClick={() => handleChoiceSelection('signin')}
+                  className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground border-accent" 
+                  disabled={isLoading}
+                >
+                  Sign in
+                </Button>
+                
+                <Button 
+                  type="button"
+                  onClick={() => handleChoiceSelection('signup')}
+                  className="flex-1 bg-transparent border border-accent text-accent hover:bg-accent/10" 
+                  disabled={isLoading}
+                >
+                  Create account
+                </Button>
+              </div>
             </div>
           ) : currentStep === 'email' ? (
             // Step 2: Email input
