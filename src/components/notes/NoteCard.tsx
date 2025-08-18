@@ -5,7 +5,7 @@ import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Eye, Edit, ArrowUpRight, Pin } from 'lucide-react';
+import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2 } from 'lucide-react';
 import type { NoteWithSharing } from '@/types/sharing';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -17,9 +17,10 @@ interface NoteCardProps {
   onOpen?: (note: Note | NoteWithSharing) => void;
   isPinned?: boolean;
   onTogglePin?: (note: Note | NoteWithSharing) => void;
+  onDelete?: (note: Note | NoteWithSharing) => void;
 }
 
-export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen, isPinned = false, onTogglePin }: NoteCardProps) {
+export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen, isPinned = false, onTogglePin, onDelete }: NoteCardProps) {
   
   const isMobile = useIsMobile();
   
@@ -71,6 +72,22 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         </Button>
       )}
       
+      {/* Delete button - shows when selected */}
+      {onDelete && isSelected && (
+        <Button
+          variant="destructive"
+          size="sm"
+          className="absolute bottom-2 right-20 h-7 w-7 rounded-full p-0 shadow-sm z-10 animate-fade-in"
+          aria-label="Delete note"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(note);
+          }}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
+      )}
+
       {/* Pin toggle */}
       <Button
         variant="secondary"
