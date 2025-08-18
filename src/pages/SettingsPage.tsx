@@ -284,18 +284,44 @@ ${note.content}
   return (
     <div className="h-full">
       <div className="p-3 md:p-6 pb-32 animate-fade-in min-h-screen">
-        <div className="flex items-center gap-2 mb-6">
-          {(isMobile || state === "collapsed") && (
-            <div className="relative">
-              <SidebarTrigger />
-              {user && unreadCount > 0 && (
-                <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
-                  {unreadCount > 99 ? '99+' : unreadCount}
+        {/* Mobile layout: Settings text on far right */}
+        <div className="md:hidden mb-6">
+          {/* Top row: Menu button left, title far right */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              {(isMobile || state === "collapsed") && (
+                <div className="relative">
+                  <SidebarTrigger />
+                  {user && unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
-          <h1 className="text-xl md:text-2xl font-serif font-medium">Settings</h1>
+            <h1 className="text-xl font-serif font-medium">Settings</h1>
+          </div>
+        </div>
+
+        {/* Desktop layout: Menu button left, title far right */}
+        <div className="hidden md:flex items-center justify-between mb-6">
+          {/* Left side: Menu button */}
+          <div className="flex items-center gap-4 px-2 py-2">
+            {(isMobile || state === "collapsed") && (
+              <div className="relative">
+                <SidebarTrigger />
+                {user && unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Right side: Title */}
+          <h1 className="text-2xl font-serif font-medium">Settings</h1>
         </div>
         
         <div className="max-w-2xl mx-auto">

@@ -75,15 +75,45 @@ export default function RecentlyDeletedPage() {
 
   return (
     <div className="container mx-auto px-4 py-4 sm:py-8 max-w-4xl min-h-screen">
-      <div className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-8">
-        <Link to="/">
-          <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
-            <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-          </Button>
-        </Link>
-        <div className="min-w-0">
-          <h1 className="text-xl sm:text-3xl font-bold truncate">Recently Deleted</h1>
-          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+      {/* Mobile layout: Recently Deleted text on far right, back button underneath */}
+      <div className="md:hidden mb-6">
+        {/* Top row: Back button left, title far right */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <Link to="/">
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+          <div className="text-right">
+            <h1 className="text-xl font-bold">Recently Deleted</h1>
+          </div>
+        </div>
+        
+        {/* Bottom row: Description with overflow protection */}
+        <div className="px-2 py-2">
+          <p className="text-muted-foreground text-sm">
+            Notes are automatically deleted after 7 days
+          </p>
+        </div>
+      </div>
+
+      {/* Desktop layout: Back button, title far right */}
+      <div className="hidden md:flex items-center justify-between mb-6">
+        {/* Left side: Back button */}
+        <div className="flex items-center gap-4 px-2 py-2">
+          <Link to="/">
+            <Button variant="ghost" size="icon" className="h-10 w-10">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
+
+        {/* Right side: Title and description */}
+        <div className="text-right">
+          <h1 className="text-3xl font-bold">Recently Deleted</h1>
+          <p className="text-muted-foreground mt-1">
             Notes are automatically deleted after 7 days
           </p>
         </div>
