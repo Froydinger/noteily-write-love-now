@@ -235,7 +235,7 @@ const Index = () => {
                 >
                   <ArrowUpDown className="h-4 w-4" />
                 </SelectTrigger>
-                <SelectContent className="z-50 bg-popover border shadow-lg">
+                <SelectContent className="z-50 bg-popover border shadow-lg" side="bottom" align="center" sideOffset={5}>
                   <SelectItem value="latest">Latest</SelectItem>
                   <SelectItem value="oldest">Oldest</SelectItem>
                   <SelectItem value="alphabetical">A-Z</SelectItem>
@@ -263,7 +263,7 @@ const Index = () => {
                 >
                   <Filter className="h-4 w-4" />
                 </SelectTrigger>
-                <SelectContent className="z-50 bg-popover border shadow-lg">
+                <SelectContent className="z-50 bg-popover border shadow-lg" side="bottom" align="center" sideOffset={5}>
                   <SelectItem value="all">All Notes</SelectItem>
                   <SelectItem value="shared-with-me">Shared with Me</SelectItem>
                   <SelectItem value="shared-with-others">My Shared Notes</SelectItem>
@@ -336,7 +336,7 @@ const Index = () => {
                 >
                   <ArrowUpDown className="h-4 w-4" />
                 </SelectTrigger>
-                <SelectContent className="z-50 bg-popover border shadow-lg">
+                <SelectContent className="z-50 bg-popover border shadow-lg" side="bottom" align="center" sideOffset={5}>
                   <SelectItem value="latest">Latest</SelectItem>
                   <SelectItem value="oldest">Oldest</SelectItem>
                   <SelectItem value="alphabetical">A-Z</SelectItem>
@@ -364,7 +364,7 @@ const Index = () => {
                 >
                   <Filter className="h-4 w-4" />
                 </SelectTrigger>
-                <SelectContent className="z-50 bg-popover border shadow-lg">
+                <SelectContent className="z-50 bg-popover border shadow-lg" side="bottom" align="center" sideOffset={5}>
                   <SelectItem value="all">All Notes</SelectItem>
                   <SelectItem value="shared-with-me">Shared with Me</SelectItem>
                   <SelectItem value="shared-with-others">My Shared Notes</SelectItem>
