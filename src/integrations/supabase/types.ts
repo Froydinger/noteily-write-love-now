@@ -218,6 +218,14 @@ export type Database = {
         Args: { note_id_param: string }
         Returns: boolean
       }
+      user_has_note_access: {
+        Args: { p_note_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      user_has_note_write_access: {
+        Args: { p_note_id: string; p_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
