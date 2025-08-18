@@ -18,7 +18,7 @@ import { toast } from '@/components/ui/sonner';
 
 const Index = () => {
   const { user } = useAuth();
-  const { notes, addNote, setCurrentNote, loading, syncNotes, hasInitialLoad } = useNotes();
+  const { notes, addNote, setCurrentNote, loading, syncNotes, hasInitialLoad, deleteNote } = useNotes();
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -145,6 +145,17 @@ const Index = () => {
       }
       return [...prev, note.id];
     });
+  };
+
+  const handleDeleteNote = async (note: Note) => {
+    try {
+      await deleteNote(note.id);
+      setSelectedNoteId(null);
+      toast.success('Note deleted');
+    } catch (error) {
+      console.error('Failed to delete note:', error);
+      toast.error('Failed to delete note');
+    }
   };
 
   // Debug logging to track the race condition
@@ -403,7 +414,7 @@ const Index = () => {
                 animationFillMode: 'both'
               }}
             >
-              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} isPinned={pinnedIds.includes(note.id)} onTogglePin={handleTogglePin} />
+              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} isPinned={pinnedIds.includes(note.id)} onTogglePin={handleTogglePin} onDelete={handleDeleteNote} />
             </div>
           ))}
         </div>
