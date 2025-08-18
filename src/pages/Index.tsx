@@ -196,7 +196,6 @@ const Index = () => {
           <div className="flex items-center gap-3 mb-4">
             {/* Search Bubble */}
             <Button
-              variant="outline"
               size="sm"
               className="h-10 w-10 p-0 rounded-full hover:scale-105 active:scale-95 transition-all duration-150"
               onClick={() => {
@@ -220,7 +219,7 @@ const Index = () => {
               onOpenChange={(open) => setOpenSelect(open ? 'sort' : null)}
             >
               <SelectTrigger 
-                className="h-10 w-10 p-0 rounded-full hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden"
+                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'sort' ? null : 'sort');
@@ -243,7 +242,7 @@ const Index = () => {
               onOpenChange={(open) => setOpenSelect(open ? 'filter' : null)}
             >
               <SelectTrigger 
-                className="h-10 w-10 p-0 rounded-full hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden"
+                className="h-10 w-10 p-0 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 [&>svg]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'filter' ? null : 'filter');
