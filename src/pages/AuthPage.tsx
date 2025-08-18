@@ -16,6 +16,7 @@ const AuthPage = () => {
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [shake, setShake] = useState(false);
   const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -74,8 +75,11 @@ const AuthPage = () => {
       
       if (!signInError) {
         navigate('/');
+      } else {
+        // Trigger shake animation for wrong password
+        setShake(true);
+        setTimeout(() => setShake(false), 600);
       }
-      // Let AuthContext handle error toasts for sign-in failures
     }
     
     setIsLoading(false);
@@ -132,7 +136,7 @@ const AuthPage = () => {
             <div className="space-y-4">
               <Button 
                 type="button"
-                className="w-full border-0 bg-transparent text-white hover:bg-secondary/50"
+                className="w-full bg-white text-black hover:bg-gray-100 border-0"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
               >
@@ -155,7 +159,7 @@ const AuthPage = () => {
                 <Button 
                   type="button"
                   onClick={() => handleChoiceSelection('signin')}
-                  className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground border-accent" 
+                  className="flex-1 bg-black text-white hover:bg-gray-800 border-0" 
                   disabled={isLoading}
                 >
                   Sign in
@@ -164,7 +168,7 @@ const AuthPage = () => {
                 <Button 
                   type="button"
                   onClick={() => handleChoiceSelection('signup')}
-                  className="flex-1 bg-transparent border border-accent text-accent hover:bg-accent/10" 
+                  className="flex-1 bg-black text-white hover:bg-gray-800 border-0" 
                   disabled={isLoading}
                 >
                   Create account
@@ -244,7 +248,7 @@ const AuthPage = () => {
                     autoComplete="current-password"
                     placeholder="Enter your password"
                     disabled={isLoading}
-                    className="border-0 focus:ring-0 focus:border-0 bg-input text-foreground"
+                    className={`border-0 focus:ring-0 focus:border-0 bg-input text-foreground transition-all ${shake ? 'animate-shake' : ''}`}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();

@@ -19,6 +19,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [shake, setShake] = useState(false);
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const { toast } = useToast();
 
@@ -62,6 +63,10 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       
       if (!signInError) {
         onOpenChange(false);
+      } else {
+        // Trigger shake animation for wrong password
+        setShake(true);
+        setTimeout(() => setShake(false), 600);
       }
     }
     
@@ -119,8 +124,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
             <div className="space-y-4">
               <Button 
                 type="button"
-                variant="outline"
-                className="w-full"
+                className="w-full bg-white text-black hover:bg-gray-100 border-0"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
               >
@@ -143,7 +147,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 <Button 
                   type="button"
                   onClick={() => handleChoiceSelection('signin')}
-                  className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground" 
+                  className="flex-1 bg-black text-white hover:bg-gray-800 border-0" 
                   disabled={isLoading}
                 >
                   Sign in
@@ -152,8 +156,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 <Button 
                   type="button"
                   onClick={() => handleChoiceSelection('signup')}
-                  variant="outline"
-                  className="flex-1" 
+                  className="flex-1 bg-black text-white hover:bg-gray-800 border-0" 
                   disabled={isLoading}
                 >
                   Create account
@@ -226,6 +229,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                     autoComplete="current-password"
                     placeholder="Enter your password"
                     disabled={isLoading}
+                    className={`transition-all ${shake ? 'animate-shake' : ''}`}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
