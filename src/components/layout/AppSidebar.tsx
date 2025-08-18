@@ -221,7 +221,16 @@ export function AppSidebar() {
                   </AccordionTrigger>
                 <AccordionContent className="pb-0">
                   <SidebarGroupContent>
-                    <div className="h-[calc(100vh-320px)] overflow-y-auto">
+                    <div className="h-[calc(100vh-320px)] overflow-y-auto scrollbar-hide"
+                         style={{
+                           scrollbarWidth: 'none', /* Firefox */
+                           msOverflowStyle: 'none' /* IE and Edge */
+                         }}>
+                      <style>{`
+                        .scrollbar-hide::-webkit-scrollbar {
+                          display: none; /* Safari and Chrome */
+                        }
+                      `}</style>
                       <div className="px-3 py-1">
                         {filteredNotes.length > 0 ? (
                           filteredNotes.map((note) => (
