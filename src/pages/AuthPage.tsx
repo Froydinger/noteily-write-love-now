@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart } from 'lucide-react';
+import { Heart, Copyright } from 'lucide-react';
 import { handleAuthKeyboard } from '@/lib/viewport';
 import { useToast } from '@/hooks/use-toast';
 
@@ -121,7 +121,10 @@ const AuthPage = () => {
           <div className="flex justify-center mb-4">
             <Heart className="h-8 w-8 text-accent" />
           </div>
-          <CardTitle className="text-2xl font-serif text-white">Welcome to Noteily</CardTitle>
+          <CardTitle className="text-2xl font-serif text-white flex items-center gap-1 justify-center">
+            Welcome to Noteily
+            <Copyright className="h-4 w-4 text-muted-foreground" />
+          </CardTitle>
           <CardDescription className="text-gray-300">
             {currentStep === 'choice' 
               ? 'Sign in to sync your notes across all devices'

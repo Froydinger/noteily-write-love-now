@@ -4,7 +4,7 @@ import { LucideIcon } from "lucide-react"
 
 interface EmptyStateProps {
   icon: LucideIcon
-  title: string
+  title: React.ReactNode
   description: string
   action?: {
     label: string

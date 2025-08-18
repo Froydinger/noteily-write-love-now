@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Heart, PenTool, Shield, Users, Smartphone, Cloud, X } from 'lucide-react';
+import { Heart, PenTool, Shield, Users, Smartphone, Cloud, X, Copyright } from 'lucide-react';
 import { LoginDialog } from '@/components/auth/LoginDialog';
 
 export function MarketingSplashScreen() {
@@ -44,7 +44,10 @@ export function MarketingSplashScreen() {
             <CardContent className="p-4 sm:p-6 lg:p-8">
               <div className="flex justify-between items-start mb-6 sm:mb-8">
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-serif mb-2">Why Choose Noteily?</h2>
+                  <h2 className="text-2xl sm:text-3xl font-serif mb-2 flex items-center gap-1 justify-start">
+                    Why Choose Noteily
+                    <Copyright className="h-4 w-4 text-muted-foreground" />?
+                  </h2>
                   <p className="text-muted-foreground text-sm sm:text-base">The note-taking app designed for passionate writers</p>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setShowFeatures(false)} className="shrink-0 ml-4">
@@ -140,8 +143,9 @@ export function MarketingSplashScreen() {
           <div className="flex justify-center">
             <Heart className="h-20 w-20 text-accent animate-heartbeat" />
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-foreground">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-foreground flex items-center gap-2 justify-center">
             Noteily
+            <Copyright className="h-6 w-6 sm:h-8 sm:w-8 md:h-12 md:w-12 text-muted-foreground" />
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-light">
             Write What You Love

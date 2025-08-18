@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Heart } from 'lucide-react';
+import { Heart, Copyright } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface LoginDialogProps {
@@ -109,7 +109,10 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
           <div className="flex justify-center mb-4">
             <Heart className="h-8 w-8 text-accent" />
           </div>
-          <DialogTitle className="text-2xl font-serif">Welcome to Noteily</DialogTitle>
+          <DialogTitle className="text-2xl font-serif flex items-center gap-1 justify-center">
+            Welcome to Noteily
+            <Copyright className="h-4 w-4 text-muted-foreground" />
+          </DialogTitle>
           <DialogDescription>
             {currentStep === 'choice' 
               ? 'Sign in to sync your notes across all devices'
