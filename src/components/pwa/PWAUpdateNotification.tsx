@@ -52,6 +52,7 @@ export const PWAUpdateNotification = () => {
     toast({
       title: "Updating...",
       description: "Close and reopen the web app or refresh your browser to finish the update.",
+      duration: Infinity, // Never expire
       action: (
         <Button 
           variant="outline" 

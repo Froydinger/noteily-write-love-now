@@ -15,6 +15,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import PullToRefresh from 'react-simple-pull-to-refresh';
 import { ShareManager } from '@/components/notes/ShareManager';
 import { toast } from '@/components/ui/sonner';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 const Index = () => {
   const { user } = useAuth();

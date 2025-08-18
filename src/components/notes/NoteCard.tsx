@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2 } from 'lucide-react';
 import type { NoteWithSharing } from '@/types/sharing';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface NoteCardProps {
   note: Note | NoteWithSharing;
@@ -74,18 +75,38 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       
       {/* Delete button - shows when selected, positioned top right */}
       {onDelete && isSelected && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="absolute top-2 right-11 h-8 w-8 rounded-full p-0 shadow-sm z-10 animate-fade-in-half hover:bg-destructive/10"
-          aria-label="Delete note"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(note);
-          }}
-        >
-          <Trash2 className="h-4 w-4 text-destructive" />
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-2 right-11 h-8 w-8 rounded-full p-0 shadow-sm z-10 animate-fade-in-half hover:bg-destructive/10"
+              aria-label="Delete note"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Note</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you would like to delete this note? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => onDelete(note)}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
 
       {/* Pin toggle */}
