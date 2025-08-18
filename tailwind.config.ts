@@ -189,10 +189,10 @@ export default {
 					'20%, 40%, 60%, 80%': { transform: 'translateX(3px)' }
 				},
 				'wiggle': {
-					'0%, 90%, 100%': { transform: 'translateX(0)' },
-					'5%': { transform: 'translateX(4px)' },
-					'10%': { transform: 'translateX(-4px)' },
-					'15%': { transform: 'translateX(0)' }
+					'0%, 95%, 100%': { transform: 'translateX(0)' },
+					'2%': { transform: 'translateX(1px)' },
+					'4%': { transform: 'translateX(-1px)' },
+					'6%': { transform: 'translateX(0)' }
 				}
 			},
 			animation: {
@@ -205,7 +205,7 @@ export default {
 				'gentle-bounce': 'gentle-bounce 2s ease-in-out infinite',
 				'slide-up-smooth': 'slide-up-smooth 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'shake': 'shake 0.6s ease-in-out',
-				'wiggle': 'wiggle 3s ease-in-out infinite'
+				'wiggle': 'wiggle 5s ease-in-out infinite'
 			}
 		}
 	},
