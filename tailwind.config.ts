@@ -203,7 +203,7 @@ export default {
 				'gentle-bounce': 'gentle-bounce 2s ease-in-out infinite',
 				'slide-up-smooth': 'slide-up-smooth 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'shake': 'shake 0.6s ease-in-out',
-				'gentle-breathing': 'gentle-breathing 4s ease-in-out infinite'
+				'gentle-breathing': 'gentle-breathing 32s ease-in-out infinite'
 			}
 		}
 	},
