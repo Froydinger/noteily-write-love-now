@@ -51,25 +51,28 @@ export const PWAUpdateNotification = () => {
     
     toast({
       title: "Updating...",
-      description: "Close and reopen the web app or refresh your browser to finish the update.",
-      duration: Infinity, // Never expire
-      action: (
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setTimeout(() => {
-              window.location.reload();
-            }, 0);
-          }}
-          className="ml-2"
-        >
-          <RefreshCw className="h-4 w-4 mr-1" />
-          Refresh
-        </Button>
+      description: (
+        <div className="space-y-2">
+          <p>Close and reopen the web app or refresh your browser to finish the update.</p>
+          <p className="text-xs text-muted-foreground">iOS users may need to tap the refresh button twice</p>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setTimeout(() => {
+                window.location.reload();
+              }, 0);
+            }}
+            className="w-full mt-3"
+          >
+            <RefreshCw className="h-4 w-4 mr-1" />
+            Refresh
+          </Button>
+        </div>
       ),
+      duration: Infinity, // Never expire
     });
     
     setShowUpdatePrompt(false);
