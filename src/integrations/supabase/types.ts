@@ -139,6 +139,7 @@ export type Database = {
           updated_at: string
           user_id: string
           username: string | null
+          username_prompt_last_shown: string | null
         }
         Insert: {
           created_at?: string
@@ -151,6 +152,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           username?: string | null
+          username_prompt_last_shown?: string | null
         }
         Update: {
           created_at?: string
@@ -163,6 +165,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           username?: string | null
+          username_prompt_last_shown?: string | null
         }
         Relationships: []
       }

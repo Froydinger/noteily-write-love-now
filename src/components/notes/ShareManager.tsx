@@ -223,7 +223,9 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                         <div className="flex items-center gap-2 min-w-0">
                           <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <div className="min-w-0">
-                            <div className="font-medium truncate text-sm">{share.shared_with_email}</div>
+                            <div className="font-medium truncate text-sm">
+                              {share.shared_with_username ? `@${share.shared_with_username}` : share.shared_with_email}
+                            </div>
                             <div className="text-xs text-muted-foreground">
                               {share.shared_with_user_id ? 'Active user' : 'Pending invitation'}
                             </div>

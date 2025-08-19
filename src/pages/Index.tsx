@@ -18,6 +18,7 @@ import { toast } from '@/components/ui/sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { UsernamePrompt } from '@/components/notes/UsernamePrompt';
 import { useUsername } from '@/hooks/useUsername';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { user } = useAuth();
@@ -53,19 +54,44 @@ const Index = () => {
     } catch {}
   }, [pinnedIds, user?.id]);
 
-  // Show username prompt for logged in users without a username
+  // Show username prompt logic - only for users without username, and either new accounts or every 7 days
   useEffect(() => {
     if (user && username === null && !showUsernamePrompt) {
-      const dismissed = localStorage.getItem(`username-prompt-dismissed-${user.id}`);
-      if (!dismissed) {
-        setShowUsernamePrompt(true);
-      }
+      const checkPromptEligibility = async () => {
+        // Check if user has preferences (determines if new user)
+        const { data: prefs } = await supabase
+          .from('user_preferences')
+          .select('username_prompt_last_shown, created_at')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (!prefs) return; // No preferences found
+        
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const isNewUser = new Date(prefs.created_at) > sevenDaysAgo;
+        
+        // Show prompt if new user OR if it's been 7+ days since last shown
+        const shouldShow = isNewUser || 
+          !prefs.username_prompt_last_shown || 
+          new Date(prefs.username_prompt_last_shown) < sevenDaysAgo;
+        
+        if (shouldShow) {
+          setShowUsernamePrompt(true);
+        }
+      };
+      
+      checkPromptEligibility();
     }
   }, [user, username, showUsernamePrompt]);
 
-  const handleDismissUsernamePrompt = () => {
+  const handleDismissUsernamePrompt = async () => {
     if (user) {
-      localStorage.setItem(`username-prompt-dismissed-${user.id}`, 'true');
+      // Update the last shown timestamp in the database
+      await supabase
+        .from('user_preferences')
+        .update({ username_prompt_last_shown: new Date().toISOString() })
+        .eq('user_id', user.id);
     }
     setShowUsernamePrompt(false);
   };
@@ -426,8 +452,8 @@ const Index = () => {
           </div>
         )}
 
-        {/* Username Prompt */}
-        {showUsernamePrompt && user && (
+        {/* Username Prompt - only for users without username */}
+        {showUsernamePrompt && user && username === null && (
           <div className="mb-6">
             <UsernamePrompt onDismiss={handleDismissUsernamePrompt} />
           </div>

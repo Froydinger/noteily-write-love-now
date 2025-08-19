@@ -24,9 +24,9 @@ export function UsernamePrompt({ onDismiss }: UsernamePromptProps) {
             <Users className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-sm mb-1">Make sharing easier!</h3>
+            <h3 className="font-medium text-sm mb-1">Make sharing easier and more secure!</h3>
             <p className="text-sm text-muted-foreground mb-3">
-              Set a username so others can share notes with you using @username instead of your email.
+              Set a username so others can share notes with you using @username instead of your email address. This keeps your email private and makes sharing easier.
             </p>
             <div className="flex items-center gap-2">
               <Button 

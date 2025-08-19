@@ -4,6 +4,7 @@ export interface SharedNote {
   owner_id: string;
   shared_with_email: string;
   shared_with_user_id: string | null;
+  shared_with_username?: string | null; // Add username field for display
   permission: 'read' | 'write';
   created_at: string;
   updated_at: string;

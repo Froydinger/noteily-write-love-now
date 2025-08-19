@@ -25,13 +25,31 @@ export function useSharedNotes(noteId?: string) {
 
       if (error) throw error;
 
-      const shares = (data || []).map(share => ({
-        ...share,
-        permission: share.permission as 'read' | 'write'
-      }));
+      // For each share, fetch the username if user_id is available
+      const sharesWithUsernames = await Promise.all(
+        (data || []).map(async (share) => {
+          let shared_with_username = null;
+          
+          if (share.shared_with_user_id) {
+            const { data: userPrefs } = await supabase
+              .from('user_preferences')
+              .select('username')
+              .eq('user_id', share.shared_with_user_id)
+              .single();
+            
+            shared_with_username = userPrefs?.username || null;
+          }
+          
+          return {
+            ...share,
+            permission: share.permission as 'read' | 'write',
+            shared_with_username
+          };
+        })
+      );
 
-      setSharedUsers(shares);
-      return shares;
+      setSharedUsers(sharesWithUsernames);
+      return sharesWithUsernames;
     } catch (error) {
       console.error('Error loading shares:', error);
       toast({
