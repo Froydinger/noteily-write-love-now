@@ -63,7 +63,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         <Button
           variant="ghost"
           size="sm"
-          className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : (!isMobile ? 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto' : 'opacity-0 pointer-events-none')}`}
+          className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${isSelected || isMobile ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
           onClick={(e) => {
             e.stopPropagation();
             onShareClick(note);
@@ -73,8 +73,8 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         </Button>
       )}
       
-      {/* Delete button - shows when selected, positioned top right */}
-      {onDelete && isSelected && (
+      {/* Delete button - shows when selected or on mobile, positioned top right */}
+      {onDelete && (isSelected || isMobile) && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
