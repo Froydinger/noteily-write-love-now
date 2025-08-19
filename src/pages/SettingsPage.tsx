@@ -443,8 +443,17 @@ ${note.content}
                           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">@</span>
                           <Input
                             value={newUsername}
-                            onChange={(e) => setNewUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                            placeholder="username"
+                            onChange={(e) => {
+                              let value = e.target.value.toLowerCase();
+                              // Remove @ if it's at the beginning
+                              if (value.startsWith('@')) {
+                                value = value.substring(1);
+                              }
+                              // Remove any other invalid characters
+                              value = value.replace(/[^a-z0-9_]/g, '');
+                              setNewUsername(value);
+                            }}
+                            placeholder="@username"
                             className="pl-8"
                             disabled={usernameLoading}
                             onKeyPress={(e) => e.key === 'Enter' && handleUsernameSubmit()}
