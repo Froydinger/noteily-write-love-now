@@ -45,13 +45,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // If it doesn't contain @, treat it as username and look up email
     if (!emailOrUsername.includes('@')) {
       try {
-        const { data, error } = await supabase
-          .from('user_preferences')
-          .select('user_id, users:user_id(email)')
-          .eq('username', emailOrUsername.toLowerCase())
-          .single();
+        const { data, error } = await supabase.rpc('get_user_email_by_username', {
+          p_username: emailOrUsername.toLowerCase()
+        });
         
-        if (error || !data || !data.users) {
+        if (error || !data) {
           toast({
             title: "Sign in failed",
             description: "Username not found",
@@ -60,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { error: { message: "Username not found" } };
         }
         
-        email = (data.users as any).email;
+        email = data;
       } catch (error) {
         toast({
           title: "Sign in failed",
