@@ -37,7 +37,7 @@ export default function EmptyNotesPlaceholder() {
               Welcome to Noteily<span className="text-xs text-muted-foreground ml-0.5 -mt-1">™</span>
             </div>
           }
-          description="Create your first note to start your journey of self-expression and reflection."
+          description="Take a sec to jot down your thoughts."
           action={{
             label: "Create Your First Note",
             onClick: handleCreateFirstNote

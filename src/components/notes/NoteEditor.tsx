@@ -265,9 +265,10 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         setCurrentBlockType('p');
       }
 
-      // Calculate absolute position on screen
+      // Calculate absolute position on screen, one line above
       const blockRect = blockElement.getBoundingClientRect();
-      const absoluteTop = blockRect.top;
+      const lineHeight = parseFloat(getComputedStyle(blockElement).lineHeight) || 24;
+      const absoluteTop = blockRect.top - lineHeight;
       
       setHandleTop(absoluteTop);
       setShowHandle(true);

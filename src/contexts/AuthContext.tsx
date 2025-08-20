@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (emailOrUsername: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -39,7 +39,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (emailOrUsername: string, password: string) => {
+    let email = emailOrUsername;
+    
+    // If it doesn't contain @, treat it as username and look up email
+    if (!emailOrUsername.includes('@')) {
+      try {
+        const { data } = await supabase.rpc('get_user_email_by_username', {
+          p_username: emailOrUsername.toLowerCase()
+        });
+        
+        if (!data) {
+          toast({
+            title: "Sign in failed",
+            description: "Username not found",
+            variant: "destructive",
+          });
+          return { error: { message: "Username not found" } };
+        }
+        
+        email = data;
+      } catch (error) {
+        toast({
+          title: "Sign in failed",
+          description: "Error looking up username",
+          variant: "destructive",
+        });
+        return { error };
+      }
+    }
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,

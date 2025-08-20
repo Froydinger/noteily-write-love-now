@@ -152,7 +152,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                       autoFocus={false}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Enter an email address or username (@username)
+                      Enter an email address or username (username without @)
                     </p>
                   </div>
 

@@ -13,7 +13,7 @@ interface LoginDialogProps {
 }
 
 export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
-  const [email, setEmail] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [currentStep, setCurrentStep] = useState<'choice' | 'email' | 'auth'>('choice');
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
@@ -29,12 +29,12 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   };
 
   const handleEmailSubmit = () => {
-    if (!email) return;
+    if (!emailOrUsername) return;
     setCurrentStep('auth');
   };
 
   const handleAuth = async () => {
-    if (!email || !password) return;
+    if (!emailOrUsername || !password) return;
 
     setIsLoading(true);
     
@@ -47,7 +47,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
         className: "bg-green-600 text-white border-green-600",
       });
       
-      const { error: signUpError } = await signUp(email, password);
+      const { error: signUpError } = await signUp(emailOrUsername, password);
       if (!signUpError) {
         setPassword('');
         toast({
@@ -59,7 +59,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       }
       setIsCreatingAccount(false);
     } else {
-      const { error: signInError } = await signIn(email, password);
+      const { error: signInError } = await signIn(emailOrUsername, password);
       
       if (!signInError) {
         onOpenChange(false);
@@ -94,7 +94,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   // Reset form when dialog closes
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
-      setEmail('');
+      setEmailOrUsername('');
       setPassword('');
       setCurrentStep('choice');
       setAuthMode('signin');
@@ -117,7 +117,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               ? 'Sign in to sync your notes across all devices'
               : currentStep === 'email' 
                 ? `${authMode === 'signin' ? 'Sign in to' : 'Create account for'} ${authMode === 'signin' ? 'your account' : 'Noteily'}`
-                : `Continue as ${email}`}
+                : `Continue as ${emailOrUsername}`}
           </DialogDescription>
         </DialogHeader>
         
@@ -182,14 +182,14 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email-or-username">Email or Username</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="email-or-username"
+                  type="text"
+                  value={emailOrUsername}
+                  onChange={(e) => setEmailOrUsername(e.target.value)}
                   autoComplete="email"
-                  placeholder="Enter your email"
+                  placeholder="Enter your email or username"
                   disabled={isLoading}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -203,7 +203,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 type="button"
                 onClick={handleEmailSubmit}
                 className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" 
-                disabled={isLoading || !email}
+                disabled={isLoading || !emailOrUsername}
               >
                 Continue
               </Button>
