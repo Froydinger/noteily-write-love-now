@@ -208,6 +208,10 @@ export type Database = {
           user_permission: string
         }[]
       }
+      get_user_email_by_username: {
+        Args: { p_username: string }
+        Returns: string
+      }
       get_user_id_by_username: {
         Args: { p_username: string }
         Returns: string
