@@ -189,19 +189,12 @@ const Index = () => {
   };
 
   const handleCardPress = (note: Note) => {
-    // On iOS, require explicit double-tap to open, single tap just selects
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    
     if (selectedNoteId === note.id) {
-      if (isIOS) {
-        // On iOS, require a third interaction via the open button
-        setSelectedNoteId(null);
-      } else {
-        // On Android/other platforms, second tap opens
-        setSelectedNoteId(null);
-        navigate(`/note/${note.id}`);
-      }
+      // Second tap: deselect and navigate (same behavior on all platforms)
+      setSelectedNoteId(null);
+      navigate(`/note/${note.id}`);
     } else {
+      // First tap: select the note
       setSelectedNoteId(note.id);
     }
   };
