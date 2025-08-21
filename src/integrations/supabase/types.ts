@@ -181,16 +181,7 @@ export type Database = {
           p_permission: string
           p_shared_with_email_or_username: string
         }
-        Returns: {
-          created_at: string
-          id: string
-          note_id: string
-          owner_id: string
-          permission: string
-          shared_with_email: string
-          shared_with_user_id: string
-          updated_at: string
-        }[]
+        Returns: string
       }
       check_username_exists: {
         Args: { p_username: string }
