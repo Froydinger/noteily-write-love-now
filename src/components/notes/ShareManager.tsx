@@ -138,12 +138,12 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                   <div className="space-y-2">
                     <Label htmlFor="email-or-username" className="flex items-center gap-2 text-sm font-medium">
                       <Users className="h-4 w-4" />
-                      Email or Username
+                      Username or Email
                     </Label>
                     <Input
                       id="email-or-username"
                       type="text"
-                      placeholder="email@example.com or @username"
+                      placeholder="username or email@example.com"
                       value={emailOrUsername}
                       onChange={(e) => setEmailOrUsername(e.target.value)}
                       onKeyPress={handleKeyPress}
@@ -152,7 +152,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                       autoFocus={false}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Enter an email address or username (username without @)
+                      Enter a username or email address
                     </p>
                   </div>
 
@@ -220,17 +220,17 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                         key={share.id}
                         className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg gap-2"
                       >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                          <div className="min-w-0">
-                            <div className="font-medium truncate text-sm">
-                              {share.shared_with_username ? `@${share.shared_with_username}` : share.shared_with_email}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {share.shared_with_user_id ? 'Active user' : 'Pending invitation'}
-                            </div>
-                          </div>
-                        </div>
+                         <div className="flex items-center gap-2 min-w-0">
+                           <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                           <div className="min-w-0">
+                             <div className="font-medium truncate text-sm">
+                               {share.shared_with_username ? `@${share.shared_with_username}` : share.shared_with_email}
+                             </div>
+                             <div className="text-xs text-muted-foreground">
+                               {share.shared_with_user_id ? 'Active user' : 'Pending invitation'}
+                             </div>
+                           </div>
+                         </div>
                         
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <Select

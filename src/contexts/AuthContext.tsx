@@ -67,8 +67,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (identifier: string, password: string) => {
     setLoading(true);
     try {
+      // Clean the identifier input
+      const cleanIdentifier = identifier.trim();
+      
       // First check if it's a Google user
-      const isGoogle = await checkIsGoogleUser(identifier);
+      const isGoogle = await checkIsGoogleUser(cleanIdentifier);
       if (isGoogle) {
         toast({
           title: "Sign in failed",
@@ -79,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // Get user data to find their email
-      const userData = await getUserByIdentifier(identifier);
+      const userData = await getUserByIdentifier(cleanIdentifier);
       if (!userData) {
         toast({
           title: "Sign in failed",
@@ -233,15 +236,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const requestPasswordReset = async (identifier: string) => {
     setLoading(true);
     try {
+      // Clean the identifier input
+      const cleanIdentifier = identifier.trim();
+      
       // Check if it's a Google user
-      const isGoogle = await checkIsGoogleUser(identifier);
+      const isGoogle = await checkIsGoogleUser(cleanIdentifier);
       if (isGoogle) {
         const error = { message: 'This account uses Google sign-in. You cannot reset the password for Google accounts.' };
         return { error };
       }
 
       // Get user data to find their email
-      const userData = await getUserByIdentifier(identifier);
+      const userData = await getUserByIdentifier(cleanIdentifier);
       if (!userData) {
         const error = { message: 'No account found with this username or email.' };
         return { error };
