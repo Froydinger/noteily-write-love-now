@@ -265,10 +265,12 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         setCurrentBlockType('p');
       }
 
-      // Calculate absolute position on screen, one line above
+      // Calculate absolute position on screen, near current line but to the right
       const blockRect = blockElement.getBoundingClientRect();
       const lineHeight = parseFloat(getComputedStyle(blockElement).lineHeight) || 24;
-      const absoluteTop = blockRect.top - lineHeight;
+      
+      // Position the handle at the middle of the current line
+      const absoluteTop = blockRect.top + (lineHeight / 2);
       
       setHandleTop(absoluteTop);
       setShowHandle(true);

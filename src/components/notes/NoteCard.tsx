@@ -74,14 +74,14 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         <Pin className="h-4 w-4" fill={isPinned ? "currentColor" : "none"} />
       </Button>
       
-      {/* Delete button - shows when selected, positioned top right */}
-      {onDelete && isSelected && (
+      {/* Delete button - shows when selected OR when hovering on non-touch devices */}
+      {onDelete && (isSelected || (!isTouchDevice)) && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
               variant="ghost"
               size="sm"
-              className="absolute top-2 right-11 h-8 w-8 rounded-full p-0 shadow-sm z-10 animate-fade-in-half hover:bg-destructive/10"
+              className={`absolute top-2 right-11 h-8 w-8 rounded-full p-0 shadow-sm z-10 hover:bg-destructive/10 transition-opacity duration-200 ${isSelected ? 'opacity-100 animate-fade-in-half' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
               aria-label="Delete note"
               onClick={(e) => {
                 e.stopPropagation();
