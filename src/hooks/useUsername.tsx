@@ -122,8 +122,9 @@ export function useUsername() {
           user_id: user.id, 
           username: trimmedUsername,
           theme: 'navy' // Default theme for new records
-        })
-        .eq('user_id', user.id);
+        }, {
+          onConflict: 'user_id'
+        });
 
       if (error) {
         throw error;
@@ -160,8 +161,9 @@ export function useUsername() {
           user_id: user.id, 
           username: null,
           theme: 'navy' // Default theme for new records
-        })
-        .eq('user_id', user.id);
+        }, {
+          onConflict: 'user_id'
+        });
 
       if (error) {
         throw error;
