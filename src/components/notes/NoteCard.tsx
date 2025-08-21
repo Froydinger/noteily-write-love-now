@@ -43,6 +43,8 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         // Intentionally do not decode &lt; or &gt; to avoid showing fake tags
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'")
+        .replace(/\n+/g, ' ')  // Convert newlines to spaces
+        .replace(/\r+/g, ' ')  // Convert carriage returns to spaces
         .replace(/\s{2,}/g, ' ')
         .trim()
     : 'No content';
