@@ -189,14 +189,8 @@ const Index = () => {
   };
 
   const handleCardPress = (note: Note) => {
-    if (selectedNoteId === note.id) {
-      // Second tap: deselect and navigate (same behavior on all platforms)
-      setSelectedNoteId(null);
-      navigate(`/note/${note.id}`);
-    } else {
-      // First tap: select the note
-      setSelectedNoteId(note.id);
-    }
+    // Simply select the note - opening will be handled by NoteCard's onOpen
+    setSelectedNoteId(note.id);
   };
 
   const handleTogglePin = (note: Note) => {
