@@ -36,29 +36,30 @@ export function useUsername() {
     loadUsername();
   }, [loadUsername]);
 
-  // Check if username is available
-  const checkUsername = useCallback(async (usernameToCheck: string): Promise<boolean> => {
-    if (!usernameToCheck.trim()) return false;
+  // Check if username is available for this user (considering email reconnection)
+  const checkUsernameAvailable = useCallback(async (usernameToCheck: string): Promise<boolean> => {
+    if (!usernameToCheck.trim() || !user) return false;
 
     setChecking(true);
     try {
-      const { data, error } = await supabase.rpc('check_username_exists', {
-        p_username: usernameToCheck.trim()
+      const { data, error } = await supabase.rpc('check_username_available_for_user', {
+        p_username: usernameToCheck.trim(),
+        p_user_email: user.email
       });
 
       if (error) {
-        console.error('Error checking username:', error);
+        console.error('Error checking username availability:', error);
         return false;
       }
 
-      return !data; // Return true if username is available (not exists)
+      return data; // Return true if username is available for this user
     } catch (error) {
-      console.error('Error checking username:', error);
+      console.error('Error checking username availability:', error);
       return false;
     } finally {
       setChecking(false);
     }
-  }, []);
+  }, [user]);
 
   // Set username
   const setUsernameValue = useCallback(async (newUsername: string): Promise<boolean> => {
@@ -104,13 +105,13 @@ export function useUsername() {
 
     setLoading(true);
     try {
-      // Skip availability check if it's the user's current username
+      // Check if username is available for this user (allows reconnection)
       if (trimmedUsername !== username) {
-        const isAvailable = await checkUsername(trimmedUsername);
+        const isAvailable = await checkUsernameAvailable(trimmedUsername);
         if (!isAvailable) {
           toast({
             title: "Username taken",
-            description: "This username is already taken. Please choose another.",
+            description: "This username is already taken by another user.",
             variant: "destructive",
           });
           return false;
@@ -147,7 +148,7 @@ export function useUsername() {
     } finally {
       setLoading(false);
     }
-  }, [user, toast, checkUsername]);
+  }, [user, toast, checkUsernameAvailable]);
 
   // Remove username
   const removeUsername = useCallback(async (): Promise<boolean> => {
@@ -191,7 +192,7 @@ export function useUsername() {
     username,
     loading,
     checking,
-    checkUsername,
+    checkUsername: checkUsernameAvailable,
     setUsername: setUsernameValue,
     removeUsername,
     refreshUsername: loadUsername,

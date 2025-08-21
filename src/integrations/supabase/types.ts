@@ -196,6 +196,10 @@ export type Database = {
         Args: { p_identifier: string }
         Returns: boolean
       }
+      check_username_available_for_user: {
+        Args: { p_user_email: string; p_username: string }
+        Returns: boolean
+      }
       check_username_exists: {
         Args: { p_username: string }
         Returns: boolean
