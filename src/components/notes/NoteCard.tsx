@@ -60,11 +60,16 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       className={`h-full cursor-pointer group interactive-card ${!isTouchDevice ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles}`}
       onClick={(e) => { 
         e.stopPropagation(); 
-        // On touch devices, if already selected, open the note directly
+        // On touch devices, always open directly on second tap if selected
         if (isTouchDevice && isSelected) {
           onOpen?.(note);
-        } else {
-          onPress?.(note);
+          return;
+        }
+        // First tap or non-touch device behavior
+        onPress?.(note);
+        // On touch devices, if this is the selecting tap, also schedule the open
+        if (isTouchDevice && !isSelected) {
+          setTimeout(() => onOpen?.(note), 100);
         }
       }}
     >
