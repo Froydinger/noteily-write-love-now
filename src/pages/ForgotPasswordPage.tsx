@@ -4,13 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Mail } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ArrowLeft, Mail, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function ForgotPasswordPage() {
   const [identifier, setIdentifier] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { user, requestPasswordReset } = useAuth();
   const navigate = useNavigate();
 
@@ -27,12 +29,20 @@ export default function ForgotPasswordPage() {
     if (!identifier.trim()) return;
 
     setLoading(true);
+    setError(null);
     const { error } = await requestPasswordReset(identifier.trim());
     setLoading(false);
 
-    if (!error) {
+    if (error) {
+      setError(error.message);
+    } else {
       setSent(true);
     }
+  };
+
+  const handleTryAgain = () => {
+    setError(null);
+    setIdentifier('');
   };
 
   if (sent) {
@@ -52,7 +62,11 @@ export default function ForgotPasswordPage() {
             
             <div className="space-y-4">
               <Button 
-                onClick={() => setSent(false)}
+                onClick={() => {
+                  setSent(false);
+                  setError(null);
+                  setIdentifier('');
+                }}
                 variant="outline"
                 className="w-full"
               >
@@ -83,6 +97,36 @@ export default function ForgotPasswordPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="space-y-2">
+                  <p>{error}</p>
+                  {error.includes('Google') && (
+                    <p className="text-sm">
+                      Try signing in with Google instead, or contact support if you need to reset your Google account password.
+                    </p>
+                  )}
+                  {error.includes('not found') && (
+                    <div className="flex gap-2 mt-2">
+                      <Button 
+                        onClick={handleTryAgain}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Try different username/email
+                      </Button>
+                      <Link to="/auth">
+                        <Button variant="outline" size="sm">
+                          Create account instead
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="identifier">Username or Email</Label>
               <Input
@@ -90,7 +134,10 @@ export default function ForgotPasswordPage() {
                 type="text"
                 placeholder="Enter your username or email"
                 value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                onChange={(e) => {
+                  setIdentifier(e.target.value);
+                  if (error) setError(null);
+                }}
                 required
                 autoComplete="username email"
                 autoFocus

@@ -236,12 +236,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Check if it's a Google user
       const isGoogle = await checkIsGoogleUser(identifier);
       if (isGoogle) {
-        const error = { message: 'This account uses Google sign-in. You cannot reset the password for Google accounts. Please use "Continue with Google" to sign in.' };
-        toast({
-          title: "Password reset failed",
-          description: error.message,
-          variant: "destructive",
-        });
+        const error = { message: 'This account uses Google sign-in. You cannot reset the password for Google accounts.' };
         return { error };
       }
 
@@ -249,11 +244,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userData = await getUserByIdentifier(identifier);
       if (!userData) {
         const error = { message: 'No account found with this username or email.' };
-        toast({
-          title: "Password reset failed",
-          description: error.message,
-          variant: "destructive",
-        });
         return { error };
       }
 
@@ -264,11 +254,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        toast({
-          title: "Password reset failed",
-          description: error.message,
-          variant: "destructive",
-        });
+        return { error };
       } else {
         toast({
           title: "Password reset sent",
@@ -278,12 +264,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return { error };
     } catch (error: any) {
-      toast({
-        title: "Password reset failed",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
-      return { error };
+      const errorMessage = 'Failed to send password reset email. Please try again.';
+      return { error: { message: errorMessage } };
     } finally {
       setLoading(false);
     }
