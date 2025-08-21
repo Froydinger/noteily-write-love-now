@@ -45,10 +45,14 @@ const Index = () => {
       const raw = localStorage.getItem(key);
       const pinnedFromStorage = raw ? JSON.parse(raw) : [];
       
+      console.log('Loading pinned notes:', { key, pinnedFromStorage, notesCount: notes.length });
+      
       // Filter out any pinned notes that no longer exist or are deleted
       if (notes.length > 0) {
         const existingNoteIds = new Set(notes.map(note => note.id));
         const validPinnedIds = pinnedFromStorage.filter((id: string) => existingNoteIds.has(id));
+        
+        console.log('Valid pinned IDs after filtering:', validPinnedIds);
         
         if (validPinnedIds.length !== pinnedFromStorage.length) {
           // Update localStorage if we filtered out deleted notes
@@ -59,8 +63,10 @@ const Index = () => {
       } else {
         setPinnedIds(pinnedFromStorage);
       }
-    } catch {}
-  }, [user?.id, notes]);
+    } catch (error) {
+      console.error('Error loading pinned notes:', error);
+    }
+  }, [user?.id, notes, hasInitialLoad]); // Add hasInitialLoad dependency
 
   useEffect(() => {
     try {
