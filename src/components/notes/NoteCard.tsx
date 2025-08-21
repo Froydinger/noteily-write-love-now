@@ -60,20 +60,19 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       className={`h-full cursor-pointer group interactive-card ${!isTouchDevice ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles}`}
       onClick={(e) => { e.stopPropagation(); onPress?.(note); }}
     >
-      {/* Share button in top right corner */}
-      {onShareClick && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onShareClick(note);
-          }}
-        >
-          <Users className="h-4 w-4" />
-        </Button>
-      )}
+      {/* Pin button in top right corner */}
+      <Button
+        variant="secondary"
+        size="sm"
+        className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 shadow-sm z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'} ${isPinned ? 'text-primary border-primary/30 bg-primary/10' : ''}`}
+        aria-label={isPinned ? 'Unpin note' : 'Pin note'}
+        onClick={(e) => {
+          e.stopPropagation();
+          onTogglePin?.(note);
+        }}
+      >
+        <Pin className="h-4 w-4" fill={isPinned ? "currentColor" : "none"} />
+      </Button>
       
       {/* Delete button - shows when selected, positioned top right */}
       {onDelete && isSelected && (
@@ -111,19 +110,20 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         </AlertDialog>
       )}
 
-      {/* Pin toggle */}
-      <Button
-        variant="secondary"
-        size="sm"
-        className={`absolute bottom-2 right-11 h-7 w-7 rounded-full p-0 shadow-sm z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'} ${isPinned ? 'text-primary border-primary/30 bg-primary/10' : ''}`}
-        aria-label={isPinned ? 'Unpin note' : 'Pin note'}
-        onClick={(e) => {
-          e.stopPropagation();
-          onTogglePin?.(note);
-        }}
-      >
-        <Pin className="h-3.5 w-3.5" fill={isPinned ? "currentColor" : "none"} />
-      </Button>
+      {/* Share button */}
+      {onShareClick && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`absolute bottom-2 right-11 h-7 w-7 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onShareClick(note);
+          }}
+        >
+          <Users className="h-3.5 w-3.5" />
+        </Button>
+      )}
 
       {/* Quick open arrow */}
       <Button
