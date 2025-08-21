@@ -43,9 +43,24 @@ const Index = () => {
     try {
       const key = `pinned:${user?.id || 'guest'}`;
       const raw = localStorage.getItem(key);
-      setPinnedIds(raw ? JSON.parse(raw) : []);
+      const pinnedFromStorage = raw ? JSON.parse(raw) : [];
+      
+      // Filter out any pinned notes that no longer exist or are deleted
+      if (notes.length > 0) {
+        const existingNoteIds = new Set(notes.map(note => note.id));
+        const validPinnedIds = pinnedFromStorage.filter((id: string) => existingNoteIds.has(id));
+        
+        if (validPinnedIds.length !== pinnedFromStorage.length) {
+          // Update localStorage if we filtered out deleted notes
+          localStorage.setItem(key, JSON.stringify(validPinnedIds));
+        }
+        
+        setPinnedIds(validPinnedIds);
+      } else {
+        setPinnedIds(pinnedFromStorage);
+      }
     } catch {}
-  }, [user?.id]);
+  }, [user?.id, notes]);
 
   useEffect(() => {
     try {
@@ -174,9 +189,18 @@ const Index = () => {
   };
 
   const handleCardPress = (note: Note) => {
+    // On iOS, require explicit double-tap to open, single tap just selects
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    
     if (selectedNoteId === note.id) {
-      setSelectedNoteId(null);
-      navigate(`/note/${note.id}`);
+      if (isIOS) {
+        // On iOS, require a third interaction via the open button
+        setSelectedNoteId(null);
+      } else {
+        // On Android/other platforms, second tap opens
+        setSelectedNoteId(null);
+        navigate(`/note/${note.id}`);
+      }
     } else {
       setSelectedNoteId(note.id);
     }
@@ -187,8 +211,8 @@ const Index = () => {
       if (prev.includes(note.id)) {
         return prev.filter((id) => id !== note.id);
       }
-      if (prev.length >= 2) {
-        toast.error('You can pin up to 2 notes');
+      if (prev.length >= 3) {
+        toast.error('You can pin up to 3 notes');
         return prev;
       }
       return [...prev, note.id];
@@ -199,6 +223,8 @@ const Index = () => {
     try {
       await deleteNote(note.id);
       setSelectedNoteId(null);
+      // Remove from pinned notes if it was pinned
+      setPinnedIds((prev) => prev.filter((id) => id !== note.id));
       toast.success('Note deleted');
     } catch (error) {
       console.error('Failed to delete note:', error);
