@@ -95,6 +95,7 @@ export type Database = {
           permission: string
           shared_with_email: string
           shared_with_user_id: string | null
+          shared_with_username: string | null
           updated_at: string
         }
         Insert: {
@@ -105,6 +106,7 @@ export type Database = {
           permission: string
           shared_with_email: string
           shared_with_user_id?: string | null
+          shared_with_username?: string | null
           updated_at?: string
         }
         Update: {
@@ -115,6 +117,7 @@ export type Database = {
           permission?: string
           shared_with_email?: string
           shared_with_user_id?: string | null
+          shared_with_username?: string | null
           updated_at?: string
         }
         Relationships: [
