@@ -104,15 +104,17 @@ export function useUsername() {
 
     setLoading(true);
     try {
-      // Check if username is available
-      const isAvailable = await checkUsername(trimmedUsername);
-      if (!isAvailable) {
-        toast({
-          title: "Username taken",
-          description: "This username is already taken. Please choose another.",
-          variant: "destructive",
-        });
-        return false;
+      // Skip availability check if it's the user's current username
+      if (trimmedUsername !== username) {
+        const isAvailable = await checkUsername(trimmedUsername);
+        if (!isAvailable) {
+          toast({
+            title: "Username taken",
+            description: "This username is already taken. Please choose another.",
+            variant: "destructive",
+          });
+          return false;
+        }
       }
 
       const { error } = await supabase
