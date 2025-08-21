@@ -58,7 +58,15 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
   return (
     <Card 
       className={`h-full cursor-pointer group interactive-card ${!isTouchDevice ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles}`}
-      onClick={(e) => { e.stopPropagation(); onPress?.(note); }}
+      onClick={(e) => { 
+        e.stopPropagation(); 
+        // On touch devices, if already selected, open the note directly
+        if (isTouchDevice && isSelected) {
+          onOpen?.(note);
+        } else {
+          onPress?.(note);
+        }
+      }}
     >
       {/* Pin button in top right corner */}
       <Button
