@@ -18,6 +18,7 @@ export interface NoteWithSharing {
   updatedAt: string;
   featured_image?: string;
   user_id: string;
+  pinned: boolean; // Add pinned field
   
   // Sharing properties
   isOwnedByUser: boolean;

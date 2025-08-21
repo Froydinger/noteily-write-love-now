@@ -21,6 +21,7 @@ export type Database = {
           deleted_at: string | null
           featured_image: string | null
           id: string
+          pinned: boolean
           title: string
           updated_at: string
           user_id: string
@@ -31,6 +32,7 @@ export type Database = {
           deleted_at?: string | null
           featured_image?: string | null
           id?: string
+          pinned?: boolean
           title?: string
           updated_at?: string
           user_id: string
@@ -41,6 +43,7 @@ export type Database = {
           deleted_at?: string | null
           featured_image?: string | null
           id?: string
+          pinned?: boolean
           title?: string
           updated_at?: string
           user_id?: string

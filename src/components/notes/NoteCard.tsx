@@ -53,11 +53,11 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
     ? contentPreview.substring(0, 120) + '...'
     : contentPreview;
 
-  const selectedStyles = isSelected ? 'ring-2 ring-primary/40 border-primary/40' : '';
+  // Remove selection styling completely to fix iOS tap issues
 
   return (
     <Card 
-      className={`h-full cursor-pointer group interactive-card ${!isTouchDevice ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95 ${selectedStyles}`}
+      className={`h-full cursor-pointer group interactive-card ${!isTouchDevice ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95`}
       onClick={(e) => { 
         e.stopPropagation(); 
         if (isTouchDevice && isSelected) {

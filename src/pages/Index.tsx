@@ -22,7 +22,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { user } = useAuth();
-  const { notes, addNote, setCurrentNote, loading, syncNotes, hasInitialLoad, deleteNote } = useNotes();
+  const { notes, addNote, setCurrentNote, loading, syncNotes, hasInitialLoad, deleteNote, togglePinNote } = useNotes();
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -33,47 +33,10 @@ const Index = () => {
   const [shareManagerNote, setShareManagerNote] = useState<Note | null>(null);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [shareChanged, setShareChanged] = useState(false);
-  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const [openSelect, setOpenSelect] = useState<string | null>(null);
   const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
   const { username } = useUsername();
-
-  useEffect(() => {
-    try {
-      const key = `pinned:${user?.id || 'guest'}`;
-      const raw = localStorage.getItem(key);
-      const pinnedFromStorage = raw ? JSON.parse(raw) : [];
-      
-      console.log('Loading pinned notes:', { key, pinnedFromStorage, notesCount: notes.length });
-      
-      // Filter out any pinned notes that no longer exist or are deleted
-      if (notes.length > 0) {
-        const existingNoteIds = new Set(notes.map(note => note.id));
-        const validPinnedIds = pinnedFromStorage.filter((id: string) => existingNoteIds.has(id));
-        
-        console.log('Valid pinned IDs after filtering:', validPinnedIds);
-        
-        if (validPinnedIds.length !== pinnedFromStorage.length) {
-          // Update localStorage if we filtered out deleted notes
-          localStorage.setItem(key, JSON.stringify(validPinnedIds));
-        }
-        
-        setPinnedIds(validPinnedIds);
-      } else {
-        setPinnedIds(pinnedFromStorage);
-      }
-    } catch (error) {
-      console.error('Error loading pinned notes:', error);
-    }
-  }, [user?.id, notes, hasInitialLoad]); // Add hasInitialLoad dependency
-
-  useEffect(() => {
-    try {
-      const key = `pinned:${user?.id || 'guest'}`;
-      localStorage.setItem(key, JSON.stringify(pinnedIds.slice(0, 2)));
-    } catch {}
-  }, [pinnedIds, user?.id]);
 
   // Show username prompt logic - only for users without username, and either new accounts or every 7 days
   useEffect(() => {
@@ -157,11 +120,10 @@ const Index = () => {
       return sorted;
     }
 
-    const pinnedSet = new Set(pinnedIds);
-    const pinned = sorted.filter(n => pinnedSet.has(n.id));
-    const unpinned = sorted.filter(n => !pinnedSet.has(n.id));
+    const pinned = sorted.filter(n => n.pinned);
+    const unpinned = sorted.filter(n => !n.pinned);
     return [...pinned, ...unpinned];
-  }, [notes, searchTerm, sortOrder, shareFilter, pinnedIds]);
+  }, [notes, searchTerm, sortOrder, shareFilter]);
   
   const handleCreateNote = async () => {
     try {
@@ -199,25 +161,10 @@ const Index = () => {
     setSelectedNoteId(note.id);
   };
 
-  const handleTogglePin = (note: Note) => {
-    setPinnedIds((prev) => {
-      if (prev.includes(note.id)) {
-        return prev.filter((id) => id !== note.id);
-      }
-      if (prev.length >= 3) {
-        toast.error('You can pin up to 3 notes');
-        return prev;
-      }
-      return [...prev, note.id];
-    });
-  };
-
   const handleDeleteNote = async (note: Note) => {
     try {
       await deleteNote(note.id);
       setSelectedNoteId(null);
-      // Remove from pinned notes if it was pinned
-      setPinnedIds((prev) => prev.filter((id) => id !== note.id));
       toast.success('Note deleted');
     } catch (error) {
       console.error('Failed to delete note:', error);
@@ -488,7 +435,7 @@ const Index = () => {
                 animationFillMode: 'both'
               }}
             >
-              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} isPinned={pinnedIds.includes(note.id)} onTogglePin={handleTogglePin} onDelete={handleDeleteNote} />
+              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} isPinned={note.pinned} onTogglePin={(n) => togglePinNote(n.id)} onDelete={handleDeleteNote} />
             </div>
           ))}
         </div>

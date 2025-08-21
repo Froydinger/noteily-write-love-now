@@ -28,6 +28,7 @@ type NoteContextType = {
   deleteNote: (id: string) => Promise<void>;
   restoreNote: (id: string) => Promise<void>;
   permanentlyDeleteNote: (id: string) => Promise<void>;
+  togglePinNote: (id: string) => Promise<void>;
   getNote: (id: string) => Note | undefined;
   setCurrentNote: (note: Note | null) => void;
   getRandomPrompt: () => WritingPrompt;
@@ -488,6 +489,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: note.updated_at,
         featured_image: note.featured_image || undefined,
         user_id: note.user_id,
+        pinned: note.pinned || false,
         isOwnedByUser: true,
         isSharedWithUser: false,
         shares: sharesMap.get(note.id) || [], // Add shares data
@@ -501,6 +503,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: share.notes.updated_at,
         featured_image: share.notes.featured_image || undefined,
         user_id: share.notes.user_id, // Keep original user_id
+        pinned: false, // Shared notes can't be pinned
         isOwnedByUser: false,
         isSharedWithUser: true,
         userPermission: share.permission as 'read' | 'write',
@@ -608,6 +611,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       user_id: user.id,
+      pinned: false,
       isOwnedByUser: true,
       isSharedWithUser: false,
     };
@@ -640,6 +644,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: data.created_at,
         updatedAt: data.updated_at,
         user_id: data.user_id,
+        pinned: data.pinned || false,
         isOwnedByUser: true,
         isSharedWithUser: false,
       };
@@ -861,6 +866,53 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const togglePinNote = async (id: string) => {
+    if (!user) {
+      console.error('User must be authenticated to pin notes');
+      return;
+    }
+
+    const note = notes.find(n => n.id === id);
+    if (!note || !note.isOwnedByUser) {
+      console.error('Note not found or not owned by user');
+      return;
+    }
+
+    const newPinnedState = !note.pinned;
+    
+    // Optimistically update local state
+    setNotes(prevNotes => 
+      prevNotes.map(n => 
+        n.id === id ? { ...n, pinned: newPinnedState } : n
+      )
+    );
+
+    try {
+      const { error } = await supabase
+        .from('notes')
+        .update({ pinned: newPinnedState })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error toggling pin:', error);
+        // Revert optimistic update
+        setNotes(prevNotes => 
+          prevNotes.map(n => 
+            n.id === id ? { ...n, pinned: !newPinnedState } : n
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling pin:', error);
+      // Revert optimistic update
+      setNotes(prevNotes => 
+        prevNotes.map(n => 
+          n.id === id ? { ...n, pinned: !newPinnedState } : n
+        )
+      );
+    }
+  };
+
   const loadDeletedNotes = async () => {
     if (!user) return;
 
@@ -885,6 +937,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: note.updated_at,
         featured_image: note.featured_image || undefined,
         user_id: note.user_id,
+        pinned: note.pinned || false,
         isOwnedByUser: true,
         isSharedWithUser: false,
         deleted_at: note.deleted_at,
@@ -930,6 +983,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteNote,
         restoreNote,
         permanentlyDeleteNote,
+        togglePinNote,
         getNote,
         setCurrentNote,
         getRandomPrompt,
