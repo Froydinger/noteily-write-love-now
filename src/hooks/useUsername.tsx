@@ -118,13 +118,8 @@ export function useUsername() {
 
       const { error } = await supabase
         .from('user_preferences')
-        .upsert({ 
-          user_id: user.id, 
-          username: trimmedUsername,
-          theme: 'navy' // Default theme for new records
-        }, {
-          onConflict: 'user_id'
-        });
+        .update({ username: trimmedUsername })
+        .eq('user_id', user.id);
 
       if (error) {
         throw error;
@@ -157,13 +152,8 @@ export function useUsername() {
     try {
       const { error } = await supabase
         .from('user_preferences')
-        .upsert({ 
-          user_id: user.id, 
-          username: null,
-          theme: 'navy' // Default theme for new records
-        }, {
-          onConflict: 'user_id'
-        });
+        .update({ username: null })
+        .eq('user_id', user.id);
 
       if (error) {
         throw error;
