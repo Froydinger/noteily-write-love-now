@@ -10,9 +10,11 @@ import { handleAuthKeyboard } from '@/lib/viewport';
 import { useToast } from '@/hooks/use-toast';
 
 const AuthPage = () => {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState(''); // Username or email for signin
+  const [username, setUsername] = useState(''); // Username for signup
+  const [email, setEmail] = useState(''); // Optional email for signup
   const [password, setPassword] = useState('');
-  const [currentStep, setCurrentStep] = useState<'choice' | 'email' | 'auth'>('choice');
+  const [currentStep, setCurrentStep] = useState<'choice' | 'identifier' | 'signup-details' | 'auth'>('choice');
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
@@ -36,20 +38,34 @@ const AuthPage = () => {
 
   const handleChoiceSelection = (mode: 'signin' | 'signup') => {
     setAuthMode(mode);
-    setCurrentStep('email');
+    if (mode === 'signin') {
+      setCurrentStep('identifier');
+    } else {
+      setCurrentStep('signup-details');
+    }
   };
 
-  const handleEmailSubmit = () => {
-    if (!email) return;
+  const handleIdentifierSubmit = () => {
+    if (!identifier) return;
+    setCurrentStep('auth');
+  };
+
+  const handleSignupDetailsSubmit = () => {
+    if (!username) return;
     setCurrentStep('auth');
   };
 
   const handleAuth = async () => {
-    if (!email || !password) return;
+    if (!password) return;
 
     setIsLoading(true);
     
     if (authMode === 'signup') {
+      if (!username) {
+        setIsLoading(false);
+        return;
+      }
+      
       // Creating new account
       setIsCreatingAccount(true);
       
@@ -59,7 +75,7 @@ const AuthPage = () => {
         className: "bg-green-600 text-white border-green-600",
       });
       
-      const { error: signUpError } = await signUp(email, password);
+      const { error: signUpError } = await signUp(username, password, email || undefined);
       if (!signUpError) {
         setPassword('');
         toast({
@@ -70,8 +86,13 @@ const AuthPage = () => {
       }
       setIsCreatingAccount(false);
     } else {
+      if (!identifier) {
+        setIsLoading(false);
+        return;
+      }
+      
       // Signing in existing account
-      const { error: signInError } = await signIn(email, password);
+      const { error: signInError } = await signIn(identifier, password);
       
       if (!signInError) {
         navigate('/');
@@ -93,8 +114,12 @@ const AuthPage = () => {
 
   const handleBack = () => {
     if (currentStep === 'auth') {
-      setCurrentStep('email');
-    } else if (currentStep === 'email') {
+      if (authMode === 'signin') {
+        setCurrentStep('identifier');
+      } else {
+        setCurrentStep('signup-details');
+      }
+    } else if (currentStep === 'identifier' || currentStep === 'signup-details') {
       setCurrentStep('choice');
     }
     setPassword('');
@@ -128,9 +153,13 @@ const AuthPage = () => {
           <CardDescription className="text-gray-300">
             {currentStep === 'choice' 
               ? 'Sign in to sync your notes across all devices'
-              : currentStep === 'email' 
-                ? `${authMode === 'signin' ? 'Sign in to' : 'Create account for'} ${authMode === 'signin' ? 'your account' : 'Noteily'}`
-                : `Continue as ${email}`}
+              : currentStep === 'identifier' 
+                ? 'Sign in to your account'
+                : currentStep === 'signup-details'
+                ? 'Create your Noteily account'
+                : authMode === 'signin' 
+                  ? `Continue as ${identifier}`
+                  : `Continue as ${username}`}
           </CardDescription>
         </CardHeader>
         <CardContent className="bg-transparent">
@@ -180,8 +209,8 @@ const AuthPage = () => {
                 </Button>
               </div>
             </div>
-          ) : currentStep === 'email' ? (
-            // Step 2: Email input
+          ) : currentStep === 'identifier' ? (
+            // Step 2: Username/Email input for sign in
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-4">
                 <Button
@@ -195,20 +224,20 @@ const AuthPage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">Email</Label>
+                <Label htmlFor="identifier" className="text-white">Username or Email</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  placeholder="Enter your email"
+                  id="identifier"
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  autoComplete="username email"
+                  placeholder="Enter your username or email"
                   disabled={isLoading}
                   className="border-0 focus:ring-0 focus:border-0 bg-input text-foreground"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
-                      handleEmailSubmit();
+                      handleIdentifierSubmit();
                     }
                   }}
                   style={{
@@ -221,9 +250,94 @@ const AuthPage = () => {
               </div>
               <Button 
                 type="button"
-                onClick={handleEmailSubmit}
+                onClick={handleIdentifierSubmit}
                 className="w-full bg-accent hover:bg-accent/90 text-accent-foreground border-accent" 
-                disabled={isLoading || !email}
+                disabled={isLoading || !identifier}
+              >
+                Continue
+              </Button>
+              
+              <div className="text-center">
+                <Link to="/forgot-password">
+                  <Button variant="ghost" className="text-sm text-muted-foreground hover:text-accent">
+                    Forgot your password?
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          ) : currentStep === 'signup-details' ? (
+            // Step 2: Signup details (username + optional email)
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Button
+                  type="button"
+                  onClick={handleBack}
+                  disabled={isLoading}
+                  className="bg-transparent border-0 text-white hover:text-accent px-3 py-2 text-sm rounded-full hover:bg-white/10 transition-all"
+                >
+                  ← Back
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="username" className="text-white">Username</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                    autoComplete="username"
+                    placeholder="Choose a username"
+                    disabled={isLoading}
+                    className="border-0 focus:ring-0 focus:border-0 bg-input text-foreground"
+                    style={{
+                      backgroundColor: 'hsl(215, 45%, 20%)',
+                      border: 'none',
+                      outline: 'none',
+                      boxShadow: 'none'
+                    }}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    3-30 characters, letters, numbers, underscores, and hyphens only
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-white">Email (optional)</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                    placeholder="Enter your email (optional)"
+                    disabled={isLoading}
+                    className="border-0 focus:ring-0 focus:border-0 bg-input text-foreground"
+                    style={{
+                      backgroundColor: 'hsl(215, 45%, 20%)',
+                      border: 'none',
+                      outline: 'none',
+                      boxShadow: 'none'
+                    }}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Email helps with password recovery and sharing
+                  </p>
+                </div>
+              </div>
+              
+              <Button 
+                type="button"
+                onClick={handleSignupDetailsSubmit}
+                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground border-accent" 
+                disabled={isLoading || !username}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSignupDetailsSubmit();
+                  }
+                }}
               >
                 Continue
               </Button>

@@ -7,10 +7,11 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signIn: (emailOrUsername: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (identifier: string, password: string) => Promise<{ error: any }>;
+  signUp: (username: string, password: string, email?: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  requestPasswordReset: (identifier: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,78 +40,253 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (emailOrUsername: string, password: string) => {
-    let email = emailOrUsername;
-    
-    // If it doesn't contain @, treat it as username and look up email
-    if (!emailOrUsername.includes('@')) {
-      try {
-        const { data, error } = await supabase.rpc('get_user_email_by_username', {
-          p_username: emailOrUsername.toLowerCase()
-        });
-        
-        if (error || !data) {
-          toast({
-            title: "Sign in failed",
-            description: "Username not found",
-            variant: "destructive",
-          });
-          return { error: { message: "Username not found" } };
-        }
-        
-        email = data;
-      } catch (error) {
+  // Check if user is Google OAuth user first
+  const checkIsGoogleUser = async (identifier: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.rpc('is_google_user', {
+        p_identifier: identifier.trim()
+      });
+      return data || false;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  // Get user data by identifier
+  const getUserByIdentifier = async (identifier: string) => {
+    try {
+      const { data, error } = await supabase.rpc('get_user_by_identifier', {
+        p_identifier: identifier.trim()
+      });
+      return data?.[0] || null;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const signIn = async (identifier: string, password: string) => {
+    setLoading(true);
+    try {
+      // First check if it's a Google user
+      const isGoogle = await checkIsGoogleUser(identifier);
+      if (isGoogle) {
         toast({
           title: "Sign in failed",
-          description: "Error looking up username",
+          description: "This account uses Google sign-in. Please use the 'Continue with Google' button instead.",
+          variant: "destructive",
+        });
+        return { error: { message: 'This account uses Google sign-in. Please use the "Continue with Google" button instead.' } };
+      }
+
+      // Get user data to find their email
+      const userData = await getUserByIdentifier(identifier);
+      if (!userData) {
+        toast({
+          title: "Sign in failed",
+          description: "No account found with this username or email.",
+          variant: "destructive",
+        });
+        return { error: { message: 'No account found with this username or email.' } };
+      }
+
+      // Sign in with email (Supabase only accepts email for sign in)
+      const { error } = await supabase.auth.signInWithPassword({
+        email: userData.email,
+        password,
+      });
+
+      if (error) {
+        toast({
+          title: "Sign in failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+
+      return { error };
+    } catch (error: any) {
+      toast({
+        title: "Sign in failed",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return { error };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signUp = async (username: string, password: string, email?: string) => {
+    setLoading(true);
+    try {
+      // Validate username format
+      const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
+      if (!usernameRegex.test(username)) {
+        const error = { message: 'Username must be 3-30 characters and contain only letters, numbers, underscores, and hyphens.' };
+        toast({
+          title: "Sign up failed",
+          description: error.message,
           variant: "destructive",
         });
         return { error };
       }
-    }
-    
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (error) {
-      toast({
-        title: "Sign in failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-    
-    return { error };
-  };
 
-  const signUp = async (email: string, password: string) => {
-    // Use current URL to preserve user's location after email confirmation
-    const redirectUrl = window.location.href;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl
+      // Check if username already exists
+      const { data: exists } = await supabase.rpc('check_identifier_exists', {
+        p_identifier: username.toLowerCase()
+      });
+      
+      if (exists) {
+        const error = { message: 'This username is already taken.' };
+        toast({
+          title: "Sign up failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return { error };
       }
-    });
-    
-    if (error) {
+
+      // For signup, we need an email. If not provided, create a temporary one
+      const signupEmail = email || `${username.toLowerCase()}@temp.noteily.app`;
+      
+      // Check if email is already taken (if provided)
+      if (email) {
+        const { data: emailExists } = await supabase.rpc('check_identifier_exists', {
+          p_identifier: email
+        });
+        if (emailExists) {
+          const error = { message: 'An account with this email already exists.' };
+          toast({
+            title: "Sign up failed",
+            description: error.message,
+            variant: "destructive",
+          });
+          return { error };
+        }
+      }
+
+      const redirectUrl = `${window.location.origin}/`;
+      
+      // Sign up with Supabase
+      const { data, error } = await supabase.auth.signUp({
+        email: signupEmail,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            username: username.toLowerCase(),
+            preferred_email: email || null
+          }
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Sign up failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return { error };
+      }
+
+      // If successful and user is created, update their preferences
+      if (data.user) {
+        // Create or update user preferences with username
+        const { error: prefError } = await supabase
+          .from('user_preferences')
+          .upsert({
+            user_id: data.user.id,
+            username: username.toLowerCase(),
+            email: email || null
+          });
+
+        if (prefError) {
+          console.error('Error setting user preferences:', prefError);
+        }
+      }
+
+      if (!email) {
+        toast({
+          title: "Account created!",
+          description: "Your account has been created successfully. You can now sign in.",
+        });
+      } else {
+        toast({
+          title: "Check your email",
+          description: "Please check your email for a confirmation link.",
+        });
+      }
+
+      return { data, error };
+    } catch (error: any) {
       toast({
         title: "Sign up failed",
-        description: error.message,
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Check your email",
-        description: "Please check your email for a confirmation link.",
-      });
+      return { error };
+    } finally {
+      setLoading(false);
     }
-    
-    return { error };
+  };
+
+  const requestPasswordReset = async (identifier: string) => {
+    setLoading(true);
+    try {
+      // Check if it's a Google user
+      const isGoogle = await checkIsGoogleUser(identifier);
+      if (isGoogle) {
+        const error = { message: 'This account uses Google sign-in. You cannot reset the password for Google accounts. Please use "Continue with Google" to sign in.' };
+        toast({
+          title: "Password reset failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return { error };
+      }
+
+      // Get user data to find their email
+      const userData = await getUserByIdentifier(identifier);
+      if (!userData) {
+        const error = { message: 'No account found with this username or email.' };
+        toast({
+          title: "Password reset failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return { error };
+      }
+
+      const redirectUrl = `${window.location.origin}/reset-password`;
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(userData.email, {
+        redirectTo: redirectUrl
+      });
+
+      if (error) {
+        toast({
+          title: "Password reset failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Password reset sent",
+          description: "Check your email for password reset instructions.",
+        });
+      }
+
+      return { error };
+    } catch (error: any) {
+      toast({
+        title: "Password reset failed",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return { error };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signInWithGoogle = async () => {
@@ -188,6 +364,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signUp,
       signInWithGoogle,
       signOut,
+      requestPasswordReset,
     }}>
       {children}
     </AuthContext.Provider>

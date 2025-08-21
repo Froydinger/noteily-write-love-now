@@ -16,6 +16,7 @@ import NotePage from "./pages/NotePage";
 import PromptsPage from "./pages/PromptsPage";
 import SettingsPage from "./pages/SettingsPage";
 import AuthPage from "./pages/AuthPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
@@ -70,6 +71,7 @@ const AppContent = () => {
       <PreferencesProvider>
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
