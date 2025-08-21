@@ -137,6 +137,7 @@ export type Database = {
         Row: {
           created_at: string
           daily_prompt_time: string | null
+          email: string | null
           id: string
           notification_daily_prompt: boolean | null
           notification_note_shared: boolean | null
@@ -150,6 +151,7 @@ export type Database = {
         Insert: {
           created_at?: string
           daily_prompt_time?: string | null
+          email?: string | null
           id?: string
           notification_daily_prompt?: boolean | null
           notification_note_shared?: boolean | null
@@ -163,6 +165,7 @@ export type Database = {
         Update: {
           created_at?: string
           daily_prompt_time?: string | null
+          email?: string | null
           id?: string
           notification_daily_prompt?: boolean | null
           notification_note_shared?: boolean | null
@@ -189,6 +192,10 @@ export type Database = {
         }
         Returns: string
       }
+      check_identifier_exists: {
+        Args: { p_identifier: string }
+        Returns: boolean
+      }
       check_username_exists: {
         Args: { p_username: string }
         Returns: boolean
@@ -205,6 +212,15 @@ export type Database = {
           user_permission: string
         }[]
       }
+      get_user_by_identifier: {
+        Args: { p_identifier: string }
+        Returns: {
+          email: string
+          has_google_auth: boolean
+          user_id: string
+          username: string
+        }[]
+      }
       get_user_email_by_username: {
         Args: { p_username: string }
         Returns: string
@@ -212,6 +228,10 @@ export type Database = {
       get_user_id_by_username: {
         Args: { p_username: string }
         Returns: string
+      }
+      is_google_user: {
+        Args: { p_identifier: string }
+        Returns: boolean
       }
       link_existing_shared_notes: {
         Args: Record<PropertyKey, never>
