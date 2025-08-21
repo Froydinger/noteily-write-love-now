@@ -23,7 +23,7 @@ interface NoteCardProps {
 
 export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen, isPinned = false, onTogglePin, onDelete }: NoteCardProps) {
   
-  const isTouchDevice = useIsTouchDevice();
+  const { isTouchDevice, isIOS } = useIsTouchDevice();
   
   // Check if this note is shared with the user (they don't own it)
   const isSharedWithUser = 'isSharedWithUser' in note && note.isSharedWithUser && !note.isOwnedByUser;
@@ -60,8 +60,11 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       className={`h-full cursor-pointer group interactive-card ${!isTouchDevice ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95`}
       onClick={(e) => { 
         e.stopPropagation(); 
-        if (isTouchDevice && isSelected) {
-          // Second tap on touch devices: open note
+        if (isIOS) {
+          // iOS: Always open immediately to avoid triple tap issues
+          onOpen?.(note);
+        } else if (isTouchDevice && isSelected) {
+          // Android/Other touch devices: Second tap opens note
           onOpen?.(note);
         } else {
           // First tap on touch devices, or any tap on non-touch devices
