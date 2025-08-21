@@ -65,7 +65,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         <Button
           variant="ghost"
           size="sm"
-          className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${isSelected || isTouchDevice ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
+          className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
           onClick={(e) => {
             e.stopPropagation();
             onShareClick(note);
@@ -75,8 +75,8 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         </Button>
       )}
       
-      {/* Delete button - shows when selected or on mobile, positioned top right */}
-      {onDelete && (isSelected || isTouchDevice) && (
+      {/* Delete button - shows when selected, positioned top right */}
+      {onDelete && isSelected && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
@@ -115,7 +115,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       <Button
         variant="secondary"
         size="sm"
-        className={`absolute bottom-2 right-11 h-7 w-7 rounded-full p-0 shadow-sm z-10 ${isTouchDevice ? '' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'} ${isPinned ? 'text-primary border-primary/30 bg-primary/10' : ''}`}
+        className={`absolute bottom-2 right-11 h-7 w-7 rounded-full p-0 shadow-sm z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'} ${isPinned ? 'text-primary border-primary/30 bg-primary/10' : ''}`}
         aria-label={isPinned ? 'Unpin note' : 'Pin note'}
         onClick={(e) => {
           e.stopPropagation();
@@ -129,7 +129,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       <Button
         variant="secondary"
         size="sm"
-        className={`absolute bottom-2 right-2 h-7 w-7 rounded-full p-0 shadow-sm z-10 ${isTouchDevice ? '' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
+        className={`absolute bottom-2 right-2 h-7 w-7 rounded-full p-0 shadow-sm z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
         aria-label="Open note"
         onClick={(e) => {
           e.stopPropagation();
