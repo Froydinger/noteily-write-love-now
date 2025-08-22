@@ -73,7 +73,7 @@ export default function ForgotPasswordPage() {
                 Send another email
               </Button>
               
-              <Link to="/auth">
+              <Link to="/">
                 <Button variant="ghost" className="w-full">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to sign in
@@ -116,7 +116,7 @@ export default function ForgotPasswordPage() {
                       >
                         Try different username/email
                       </Button>
-                      <Link to="/auth">
+                      <Link to="/">
                         <Button variant="outline" size="sm">
                           Create account instead
                         </Button>
@@ -154,7 +154,7 @@ export default function ForgotPasswordPage() {
           </form>
           
           <div className="mt-6 text-center">
-            <Link to="/auth">
+            <Link to="/">
               <Button variant="ghost" className="text-sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to sign in

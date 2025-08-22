@@ -35,7 +35,7 @@ const ResetPasswordPage = () => {
         description: "This password reset link is invalid or has expired.",
         variant: "destructive",
       });
-      navigate('/auth');
+      navigate('/');
     }
   }, [accessToken, refreshToken, type, navigate, toast]);
 

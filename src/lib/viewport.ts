@@ -23,10 +23,7 @@ export const handleAuthKeyboard = () => {
     const wasOpen = keyboardOpen;
     keyboardOpen = heightDiff > 150;
     
-    // Only scroll to top when keyboard closes on auth page
-    if (wasOpen && !keyboardOpen && window.location.pathname === '/auth') {
-      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
-    }
+    // Remove auth-specific logic since we no longer have a dedicated auth page
   };
 
   if (window.visualViewport) {

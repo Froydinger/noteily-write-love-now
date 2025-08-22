@@ -52,7 +52,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             Sign in to access your notes and sync them across all your devices.
           </p>
           <Button 
-            onClick={() => navigate('/auth')} 
+            onClick={() => navigate('/')} 
             size="lg"
             className="hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]"
             style={{

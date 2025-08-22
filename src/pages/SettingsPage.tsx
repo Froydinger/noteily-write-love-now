@@ -67,7 +67,7 @@ const SettingsPage = () => {
   };
 
   const handleSignIn = () => {
-    navigate('/auth');
+    navigate('/');
   };
 
   const faqItems = [
@@ -275,7 +275,7 @@ ${note.content}
       });
       
       // Navigate to auth page
-      navigate('/auth');
+      navigate('/');
       
     } catch (error: any) {
       console.error('Error deleting account:', error);
