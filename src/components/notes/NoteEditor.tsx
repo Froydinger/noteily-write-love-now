@@ -265,14 +265,17 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         setCurrentBlockType('p');
       }
 
-      // Get the actual cursor position for precise positioning
-      const rangeRect = range.getBoundingClientRect();
+      // Position handle at top-right of the current block
       const editorRect = editor.getBoundingClientRect();
+      const blockRect = blockElement.getBoundingClientRect();
       
-      // Position handle at the cursor line, accounting for scroll
-      const cursorTop = rangeRect.top;
-      const relativeTop = cursorTop - editorRect.top;
-      const absoluteTop = Math.max(cursorTop, editorRect.top + 20);
+      // Calculate position at top-right of block, with some padding
+      const blockTop = blockRect.top;
+      const blockRight = blockRect.right;
+      const handleOffset = 8; // Padding from block edge
+      
+      const absoluteTop = Math.max(blockTop, editorRect.top + 20);
+      const absoluteRight = blockRight + handleOffset;
       
       setHandleTop(absoluteTop);
       setShowHandle(true);

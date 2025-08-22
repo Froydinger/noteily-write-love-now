@@ -17,13 +17,12 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
     <div
       className={`fixed z-50 transition-all duration-300 ease-out ${
         visible 
-          ? 'opacity-60' 
+          ? 'opacity-80' 
           : 'opacity-0 pointer-events-none'
       }`}
       style={{ 
         top: `${top}px`,
-        right: '1rem',
-        transform: 'translateY(-50%)'
+        right: '1rem'
       }}
       aria-hidden={!visible}
     >
@@ -32,7 +31,7 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
           <Button 
             size="icon" 
             variant="secondary" 
-            className="rounded-full shadow-sm" 
+            className="rounded-full shadow-md border border-border/50 bg-background/90 backdrop-blur-sm hover:bg-muted/90 dark:border-border" 
             aria-label="Change block type"
             onPointerDown={(e) => e.preventDefault()}
           >
