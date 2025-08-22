@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -48,6 +48,14 @@ const AppContent = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showMarketingSplash, setShowMarketingSplash] = useState(false);
   const { user } = useAuth();
+
+  // Reset splash states when user logs out
+  useEffect(() => {
+    if (!user) {
+      setShowSplash(true);
+      setShowMarketingSplash(false);
+    }
+  }, [user]);
 
   // Show regular splash screen first
   if (showSplash) {
