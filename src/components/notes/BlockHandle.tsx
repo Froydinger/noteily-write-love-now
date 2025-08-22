@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Heading1, Quote, Pilcrow, Type } from "lucide-react";
@@ -12,13 +12,32 @@ interface BlockHandleProps {
 }
 
 export const BlockHandle: React.FC<BlockHandleProps> = ({ visible, currentType, onSelect }) => {
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const handleViewportChange = () => {
+      if (window.visualViewport) {
+        const newKeyboardHeight = window.innerHeight - window.visualViewport.height;
+        setKeyboardHeight(Math.max(0, newKeyboardHeight));
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+      return () => window.visualViewport?.removeEventListener('resize', handleViewportChange);
+    }
+  }, []);
+
   return (
     <div
-      className={`fixed bottom-20 right-4 z-50 transition-all duration-200 ease-out ${
+      className={`fixed right-4 z-50 transition-all duration-200 ease-out ${
         visible 
           ? 'opacity-100 scale-100' 
           : 'opacity-0 scale-95 pointer-events-none'
       }`}
+      style={{
+        bottom: `${keyboardHeight + 20}px`, // 20px above keyboard or bottom
+      }}
       aria-hidden={!visible}
     >
       <Popover>
