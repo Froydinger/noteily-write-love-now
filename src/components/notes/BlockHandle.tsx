@@ -6,23 +6,22 @@ import { Heading1, Quote, Pilcrow, Type } from "lucide-react";
 export type BlockType = "p" | "h1";
 
 interface BlockHandleProps {
-  top: number;
   visible: boolean;
   currentType: BlockType;
   onSelect: (type: BlockType) => void;
 }
 
-export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentType, onSelect }) => {
+export const BlockHandle: React.FC<BlockHandleProps> = ({ visible, currentType, onSelect }) => {
   return (
     <div
-      className={`fixed z-50 transition-all duration-300 ease-out ${
+      className={`sticky top-4 right-4 z-50 float-right transition-all duration-300 ease-out ${
         visible 
-          ? 'opacity-80' 
+          ? 'opacity-90' 
           : 'opacity-0 pointer-events-none'
       }`}
-      style={{ 
-        top: `${top}px`,
-        right: '1rem'
+      style={{
+        marginTop: '1rem',
+        marginRight: '1rem'
       }}
       aria-hidden={!visible}
     >
@@ -31,7 +30,7 @@ export const BlockHandle: React.FC<BlockHandleProps> = ({ top, visible, currentT
           <Button 
             size="icon" 
             variant="secondary" 
-            className="rounded-full shadow-md border border-border/50 bg-background/90 backdrop-blur-sm hover:bg-muted/90 dark:border-border" 
+            className="rounded-full shadow-lg border border-border/50 bg-background/95 backdrop-blur-sm hover:bg-muted/90 dark:border-border dark:text-foreground text-foreground/80" 
             aria-label="Change block type"
             onPointerDown={(e) => e.preventDefault()}
           >

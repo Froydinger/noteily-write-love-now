@@ -19,7 +19,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [handleTop, setHandleTop] = useState(0);
   const [showHandle, setShowHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
   
@@ -213,11 +212,11 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
   }, [note.id]);
 
-  // Block handle positioning and block type detection
+  // Block type detection when editing
   useEffect(() => {
     if (isReadOnly) return;
     
-    const updateHandle = () => {
+    const updateBlockType = () => {
       const editor = contentRef.current;
       if (!editor) {
         setShowHandle(false);
@@ -265,41 +264,28 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         setCurrentBlockType('p');
       }
 
-      // Position handle at top-right of the current block
-      const editorRect = editor.getBoundingClientRect();
-      const blockRect = blockElement.getBoundingClientRect();
-      
-      // Calculate position at top-right of block, with some padding
-      const blockTop = blockRect.top;
-      const blockRight = blockRect.right;
-      const handleOffset = 8; // Padding from block edge
-      
-      const absoluteTop = Math.max(blockTop, editorRect.top + 20);
-      const absoluteRight = blockRight + handleOffset;
-      
-      setHandleTop(absoluteTop);
       setShowHandle(true);
     };
 
     // Add event listeners
     const editor = contentRef.current;
     if (editor) {
-      editor.addEventListener('focus', updateHandle);
-      editor.addEventListener('input', updateHandle);
-      editor.addEventListener('keyup', updateHandle);
-      editor.addEventListener('click', updateHandle);
+      editor.addEventListener('focus', updateBlockType);
+      editor.addEventListener('input', updateBlockType);
+      editor.addEventListener('keyup', updateBlockType);
+      editor.addEventListener('click', updateBlockType);
     }
     
-    document.addEventListener('selectionchange', updateHandle);
+    document.addEventListener('selectionchange', updateBlockType);
     
     return () => {
       if (editor) {
-        editor.removeEventListener('focus', updateHandle);
-        editor.removeEventListener('input', updateHandle);
-        editor.removeEventListener('keyup', updateHandle);
-        editor.removeEventListener('click', updateHandle);
+        editor.removeEventListener('focus', updateBlockType);
+        editor.removeEventListener('input', updateBlockType);
+        editor.removeEventListener('keyup', updateBlockType);
+        editor.removeEventListener('click', updateBlockType);
       }
-      document.removeEventListener('selectionchange', updateHandle);
+      document.removeEventListener('selectionchange', updateBlockType);
     };
   }, [isReadOnly]);
 
@@ -315,7 +301,16 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24 relative overflow-visible">
+    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24 relative">
+      {!isReadOnly && (
+        <BlockHandle
+          visible={showHandle}
+          currentType={currentBlockType}
+          onSelect={handleBlockTypeSelect}
+        />
+      )}
+      
+      <div className="relative overflow-visible">
       <textarea
         ref={titleRef}
         value={title}
@@ -360,15 +355,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
       />
       
       {!isReadOnly && <ImageUploadButton onImageInsert={insertImageAtCursor} />}
-
-      {!isReadOnly && (
-        <BlockHandle
-          top={handleTop}
-          visible={showHandle}
-          currentType={currentBlockType}
-          onSelect={handleBlockTypeSelect}
-        />
-      )}
+      </div>
     </div>
   );
 }
