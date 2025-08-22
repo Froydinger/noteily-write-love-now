@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Heading1, Quote, Pilcrow, Type } from "lucide-react";
+import { Heading1, Pilcrow, Type } from "lucide-react";
 
 export type BlockType = "p" | "h1";
 
@@ -12,67 +12,39 @@ interface BlockHandleProps {
 }
 
 export const BlockHandle: React.FC<BlockHandleProps> = ({ visible, currentType, onSelect }) => {
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-
-  useEffect(() => {
-    const handleViewportChange = () => {
-      if (window.visualViewport) {
-        const newKeyboardHeight = window.innerHeight - window.visualViewport.height;
-        setKeyboardHeight(Math.max(0, newKeyboardHeight));
-      }
-    };
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleViewportChange);
-      return () => window.visualViewport?.removeEventListener('resize', handleViewportChange);
-    }
-  }, []);
-
+  if (!visible) return null;
+  
   return (
-    <div
-      className={`fixed right-4 z-50 transition-all duration-200 ease-out ${
-        visible 
-          ? 'opacity-100 scale-100' 
-          : 'opacity-0 scale-95 pointer-events-none'
-      }`}
-      style={{
-        bottom: `${keyboardHeight + 20}px`, // 20px above keyboard or bottom
-      }}
-      aria-hidden={!visible}
-    >
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button 
-            size="icon" 
-            variant="secondary" 
-            className="rounded-full shadow-lg border border-border/50 bg-background/95 backdrop-blur-sm hover:bg-muted/90 dark:border-border dark:text-foreground text-foreground/80" 
-            aria-label="Change block type"
-            onPointerDown={(e) => e.preventDefault()}
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="btn-accessible p-2"
+          aria-label="Change block type"
+          title="Text formatting"
+        >
+          <Type className="h-4 w-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-40 p-2" align="end">
+        <div className="flex flex-col gap-1">
+          <Button
+            variant={currentType === "h1" ? "default" : "ghost"}
+            className="justify-start"
+            onClick={() => onSelect("h1")}
           >
-            <Type className="h-4 w-4" />
+            <Heading1 className="h-4 w-4 mr-2" /> Header
           </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-40 p-2" align="center">
-          <div className="flex flex-col gap-1">
-            <Button
-              variant={currentType === "h1" ? "default" : "ghost"}
-              className="justify-start"
-              onPointerDown={(e) => e.preventDefault()}
-              onClick={() => onSelect("h1")}
-            >
-              <Heading1 className="h-4 w-4 mr-2" /> Header
-            </Button>
-            <Button
-              variant={currentType === "p" ? "default" : "ghost"}
-              className="justify-start"
-              onPointerDown={(e) => e.preventDefault()}
-              onClick={() => onSelect("p")}
-            >
-              <Pilcrow className="h-4 w-4 mr-2" /> Body
-            </Button>
-          </div>
-        </PopoverContent>
-      </Popover>
-    </div>
+          <Button
+            variant={currentType === "p" ? "default" : "ghost"}
+            className="justify-start"
+            onClick={() => onSelect("p")}
+          >
+            <Pilcrow className="h-4 w-4 mr-2" /> Body
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };

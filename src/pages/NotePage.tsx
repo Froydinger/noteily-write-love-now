@@ -1,10 +1,11 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus, Users, Eye, Edit } from 'lucide-react';
+import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus, Users, Eye, Edit, Type } from 'lucide-react';
+import { BlockHandle, BlockType } from '@/components/notes/BlockHandle';
 import { Badge } from '@/components/ui/badge';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
@@ -37,6 +38,11 @@ const NotePage = () => {
   const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
   const [entered, setEntered] = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [showFormatHandle, setShowFormatHandle] = useState(false);
+  const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
+  const headerRef = useRef<HTMLElement>(null);
   
   const note = getNote(id || '');
   
@@ -63,6 +69,42 @@ const NotePage = () => {
       requestAnimationFrame(() => setEntered(true));
     });
   }, [id]);
+
+  // Handle scroll behavior for header auto-hide
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down and past 100px - hide header
+        setHeaderVisible(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up - show header
+        setHeaderVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
+  const handleBlockTypeSelect = (type: BlockType) => {
+    // Find the content editor and apply formatting
+    const contentEditor = document.querySelector('[contenteditable="true"]') as HTMLElement;
+    if (!contentEditor) return;
+    
+    contentEditor.focus();
+    try {
+      document.execCommand('formatBlock', false, type === 'p' ? 'p' : type);
+    } catch (e) {
+      // no-op
+    }
+    
+    // Trigger content change event
+    contentEditor.dispatchEvent(new Event('input', { bubbles: true }));
+  };
 
   const handleDelete = () => {
     if (id) {
@@ -154,7 +196,12 @@ const NotePage = () => {
   
   return (
     <div key={id} className={`h-full flex flex-col transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}>
-      <header className="border-b p-3">
+      <header 
+        ref={headerRef}
+        className={`sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b p-3 transition-transform duration-300 ease-out ${
+          headerVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             {isMobile ? (
@@ -207,6 +254,15 @@ const NotePage = () => {
           </div>
           
           <div className="flex items-center gap-1">
+            {/* Formatting button - only show if not read-only */}
+            {!note.isSharedWithUser || note.userPermission !== 'read' ? (
+              <BlockHandle
+                visible={true}
+                currentType={currentBlockType}
+                onSelect={handleBlockTypeSelect}
+              />
+            ) : null}
+            
             {/* Show people icon for owned notes (to share) or shared notes (to manage) */}
             {(note.isOwnedByUser || (note.isSharedWithUser && !note.isOwnedByUser)) && (
               <Button 
@@ -262,7 +318,10 @@ const NotePage = () => {
       </header>
       
       <div className="flex-grow">
-        <NoteEditor note={note} />
+        <NoteEditor 
+          note={note} 
+          onBlockTypeChange={setCurrentBlockType}
+        />
       </div>
       
       {/* Share Manager - now accessible from persistent people icon */}

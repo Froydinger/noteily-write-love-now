@@ -10,9 +10,10 @@ import { usePageLeave } from '@/hooks/usePageLeave';
 
 interface NoteEditorProps {
   note: Note;
+  onBlockTypeChange?: (type: BlockType) => void;
 }
 
-export default function NoteEditor({ note }: NoteEditorProps) {
+export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps) {
   const { updateNote } = useNotes();
   const [title, setTitle] = useState(note.title);
   const [lastSavedContent, setLastSavedContent] = useState(note.content);
@@ -234,11 +235,9 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
       // Check if we're in an H1
       const h1 = (element as Element).closest('h1');
-      if (h1) {
-        setCurrentBlockType('h1');
-      } else {
-        setCurrentBlockType('p');
-      }
+      const newType: BlockType = h1 ? 'h1' : 'p';
+      setCurrentBlockType(newType);
+      onBlockTypeChange?.(newType);
     };
 
     const handleFocus = () => {
@@ -289,13 +288,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24 relative">
-      {!isReadOnly && (
-        <BlockHandle
-          visible={showHandle}
-          currentType={currentBlockType}
-          onSelect={handleBlockTypeSelect}
-        />
-      )}
       
       <div className="relative overflow-visible">
       <textarea
