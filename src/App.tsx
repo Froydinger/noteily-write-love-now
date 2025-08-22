@@ -34,6 +34,8 @@ const App = () => {
       <TooltipProvider>
         <BrowserRouter>
           <AuthProvider>
+            <Toaster />
+            <Sonner position="top-right" duration={3000} />
             <AppContent />
           </AuthProvider>
         </BrowserRouter>
@@ -65,8 +67,6 @@ const AppContent = () => {
 
   return (
     <>
-      <Toaster />
-      <Sonner position="top-right" duration={3000} />
       <NotificationToastListener />
       <PreferencesProvider>
         <Routes>
