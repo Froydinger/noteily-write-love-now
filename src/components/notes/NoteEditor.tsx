@@ -21,7 +21,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showHandle, setShowHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
-  const [cursorPosition, setCursorPosition] = useState({ top: 0, left: 0 });
   
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
 
@@ -213,87 +212,67 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
   }, [note.id]);
 
-  // Block type detection and cursor tracking when editing
+  // Simple block type detection when editing
   useEffect(() => {
     if (isReadOnly) return;
     
-    const updateBlockTypeAndPosition = () => {
+    const updateBlockType = () => {
       const editor = contentRef.current;
-      if (!editor) {
-        setShowHandle(false);
-        return;
-      }
+      if (!editor) return;
 
       const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) {
-        setShowHandle(false);
-        return;
-      }
+      if (!selection || selection.rangeCount === 0) return;
 
       const range = selection.getRangeAt(0);
-      
-      // Check if selection is within the editor
-      if (!editor.contains(range.commonAncestorContainer)) {
-        setShowHandle(false);
-        return;
-      }
+      if (!editor.contains(range.commonAncestorContainer)) return;
 
-      // Update cursor position relative to the viewport
-      const rect = range.getBoundingClientRect();
-      setCursorPosition({
-        top: rect.top,
-        left: rect.left
-      });
-
-      // Find the current line/block element
+      // Find the current block element
       let element = range.commonAncestorContainer;
       if (element.nodeType === Node.TEXT_NODE) {
         element = element.parentElement!;
       }
 
-      // Find the closest block element (div is the editor's main container)
-      let blockElement = (element as Element).closest('h1, blockquote, p, div');
-      
-      // If we're in the main editor div, treat it as a paragraph
-      if (blockElement === editor) {
-        blockElement = element as Element;
-      }
-
-      if (!blockElement) {
-        setShowHandle(false);
-        return;
-      }
-
-      // Determine block type
-      const tagName = blockElement.tagName.toLowerCase();
-      if (tagName === 'h1') {
+      // Check if we're in an H1
+      const h1 = (element as Element).closest('h1');
+      if (h1) {
         setCurrentBlockType('h1');
       } else {
         setCurrentBlockType('p');
       }
-
-      setShowHandle(true);
     };
 
-    // Add event listeners
+    const handleFocus = () => {
+      setShowHandle(true);
+      updateBlockType();
+    };
+
+    const handleBlur = () => {
+      // Delay hiding to allow for popover interactions
+      setTimeout(() => {
+        if (!document.activeElement?.closest('[data-radix-popper-content-wrapper]')) {
+          setShowHandle(false);
+        }
+      }, 100);
+    };
+
     const editor = contentRef.current;
     if (editor) {
-      editor.addEventListener('focus', updateBlockTypeAndPosition);
-      editor.addEventListener('input', updateBlockTypeAndPosition);
-      editor.addEventListener('keyup', updateBlockTypeAndPosition);
-      editor.addEventListener('click', updateBlockTypeAndPosition);
+      editor.addEventListener('focus', handleFocus);
+      editor.addEventListener('blur', handleBlur);
+      editor.addEventListener('input', updateBlockType);
+      editor.addEventListener('keyup', updateBlockType);
     }
     
-    document.addEventListener('selectionchange', updateBlockTypeAndPosition);
+    document.addEventListener('selectionchange', updateBlockType);
     
     return () => {
       if (editor) {
-        editor.removeEventListener('focus', updateBlockTypeAndPosition);
-        editor.removeEventListener('input', updateBlockTypeAndPosition);
-        editor.removeEventListener('keyup', updateBlockTypeAndPosition);
-        editor.removeEventListener('click', updateBlockTypeAndPosition);
+        editor.removeEventListener('focus', handleFocus);
+        editor.removeEventListener('blur', handleBlur);
+        editor.removeEventListener('input', updateBlockType);
+        editor.removeEventListener('keyup', updateBlockType);
       }
-      document.removeEventListener('selectionchange', updateBlockTypeAndPosition);
+      document.removeEventListener('selectionchange', updateBlockType);
     };
   }, [isReadOnly]);
 
@@ -315,7 +294,6 @@ export default function NoteEditor({ note }: NoteEditorProps) {
           visible={showHandle}
           currentType={currentBlockType}
           onSelect={handleBlockTypeSelect}
-          cursorPosition={cursorPosition}
         />
       )}
       
