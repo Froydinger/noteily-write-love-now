@@ -69,7 +69,8 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
         // Email notification will be automatically triggered by database trigger
         setEmailOrUsername('');
         setPermission('read');
-        onShareUpdate?.();
+        // Refresh the shares list locally instead of triggering parent re-render
+        loadShares(note.id);
       }
     } finally {
       setIsAdding(false);
@@ -78,12 +79,14 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
 
   const handleUpdatePermission = async (shareId: string, newPermission: 'read' | 'write') => {
     await updateShare({ shareId, permission: newPermission });
-    onShareUpdate?.();
+    // Refresh the shares list locally instead of triggering parent re-render
+    loadShares(note.id);
   };
 
   const handleRemoveShare = async (shareId: string) => {
     await removeShare({ shareId });
-    onShareUpdate?.();
+    // Refresh the shares list locally instead of triggering parent re-render
+    loadShares(note.id);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

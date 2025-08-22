@@ -265,12 +265,14 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         setCurrentBlockType('p');
       }
 
-      // Calculate absolute position on screen, near current line but to the right
+      // Calculate position relative to the viewport, accounting for scroll
+      const editorRect = editor.getBoundingClientRect();
       const blockRect = blockElement.getBoundingClientRect();
       const lineHeight = parseFloat(getComputedStyle(blockElement).lineHeight) || 24;
       
-      // Position the handle at the middle of the current line
-      const absoluteTop = blockRect.top + (lineHeight / 2);
+      // Position the handle at the middle of the current line, clamped to editor bounds
+      const relativeTop = blockRect.top - editorRect.top + (lineHeight / 2);
+      const absoluteTop = Math.max(editorRect.top + relativeTop, editorRect.top + 20);
       
       setHandleTop(absoluteTop);
       setShowHandle(true);
