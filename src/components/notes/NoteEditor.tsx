@@ -21,6 +21,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showHandle, setShowHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
+  const [cursorPosition, setCursorPosition] = useState({ top: 0, left: 0 });
   
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
 
@@ -212,11 +213,11 @@ export default function NoteEditor({ note }: NoteEditorProps) {
 
   }, [note.id]);
 
-  // Block type detection when editing
+  // Block type detection and cursor tracking when editing
   useEffect(() => {
     if (isReadOnly) return;
     
-    const updateBlockType = () => {
+    const updateBlockTypeAndPosition = () => {
       const editor = contentRef.current;
       if (!editor) {
         setShowHandle(false);
@@ -236,6 +237,13 @@ export default function NoteEditor({ note }: NoteEditorProps) {
         setShowHandle(false);
         return;
       }
+
+      // Update cursor position relative to the viewport
+      const rect = range.getBoundingClientRect();
+      setCursorPosition({
+        top: rect.top,
+        left: rect.left
+      });
 
       // Find the current line/block element
       let element = range.commonAncestorContainer;
@@ -270,22 +278,22 @@ export default function NoteEditor({ note }: NoteEditorProps) {
     // Add event listeners
     const editor = contentRef.current;
     if (editor) {
-      editor.addEventListener('focus', updateBlockType);
-      editor.addEventListener('input', updateBlockType);
-      editor.addEventListener('keyup', updateBlockType);
-      editor.addEventListener('click', updateBlockType);
+      editor.addEventListener('focus', updateBlockTypeAndPosition);
+      editor.addEventListener('input', updateBlockTypeAndPosition);
+      editor.addEventListener('keyup', updateBlockTypeAndPosition);
+      editor.addEventListener('click', updateBlockTypeAndPosition);
     }
     
-    document.addEventListener('selectionchange', updateBlockType);
+    document.addEventListener('selectionchange', updateBlockTypeAndPosition);
     
     return () => {
       if (editor) {
-        editor.removeEventListener('focus', updateBlockType);
-        editor.removeEventListener('input', updateBlockType);
-        editor.removeEventListener('keyup', updateBlockType);
-        editor.removeEventListener('click', updateBlockType);
+        editor.removeEventListener('focus', updateBlockTypeAndPosition);
+        editor.removeEventListener('input', updateBlockTypeAndPosition);
+        editor.removeEventListener('keyup', updateBlockTypeAndPosition);
+        editor.removeEventListener('click', updateBlockTypeAndPosition);
       }
-      document.removeEventListener('selectionchange', updateBlockType);
+      document.removeEventListener('selectionchange', updateBlockTypeAndPosition);
     };
   }, [isReadOnly]);
 
@@ -307,6 +315,7 @@ export default function NoteEditor({ note }: NoteEditorProps) {
           visible={showHandle}
           currentType={currentBlockType}
           onSelect={handleBlockTypeSelect}
+          cursorPosition={cursorPosition}
         />
       )}
       

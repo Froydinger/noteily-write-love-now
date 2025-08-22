@@ -9,16 +9,22 @@ interface BlockHandleProps {
   visible: boolean;
   currentType: BlockType;
   onSelect: (type: BlockType) => void;
+  cursorPosition: { top: number; left: number };
 }
 
-export const BlockHandle: React.FC<BlockHandleProps> = ({ visible, currentType, onSelect }) => {
+export const BlockHandle: React.FC<BlockHandleProps> = ({ visible, currentType, onSelect, cursorPosition }) => {
   return (
     <div
-      className={`fixed top-4 right-4 z-50 transition-all duration-300 ease-out ${
+      className={`fixed z-50 transition-all duration-300 ease-out ${
         visible 
           ? 'opacity-90' 
           : 'opacity-0 pointer-events-none'
       }`}
+      style={{
+        top: `${cursorPosition.top}px`,
+        left: `${cursorPosition.left + 250}px`, // Position to the right of cursor
+        transform: 'translateY(-50%)', // Center vertically on the line
+      }}
       aria-hidden={!visible}
     >
       <Popover>
