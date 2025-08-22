@@ -14,15 +14,11 @@ interface BlockHandleProps {
 export const BlockHandle: React.FC<BlockHandleProps> = ({ visible, currentType, onSelect }) => {
   return (
     <div
-      className={`sticky top-4 right-4 z-50 float-right transition-all duration-300 ease-out ${
+      className={`fixed top-4 right-4 z-50 transition-all duration-300 ease-out ${
         visible 
           ? 'opacity-90' 
           : 'opacity-0 pointer-events-none'
       }`}
-      style={{
-        marginTop: '1rem',
-        marginRight: '1rem'
-      }}
       aria-hidden={!visible}
     >
       <Popover>
