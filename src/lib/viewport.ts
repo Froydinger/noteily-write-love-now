@@ -12,8 +12,8 @@ export const preventViewportZoom = () => {
   });
 };
 
-// Basic keyboard detection - only for auth page
-export const handleAuthKeyboard = () => {
+// Keyboard-aware viewport handling for note editor
+export const handleNoteKeyboard = () => {
   let keyboardOpen = false;
   
   const handleResize = () => {
@@ -23,7 +23,25 @@ export const handleAuthKeyboard = () => {
     const wasOpen = keyboardOpen;
     keyboardOpen = heightDiff > 150;
     
-    // Remove auth-specific logic since we no longer have a dedicated auth page
+    // Adjust header position when keyboard opens/closes
+    const noteHeader = document.querySelector('[data-note-header]') as HTMLElement;
+    if (noteHeader) {
+      if (keyboardOpen && !wasOpen) {
+        // Keyboard opened - ensure header stays visible
+        noteHeader.style.position = 'fixed';
+        noteHeader.style.top = '0px';
+        noteHeader.style.left = '0px';
+        noteHeader.style.right = '0px';
+        noteHeader.style.zIndex = '50';
+      } else if (!keyboardOpen && wasOpen) {
+        // Keyboard closed - reset to sticky
+        noteHeader.style.position = 'sticky';
+        noteHeader.style.top = '0px';
+        noteHeader.style.left = 'auto';
+        noteHeader.style.right = 'auto';
+        noteHeader.style.zIndex = '40';
+      }
+    }
   };
 
   if (window.visualViewport) {

@@ -26,6 +26,7 @@ import { ExportMenu } from '@/components/notes/ExportMenu';
 import { ShareManager } from '@/components/notes/ShareManager';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotifications } from '@/hooks/useNotifications';
+import { handleNoteKeyboard } from '@/lib/viewport';
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -43,6 +44,12 @@ const NotePage = () => {
   const headerRef = useRef<HTMLElement>(null);
   
   const note = getNote(id || '');
+  
+  // Handle keyboard viewport changes
+  useEffect(() => {
+    const cleanup = handleNoteKeyboard();
+    return cleanup;
+  }, []);
   
   useEffect(() => {
     if (note) {
@@ -177,6 +184,7 @@ const NotePage = () => {
     <div key={id} className={`h-screen flex flex-col overflow-hidden transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}>
       <header 
         ref={headerRef}
+        data-note-header
         className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b p-3"
       >
         <div className="flex items-center justify-between">
