@@ -287,7 +287,7 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24 relative min-h-full">
+    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24">
       
       <div className="relative overflow-visible">
       <textarea
@@ -326,7 +326,7 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
       <div
         ref={contentRef}
         contentEditable={!isReadOnly}
-        className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none min-h-[50vh] transition-none editor-anchor relative ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+        className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none min-h-[calc(100vh-200px)] transition-none editor-anchor relative ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
         data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
         aria-label="Note content"
         onPaste={isReadOnly ? undefined : handlePaste}
