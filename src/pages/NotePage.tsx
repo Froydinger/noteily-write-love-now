@@ -174,7 +174,7 @@ const NotePage = () => {
   }
   
   return (
-    <div key={id} className={`h-full flex flex-col transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}>
+    <div key={id} className={`h-screen flex flex-col overflow-hidden transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}>
       <header 
         ref={headerRef}
         className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b p-3"
@@ -294,7 +294,7 @@ const NotePage = () => {
         </div>
       </header>
       
-      <div className="flex-grow">
+      <div className="flex-grow overflow-y-auto">
         <NoteEditor 
           note={note} 
           onBlockTypeChange={setCurrentBlockType}
