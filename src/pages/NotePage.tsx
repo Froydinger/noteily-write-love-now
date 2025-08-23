@@ -294,11 +294,13 @@ const NotePage = () => {
         </div>
       </header>
       
-      <div className="flex-grow overflow-y-auto">
-        <NoteEditor 
-          note={note} 
-          onBlockTypeChange={setCurrentBlockType}
-        />
+      <div className="flex-grow overflow-y-auto min-h-0">
+        <div className="min-h-full">
+          <NoteEditor 
+            note={note} 
+            onBlockTypeChange={setCurrentBlockType}
+          />
+        </div>
       </div>
       
       {/* Share Manager - now accessible from persistent people icon */}
