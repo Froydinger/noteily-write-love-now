@@ -46,31 +46,11 @@ const App = () => {
 
 const AppContent = () => {
   const [showSplash, setShowSplash] = useState(true);
-  const [showMarketingSplash, setShowMarketingSplash] = useState(false);
   const { user } = useAuth();
 
-  // Reset splash states when user logs out
-  useEffect(() => {
-    if (!user) {
-      setShowSplash(true);
-      setShowMarketingSplash(false);
-    }
-  }, [user]);
-
-  // Show regular splash screen first
-  if (showSplash) {
-    return <SplashScreen onComplete={() => {
-      setShowSplash(false);
-      // Show marketing splash for non-authenticated users
-      if (!user) {
-        setShowMarketingSplash(true);
-      }
-    }} />;
-  }
-
-  // Show marketing splash for unregistered users
-  if (showMarketingSplash && !user) {
-    return <MarketingSplashScreen />;
+  // Only show splash screen for authenticated users
+  if (showSplash && user) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
   }
 
   return (

@@ -16,13 +16,12 @@ export default function ForgotPasswordPage() {
   const { user, requestPasswordReset } = useAuth();
   const navigate = useNavigate();
 
-  // Temporarily disabled to debug routing issue
-  // useEffect(() => {
-  //   // Redirect if already logged in
-  //   if (user) {
-  //     navigate('/');
-  //   }
-  // }, [user, navigate]);
+  useEffect(() => {
+    // Redirect if already logged in
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
