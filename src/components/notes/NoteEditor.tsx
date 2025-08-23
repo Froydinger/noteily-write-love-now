@@ -288,52 +288,51 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24">
-      
-      <div className="relative overflow-visible">
-      <textarea
-        ref={titleRef}
-        value={title}
-        onChange={(e) => {
-          if (isReadOnly) return;
-          const newTitle = e.target.value;
-          setTitle(newTitle);
-          updateNote(note.id, { title: newTitle }, true); // Silent title update
-        }}
-        placeholder="Untitled Note"
-        className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
-        readOnly={isReadOnly}
-        style={{ 
-          minHeight: 'auto',
-          height: 'auto'
-        }}
-        rows={1}
-        onInput={(e) => {
-          const target = e.target as HTMLTextAreaElement;
-          target.style.height = 'auto';
-          target.style.height = target.scrollHeight + 'px';
-        }}
-        aria-label="Note title"
-      />
-      
-      {note.featured_image && (
-        <FeaturedImage 
-          imageUrl={note.featured_image} 
-          alt={note.title}
-          onDelete={() => updateNote(note.id, { featured_image: null }, true)}
+      <div className="relative">
+        <textarea
+          ref={titleRef}
+          value={title}
+          onChange={(e) => {
+            if (isReadOnly) return;
+            const newTitle = e.target.value;
+            setTitle(newTitle);
+            updateNote(note.id, { title: newTitle }, true); // Silent title update
+          }}
+          placeholder="Untitled Note"
+          className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+          readOnly={isReadOnly}
+          style={{ 
+            minHeight: 'auto',
+            height: 'auto'
+          }}
+          rows={1}
+          onInput={(e) => {
+            const target = e.target as HTMLTextAreaElement;
+            target.style.height = 'auto';
+            target.style.height = target.scrollHeight + 'px';
+          }}
+          aria-label="Note title"
         />
-      )}
-      
-      <div
-        ref={contentRef}
-        contentEditable={!isReadOnly}
-        className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none min-h-[calc(100vh-200px)] transition-none editor-anchor relative ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
-        data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
-        aria-label="Note content"
-        onPaste={isReadOnly ? undefined : handlePaste}
-        onFocus={() => !isReadOnly && setShowHandle(true)}
-      />
-      
-      {!isReadOnly && <ImageUploadButton onImageInsert={insertImageAtCursor} />}
+        
+        {note.featured_image && (
+          <FeaturedImage 
+            imageUrl={note.featured_image} 
+            alt={note.title}
+            onDelete={() => updateNote(note.id, { featured_image: null }, true)}
+          />
+        )}
+        
+        <div
+          ref={contentRef}
+          contentEditable={!isReadOnly}
+          className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none pb-32 transition-none editor-anchor relative ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+          data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
+          aria-label="Note content"
+          onPaste={isReadOnly ? undefined : handlePaste}
+          onFocus={() => !isReadOnly && setShowHandle(true)}
+        />
+        
+        {!isReadOnly && <ImageUploadButton onImageInsert={insertImageAtCursor} />}
       </div>
     </div>
   );

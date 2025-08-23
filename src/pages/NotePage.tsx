@@ -45,23 +45,10 @@ const NotePage = () => {
   
   const note = getNote(id || '');
   
-  // Handle keyboard viewport changes
+  // Simplified keyboard handling
   useEffect(() => {
     const cleanup = handleNoteKeyboard();
-    
-    // Also ensure header is reset when component unmounts
-    return () => {
-      cleanup();
-      const noteHeader = document.querySelector('[data-note-header]') as HTMLElement;
-      if (noteHeader) {
-        noteHeader.style.position = '';
-        noteHeader.style.top = '';
-        noteHeader.style.left = '';
-        noteHeader.style.right = '';
-        noteHeader.style.zIndex = '';
-        noteHeader.style.transform = '';
-      }
-    };
+    return cleanup;
   }, []);
   
   useEffect(() => {
@@ -194,11 +181,11 @@ const NotePage = () => {
   }
   
   return (
-    <div key={id} className={`h-screen flex flex-col transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}>
+    <div key={id} className={`min-h-screen transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}>
       <header 
         ref={headerRef}
         data-note-header
-        className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b p-3 flex-shrink-0"
+        className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b p-3"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
@@ -315,12 +302,10 @@ const NotePage = () => {
         </div>
       </header>
       
-      <main className="flex-1 overflow-y-auto">
-        <NoteEditor 
-          note={note} 
-          onBlockTypeChange={setCurrentBlockType}
-        />
-      </main>
+      <NoteEditor 
+        note={note} 
+        onBlockTypeChange={setCurrentBlockType}
+      />
       
       {/* Share Manager - now accessible from persistent people icon */}
       {showShareManager && (
