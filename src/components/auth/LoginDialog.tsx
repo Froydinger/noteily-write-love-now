@@ -167,18 +167,6 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 >
                   Create account
                 </Button>
-                
-                <button 
-                  type="button"
-                  onClick={() => {
-                    onOpenChange(false);
-                    navigate('/forgot-password');
-                  }}
-                  className="text-xs text-muted-foreground hover:text-foreground underline mt-2"
-                  disabled={isLoading}
-                >
-                  Forgot password?
-                </button>
               </div>
             </div>
           ) : currentStep === 'email' ? (
