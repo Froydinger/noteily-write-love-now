@@ -4,8 +4,6 @@ import { AppSidebar } from "@/components/layout/AppSidebar";
 import { NoteProvider } from "@/contexts/NoteContext";
 import { OfflineIndicator } from "@/components/notifications/OfflineIndicator";
 import { useAuth } from "@/contexts/AuthContext";
-import { LoginDialog } from "@/components/auth/LoginDialog";
-import { useState } from "react";
 
 type AppLayoutProps = {
   children: React.ReactNode;
@@ -13,16 +11,10 @@ type AppLayoutProps = {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const { user } = useAuth();
-  const [showLoginDialog, setShowLoginDialog] = useState(!user);
 
-  // Show login dialog for unauthenticated users
+  // For unauthenticated users, just show the children (Index will handle the marketing page)
   if (!user) {
-    return (
-      <>
-        {children}
-        <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
-      </>
-    );
+    return <>{children}</>;
   }
 
   return (
