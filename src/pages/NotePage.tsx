@@ -38,8 +38,6 @@ const NotePage = () => {
   const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
   const [entered, setEntered] = useState(false);
-  const [headerVisible, setHeaderVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [showFormatHandle, setShowFormatHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
   const headerRef = useRef<HTMLElement>(null);
@@ -70,25 +68,6 @@ const NotePage = () => {
     });
   }, [id]);
 
-  // Handle scroll behavior for header auto-hide
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down and past 100px - hide header
-        setHeaderVisible(false);
-      } else if (currentScrollY < lastScrollY) {
-        // Scrolling up - show header
-        setHeaderVisible(true);
-      }
-      
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
 
   const handleBlockTypeSelect = (type: BlockType) => {
     // Find the content editor and apply formatting
@@ -198,9 +177,7 @@ const NotePage = () => {
     <div key={id} className={`h-full flex flex-col transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}>
       <header 
         ref={headerRef}
-        className={`sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b p-3 transition-transform duration-300 ease-out ${
-          headerVisible ? 'translate-y-0' : '-translate-y-full'
-        }`}
+        className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b p-3"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
