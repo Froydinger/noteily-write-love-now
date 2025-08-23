@@ -287,7 +287,7 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24 relative">
+    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24 relative min-h-full">
       
       <div className="relative overflow-visible">
       <textarea
