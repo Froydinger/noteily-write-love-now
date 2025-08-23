@@ -9,7 +9,7 @@ export interface Notification {
   title: string;
   message: string;
   note_id?: string;
-  from_user_email?: string;
+  from_user_email?: string; // email of the actor who triggered it
   read: boolean;
   created_at: string;
   updated_at: string;
@@ -23,13 +23,11 @@ export const useNotifications = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  // cooldownRef tracks the last time we allowed a notification for a given key
-  // key groups by note_id when present, otherwise by type
+  // Tracks last allowed time per key to throttle bursts
   const cooldownRef = useRef<Record<string, number>>({});
 
-  const getKeyFor = (n: Pick<Notification, 'type' | 'note_id'>) => {
-    return n.note_id ? `note:${n.note_id}` : `type:${n.type || 'default'}`;
-  };
+  const getKeyFor = (n: Pick<Notification, 'type' | 'note_id'>) =>
+    n.note_id ? `note:${n.note_id}` : `type:${n.type || 'default'}`;
 
   const canEmitNow = (key: string) => {
     const now = Date.now();
@@ -39,6 +37,12 @@ export const useNotifications = () => {
       return true;
     }
     return false;
+  };
+
+  const isSelf = (n: Notification) => {
+    const actor = (n.from_user_email || '').trim().toLowerCase();
+    const current = (user?.email || '').trim().toLowerCase();
+    return Boolean(actor && current && actor === current);
   };
 
   const fetchNotifications = async () => {
@@ -53,17 +57,19 @@ export const useNotifications = () => {
 
       if (error) throw error;
 
-      setNotifications(data || []);
-      setUnreadCount(data?.filter(n => !n.read).length || 0);
+      // Drop any self-generated notifications
+      const filtered = (data || []).filter(n => !isSelf(n));
 
-      // warm up cooldowns so we do not instantly double show on initial subscribe
-      // for the newest notification per key, set the cooldown as if it just fired
-      const seenKeys = new Set<string>();
-      for (const n of data || []) {
+      setNotifications(filtered);
+      setUnreadCount(filtered.filter(n => !n.read).length);
+
+      // Warm cooldown with the newest item per key so we do not double-fire right away
+      const seen = new Set<string>();
+      for (const n of filtered) {
         const key = getKeyFor(n);
-        if (!seenKeys.has(key)) {
+        if (!seen.has(key)) {
           cooldownRef.current[key] = Date.now();
-          seenKeys.add(key);
+          seen.add(key);
         }
       }
     } catch (error) {
@@ -121,8 +127,8 @@ export const useNotifications = () => {
 
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
       setUnreadCount(prev => {
-        const deletedNotification = notifications.find(n => n.id === notificationId);
-        return deletedNotification && !deletedNotification.read ? Math.max(0, prev - 1) : prev;
+        const deleted = notifications.find(n => n.id === notificationId);
+        return deleted && !deleted.read ? Math.max(0, prev - 1) : prev;
       });
     } catch (error) {
       console.error('Error deleting notification:', error);
@@ -152,7 +158,6 @@ export const useNotifications = () => {
 
     fetchNotifications();
 
-    // Subscribe to real-time notifications, but throttle per key to 5 minutes
     const channel = supabase
       .channel('notifications-changes')
       .on(
@@ -164,16 +169,16 @@ export const useNotifications = () => {
           filter: `user_id=eq.${user.id}`
         },
         payload => {
-          const newNotification = payload.new as Notification;
-          const key = getKeyFor(newNotification);
+          const n = payload.new as Notification;
+
+          // Ignore if the actor is the same as the current user
+          if (isSelf(n)) return;
+
+          // Throttle by note_id or type
+          const key = getKeyFor(n);
           if (canEmitNow(key)) {
-            setNotifications(prev => [newNotification, ...prev]);
-            if (!newNotification.read) {
-              setUnreadCount(prev => prev + 1);
-            }
-          } else {
-            // ignored due to cooldown
-            // no state update here to avoid spam
+            setNotifications(prev => [n, ...prev]);
+            if (!n.read) setUnreadCount(prev => prev + 1);
           }
         }
       )
@@ -186,9 +191,16 @@ export const useNotifications = () => {
           filter: `user_id=eq.${user.id}`
         },
         payload => {
-          const updatedNotification = payload.new as Notification;
+          const updated = payload.new as Notification;
+
+          // If an update makes it self after the fact, still ignore in list
+          if (isSelf(updated)) {
+            setNotifications(prev => prev.filter(n => n.id !== updated.id));
+            return;
+          }
+
           setNotifications(prev =>
-            prev.map(n => (n.id === updatedNotification.id ? updatedNotification : n))
+            prev.map(n => (n.id === updated.id ? updated : n))
           );
         }
       )
