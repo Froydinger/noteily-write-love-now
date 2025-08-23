@@ -21,6 +21,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   if (!user) {
     return (
       <div 
+        className="animate-fade-in"
         style={{
           minHeight: '100vh',
           display: 'flex',
@@ -32,9 +33,9 @@ export function AppLayout({ children }: AppLayoutProps) {
           backgroundColor: 'hsl(215, 45%, 12%) !important'
         }}
       >
-        <div style={{ textAlign: 'center', maxWidth: '28rem' }}>
+        <div className="animate-scale-in" style={{ textAlign: 'center', maxWidth: '28rem', animationDelay: '0.1s', animationFillMode: 'both' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-            <Heart className="h-12 w-12" style={{ color: '#1EAEDB' }} />
+            <Heart className="h-12 w-12 animate-gentle-bounce" style={{ color: '#1EAEDB' }} />
           </div>
           <h1 style={{ 
             fontSize: '1.875rem', 
@@ -54,7 +55,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           <Button 
             onClick={() => navigate('/')} 
             size="lg"
-            className="hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE]"
+            className="hover:bg-[#0FA0CE] focus:bg-[#0FA0CE] active:bg-[#0FA0CE] transition-all duration-200 hover:scale-105"
             style={{
               backgroundColor: '#1EAEDB !important',
               color: '#ffffff !important',
@@ -82,7 +83,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <NoteProvider>
       <SidebarProvider>
-        <div className="flex min-h-screen w-full">
+        <div className="flex min-h-screen w-full animate-fade-in">
           <AppSidebar />
           <main className="flex-1 md:pl-6 lg:pl-8 xl:pl-10">
             {children}
