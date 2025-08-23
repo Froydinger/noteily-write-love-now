@@ -181,11 +181,11 @@ const NotePage = () => {
   }
   
   return (
-    <div key={id} className={`min-h-screen transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}>
+    <div key={id} className={`min-h-screen transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`} style={{ paddingTop: '73px' }}>
       <header 
         ref={headerRef}
         data-note-header
-        className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b p-3"
+        className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b p-3"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
@@ -302,10 +302,12 @@ const NotePage = () => {
         </div>
       </header>
       
-      <NoteEditor 
-        note={note} 
-        onBlockTypeChange={setCurrentBlockType}
-      />
+      <div className="relative">
+        <NoteEditor 
+          note={note} 
+          onBlockTypeChange={setCurrentBlockType}
+        />
+      </div>
       
       {/* Share Manager - now accessible from persistent people icon */}
       {showShareManager && (

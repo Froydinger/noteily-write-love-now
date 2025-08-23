@@ -12,9 +12,7 @@ export const preventViewportZoom = () => {
   });
 };
 
-// Simplified keyboard handling - no position manipulation
+// No keyboard handling needed - browser handles everything naturally
 export const handleNoteKeyboard = () => {
-  // Remove the complex viewport manipulation that was causing issues
-  // Let the browser handle keyboard/viewport changes naturally
   return () => {};
 };
