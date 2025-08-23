@@ -3,23 +3,44 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
-import { BlockType } from '@/components/notes/BlockHandle';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus, Users, Eye, Edit, Type } from 'lucide-react';
+import { BlockHandle, BlockType } from '@/components/notes/BlockHandle';
+import { Badge } from '@/components/ui/badge';
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useIsMobile } from '@/hooks/use-mobile';
+import { FeaturedImageUpload } from '@/components/notes/FeaturedImageUpload';
+import { ExportMenu } from '@/components/notes/ExportMenu';
 import { ShareManager } from '@/components/notes/ShareManager';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNotifications } from '@/hooks/useNotifications';
 import { handleNoteKeyboard } from '@/lib/viewport';
-import { HeaderContent } from '@/components/notes/HeaderContent';
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
   const { getNote, setCurrentNote, deleteNote, loading, updateNote } = useNotes();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+  const { state, toggleSidebar } = useSidebar();
   const { user } = useAuth();
+  const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
   const [entered, setEntered] = useState(false);
+  const [showFormatHandle, setShowFormatHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
-  const [showStickyHeader, setShowStickyHeader] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   
   const note = getNote(id || '');
@@ -28,28 +49,6 @@ const NotePage = () => {
   useEffect(() => {
     const cleanup = handleNoteKeyboard();
     return cleanup;
-  }, []);
-
-  // Set up IntersectionObserver to detect when original header goes out of view
-  useEffect(() => {
-    if (!headerRef.current) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // Show sticky header when original header is not visible
-        setShowStickyHeader(!entry.isIntersecting);
-      },
-      {
-        threshold: 0,
-        rootMargin: '-1px 0px 0px 0px' // Trigger slightly before header disappears
-      }
-    );
-
-    observer.observe(headerRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
   }, []);
   
   useEffect(() => {
@@ -183,38 +182,125 @@ const NotePage = () => {
   
   return (
     <div key={id} className={`min-h-screen transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`} style={{ paddingTop: '73px' }}>
-      {/* Original header - no longer sticky */}
       <header 
         ref={headerRef}
         data-note-header
-        className="relative bg-background border-b p-3"
+        className="fixed top-0 left-0 right-0 z-[9999] bg-background/95 backdrop-blur-sm border-b p-3"
+        style={{ position: 'fixed !important' as any, top: 0, left: 0, right: 0, zIndex: 9999 }}
       >
-        <HeaderContent 
-          note={note}
-          currentBlockType={currentBlockType}
-          onBlockTypeSelect={handleBlockTypeSelect}
-          onDelete={handleDelete}
-          onShare={handleShare}
-          onFeaturedImageSet={handleFeaturedImageSet}
-          onShowShareManager={() => setShowShareManager(true)}
-        />
-      </header>
-
-      {/* Sticky header that appears on scroll */}
-      <header 
-        className={`fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-sm border-b p-3 transition-transform duration-300 ease-out ${
-          showStickyHeader ? 'translate-y-0' : '-translate-y-full'
-        }`}
-      >
-        <HeaderContent 
-          note={note}
-          currentBlockType={currentBlockType}
-          onBlockTypeSelect={handleBlockTypeSelect}
-          onDelete={handleDelete}
-          onShare={handleShare}
-          onFeaturedImageSet={handleFeaturedImageSet}
-          onShowShareManager={() => setShowShareManager(true)}
-        />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            {isMobile ? (
+              <div className="relative">
+                <SidebarTrigger />
+                {user && unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="relative">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={toggleSidebar}
+                  className="btn-accessible p-2"
+                  title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
+                >
+                  {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
+                </Button>
+                {user && unreadCount > 0 && state === "collapsed" && (
+                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </div>
+            )}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/')}
+              className="btn-accessible p-2"
+              title="Back to notes"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            {note.isSharedWithUser && (
+              <Badge variant="secondary" className="ml-1 flex items-center gap-1 px-2">
+                <Users className="h-3 w-3" />
+                {note.userPermission === 'read' ? (
+                  <Eye className="h-3 w-3" />
+                ) : (
+                  <Edit className="h-3 w-3" />
+                )}
+              </Badge>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-1">
+            {/* Formatting button - only show if not read-only */}
+            {!note.isSharedWithUser || note.userPermission !== 'read' ? (
+              <BlockHandle
+                visible={true}
+                currentType={currentBlockType}
+                onSelect={handleBlockTypeSelect}
+              />
+            ) : null}
+            
+            {/* Show people icon for owned notes (to share) or shared notes (to manage) */}
+            {(note.isOwnedByUser || (note.isSharedWithUser && !note.isOwnedByUser)) && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowShareManager(true)}
+                className="btn-accessible p-2"
+                title={note.isOwnedByUser ? "Share note" : "Manage sharing"}
+              >
+                <Users className="h-4 w-4" />
+              </Button>
+            )}
+            
+            <FeaturedImageUpload 
+              noteId={note.id}
+              onImageSet={handleFeaturedImageSet}
+              hasImage={!!note.featured_image}
+            />
+            
+            <ExportMenu
+              note={note}
+              onShare={handleShare}
+            />
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive-foreground hover:bg-destructive/10">
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+               <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {note.isSharedWithUser && !note.isOwnedByUser ? 'Remove Access' : 'Delete Note'}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {note.isSharedWithUser && !note.isOwnedByUser 
+                      ? 'Are you sure you want to remove your access to this shared note? You will no longer be able to view or edit it.'
+                      : 'Are you sure you want to delete this note? It will be moved to Recently Deleted where you can restore it within 7 days.'
+                    }
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                 <AlertDialogFooter>
+                   <AlertDialogCancel className="btn-accessible">Cancel</AlertDialogCancel>
+                   <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                     {note.isSharedWithUser && !note.isOwnedByUser ? 'Remove Access' : 'Delete'}
+                   </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
       </header>
       
       <div className="relative">
