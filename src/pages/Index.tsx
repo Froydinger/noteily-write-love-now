@@ -19,7 +19,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { UsernamePrompt } from '@/components/notes/UsernamePrompt';
 import { useUsername } from '@/hooks/useUsername';
 import { supabase } from '@/integrations/supabase/client';
-import { MarketingSplashScreen } from '@/components/layout/MarketingSplashScreen';
 
 const Index = () => {
   const { user } = useAuth();
@@ -175,11 +174,6 @@ const Index = () => {
 
   // Debug logging to track the race condition
   console.log('Index render state:', { loading, notesLength: notes.length, hasUser: !!user, hasInitialLoad });
-
-  // Show marketing splash screen for unauthenticated users
-  if (!user) {
-    return <MarketingSplashScreen />;
-  }
 
   // Only show empty state when we've completed the initial load AND notes are actually empty AND we have a user
   if (hasInitialLoad && !loading && notes.length === 0 && user) {
