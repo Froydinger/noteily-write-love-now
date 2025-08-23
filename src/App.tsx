@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppLayout } from "./components/layout/AppLayout";
-import { SplashScreen } from "./components/layout/SplashScreen";
+
 import { MarketingSplashScreen } from "./components/layout/MarketingSplashScreen";
 import { PWAInstall } from "./components/pwa/PWAInstall";
 import { PWAUpdateNotification } from "./components/pwa/PWAUpdateNotification";
@@ -45,31 +45,10 @@ const App = () => {
 };
 
 const AppContent = () => {
-  const [showSplash, setShowSplash] = useState(true);
-  const [showMarketingSplash, setShowMarketingSplash] = useState(false);
   const { user } = useAuth();
 
-  // Reset splash states when user logs out
-  useEffect(() => {
-    if (!user) {
-      setShowSplash(true);
-      setShowMarketingSplash(false);
-    }
-  }, [user]);
-
-  // Show regular splash screen first
-  if (showSplash) {
-    return <SplashScreen onComplete={() => {
-      setShowSplash(false);
-      // Show marketing splash for non-authenticated users
-      if (!user) {
-        setShowMarketingSplash(true);
-      }
-    }} />;
-  }
-
   // Show marketing splash for unregistered users
-  if (showMarketingSplash && !user) {
+  if (!user) {
     return <MarketingSplashScreen />;
   }
 
