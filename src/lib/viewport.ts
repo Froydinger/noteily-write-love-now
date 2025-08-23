@@ -23,7 +23,7 @@ export const handleNoteKeyboard = () => {
     const wasOpen = keyboardOpen;
     keyboardOpen = heightDiff > 150;
     
-    // Adjust header position when keyboard opens/closes
+    // Adjust header position when keyboard opens/closes - but ensure it resets properly
     const noteHeader = document.querySelector('[data-note-header]') as HTMLElement;
     if (noteHeader) {
       if (keyboardOpen && !wasOpen) {
@@ -33,20 +33,43 @@ export const handleNoteKeyboard = () => {
         noteHeader.style.left = '0px';
         noteHeader.style.right = '0px';
         noteHeader.style.zIndex = '50';
+        noteHeader.style.transform = 'none';
       } else if (!keyboardOpen && wasOpen) {
-        // Keyboard closed - reset to sticky
-        noteHeader.style.position = 'sticky';
-        noteHeader.style.top = '0px';
-        noteHeader.style.left = 'auto';
-        noteHeader.style.right = 'auto';
-        noteHeader.style.zIndex = '40';
+        // Keyboard closed - reset to original sticky behavior
+        noteHeader.style.position = '';
+        noteHeader.style.top = '';
+        noteHeader.style.left = '';
+        noteHeader.style.right = '';
+        noteHeader.style.zIndex = '';
+        noteHeader.style.transform = '';
+      }
+    }
+  };
+
+  // Also listen for visibility changes to reset header
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      // Reset header when page becomes visible again
+      const noteHeader = document.querySelector('[data-note-header]') as HTMLElement;
+      if (noteHeader) {
+        noteHeader.style.position = '';
+        noteHeader.style.top = '';
+        noteHeader.style.left = '';
+        noteHeader.style.right = '';
+        noteHeader.style.zIndex = '';
+        noteHeader.style.transform = '';
       }
     }
   };
 
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', handleResize);
-    return () => window.visualViewport.removeEventListener('resize', handleResize);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      window.visualViewport.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }
   
   return () => {};

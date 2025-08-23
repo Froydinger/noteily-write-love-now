@@ -48,7 +48,20 @@ const NotePage = () => {
   // Handle keyboard viewport changes
   useEffect(() => {
     const cleanup = handleNoteKeyboard();
-    return cleanup;
+    
+    // Also ensure header is reset when component unmounts
+    return () => {
+      cleanup();
+      const noteHeader = document.querySelector('[data-note-header]') as HTMLElement;
+      if (noteHeader) {
+        noteHeader.style.position = '';
+        noteHeader.style.top = '';
+        noteHeader.style.left = '';
+        noteHeader.style.right = '';
+        noteHeader.style.zIndex = '';
+        noteHeader.style.transform = '';
+      }
+    };
   }, []);
   
   useEffect(() => {
@@ -302,12 +315,12 @@ const NotePage = () => {
         </div>
       </header>
       
-      <div className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto">
         <NoteEditor 
           note={note} 
           onBlockTypeChange={setCurrentBlockType}
         />
-      </div>
+      </main>
       
       {/* Share Manager - now accessible from persistent people icon */}
       {showShareManager && (
