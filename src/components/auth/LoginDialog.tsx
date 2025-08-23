@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface LoginDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const [shake, setShake] = useState(false);
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleChoiceSelection = (mode: 'signin' | 'signup') => {
     setAuthMode(mode);
@@ -170,7 +172,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                   type="button"
                   onClick={() => {
                     onOpenChange(false);
-                    window.location.href = '/forgot-password';
+                    navigate('/forgot-password');
                   }}
                   className="text-xs text-muted-foreground hover:text-foreground underline mt-2"
                   disabled={isLoading}
