@@ -17,11 +17,14 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
   const { updateNote } = useNotes();
   const [title, setTitle] = useState(note.title);
   const [lastSavedContent, setLastSavedContent] = useState(note.content);
+  const [lastNotifiedContent, setLastNotifiedContent] = useState(note.content);
+  const [lastNotifiedTitle, setLastNotifiedTitle] = useState(note.title);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [showHandle, setShowHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
+  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
 
@@ -33,6 +36,12 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
       if (sanitizedContent !== lastSavedContent) {
         updateNote(note.id, { content: sanitizedContent }, false); // Non-silent save on page leave
       }
+    }
+    
+    // Send final notification if there are unsent changes
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+      sendInactivityNotification();
     }
   };
 
@@ -72,13 +81,52 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
   }, [note.id]);
 
 
-  // Handle content updates with debounce
+  // Send notifications after 5 minutes of inactivity
+  const sendInactivityNotification = async () => {
+    if (!note.isSharedWithUser && (!note.shares || note.shares.length === 0)) {
+      return; // No one to notify
+    }
+
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      await supabase.functions.invoke('notify-note-update', {
+        body: {
+          noteId: note.id,
+          originalContent: lastNotifiedContent,
+          currentContent: contentRef.current?.innerHTML || '',
+          originalTitle: lastNotifiedTitle,
+          currentTitle: title
+        }
+      });
+
+      // Update our tracking state
+      setLastNotifiedContent(contentRef.current?.innerHTML || '');
+      setLastNotifiedTitle(title);
+      
+      console.log('Inactivity notification sent for note:', note.id);
+    } catch (error) {
+      console.error('Failed to send inactivity notification:', error);
+    }
+  };
+
+  // Handle content updates with debounce and inactivity tracking
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     
     const handleContentChange = () => {
       if (contentRef.current) {
         const content = contentRef.current.innerHTML;
+        
+        // Clear any existing inactivity timer
+        if (inactivityTimerRef.current) {
+          clearTimeout(inactivityTimerRef.current);
+        }
+        
+        // Start 5-minute inactivity timer
+        inactivityTimerRef.current = setTimeout(() => {
+          sendInactivityNotification();
+        }, 5 * 60 * 1000); // 5 minutes
         
         clearTimeout(timeout);
         timeout = setTimeout(() => {
@@ -98,11 +146,14 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
     
     return () => {
       clearTimeout(timeout);
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current);
+      }
       if (currentRef) {
         currentRef.removeEventListener('input', handleContentChange);
       }
     };
-  }, [note.id, updateNote]);
+  }, [note.id, updateNote, lastNotifiedContent, lastNotifiedTitle, title]);
 
   // Handle image insertion at cursor position with validation
   const insertImageAtCursor = (imageUrl: string) => {
@@ -296,6 +347,17 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
             if (isReadOnly) return;
             const newTitle = e.target.value;
             setTitle(newTitle);
+            
+            // Clear any existing inactivity timer
+            if (inactivityTimerRef.current) {
+              clearTimeout(inactivityTimerRef.current);
+            }
+            
+            // Start 5-minute inactivity timer
+            inactivityTimerRef.current = setTimeout(() => {
+              sendInactivityNotification();
+            }, 5 * 60 * 1000); // 5 minutes
+            
             updateNote(note.id, { title: newTitle }, true); // Silent title update
           }}
           placeholder="Untitled Note"
