@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const [shake, setShake] = useState(false);
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleChoiceSelection = (mode: 'signin' | 'signup') => {
     setAuthMode(mode);
@@ -158,7 +160,10 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 
                 <Button 
                   type="button"
-                  onClick={() => window.location.href = '/paywall'}
+                  onClick={() => {
+                    onOpenChange(false);
+                    navigate('/paywall');
+                  }}
                   size="sm"
                   className="w-48 bg-black text-white hover:bg-gray-800 border-0" 
                   disabled={isLoading}
