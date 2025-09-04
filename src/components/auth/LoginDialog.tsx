@@ -158,7 +158,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 
                 <Button 
                   type="button"
-                  onClick={() => handleChoiceSelection('signup')}
+                  onClick={() => window.location.href = '/paywall'}
                   size="sm"
                   className="w-48 bg-black text-white hover:bg-gray-800 border-0" 
                   disabled={isLoading}

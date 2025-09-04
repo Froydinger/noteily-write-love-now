@@ -15,7 +15,8 @@ import Index from "./pages/Index";
 import NotePage from "./pages/NotePage";
 import PromptsPage from "./pages/PromptsPage";
 import SettingsPage from "./pages/SettingsPage";
-
+import PaywallPage from "./pages/PaywallPage";
+import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PrivacyPage from "./pages/PrivacyPage";
@@ -57,7 +58,8 @@ const AppContent = () => {
       <NotificationToastListener />
       <PreferencesProvider>
         <Routes>
-          
+          <Route path="/paywall" element={<PaywallPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
