@@ -41,6 +41,7 @@ serve(async (req) => {
     let subscriptionTier = null;
     let subscriptionEnd = null;
     let customerId = null;
+    let userId = null;
 
     // If session ID provided, verify payment completion
     if (sessionId) {
@@ -50,6 +51,26 @@ serve(async (req) => {
       if (session.payment_status === 'paid' && session.mode === 'subscription') {
         logStep("Payment confirmed, checking subscription");
         customerId = session.customer as string;
+        
+        // Get user ID from existing subscriber record or user_preferences
+        const { data: existingSubscriber } = await supabaseClient
+          .from('subscribers')
+          .select('user_id')
+          .eq('email', email)
+          .single();
+        
+        if (existingSubscriber?.user_id) {
+          userId = existingSubscriber.user_id;
+        } else {
+          // Try to get from user_preferences if not in subscribers yet
+          const { data: userPref } = await supabaseClient
+            .from('user_preferences')
+            .select('user_id')
+            .eq('email', email)
+            .single();
+          
+          userId = userPref?.user_id;
+        }
         
         const subscriptions = await stripe.subscriptions.list({
           customer: customerId,
@@ -70,6 +91,27 @@ serve(async (req) => {
       const customers = await stripe.customers.list({ email, limit: 1 });
       if (customers.data.length > 0) {
         customerId = customers.data[0].id;
+        
+        // Get user ID from existing subscriber record or user_preferences  
+        const { data: existingSubscriber } = await supabaseClient
+          .from('subscribers')
+          .select('user_id')
+          .eq('email', email)
+          .single();
+        
+        if (existingSubscriber?.user_id) {
+          userId = existingSubscriber.user_id;
+        } else {
+          // Try to get from user_preferences if not in subscribers yet
+          const { data: userPref } = await supabaseClient
+            .from('user_preferences')
+            .select('user_id')
+            .eq('email', email)
+            .single();
+          
+          userId = userPref?.user_id;
+        }
+        
         const subscriptions = await stripe.subscriptions.list({
           customer: customerId,
           status: "active",
@@ -85,15 +127,18 @@ serve(async (req) => {
       }
     }
 
-    // Update or create subscriber record
-    await supabaseClient.from("subscribers").upsert({
-      email,
-      stripe_customer_id: customerId,
-      subscribed,
-      subscription_tier: subscriptionTier,
-      subscription_end: subscriptionEnd,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'email' });
+    // Update or create subscriber record (service role key bypasses RLS)
+    if (userId) {
+      await supabaseClient.from("subscribers").upsert({
+        user_id: userId,
+        email,
+        stripe_customer_id: customerId,
+        subscribed,
+        subscription_tier: subscriptionTier,
+        subscription_end: subscriptionEnd,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'email' });
+    }
 
     logStep("Updated subscriber record", { subscribed, subscriptionTier });
 
