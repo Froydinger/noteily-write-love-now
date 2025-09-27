@@ -151,7 +151,7 @@ export function SpellCheckButton({ content, originalHTML, onContentChange, disab
       variant="outline"
       size="icon"
       className={`
-        fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full shadow-lg
+        spell-check-fab h-12 w-12 rounded-full shadow-lg
         transition-all duration-300 hover:scale-105
         ${isChecking 
           ? 'bg-primary/10 border-primary text-primary animate-pulse shadow-lg shadow-primary/30' 

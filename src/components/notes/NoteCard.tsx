@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 
 import { Note } from '@/contexts/NoteContext';
@@ -8,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2 } from 'lucide-react';
 import type { NoteWithSharing } from '@/types/sharing';
 import { useIsTouchDevice } from '@/hooks/use-touch-device';
+import { useTitleFont } from '@/hooks/useTitleFont';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface NoteCardProps {
@@ -22,7 +24,7 @@ interface NoteCardProps {
 }
 
 export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen, isPinned = false, onTogglePin, onDelete }: NoteCardProps) {
-  
+  const titleFont = useTitleFont();
   const { isTouchDevice, isIOS } = useIsTouchDevice();
   
   // Check if this note is shared with the user (they don't own it)
@@ -179,7 +181,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
             I Shared
           </Badge>
         )}
-        <h3 className="font-medium text-lg font-serif break-words overflow-wrap-anywhere leading-tight text-foreground transition-colors duration-300 mb-3">{note.title || "Untitled Note"}</h3>
+        <h3 className={`font-medium text-lg font-${titleFont} break-words overflow-wrap-anywhere leading-tight text-foreground transition-colors duration-300 mb-3 dynamic-title-font`}>{note.title || "Untitled Note"}</h3>
         <p className={`text-sm text-muted-foreground line-clamp-4 ${!isTouchDevice ? 'group-hover:text-foreground/90' : ''} transition-colors duration-300 leading-relaxed`}>{truncatedContent}</p>
       </CardContent>
       <CardFooter className={`p-4 pt-0 text-xs text-muted-foreground transition-all duration-300 ${!isTouchDevice ? 'group-hover:text-muted-foreground/80' : ''}`}>

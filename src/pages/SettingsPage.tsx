@@ -12,7 +12,7 @@ import { useNotes } from '@/contexts/NoteContext';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart, AtSign, Check, X, Loader2 } from 'lucide-react';
+import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart, AtSign, Check, X, Loader2, Type } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { Input } from '@/components/ui/input';
@@ -30,7 +30,7 @@ const SettingsPage = () => {
   const { toast } = useToast();
   const { user, signOut } = useAuth();
   const { notes } = useNotes();
-  const { preferences } = usePreferences();
+  const { preferences, updateTitleFont } = usePreferences();
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -48,6 +48,21 @@ const SettingsPage = () => {
       case 'sepia': return 'Fresh Page';
       default: return 'Night Mode';
     }
+  };
+
+  const getTitleFontLabel = (font: string) => {
+    switch (font) {
+      case 'serif': return 'Serif (Playfair)';
+      case 'sans': return 'Sans (Inter)';
+      case 'mono': return 'Mono (JetBrains)';
+      default: return 'Serif (Playfair)';
+    }
+  };
+
+  const handleTitleFontChange = async () => {
+    const currentIndex = ['serif', 'sans', 'mono'].indexOf(preferences.titleFont);
+    const nextFont = ['serif', 'sans', 'mono'][(currentIndex + 1) % 3] as 'serif' | 'sans' | 'mono';
+    await updateTitleFont(nextFont);
   };
 
   const handleSignOut = async () => {
@@ -372,18 +387,45 @@ ${note.content}
             <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
               <span>Preferences</span>
             </h2>
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <Label htmlFor="theme" className="text-sm font-medium">Theme</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Choose your preferred theme
-                </p>
+            <div className="space-y-4">
+              {/* Theme setting */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <Label htmlFor="theme" className="text-sm font-medium">Theme</Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Choose your preferred theme
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="text-sm text-muted-foreground hidden sm:inline">
+                    {getThemeLabel(preferences.theme)}
+                  </span>
+                  <ThemeToggle variant="settings" />
+                </div>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <span className="text-sm text-muted-foreground hidden sm:inline">
-                  {getThemeLabel(preferences.theme)}
-                </span>
-                <ThemeToggle variant="settings" />
+              
+              {/* Title font setting */}
+              <div className="flex items-start justify-between gap-3 border-t pt-4">
+                <div className="flex-1 min-w-0">
+                  <Label htmlFor="titleFont" className="text-sm font-medium">Title Font</Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Choose your preferred font for note titles
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="text-sm text-muted-foreground hidden sm:inline">
+                    {getTitleFontLabel(preferences.titleFont)}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleTitleFontChange}
+                    className="p-2 h-8 w-8"
+                    title="Change title font"
+                  >
+                    <Type className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

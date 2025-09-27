@@ -7,6 +7,7 @@ import { FeaturedImage } from './FeaturedImage';
 import { sanitizeContent, sanitizeForDisplay, sanitizeImageUrl, isValidImageUrl } from "@/lib/sanitization";
 import { BlockHandle, BlockType } from './BlockHandle';
 import { usePageLeave } from '@/hooks/usePageLeave';
+import { useTitleFont } from '@/hooks/useTitleFont';
 import { SpellCheckButton } from './SpellCheckButton';
 
 interface NoteEditorProps {
@@ -16,6 +17,7 @@ interface NoteEditorProps {
 }
 
 export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange }: NoteEditorProps) {
+  const titleFont = useTitleFont();
   const { updateNote } = useNotes();
   const [title, setTitle] = useState(note.title);
   const [lastSavedContent, setLastSavedContent] = useState(note.content);
@@ -369,7 +371,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
             updateNote(note.id, { title: newTitle }, true); // Silent title update
           }}
           placeholder="Untitled Note"
-          className={`w-full text-3xl font-serif font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+          className={`w-full text-3xl font-${titleFont} font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden dynamic-title-font ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
           readOnly={isReadOnly}
           style={{ 
             minHeight: 'auto',

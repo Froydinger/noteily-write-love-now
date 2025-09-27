@@ -630,3 +630,33 @@
   }
 
 }
+
+/* Dynamic title font classes based on preference */
+html[data-title-font="serif"] .dynamic-title-font {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+html[data-title-font="sans"] .dynamic-title-font {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+html[data-title-font="mono"] .dynamic-title-font {
+  font-family: 'JetBrains Mono', Menlo, Monaco, monospace;
+}
+
+/* Enhanced spell check button positioning */
+.spell-check-fab {
+  position: fixed !important;
+  bottom: 1.5rem !important;
+  right: 1.5rem !important;
+  z-index: 9999 !important;
+  pointer-events: all !important;
+}
+
+/* Safe area insets for mobile devices */
+@supports(padding: max(0px)) {
+  .spell-check-fab {
+    bottom: max(1.5rem, env(safe-area-inset-bottom)) !important;
+    right: max(1.5rem, env(safe-area-inset-right)) !important;
+  }
+}
