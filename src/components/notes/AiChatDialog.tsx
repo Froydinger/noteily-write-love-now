@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Brain, Send, Undo2, History, X, Eye, EyeOff } from 'lucide-react';
+import { Brain, Send, History, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { AiHistoryEntry } from '@/hooks/useAiHistory';
@@ -59,7 +59,6 @@ export function AiChatDialog({
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [autoHide, setAutoHide] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [selectedTextRange, setSelectedTextRange] = useState<{start: number, end: number} | null>(null);
@@ -88,7 +87,6 @@ export function AiChatDialog({
       console.log('Dialog opening - resetting states');
       setIsMinimized(false); // Always start expanded when opening
       setHasUserInteracted(false); // Reset interaction flag
-      setAutoHide(false); // Reset auto-hide on new session
       
       // Calculate text selection range if working with selected text
       if (isSelectedText) {
@@ -118,11 +116,8 @@ export function AiChatDialog({
     }
   }, [open, isSelectedText, content, originalHTML]);
 
-  // Auto-hide functionality - DISABLED to prevent unwanted minimizing
-  useEffect(() => {
-    // Completely disabled auto-hide to prevent issues
-    return;
-  }, []);
+  // Removed auto-hide functionality completely
+
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -146,7 +141,6 @@ export function AiChatDialog({
   const handleQuickAction = async (instruction: string, actionLabel: string) => {
     console.log('Quick action triggered:', actionLabel);
     setHasUserInteracted(true);
-    setAutoHide(true);
     await handleRewrite(instruction, actionLabel);
   };
 
@@ -162,7 +156,6 @@ export function AiChatDialog({
 
     console.log('Spell check triggered');
     setHasUserInteracted(true);
-    setAutoHide(true);
     setIsProcessing(true);
     
     // Add user message
@@ -243,7 +236,6 @@ export function AiChatDialog({
 
     console.log('Grammar check triggered');
     setHasUserInteracted(true);
-    setAutoHide(true);
     setIsProcessing(true);
     
     const userMessage: ChatMessage = {
@@ -413,7 +405,6 @@ export function AiChatDialog({
     
     console.log('Send message triggered');
     setHasUserInteracted(true);
-    setAutoHide(true);
     const instruction = inputValue.trim();
     setInputValue('');
     await handleRewrite(instruction);
@@ -552,21 +543,13 @@ export function AiChatDialog({
                 </div>
               </ScrollArea>
 
-              {/* Auto-hide toggle and Quick Actions */}
+              {/* Status text instead of auto-hide toggle */}
               <div className="px-6 py-3 border-t bg-muted/30">
-                {/* Auto-hide toggle */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-xs font-medium text-muted-foreground">Quick Actions:</div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setAutoHide(!autoHide)}
-                    className="text-xs flex items-center gap-1"
-                    title={autoHide ? "Turn off auto-hide" : "Turn on auto-hide"}
-                  >
-                    {autoHide ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-                    Auto Hide {autoHide ? 'On' : 'Off'}
-                  </Button>
+                  <div className="text-xs text-muted-foreground px-2 py-1 bg-background/50 rounded">
+                    {isSelectedText ? "Text is selected" : "Editing whole page"}
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-1">
                   <Button

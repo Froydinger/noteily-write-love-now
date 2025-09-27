@@ -47,6 +47,7 @@ export function TextEnhancementMenu({
   const [isProcessing, setIsProcessing] = useState(false);
   const [showChatDialog, setShowChatDialog] = useState(false);
   const [selectedText, setSelectedText] = useState('');
+  const [hasTextSelected, setHasTextSelected] = useState(false);
   const { toast } = useToast();
   const { preferences } = usePreferences();
   const { history, addHistoryEntry, revertToVersion, clearHistory } = useAiHistory(noteId);
@@ -56,6 +57,28 @@ export function TextEnhancementMenu({
     const selection = window.getSelection();
     return selection ? selection.toString().trim() : '';
   };
+
+  // Check for text selection periodically
+  React.useEffect(() => {
+    const checkSelection = () => {
+      const selected = getSelectedText();
+      setHasTextSelected(selected.length > 0);
+    };
+
+    // Check immediately
+    checkSelection();
+
+    // Add event listeners for selection changes
+    document.addEventListener('selectionchange', checkSelection);
+    document.addEventListener('mouseup', checkSelection);
+    document.addEventListener('keyup', checkSelection);
+
+    return () => {
+      document.removeEventListener('selectionchange', checkSelection);
+      document.removeEventListener('mouseup', checkSelection);
+      document.removeEventListener('keyup', checkSelection);
+    };
+  }, []);
 
   // Handle opening chat dialog with text selection check
   const handleOpenChatDialog = () => {
@@ -233,8 +256,10 @@ export function TextEnhancementMenu({
             variant="ghost"
             size="sm"
             disabled={disabled || isProcessing}
-            className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105"
-            title="AI Enhancement Menu"
+            className={`fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105 ${
+              hasTextSelected ? 'ring-2 ring-yellow-400 ring-offset-2 shadow-yellow-400/50 animate-pulse' : ''
+            }`}
+            title={hasTextSelected ? "AI Enhancement Menu - Text Selected" : "AI Enhancement Menu"}
           >
             {isProcessing ? (
               <Wand2 className="h-5 w-5 animate-spin" />
