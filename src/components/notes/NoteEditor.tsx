@@ -399,17 +399,10 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
           <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-3 z-10">
             <SpellCheckButton 
               content={contentRef.current?.textContent || ''}
-              onContentChange={(newContent) => {
+              originalHTML={contentRef.current?.innerHTML || ''}
+              onContentChange={(newHTML) => {
                 if (contentRef.current) {
-                  // Preserve formatting while updating text content
-                  const paragraphs = newContent.split('\n\n');
-                  const formattedContent = paragraphs
-                    .map(p => p.replace(/\n/g, '<br>'))
-                    .join('</p><p>')
-                    .replace(/^/, '<p>')
-                    .replace(/$/, '</p>');
-                  
-                  contentRef.current.innerHTML = formattedContent;
+                  contentRef.current.innerHTML = newHTML;
                   contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
                 }
               }}

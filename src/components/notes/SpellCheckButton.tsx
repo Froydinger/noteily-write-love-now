@@ -6,11 +6,12 @@ import { useToast } from '@/hooks/use-toast';
 
 interface SpellCheckButtonProps {
   content: string;
+  originalHTML: string;
   onContentChange: (newContent: string) => void;
   disabled?: boolean;
 }
 
-export function SpellCheckButton({ content, onContentChange, disabled }: SpellCheckButtonProps) {
+export function SpellCheckButton({ content, originalHTML, onContentChange, disabled }: SpellCheckButtonProps) {
   const [isChecking, setIsChecking] = useState(false);
   const { toast } = useToast();
 
@@ -42,7 +43,9 @@ export function SpellCheckButton({ content, onContentChange, disabled }: SpellCh
       }
 
       if (data.hasChanges) {
-        onContentChange(data.correctedText);
+        // Preserve original HTML structure while updating text content
+        const correctedHTML = preserveHTMLStructure(originalHTML, data.correctedText);
+        onContentChange(correctedHTML);
         toast({
           title: "Spelling corrected! ✨",
           description: "Found and fixed spelling and grammar errors.",
@@ -64,6 +67,80 @@ export function SpellCheckButton({ content, onContentChange, disabled }: SpellCh
       });
     } finally {
       setIsChecking(false);
+    }
+  };
+
+  // Function to preserve HTML structure while updating text content
+  const preserveHTMLStructure = (originalHTML: string, correctedText: string): string => {
+    try {
+      // Create a temporary div to parse the original HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = originalHTML;
+      
+      // Extract text content from original HTML for mapping
+      const originalText = tempDiv.textContent || '';
+      
+      // If the text hasn't changed significantly, return original
+      if (originalText.trim() === correctedText.trim()) {
+        return originalHTML;
+      }
+      
+      // Create a simple mapping by splitting both texts into words
+      const originalWords = originalText.split(/(\s+)/);
+      const correctedWords = correctedText.split(/(\s+)/);
+      
+      // Walk through all text nodes in the DOM and update them
+      const walker = document.createTreeWalker(
+        tempDiv,
+        NodeFilter.SHOW_TEXT,
+        null
+      );
+      
+      let textNodes: Text[] = [];
+      let node;
+      while (node = walker.nextNode()) {
+        if (node.textContent?.trim()) {
+          textNodes.push(node as Text);
+        }
+      }
+      
+      // Simple word-by-word replacement approach
+      let correctedWordIndex = 0;
+      let correctedTextRemaining = correctedText;
+      
+      for (const textNode of textNodes) {
+        const nodeText = textNode.textContent || '';
+        const nodeWords = nodeText.split(/(\s+)/);
+        
+        let newNodeText = '';
+        for (let i = 0; i < nodeWords.length; i++) {
+          const word = nodeWords[i];
+          
+          if (word.trim()) {
+            // Find the next non-whitespace word from corrected text
+            while (correctedWordIndex < correctedWords.length && !correctedWords[correctedWordIndex].trim()) {
+              correctedWordIndex++;
+            }
+            
+            if (correctedWordIndex < correctedWords.length) {
+              newNodeText += correctedWords[correctedWordIndex];
+              correctedWordIndex++;
+            } else {
+              newNodeText += word; // Fallback to original if we run out
+            }
+          } else {
+            newNodeText += word; // Preserve whitespace
+          }
+        }
+        
+        textNode.textContent = newNodeText;
+      }
+      
+      return tempDiv.innerHTML;
+    } catch (error) {
+      console.error('Error preserving HTML structure:', error);
+      // Fallback: return original HTML if something goes wrong
+      return originalHTML;
     }
   };
 
