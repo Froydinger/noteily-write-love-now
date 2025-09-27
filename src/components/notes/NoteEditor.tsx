@@ -72,19 +72,18 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
     }
   }, [title]);
 
-  // Update title and content when note changes
+  // Update title and content when note changes (force update for undo/redo)
   useEffect(() => {
     setTitle(note.title);
     if (contentRef.current) {
-      // Only update content if it's actually different to avoid removing event handlers
-      const currentContent = contentRef.current.innerHTML;
-      if (currentContent !== note.content) {
-        // Sanitize content for display
-        const sanitizedContent = sanitizeForDisplay(note.content);
-        contentRef.current.innerHTML = sanitizedContent;
-      }
+      // Always update content to ensure undo/redo works
+      const sanitizedContent = sanitizeForDisplay(note.content);
+      contentRef.current.innerHTML = sanitizedContent;
+      
+      // Trigger any additional update events
+      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
     }
-  }, [note.id, note.title, note.content]); // Added note.title and note.content as dependencies
+  }, [note.id, note.title, note.content]);
 
 
   // Send notifications after 5 minutes of inactivity
@@ -350,6 +349,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
     <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-8">
       <div className="relative">
         <textarea
+          data-title-input
           ref={titleRef}
           value={title}
           onChange={(e) => {

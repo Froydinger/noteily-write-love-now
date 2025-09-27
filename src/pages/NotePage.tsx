@@ -185,11 +185,33 @@ const NotePage = () => {
   const handleUndo = () => {
     if (!note) return;
     
+    // Save current state first
     const currentState = { title: note.title, content: note.content };
-    const undoneState = undo(currentState);
+    saveState(currentState.title, currentState.content);
     
+    const undoneState = undo();
     if (undoneState) {
-      updateNote(note.id, { title: undoneState.title, content: undoneState.content }, false);
+      // Force update the note content directly
+      updateNote(note.id, { 
+        title: undoneState.title, 
+        content: undoneState.content 
+      }, false);
+      
+      // Force editor update by updating DOM directly
+      setTimeout(() => {
+        const titleInput = document.querySelector('[data-title-input]') as HTMLTextAreaElement;
+        const contentDiv = document.querySelector('[contenteditable="true"]') as HTMLDivElement;
+        
+        if (titleInput && titleInput.value !== undoneState.title) {
+          titleInput.value = undoneState.title;
+          titleInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        
+        if (contentDiv && contentDiv.innerHTML !== undoneState.content) {
+          contentDiv.innerHTML = undoneState.content;
+          contentDiv.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }, 50);
       
       toast({
         title: "Undone",
@@ -201,11 +223,29 @@ const NotePage = () => {
   const handleRedo = () => {
     if (!note) return;
     
-    const currentState = { title: note.title, content: note.content };
-    const redoneState = redo(currentState);
-    
+    const redoneState = redo();
     if (redoneState) {
-      updateNote(note.id, { title: redoneState.title, content: redoneState.content }, false);
+      // Force update the note content directly
+      updateNote(note.id, { 
+        title: redoneState.title, 
+        content: redoneState.content 
+      }, false);
+      
+      // Force editor update by updating DOM directly
+      setTimeout(() => {
+        const titleInput = document.querySelector('[data-title-input]') as HTMLTextAreaElement;
+        const contentDiv = document.querySelector('[contenteditable="true"]') as HTMLDivElement;
+        
+        if (titleInput && titleInput.value !== redoneState.title) {
+          titleInput.value = redoneState.title;
+          titleInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        
+        if (contentDiv && contentDiv.innerHTML !== redoneState.content) {
+          contentDiv.innerHTML = redoneState.content;
+          contentDiv.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }, 50);
       
       toast({
         title: "Redone",
