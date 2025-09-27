@@ -610,7 +610,7 @@ export function AiChatDialog({
                         handleSendMessage();
                       }
                     }}
-                    className="flex-1"
+                    className="flex-1 bg-background text-foreground border-border placeholder:text-muted-foreground focus:ring-ring focus:border-ring"
                   />
                   <Button
                     onClick={handleSendMessage}
