@@ -451,6 +451,7 @@ export function AiChatDialog({
             : 'sm:max-w-2xl h-[80vh]'
           } 
           flex flex-col p-0 transition-all duration-300 z-50 bg-background
+          [&>button]:hidden
         `}
       >
         <DialogHeader className="px-6 py-4 border-b">
@@ -471,11 +472,11 @@ export function AiChatDialog({
                   size="sm"
                   onClick={() => setIsMinimized(!isMinimized)}
                   title={isMinimized ? "Expand chat" : "Minimize chat"}
-                  className={`transition-all duration-300 ${
-                    hasTextSelected ? 'ring-2 ring-orange-400 ring-offset-1 shadow-orange-400/50' : ''
+                  className={`transition-all duration-300 mr-2 ${
+                    hasTextSelected ? 'ring-2 ring-blue-400 ring-offset-1 shadow-blue-400/50' : ''
                   }`}
                   style={{
-                    animation: hasTextSelected ? 'glow 2s ease-in-out infinite alternate' : 'none'
+                    animation: hasTextSelected ? 'glowBlue 2s ease-in-out infinite alternate' : 'none'
                   }}
                 >
                   {isMinimized ? "↑" : "↓"}
@@ -554,10 +555,10 @@ export function AiChatDialog({
                   <div className="text-xs font-medium text-muted-foreground">Quick Actions:</div>
                   <div 
                     className={`text-xs text-muted-foreground px-2 py-1 bg-background/50 rounded transition-all duration-300 ${
-                      hasTextSelected ? 'ring-1 ring-orange-400 shadow-orange-400/30' : ''
+                      hasTextSelected ? 'ring-1 ring-blue-400 shadow-blue-400/30' : ''
                     }`}
                     style={{
-                      animation: hasTextSelected ? 'glow 2s ease-in-out infinite alternate' : 'none'
+                      animation: hasTextSelected ? 'glowBlue 2s ease-in-out infinite alternate' : 'none'
                     }}
                   >
                     {hasTextSelected ? "Text is selected" : "Editing whole page"}
