@@ -441,10 +441,15 @@ export function AiChatDialog({
     <Dialog 
       open={open} 
       onOpenChange={(newOpen) => {
-        console.log('Dialog onOpenChange called:', { from: open, to: newOpen });
-        onOpenChange(newOpen);
+        console.log('Dialog onOpenChange called:', { from: open, to: newOpen, isMinimized });
+        // Only allow closing if user explicitly closes, not when minimizing
+        if (!newOpen && !isMinimized) {
+          onOpenChange(newOpen);
+        } else if (newOpen) {
+          onOpenChange(newOpen);
+        }
       }}
-      modal={!isMinimized}
+      modal={false}
     >
       <DialogContent
         className={`
@@ -460,14 +465,7 @@ export function AiChatDialog({
             <DialogTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5" />
               {!isMinimized && (
-                <div className="flex items-center gap-2">
-                  <span>AI Writing Assistant</span>
-                  {isSelectedText && (
-                    <span className="text-xs bg-accent text-accent-foreground px-2 py-1 rounded">
-                      Selected Text
-                    </span>
-                  )}
-                </div>
+                <span>AI Writing Assistant</span>
               )}
               {isProcessing && (
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
@@ -559,7 +557,7 @@ export function AiChatDialog({
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-xs font-medium text-muted-foreground">Quick Actions:</div>
                   <div className="text-xs text-muted-foreground px-2 py-1 bg-background/50 rounded">
-                    {isSelectedText ? "Text is selected" : "Editing whole page"}
+                    {hasTextSelected ? "Text is selected" : "Editing whole page"}
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-1">
