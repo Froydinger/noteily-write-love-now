@@ -426,14 +426,14 @@ export function AiChatDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogContent 
         className={`
           ${isMobile 
-            ? `fixed bottom-0 right-0 top-auto left-auto w-[90vw] max-w-sm h-[70vh] m-0 translate-x-0 translate-y-0 rounded-tl-lg rounded-tr-none rounded-bl-none rounded-br-none border-l border-t border-r-0 border-b-0 ${isMinimized ? 'h-16' : 'h-[70vh]'}` 
+            ? `fixed bottom-4 right-4 top-auto left-auto w-[90vw] max-w-sm ${isMinimized ? 'h-16' : 'h-[70vh]'} m-0 translate-x-0 translate-y-0 rounded-lg border shadow-lg` 
             : 'sm:max-w-2xl h-[80vh]'
           } 
-          flex flex-col p-0 transition-all duration-300 z-50
+          flex flex-col p-0 transition-all duration-300 z-50 bg-background [&>button]:hidden
         `}
       >
         <DialogHeader className="px-6 py-4 border-b">
@@ -581,7 +581,7 @@ export function AiChatDialog({
                 </div>
 
                 {/* Message Input */}
-                <div className="flex gap-2 px-6 py-3">
+                <div className="flex gap-2 mt-3">
                   <Input
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
