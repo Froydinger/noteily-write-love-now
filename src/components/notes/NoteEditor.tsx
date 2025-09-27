@@ -28,6 +28,8 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
   const [lastSavedContent, setLastSavedContent] = useState(note.content);
   const [lastNotifiedContent, setLastNotifiedContent] = useState(note.content);
   const [lastNotifiedTitle, setLastNotifiedTitle] = useState(note.title);
+  const [previousContent, setPreviousContent] = useState(note.content);
+  const [previousTitle, setPreviousTitle] = useState(note.title);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -494,6 +496,10 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
             onContentChange={(newHTML) => {
               console.log('TextEnhancementMenu onContentChange called with:', newHTML);
               if (contentRef.current) {
+                // Store previous state before making AI changes
+                setPreviousContent(contentRef.current.innerHTML);
+                setPreviousTitle(title);
+                
                 onContentBeforeChange?.();
                 
                 // Update content without cursor position issues
@@ -517,8 +523,11 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
             noteTitle={title}
             onTitleChange={(newTitle) => {
               console.log('TextEnhancementMenu onTitleChange called with:', newTitle);
+              setPreviousTitle(title); // Store previous title
               setTitle(newTitle);
             }}
+            previousContent={previousContent}
+            previousTitle={previousTitle}
           />
         )}
       </div>

@@ -33,6 +33,8 @@ interface TextEnhancementMenuProps {
   noteTitle: string;
   onTitleChange: (newTitle: string) => void;
   disabled?: boolean;
+  previousContent?: string;
+  previousTitle?: string;
 }
 
 export function TextEnhancementMenu({
@@ -41,7 +43,9 @@ export function TextEnhancementMenu({
   onContentChange,
   noteTitle,
   onTitleChange,
-  disabled = false
+  disabled = false,
+  previousContent,
+  previousTitle
 }: TextEnhancementMenuProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showRewriteDialog, setShowRewriteDialog] = useState(false);
@@ -220,10 +224,10 @@ export function TextEnhancementMenu({
   };
 
   const handleAIUndo = async () => {
-    if (!content.trim()) {
+    if (!previousContent || !previousContent.trim()) {
       toast({
         title: "Nothing to undo",
-        description: "No content to revert.",
+        description: "No previous version available to restore.",
         variant: "destructive",
       });
       return;
@@ -237,7 +241,7 @@ export function TextEnhancementMenu({
           content: content,
           title: noteTitle,
           action: 'rewrite',
-          instructions: 'Undo the last changes and return to the previous version of this content. Revert any recent modifications, corrections, or rewrites to restore the original text.'
+          instructions: `Revert this content back to exactly this previous version:\n\n${previousContent}\n\nRestore the content to match this previous version exactly. If the previous title was "${previousTitle || 'Untitled'}", restore that title too.`
         }
       });
       
@@ -248,8 +252,8 @@ export function TextEnhancementMenu({
       if (response.data && response.data.correctedContent) {
         onContentChange(response.data.correctedContent);
         
-        if (response.data.newTitle && response.data.newTitle !== noteTitle) {
-          onTitleChange(response.data.newTitle);
+        if (previousTitle && previousTitle !== noteTitle) {
+          onTitleChange(previousTitle);
         }
         
         toast({
