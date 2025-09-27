@@ -46,7 +46,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-5-2025-08-07', // Most powerful model with massive context
         messages: [
           {
             role: 'system',
@@ -57,8 +57,8 @@ serve(async (req) => {
             content: getUserPrompt(action, content, instructions, title)
           }
         ],
-        max_tokens: Math.min(4000, content.length * 3),
-        temperature: 1.0
+        max_completion_tokens: 'inf', // Unlimited output tokens
+        // Note: temperature is not supported by GPT-5, defaults to 1.0
       }),
     });
 
