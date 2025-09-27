@@ -17,37 +17,27 @@ export function useUndoRedo() {
   const undo = useCallback(() => {
     if (undoStack.length === 0) return null;
     
-    setUndoStack(prev => {
-      if (prev.length === 0) return prev;
-      
-      const newUndoStack = prev.slice(0, -1);
-      const previousState = prev[prev.length - 1];
-      
-      // Move the undone state to redo stack
-      setRedoStack(redoPrev => [...redoPrev, previousState]);
-      
-      return newUndoStack;
-    });
+    // Get the current state from the last item in undo stack
+    const previousState = undoStack[undoStack.length - 1];
     
-    return undoStack[undoStack.length - 1];
+    // Remove it from undo stack and add it to redo stack
+    setUndoStack(prev => prev.slice(0, -1));
+    setRedoStack(prev => [...prev, previousState]);
+    
+    return previousState;
   }, [undoStack]);
 
   const redo = useCallback(() => {
     if (redoStack.length === 0) return null;
     
-    setRedoStack(prev => {
-      if (prev.length === 0) return prev;
-      
-      const newRedoStack = prev.slice(0, -1);
-      const nextState = prev[prev.length - 1];
-      
-      // Move the redone state back to undo stack
-      setUndoStack(undoPrev => [...undoPrev, nextState]);
-      
-      return newRedoStack;
-    });
+    // Get the state to redo
+    const nextState = redoStack[redoStack.length - 1];
     
-    return redoStack[redoStack.length - 1];
+    // Remove it from redo stack and add it back to undo stack
+    setRedoStack(prev => prev.slice(0, -1));
+    setUndoStack(prev => [...prev, nextState]);
+    
+    return nextState;
   }, [redoStack]);
 
   const canUndo = undoStack.length > 0;

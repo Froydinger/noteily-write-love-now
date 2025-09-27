@@ -185,10 +185,7 @@ const NotePage = () => {
   const handleUndo = () => {
     if (!note) return;
     
-    // Save current state first
-    const currentState = { title: note.title, content: note.content };
-    saveState(currentState.title, currentState.content);
-    
+    // DON'T save current state to undo stack - just get the previous state
     const undoneState = undo();
     if (undoneState) {
       // Force update the note content directly
