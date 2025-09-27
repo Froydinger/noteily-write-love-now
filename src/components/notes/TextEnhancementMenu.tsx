@@ -187,10 +187,14 @@ export function TextEnhancementMenu({
       }
 
       if (response.data && response.data.correctedContent) {
-        console.log('Success! Updating content');
+        console.log('Success! Updating content with:', response.data.correctedContent);
+        console.log('Original content was:', content);
+        console.log('Calling onContentChange...');
         onContentChange(response.data.correctedContent);
+        console.log('onContentChange called');
         
         if (response.data.newTitle && response.data.newTitle !== noteTitle) {
+          console.log('Updating title to:', response.data.newTitle);
           onTitleChange(response.data.newTitle);
         }
         
