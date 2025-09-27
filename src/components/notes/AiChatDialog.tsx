@@ -184,8 +184,16 @@ export function AiChatDialog({
 
       if (data.correctedContent && data.correctedContent !== content) {
         await onAddHistoryEntry('spell', content, data.correctedContent, noteTitle, noteTitle);
-        const finalContent = injectChangedText(originalHTML.replace(/<[^>]*>/g, ''), content, data.correctedContent);
-        onContentChange(finalContent);
+        
+        // For spell check, preserve the original HTML structure but inject corrected text
+        if (isSelectedText && selectedTextRange) {
+          const beforeSelection = originalHTML.substring(0, selectedTextRange.start);
+          const afterSelection = originalHTML.substring(selectedTextRange.end);
+          const finalContent = beforeSelection + data.correctedContent + afterSelection;
+          onContentChange(finalContent);
+        } else {
+          onContentChange(data.correctedContent);
+        }
         
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
@@ -265,8 +273,16 @@ export function AiChatDialog({
 
       if (data.correctedContent && data.correctedContent !== content) {
         await onAddHistoryEntry('grammar', content, data.correctedContent, noteTitle, noteTitle);
-        const finalContent = injectChangedText(originalHTML.replace(/<[^>]*>/g, ''), content, data.correctedContent);
-        onContentChange(finalContent);
+        
+        // For grammar check, preserve the original HTML structure but inject corrected text
+        if (isSelectedText && selectedTextRange) {
+          const beforeSelection = originalHTML.substring(0, selectedTextRange.start);
+          const afterSelection = originalHTML.substring(selectedTextRange.end);
+          const finalContent = beforeSelection + data.correctedContent + afterSelection;
+          onContentChange(finalContent);
+        } else {
+          onContentChange(data.correctedContent);
+        }
         
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
@@ -366,8 +382,17 @@ export function AiChatDialog({
           instruction
         );
         
-        const finalContent = injectChangedText(originalHTML.replace(/<[^>]*>/g, ''), content, response.data.correctedContent);
-        onContentChange(finalContent);
+        // For rewrite operations, use the AI's HTML directly since it's properly formatted
+        if (isSelectedText && selectedTextRange) {
+          // For selected text, inject the HTML content properly
+          const beforeSelection = originalHTML.substring(0, selectedTextRange.start);
+          const afterSelection = originalHTML.substring(selectedTextRange.end);
+          const finalContent = beforeSelection + response.data.correctedContent + afterSelection;
+          onContentChange(finalContent);
+        } else {
+          // For full content rewrite, use the AI's HTML directly
+          onContentChange(response.data.correctedContent);
+        }
         
         if (response.data.newTitle && response.data.newTitle !== noteTitle) {
           onTitleChange(response.data.newTitle);
