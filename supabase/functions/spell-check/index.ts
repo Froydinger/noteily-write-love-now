@@ -193,6 +193,12 @@ HEADING FORMATTING EXAMPLE:
 <p></p>
 <p>This paragraph follows the heading with proper spacing.</p>
 
+LENGTH PRESERVATION RULES:
+- For TONE CHANGES (professional, casual, formal, friendly, positive, happier): Keep approximately the same length as original
+- For EXPAND requests: Make content longer with more details
+- For SHORTEN/CONCISE requests: Make content shorter
+- When in doubt about tone vs length change, prioritize maintaining similar length
+
 CONTENT RULES:
 - Follow user instructions precisely for the rewrite
 - When creating titles/headings, always add empty <p></p> tags above and below
@@ -214,6 +220,21 @@ function getUserPrompt(action: string, content: string, instructions?: string, t
   switch (action) {
     case 'rewrite':
       let prompt = `REWRITE INSTRUCTIONS: ${instructions || 'Improve and enhance the content'}\n\n`;
+      
+      // Check if this is a tone change (preserve length) vs expand/shorten (allow length change)
+      const isToneChange = instructions && (
+        instructions.includes('professional') || 
+        instructions.includes('casual') || 
+        instructions.includes('formal') || 
+        instructions.includes('friendly') ||
+        instructions.includes('upbeat') ||
+        instructions.includes('positive') ||
+        instructions.includes('happier')
+      ) && !instructions.includes('expand') && !instructions.includes('shorten') && !instructions.includes('concise');
+      
+      if (isToneChange) {
+        prompt += `LENGTH REQUIREMENT: Keep the text approximately the same length as the original. This is a tone change, not a length change.\n\n`;
+      }
       
       // Provide clear context about the document structure
       if (title) {
