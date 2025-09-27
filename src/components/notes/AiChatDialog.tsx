@@ -479,7 +479,7 @@ export function AiChatDialog({
             ? `fixed bottom-4 right-4 top-auto left-auto w-[90vw] max-w-sm ${isMinimized ? 'h-16' : 'h-[70vh]'} m-0 translate-x-0 translate-y-0 rounded-lg border shadow-lg` 
             : 'sm:max-w-2xl h-[80vh]'
           } 
-          flex flex-col p-0 transition-all duration-300 z-50 bg-background [&>button]:hidden
+          flex flex-col p-0 transition-all duration-300 z-50 bg-background
         `}
       >
         <DialogHeader className="px-6 py-4 border-b">
