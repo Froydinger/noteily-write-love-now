@@ -10,6 +10,7 @@ interface UserPreferences {
   theme: ThemeType;
   titleFont: TitleFontType;
   bodyFont: BodyFontType;
+  aiEnabled: boolean;
 }
 
 interface PreferencesContextType {
@@ -17,6 +18,7 @@ interface PreferencesContextType {
   updateTheme: (theme: ThemeType) => Promise<void>;
   updateTitleFont: (font: TitleFontType) => Promise<void>;
   updateBodyFont: (font: BodyFontType) => Promise<void>;
+  updateAiEnabled: (enabled: boolean) => Promise<void>;
   refreshPreferences: () => Promise<void>;
   loading: boolean;
 }
@@ -33,7 +35,7 @@ export const usePreferences = () => {
 
 export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const [preferences, setPreferences] = useState<UserPreferences>({ theme: 'navy', titleFont: 'serif', bodyFont: 'sans' });
+  const [preferences, setPreferences] = useState<UserPreferences>({ theme: 'navy', titleFont: 'serif', bodyFont: 'sans', aiEnabled: true });
   const [loading, setLoading] = useState(false);
 
   // Load user preferences - prioritize localStorage, sync with Supabase
@@ -42,7 +44,8 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const localTheme = (localStorage.getItem('theme') as ThemeType) || 'navy';
     const localTitleFont = (localStorage.getItem('titleFont') as TitleFontType) || 'serif';
     const localBodyFont = (localStorage.getItem('bodyFont') as BodyFontType) || 'sans';
-    setPreferences({ theme: localTheme, titleFont: localTitleFont, bodyFont: localBodyFont });
+    const localAiEnabled = localStorage.getItem('aiEnabled') !== 'false'; // Default to true
+    setPreferences({ theme: localTheme, titleFont: localTitleFont, bodyFont: localBodyFont, aiEnabled: localAiEnabled });
     
     // Apply theme immediately if not already applied
     const html = document.documentElement;
@@ -61,7 +64,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
       // Try to sync with Supabase for authenticated users
       const { data, error } = await supabase
         .from('user_preferences')
-        .select('theme, title_font, body_font')
+        .select('theme, title_font, body_font, ai_enabled')
         .eq('user_id', user.id)
         .single();
 
@@ -72,16 +75,18 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
         // Check if Supabase data differs from local
         const supabaseTitleFont = (data.title_font as TitleFontType) || 'serif';
         const supabaseBodyFont = (data.body_font as BodyFontType) || 'sans';
-        if (data.theme !== localTheme || supabaseTitleFont !== localTitleFont || supabaseBodyFont !== localBodyFont) {
+        const supabaseAiEnabled = data.ai_enabled !== false; // Default to true
+        if (data.theme !== localTheme || supabaseTitleFont !== localTitleFont || supabaseBodyFont !== localBodyFont || supabaseAiEnabled !== localAiEnabled) {
           // Supabase has different preferences - use them and update localStorage
-          setPreferences({ theme: data.theme as ThemeType, titleFont: supabaseTitleFont, bodyFont: supabaseBodyFont });
+          setPreferences({ theme: data.theme as ThemeType, titleFont: supabaseTitleFont, bodyFont: supabaseBodyFont, aiEnabled: supabaseAiEnabled });
           applyTheme(data.theme as ThemeType);
           applyTitleFont(supabaseTitleFont);
           applyBodyFont(supabaseBodyFont);
+          applyAiEnabled(supabaseAiEnabled);
         }
       } else {
         // No preferences found in Supabase - sync local to Supabase
-        await createDefaultPreferences(localTheme, localTitleFont, localBodyFont);
+        await createDefaultPreferences(localTheme, localTitleFont, localBodyFont, localAiEnabled);
       }
     } catch (error) {
       console.error('Error syncing preferences:', error);
