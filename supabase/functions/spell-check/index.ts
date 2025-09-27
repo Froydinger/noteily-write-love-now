@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { content, action = 'spell', instructions, title } = await req.json();
+    const { content, action = 'spell', instructions, title, originalHTML, isSelectedText = false } = await req.json();
     
     if (!content || typeof content !== 'string') {
       return new Response(
@@ -54,7 +54,7 @@ serve(async (req) => {
           },
           {
             role: 'user',
-            content: getUserPrompt(action, content, instructions, title)
+            content: getUserPrompt(action, content, instructions, title, originalHTML, isSelectedText)
           }
         ],
         max_tokens: 1500, // Fast responses
@@ -155,34 +155,88 @@ CRITICAL RULES:
 - Return ONLY the corrected text, no explanations`;
 
     case 'rewrite':
-      return `You are a professional writer and editor. Your task is to rewrite the provided content according to the user's specific instructions while maintaining the original structure and format.
+      return `You are a professional writer and editor. Your task is to rewrite the provided content according to the user's specific instructions while maintaining document structure and formatting consistency.
+
+CRITICAL FORMATTING RULES:
+- Preserve existing HTML structure and formatting patterns from the document
+- Maintain consistent heading hierarchy (H1, H2, H3, etc.) that matches the document style
+- Respect line breaks as semantic blocks - they separate ideas and should be preserved
+- Keep consistent formatting with the rest of the document
+- Use the same title/heading style as found in the original document
+- For selected text: ensure the rewritten text flows naturally with surrounding content
 
 INSTRUCTIONS:
 - Follow the user's rewriting instructions precisely
-- Maintain the original HTML formatting and structure unless asked to change it
 - If there's a title, you may update it to match the new content
 - If you update the title, format your response as:
   TITLE: [new title]
   [rewritten content]
 - Otherwise, just return the rewritten content
-- Be creative but stay true to the original intent unless instructed otherwise`;
+- Be creative but maintain document consistency and flow`;
 
     default:
       return `You are a text processor. Process the provided text according to the specified action.`;
   }
 }
 
-function getUserPrompt(action: string, content: string, instructions?: string, title?: string): string {
+function getUserPrompt(action: string, content: string, instructions?: string, title?: string, originalHTML?: string, isSelectedText?: boolean): string {
   switch (action) {
     case 'rewrite':
       let prompt = `Rewrite the following content according to these instructions: "${instructions}"\n\n`;
+      
       if (title) {
-        prompt += `Current title: ${title}\n\n`;
+        prompt += `Current document title: ${title}\n\n`;
       }
-      prompt += `${content}`;
+      
+      if (originalHTML && isSelectedText) {
+        // Extract formatting context from the original HTML
+        const htmlStructure = extractFormatContext(originalHTML);
+        prompt += `DOCUMENT CONTEXT:\n${htmlStructure}\n\n`;
+        prompt += `SELECTED TEXT TO REWRITE:\n${content}\n\n`;
+        prompt += `Note: This is selected text from within a larger document. Ensure the rewritten text maintains consistency with the document's existing formatting and style patterns.`;
+      } else if (originalHTML) {
+        const htmlStructure = extractFormatContext(originalHTML);
+        prompt += `DOCUMENT FORMATTING CONTEXT:\n${htmlStructure}\n\n`;
+        prompt += `CONTENT TO REWRITE:\n${content}`;
+      } else {
+        prompt += `${content}`;
+      }
+      
       return prompt;
     
     default:
       return content;
   }
+}
+
+function extractFormatContext(html: string): string {
+  if (!html) return "No formatting context available.";
+  
+  // Extract heading structure and formatting patterns
+  const headings = html.match(/<h[1-6][^>]*>.*?<\/h[1-6]>/gi) || [];
+  const hasLists = html.includes('<ul>') || html.includes('<ol>');
+  const hasBlockquotes = html.includes('<blockquote>');
+  const hasBold = html.includes('<strong>') || html.includes('<b>');
+  const hasItalic = html.includes('<em>') || html.includes('<i>');
+  
+  let context = "Document formatting patterns:\n";
+  
+  if (headings.length > 0) {
+    context += `- Uses headings: ${headings.slice(0, 3).map(h => h.replace(/<[^>]*>/g, '')).join(', ')}${headings.length > 3 ? '...' : ''}\n`;
+  }
+  
+  if (hasLists) context += "- Contains lists (maintain list formatting)\n";
+  if (hasBlockquotes) context += "- Uses blockquotes\n";
+  if (hasBold) context += "- Uses bold text for emphasis\n";
+  if (hasItalic) context += "- Uses italic text for emphasis\n";
+  
+  // Check for line break patterns
+  const lineBreaks = (html.match(/<br\s*\/?>/gi) || []).length;
+  if (lineBreaks > 0) {
+    context += `- Uses line breaks as semantic separators (${lineBreaks} breaks found)\n`;
+  }
+  
+  context += "- Maintain consistent formatting with these patterns";
+  
+  return context;
 }

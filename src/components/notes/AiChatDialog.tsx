@@ -174,7 +174,9 @@ export function AiChatDialog({
       const { data, error } = await supabase.functions.invoke('spell-check', {
         body: { 
           content: content,
-          action: 'spell'
+          action: 'spell',
+          originalHTML: originalHTML,
+          isSelectedText: isSelectedText
         }
       });
 
@@ -253,7 +255,9 @@ export function AiChatDialog({
       const { data, error } = await supabase.functions.invoke('spell-check', {
         body: { 
           content: content,
-          action: 'grammar'
+          action: 'grammar',
+          originalHTML: originalHTML,
+          isSelectedText: isSelectedText
         }
       });
 
@@ -342,7 +346,9 @@ export function AiChatDialog({
           content: content,
           title: noteTitle,
           action: 'rewrite',
-          instructions: instruction
+          instructions: instruction,
+          originalHTML: originalHTML,
+          isSelectedText: isSelectedText
         }
       });
 
