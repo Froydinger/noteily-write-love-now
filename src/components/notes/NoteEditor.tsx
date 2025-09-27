@@ -122,7 +122,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     
-    const handleContentChange = () => {
+    const handleContentChange = (e?: Event) => {
       if (contentRef.current) {
         const content = contentRef.current.innerHTML;
         
@@ -137,15 +137,24 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
         }, 5 * 60 * 1000); // 5 minutes
         
         clearTimeout(timeout);
+        
+        // Check if this is an AI update (has special data attribute)
+        const isAIUpdate = e && (e as any).isAIUpdate;
+        const delay = isAIUpdate ? 0 : 500; // Immediate save for AI updates, debounced for user typing
+        
         timeout = setTimeout(() => {
           // Store undo state before making changes
           onContentBeforeChange?.();
           
           // Sanitize content before saving to database
           const sanitizedContent = sanitizeContent(content);
-          updateNote(note.id, { content: sanitizedContent }, true); // Silent auto-save
-          setLastSavedContent(sanitizedContent);
-        }, 500);
+          
+          // Force save for AI updates even if content seems unchanged
+          if (isAIUpdate || sanitizedContent !== lastSavedContent) {
+            updateNote(note.id, { content: sanitizedContent }, true); // Silent auto-save
+            setLastSavedContent(sanitizedContent);
+          }
+        }, delay);
       }
     };
 
@@ -418,31 +427,14 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
               if (contentRef.current) {
                 onContentBeforeChange?.();
                 
-                // Save cursor position
-                const selection = window.getSelection();
-                let range = null;
-                if (selection && selection.rangeCount > 0) {
-                  range = selection.getRangeAt(0).cloneRange();
-                }
-                
+                // Update content without cursor position issues
                 contentRef.current.innerHTML = newHTML;
                 
-                // Restore cursor position
-                if (range) {
-                  try {
-                    selection?.removeAllRanges();
-                    selection?.addRange(range);
-                  } catch (e) {
-                    // If restoring fails, place cursor at end
-                    const newRange = document.createRange();
-                    newRange.selectNodeContents(contentRef.current);
-                    newRange.collapse(false);
-                    selection?.removeAllRanges();
-                    selection?.addRange(newRange);
-                  }
-                }
+                // Create a custom event to mark this as an AI update for immediate saving
+                const customEvent = new Event('input', { bubbles: true }) as any;
+                customEvent.isAIUpdate = true;
+                contentRef.current.dispatchEvent(customEvent);
                 
-                contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
                 onSpellCheckApplied?.();
                 console.log('Content updated in editor');
               }
