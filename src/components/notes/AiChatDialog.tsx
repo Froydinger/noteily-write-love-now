@@ -62,12 +62,25 @@ export function AiChatDialog({
   const [autoHide, setAutoHide] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [selectedTextRange, setSelectedTextRange] = useState<{start: number, end: number} | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-
+  
   // Check if working with selected text
   const isSelectedText = content.length < originalHTML.length;
+
+  // Function to inject changed text back into the original content
+  const injectChangedText = (originalContent: string, selectedText: string, newText: string): string => {
+    if (!isSelectedText || !selectedTextRange) {
+      return newText; // If no selection, replace all content
+    }
+
+    // Find the selected text in the original content and replace it
+    const beforeSelection = originalContent.substring(0, selectedTextRange.start);
+    const afterSelection = originalContent.substring(selectedTextRange.end);
+    return beforeSelection + newText + afterSelection;
+  };
 
   // Initialize chat with welcome message and reset states when opening
   useEffect(() => {
@@ -76,6 +89,21 @@ export function AiChatDialog({
       setIsMinimized(false); // Always start expanded when opening
       setHasUserInteracted(false); // Reset interaction flag
       setAutoHide(false); // Reset auto-hide on new session
+      
+      // Calculate text selection range if working with selected text
+      if (isSelectedText) {
+        const fullText = originalHTML.replace(/<[^>]*>/g, ''); // Strip HTML for text comparison
+        const selectedIndex = fullText.indexOf(content);
+        if (selectedIndex !== -1) {
+          setSelectedTextRange({
+            start: selectedIndex,
+            end: selectedIndex + content.length
+          });
+        }
+      } else {
+        setSelectedTextRange(null);
+      }
+      
       if (chatMessages.length === 0) {
         const welcomeMessage = isSelectedText 
           ? 'Hi! I can help you improve your selected text. Use the quick actions below or tell me what you\'d like me to do.'
@@ -88,7 +116,7 @@ export function AiChatDialog({
         }]);
       }
     }
-  }, [open, isSelectedText]);
+  }, [open, isSelectedText, content, originalHTML]);
 
   // Auto-hide functionality - DISABLED to prevent unwanted minimizing
   useEffect(() => {
@@ -159,7 +187,8 @@ export function AiChatDialog({
 
       if (data.correctedContent && data.correctedContent !== content) {
         await onAddHistoryEntry('spell', content, data.correctedContent, noteTitle, noteTitle);
-        onContentChange(data.correctedContent);
+        const finalContent = injectChangedText(originalHTML.replace(/<[^>]*>/g, ''), content, data.correctedContent);
+        onContentChange(finalContent);
         
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
@@ -238,7 +267,8 @@ export function AiChatDialog({
 
       if (data.correctedContent && data.correctedContent !== content) {
         await onAddHistoryEntry('grammar', content, data.correctedContent, noteTitle, noteTitle);
-        onContentChange(data.correctedContent);
+        const finalContent = injectChangedText(originalHTML.replace(/<[^>]*>/g, ''), content, data.correctedContent);
+        onContentChange(finalContent);
         
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
@@ -336,7 +366,8 @@ export function AiChatDialog({
           instruction
         );
         
-        onContentChange(response.data.correctedContent);
+        const finalContent = injectChangedText(originalHTML.replace(/<[^>]*>/g, ''), content, response.data.correctedContent);
+        onContentChange(finalContent);
         
         if (response.data.newTitle && response.data.newTitle !== noteTitle) {
           onTitleChange(response.data.newTitle);
@@ -388,37 +419,6 @@ export function AiChatDialog({
     await handleRewrite(instruction);
   };
 
-  const handleUndo = async () => {
-    if (history.length === 0) {
-      toast({
-        title: "Nothing to undo",
-        description: "No previous AI changes available to restore.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const lastEntry = history[0];
-    const revertData = await onRevertToVersion(lastEntry);
-    
-    onContentChange(revertData.content);
-    if (revertData.title && revertData.title !== noteTitle) {
-      onTitleChange(revertData.title);
-    }
-    
-    const undoMessage: ChatMessage = {
-      id: Date.now().toString(),
-      type: 'system',
-      content: 'Reverted to previous version.',
-      timestamp: new Date()
-    };
-    setChatMessages(prev => [...prev, undoMessage]);
-    
-    toast({
-      title: "Changes undone",
-      description: "Content has been reverted to previous version.",
-    });
-  };
 
   const handleRevertToHistoryVersion = async (entry: AiHistoryEntry) => {
     const revertData = await onRevertToVersion(entry);
@@ -489,26 +489,15 @@ export function AiChatDialog({
                 </Button>
               )}
               {!isMinimized && (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleUndo}
-                    disabled={history.length === 0 || isProcessing}
-                    title="Undo last AI change"
-                  >
-                    <Undo2 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowHistory(!showHistory)}
-                    disabled={isProcessing}
-                    title="Toggle history view"
-                  >
-                    <History className="h-4 w-4" />
-                  </Button>
-                </>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowHistory(!showHistory)}
+                  disabled={isProcessing}
+                  title="Toggle history view"
+                >
+                  <History className="h-4 w-4" />
+                </Button>
               )}
               <Button
                 variant="ghost"
