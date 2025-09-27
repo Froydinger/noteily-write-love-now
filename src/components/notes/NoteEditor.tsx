@@ -84,7 +84,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
         contentRef.current.innerHTML = sanitizedContent;
       }
     }
-  }, [note.id]);
+  }, [note.id, note.title, note.content]); // Added note.title and note.content as dependencies
 
 
   // Send notifications after 5 minutes of inactivity
