@@ -57,7 +57,7 @@ serve(async (req) => {
             content: getUserPrompt(action, content, instructions, title)
           }
         ],
-        max_completion_tokens: 4096, // Balanced output limit - fast but substantial
+        max_completion_tokens: 2048, // Faster responses
         // Note: temperature is not supported by GPT-5, defaults to 1.0
       }),
     });

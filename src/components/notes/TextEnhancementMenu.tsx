@@ -361,7 +361,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                Professional
+                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Professional'}
               </Button>
               <Button
                 variant="outline"
@@ -370,7 +370,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                Casual
+                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Casual'}
               </Button>
               <Button
                 variant="outline"
@@ -379,7 +379,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                Expand
+                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Expand'}
               </Button>
               <Button
                 variant="outline"
@@ -388,7 +388,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                Shorten
+                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Shorten'}
               </Button>
               <Button
                 variant="outline"
@@ -397,7 +397,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                Happier
+                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Happier'}
               </Button>
               <Button
                 variant="outline"
@@ -406,7 +406,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                Formal
+                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Formal'}
               </Button>
             </div>
             
@@ -425,11 +425,18 @@ export function TextEnhancementMenu({
               <Label htmlFor="instructions">Custom Rewrite Instructions</Label>
               <Input
                 id="instructions"
-                placeholder="e.g., add more examples, change tone, fix structure..."
+                placeholder={isProcessing ? "AI is processing..." : "e.g., add more examples, change tone, fix structure..."}
                 value={rewriteInstructions}
                 onChange={(e) => setRewriteInstructions(e.target.value)}
                 className="mt-1"
+                disabled={isProcessing}
               />
+              {isProcessing && (
+                <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+                  Processing with AI...
+                </div>
+              )}
             </div>
             <div className="flex justify-end gap-2">
               <Button
@@ -445,8 +452,16 @@ export function TextEnhancementMenu({
               <Button
                 onClick={() => handleRewrite()}
                 disabled={isProcessing || !rewriteInstructions.trim()}
+                className="min-w-[100px]"
               >
-                {isProcessing ? 'Rewriting...' : 'Rewrite'}
+                {isProcessing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-foreground border-t-transparent mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  'Rewrite'
+                )}
               </Button>
             </div>
           </div>
