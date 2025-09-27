@@ -185,29 +185,31 @@ export function AppSidebar() {
           <SidebarGroup>
             <SidebarGroupContent>
               {/* Horizontal navigation buttons */}
-              <div className="flex gap-1 px-4 mb-4">
-                <Button
-                  variant={isActive('/') ? 'default' : 'outline'}
-                  size="sm"
-                  asChild
-                  className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm"
-                >
-                  <a href="/" className="flex items-center justify-center gap-2">
-                    <BookOpen className="h-4 w-4" />
-                    <span>My Notes</span>
-                  </a>
-                </Button>
-                <Button
-                  variant={isActive('/prompts') ? 'default' : 'outline'}
-                  size="sm"
-                  asChild
-                  className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm"
-                >
-                  <a href="/prompts" className="flex items-center justify-center gap-2">
-                    <Pencil className="h-4 w-4" />
-                    <span>Prompts</span>
-                  </a>
-                </Button>
+              <div className="flex justify-center px-4 mb-4">
+                <div className="flex gap-1 w-full max-w-[220px]">
+                  <Button
+                    variant={isActive('/') ? 'default' : 'outline'}
+                    size="sm"
+                    asChild
+                    className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm min-w-0"
+                  >
+                    <a href="/" className="flex items-center justify-center gap-1.5 px-2">
+                      <BookOpen className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate">My Notes</span>
+                    </a>
+                  </Button>
+                  <Button
+                    variant={isActive('/prompts') ? 'default' : 'outline'}
+                    size="sm"
+                    asChild
+                    className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm min-w-0"
+                  >
+                    <a href="/prompts" className="flex items-center justify-center gap-1.5 px-2">
+                      <Pencil className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate">Prompts</span>
+                    </a>
+                  </Button>
+                </div>
               </div>
             </SidebarGroupContent>
           </SidebarGroup>

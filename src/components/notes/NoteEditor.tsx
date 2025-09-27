@@ -14,9 +14,10 @@ interface NoteEditorProps {
   note: Note;
   onBlockTypeChange?: (type: BlockType) => void;
   onContentBeforeChange?: () => void;
+  onSpellCheckApplied?: () => void;
 }
 
-export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange }: NoteEditorProps) {
+export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange, onSpellCheckApplied }: NoteEditorProps) {
   const titleFont = useTitleFont();
   const bodyFont = useBodyFont();
   const { updateNote } = useNotes();
@@ -406,17 +407,20 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
         />
         
         {!isReadOnly && (
-          <SpellCheckButton 
-            content={contentRef.current?.textContent || ''}
-            originalHTML={contentRef.current?.innerHTML || ''}
-            onContentChange={(newHTML) => {
-              if (contentRef.current) {
-                onContentBeforeChange?.();
-                contentRef.current.innerHTML = newHTML;
-                contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-              }
-            }}
-          />
+          <div className="fixed bottom-4 right-4 z-50">
+            <SpellCheckButton 
+              content={contentRef.current?.textContent || ''}
+              originalHTML={contentRef.current?.innerHTML || ''}
+              onContentChange={(newHTML) => {
+                if (contentRef.current) {
+                  onContentBeforeChange?.();
+                  contentRef.current.innerHTML = newHTML;
+                  contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+                  onSpellCheckApplied?.();
+                }
+              }}
+            />
+          </div>
         )}
       </div>
     </div>

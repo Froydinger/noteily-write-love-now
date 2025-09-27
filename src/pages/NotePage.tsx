@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus, Users, Eye, Edit, Type, Undo2 } from 'lucide-react';
+import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus, Users, Eye, Edit, Type, Undo2, Redo2 } from 'lucide-react';
 import { BlockHandle, BlockType } from '@/components/notes/BlockHandle';
 import { Badge } from '@/components/ui/badge';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
@@ -27,6 +27,7 @@ import { ShareManager } from '@/components/notes/ShareManager';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotifications } from '@/hooks/useNotifications';
 import { handleNoteKeyboard } from '@/lib/viewport';
+import { useUndoRedo } from '@/hooks/useUndoRedo';
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,7 +42,7 @@ const NotePage = () => {
   const [entered, setEntered] = useState(false);
   const [showFormatHandle, setShowFormatHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
-  const [undoContent, setUndoContent] = useState<{title: string, content: string} | null>(null);
+  const { saveState, undo, redo, canUndo, canRedo, clearHistory } = useUndoRedo();
   const headerRef = useRef<HTMLElement>(null);
   
   const note = getNote(id || '');
@@ -177,15 +178,11 @@ const NotePage = () => {
   };
 
   const handleUndo = () => {
-    if (undoContent && note) {
-      // Store current state before undo
-      const currentState = { title: note.title, content: note.content };
-      
-      // Apply undo
-      updateNote(note.id, { title: undoContent.title, content: undoContent.content }, false);
-      
-      // Set new undo state to current state
-      setUndoContent(currentState);
+    if (!note) return;
+    
+    const undoneState = undo();
+    if (undoneState) {
+      updateNote(note.id, { title: undoneState.title, content: undoneState.content }, false);
       
       toast({
         title: "Undone",
@@ -194,9 +191,23 @@ const NotePage = () => {
     }
   };
 
+  const handleRedo = () => {
+    if (!note) return;
+    
+    const redoneState = redo();
+    if (redoneState) {
+      updateNote(note.id, { title: redoneState.title, content: redoneState.content }, false);
+      
+      toast({
+        title: "Redone",
+        description: "Note restored to next state.",
+      });
+    }
+  };
+
   const storeUndoState = () => {
     if (note) {
-      setUndoContent({ title: note.title, content: note.content });
+      saveState(note.title, note.content);
     }
   };
 
@@ -265,17 +276,30 @@ const NotePage = () => {
           </div>
           
           <div className="flex items-center gap-1">
-            {/* Undo button - only show if not read-only and has undo state */}
-            {(!note.isSharedWithUser || note.userPermission !== 'read') && undoContent && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleUndo}
-                className="btn-accessible p-2"
-                title="Undo last change"
-              >
-                <Undo2 className="h-4 w-4" />
-              </Button>
+            {/* Undo/Redo buttons - only show if not read-only */}
+            {(!note.isSharedWithUser || note.userPermission !== 'read') && (
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleUndo}
+                  disabled={!canUndo}
+                  className={`btn-accessible p-2 ${!canUndo ? 'opacity-30' : ''}`}
+                  title="Undo AI changes"
+                >
+                  <Undo2 className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleRedo}
+                  disabled={!canRedo}
+                  className={`btn-accessible p-2 ${!canRedo ? 'opacity-30' : ''}`}
+                  title="Redo AI changes"
+                >
+                  <Redo2 className="h-4 w-4" />
+                </Button>
+              </>
             )}
             
             {/* Formatting button - only show if not read-only */}
@@ -346,6 +370,7 @@ const NotePage = () => {
           note={note} 
           onBlockTypeChange={setCurrentBlockType}
           onContentBeforeChange={storeUndoState}
+          onSpellCheckApplied={storeUndoState}
         />
       </div>
       
