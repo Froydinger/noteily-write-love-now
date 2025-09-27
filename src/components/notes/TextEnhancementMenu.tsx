@@ -166,9 +166,10 @@ export function TextEnhancementMenu({
     }
 
     setIsProcessing(true);
-    console.log('Starting rewrite with:', { content, noteTitle, instructions: rewriteInstructions });
+    
     try {
-      console.log('Calling spell-check function...');
+      console.log('About to call edge function');
+      
       const response = await supabase.functions.invoke('spell-check', {
         body: { 
           content: content,
@@ -178,24 +179,19 @@ export function TextEnhancementMenu({
         }
       });
 
-      console.log('Raw response from spell-check:', response);
-      const { data, error } = response;
-
-      console.log('Response data:', data);
-
-      if (error) {
-        console.error('Supabase function error:', error);
-        throw error;
+      console.log('Got response:', response);
+      
+      if (response.error) {
+        console.error('Function error:', response.error);
+        throw new Error(response.error.message || 'Function failed');
       }
 
-      if (data && data.correctedContent) {
-        console.log('Updating content with:', data.correctedContent);
-        onContentChange(data.correctedContent);
+      if (response.data && response.data.correctedContent) {
+        console.log('Success! Updating content');
+        onContentChange(response.data.correctedContent);
         
-        // Update title if provided
-        if (data.newTitle && data.newTitle !== noteTitle) {
-          console.log('Updating title with:', data.newTitle);
-          onTitleChange(data.newTitle);
+        if (response.data.newTitle && response.data.newTitle !== noteTitle) {
+          onTitleChange(response.data.newTitle);
         }
         
         toast({
@@ -206,18 +202,14 @@ export function TextEnhancementMenu({
         setShowRewriteDialog(false);
         setRewriteInstructions('');
       } else {
-        console.error('No correctedContent in response:', data);
-        toast({
-          title: "Rewrite failed",
-          description: "No rewritten content received.",
-          variant: "destructive",
-        });
+        console.error('No content returned:', response.data);
+        throw new Error('No rewritten content received');
       }
     } catch (error) {
-      console.error('Rewrite failed:', error);
+      console.error('Rewrite error:', error);
       toast({
-        title: "Rewrite failed",
-        description: "There was an error rewriting your text.",
+        title: "Rewrite failed", 
+        description: error.message || "There was an error rewriting your text.",
         variant: "destructive",
       });
     } finally {
