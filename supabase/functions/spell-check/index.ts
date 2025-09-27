@@ -58,8 +58,7 @@ serve(async (req) => {
           }
         ],
         max_completion_tokens: Math.min(4000, content.length * 3),
-        temperature: 1.0,
-        reasoning: "minimal"
+        temperature: 1.0
       }),
     });
 
