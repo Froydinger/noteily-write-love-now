@@ -41,6 +41,7 @@ interface AiChatDialogProps {
     newTitle?: string,
     instruction?: string
   ) => Promise<void>;
+  hasTextSelected?: boolean;
 }
 
 export function AiChatDialog({
@@ -53,7 +54,8 @@ export function AiChatDialog({
   onTitleChange,
   history,
   onRevertToVersion,
-  onAddHistoryEntry
+  onAddHistoryEntry,
+  hasTextSelected = false
 }: AiChatDialogProps) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -85,7 +87,10 @@ export function AiChatDialog({
   useEffect(() => {
     if (open) {
       console.log('Dialog opening - resetting states');
-      setIsMinimized(false); // Always start expanded when opening
+      // Don't auto-minimize when opening - let user control this
+      if (!isMinimized) {
+        setIsMinimized(false); // Keep expanded when opening unless already minimized
+      }
       setHasUserInteracted(false); // Reset interaction flag
       
       // Calculate text selection range if working with selected text
@@ -475,6 +480,12 @@ export function AiChatDialog({
                   size="sm"
                   onClick={() => setIsMinimized(!isMinimized)}
                   title={isMinimized ? "Expand chat" : "Minimize chat"}
+                  className={`transition-all duration-300 ${
+                    hasTextSelected ? 'ring-2 ring-orange-400 ring-offset-1 shadow-orange-400/50' : ''
+                  }`}
+                  style={{
+                    animation: hasTextSelected ? 'glow 2s ease-in-out infinite alternate' : 'none'
+                  }}
                 >
                   {isMinimized ? "↑" : "↓"}
                 </Button>

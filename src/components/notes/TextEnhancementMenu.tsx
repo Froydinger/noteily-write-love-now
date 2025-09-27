@@ -256,9 +256,7 @@ export function TextEnhancementMenu({
             variant="ghost"
             size="sm"
             disabled={disabled || isProcessing}
-            className={`fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105 ${
-              hasTextSelected ? 'ring-2 ring-yellow-400 ring-offset-2 shadow-yellow-400/50 animate-pulse' : ''
-            }`}
+            className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105"
             title={hasTextSelected ? "AI Enhancement Menu - Text Selected" : "AI Enhancement Menu"}
           >
             {isProcessing ? (
@@ -301,6 +299,7 @@ export function TextEnhancementMenu({
         history={history}
         onRevertToVersion={revertToVersion}
         onAddHistoryEntry={addHistoryEntry}
+        hasTextSelected={hasTextSelected}
       />
 
       {/* Bottom left loading indicator */}

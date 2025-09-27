@@ -718,3 +718,13 @@ html[data-title-font="mono"] .note-editor h6 {
     right: max(1.5rem, env(safe-area-inset-right)) !important;
   }
 }
+
+/* Smooth glow animation for accessibility */
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(251, 146, 60, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(251, 146, 60, 0.6), 0 0 30px rgba(251, 146, 60, 0.3);
+  }
+}
