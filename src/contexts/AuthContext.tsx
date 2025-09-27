@@ -70,43 +70,84 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Clean the identifier input
       const cleanIdentifier = identifier.trim();
       
-      // First check if it's a Google user
-      const isGoogle = await checkIsGoogleUser(cleanIdentifier);
-      if (isGoogle) {
-        toast({
-          title: "Sign in failed",
-          description: "This account uses Google sign-in. Please use the 'Continue with Google' button instead.",
-          variant: "destructive",
+      // Check if identifier is an email or username
+      const isEmail = cleanIdentifier.includes('@');
+      
+      if (isEmail) {
+        // If it's an email, try signing in directly
+        const { error } = await supabase.auth.signInWithPassword({
+          email: cleanIdentifier,
+          password,
         });
-        return { error: { message: 'This account uses Google sign-in. Please use the "Continue with Google" button instead.' } };
-      }
 
-      // Get user data to find their email
-      const userData = await getUserByIdentifier(cleanIdentifier);
-      if (!userData) {
-        toast({
-          title: "Sign in failed",
-          description: "No account found with this username or email.",
-          variant: "destructive",
+        if (error) {
+          toast({
+            title: "Sign in failed",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+
+        return { error };
+      } else {
+        // If it's a username, look up the email in user_preferences
+        const { data: userPrefs, error: lookupError } = await supabase
+          .from('user_preferences')
+          .select('email, user_id')
+          .eq('username', cleanIdentifier.toLowerCase())
+          .single();
+
+        if (lookupError || !userPrefs) {
+          toast({
+            title: "Sign in failed",
+            description: "No account found with this username or email.",
+            variant: "destructive",
+          });
+          return { error: { message: 'No account found with this username or email.' } };
+        }
+
+        // If user has no email in preferences, check if they might need to use their actual email
+        if (!userPrefs.email) {
+          // Try to find the user's auth record to get their email
+          try {
+            // First try with the temp email format
+            const tempEmail = `${cleanIdentifier.toLowerCase()}@temp.noteily.app`;
+            const { error: tempError } = await supabase.auth.signInWithPassword({
+              email: tempEmail,
+              password,
+            });
+            
+            if (!tempError) {
+              return { error: null };
+            }
+          } catch (e) {
+            // Continue to error handling below
+          }
+          
+          toast({
+            title: "Sign in failed",
+            description: "Please contact support to update your account email.",
+            variant: "destructive",
+          });
+          return { error: { message: 'Account email not found.' } };
+        }
+
+        // Sign in with the email from user preferences
+        const { error } = await supabase.auth.signInWithPassword({
+          email: userPrefs.email,
+          password,
         });
-        return { error: { message: 'No account found with this username or email.' } };
+
+        if (error) {
+          toast({
+            title: "Sign in failed",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+
+        return { error };
       }
-
-      // Sign in with email (Supabase only accepts email for sign in)
-      const { error } = await supabase.auth.signInWithPassword({
-        email: userData.email,
-        password,
-      });
-
-      if (error) {
-        toast({
-          title: "Sign in failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-
-      return { error };
     } catch (error: any) {
       toast({
         title: "Sign in failed",
