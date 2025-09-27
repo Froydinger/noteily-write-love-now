@@ -458,7 +458,7 @@ export function AiChatDialog({
             <DialogTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5" />
               {!isMinimized && (
-                <span>AI Writing Assistant</span>
+                <span>NoteBot</span>
               )}
               {isProcessing && (
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
@@ -552,7 +552,14 @@ export function AiChatDialog({
               <div className="px-6 py-3 border-t bg-muted/30">
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-xs font-medium text-muted-foreground">Quick Actions:</div>
-                  <div className="text-xs text-muted-foreground px-2 py-1 bg-background/50 rounded">
+                  <div 
+                    className={`text-xs text-muted-foreground px-2 py-1 bg-background/50 rounded transition-all duration-300 ${
+                      hasTextSelected ? 'ring-1 ring-orange-400 shadow-orange-400/30' : ''
+                    }`}
+                    style={{
+                      animation: hasTextSelected ? 'glow 2s ease-in-out infinite alternate' : 'none'
+                    }}
+                  >
                     {hasTextSelected ? "Text is selected" : "Editing whole page"}
                   </div>
                 </div>
