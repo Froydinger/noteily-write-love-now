@@ -504,6 +504,12 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
                 customEvent.isAIUpdate = true;
                 contentRef.current.dispatchEvent(customEvent);
                 
+                // Trigger undo state update by calling onContentBeforeChange again
+                // This ensures the undo button becomes active after AI changes
+                setTimeout(() => {
+                  onContentBeforeChange?.();
+                }, 100);
+                
                 onSpellCheckApplied?.();
                 console.log('Content updated in editor');
               }

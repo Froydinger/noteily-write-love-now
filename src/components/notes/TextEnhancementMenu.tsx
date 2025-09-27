@@ -146,7 +146,9 @@ export function TextEnhancementMenu({
     }
   };
 
-  const handleRewrite = async () => {
+  const handleRewrite = async (instructions?: string) => {
+    const instructionsToUse = instructions || rewriteInstructions;
+    
     if (!content.trim()) {
       toast({
         title: "No text to rewrite",
@@ -156,7 +158,7 @@ export function TextEnhancementMenu({
       return;
     }
 
-    if (!rewriteInstructions.trim()) {
+    if (!instructionsToUse.trim()) {
       toast({
         title: "No instructions provided",
         description: "Please provide instructions for how to rewrite the text.",
@@ -175,7 +177,7 @@ export function TextEnhancementMenu({
           content: content,
           title: noteTitle,
           action: 'rewrite',
-          instructions: rewriteInstructions
+          instructions: instructionsToUse
         }
       });
 
@@ -298,11 +300,80 @@ export function TextEnhancementMenu({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
+            {/* Quick suggestion buttons */}
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleRewrite("Make this more professional and formal")}
+                disabled={isProcessing}
+                className="text-xs"
+              >
+                Professional
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleRewrite("Make this more casual and friendly")}
+                disabled={isProcessing}
+                className="text-xs"
+              >
+                Casual
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleRewrite("Expand this text with more details and examples")}
+                disabled={isProcessing}
+                className="text-xs"
+              >
+                Expand
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleRewrite("Make this shorter and more concise")}
+                disabled={isProcessing}
+                className="text-xs"
+              >
+                Shorten
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleRewrite("Make this more upbeat, positive and happier")}
+                disabled={isProcessing}
+                className="text-xs"
+              >
+                Happier
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleRewrite("Make this more formal and business-appropriate")}
+                disabled={isProcessing}
+                className="text-xs"
+              >
+                Formal
+              </Button>
+            </div>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or custom instructions
+                </span>
+              </div>
+            </div>
+            
             <div>
-              <Label htmlFor="instructions">Rewrite Instructions</Label>
+              <Label htmlFor="instructions">Custom Rewrite Instructions</Label>
               <Input
                 id="instructions"
-                placeholder="e.g., make it more formal, add humor, simplify the language..."
+                placeholder="e.g., add more examples, change tone, fix structure..."
                 value={rewriteInstructions}
                 onChange={(e) => setRewriteInstructions(e.target.value)}
                 className="mt-1"
@@ -320,7 +391,7 @@ export function TextEnhancementMenu({
                 Cancel
               </Button>
               <Button
-                onClick={handleRewrite}
+                onClick={() => handleRewrite()}
                 disabled={isProcessing || !rewriteInstructions.trim()}
               >
                 {isProcessing ? 'Rewriting...' : 'Rewrite'}
