@@ -77,7 +77,7 @@ serve(async (req) => {
     const data = await response.json();
     let result = data.choices[0].message.content;
 
-    console.log(`${action} completed successfully`);
+    console.log(`${action} completed successfully. Result:`, result);
 
     // Handle rewrite response that might include title
     if (action === 'rewrite') {

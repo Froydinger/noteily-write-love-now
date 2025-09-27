@@ -166,8 +166,10 @@ export function TextEnhancementMenu({
     }
 
     setIsProcessing(true);
+    console.log('Starting rewrite with:', { content, noteTitle, instructions: rewriteInstructions });
     try {
-      const { data, error } = await supabase.functions.invoke('spell-check', {
+      console.log('Calling spell-check function...');
+      const response = await supabase.functions.invoke('spell-check', {
         body: { 
           content: content,
           title: noteTitle,
@@ -175,6 +177,9 @@ export function TextEnhancementMenu({
           instructions: rewriteInstructions
         }
       });
+
+      console.log('Raw response from spell-check:', response);
+      const { data, error } = response;
 
       console.log('Rewrite response:', data, error);
 
