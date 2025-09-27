@@ -8,10 +8,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Brain, Send, Undo2, History, X } from 'lucide-react';
+import { Brain, Send, Undo2, History, X, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { AiHistoryEntry } from '@/hooks/useAiHistory';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ChatMessage {
   id: string;
@@ -58,7 +59,10 @@ export function AiChatDialog({
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [autoHide, setAutoHide] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Initialize chat with welcome message
@@ -72,6 +76,21 @@ export function AiChatDialog({
       }]);
     }
   }, [open, chatMessages.length]);
+
+  // Auto-hide functionality - minimize dialog when AI responds
+  useEffect(() => {
+    if (autoHide && chatMessages.length > 1) {
+      const lastMessage = chatMessages[chatMessages.length - 1];
+      if (lastMessage.type === 'ai' && !isProcessing) {
+        // Auto-hide after AI response with a delay
+        const timer = setTimeout(() => {
+          setIsMinimized(true);
+        }, 2000); // 2 second delay
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [chatMessages, autoHide, isProcessing]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -408,35 +427,57 @@ export function AiChatDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl h-[80vh] flex flex-col p-0">
+      <DialogContent 
+        className={`
+          ${isMobile 
+            ? `fixed bottom-0 right-0 top-auto left-auto w-[90vw] max-w-sm h-[70vh] m-0 translate-x-0 translate-y-0 rounded-tl-lg rounded-tr-none rounded-bl-none rounded-br-none border-l border-t border-r-0 border-b-0 ${isMinimized ? 'h-16' : 'h-[70vh]'}` 
+            : 'sm:max-w-2xl h-[80vh]'
+          } 
+          flex flex-col p-0 transition-all duration-300 z-50
+        `}
+      >
         <DialogHeader className="px-6 py-4 border-b">
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5" />
-              AI Writing Assistant
+              {!isMinimized && "AI Writing Assistant"}
               {isProcessing && (
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
               )}
             </DialogTitle>
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleUndo}
-                disabled={history.length === 0 || isProcessing}
-                title="Undo last AI change"
-              >
-                <Undo2 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowHistory(!showHistory)}
-                disabled={isProcessing}
-                title="Toggle history view"
-              >
-                <History className="h-4 w-4" />
-              </Button>
+              {isMobile && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsMinimized(!isMinimized)}
+                  title={isMinimized ? "Expand chat" : "Minimize chat"}
+                >
+                  {isMinimized ? "↑" : "↓"}
+                </Button>
+              )}
+              {!isMinimized && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleUndo}
+                    disabled={history.length === 0 || isProcessing}
+                    title="Undo last AI change"
+                  >
+                    <Undo2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowHistory(!showHistory)}
+                    disabled={isProcessing}
+                    title="Toggle history view"
+                  >
+                    <History className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
@@ -448,51 +489,64 @@ export function AiChatDialog({
           </div>
         </DialogHeader>
 
-        <div className="flex-1 flex min-h-0">
-          {/* Chat Area */}
-          <div className="flex-1 flex flex-col">
-            {/* Messages */}
-            <ScrollArea ref={scrollAreaRef} className="flex-1 px-6 py-4">
-              <div className="space-y-4">
-                {chatMessages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
+        {!isMinimized && (
+          <div className="flex-1 flex min-h-0">
+            {/* Chat Area */}
+            <div className="flex-1 flex flex-col">
+              {/* Messages */}
+              <ScrollArea ref={scrollAreaRef} className="flex-1 px-6 py-4">
+                <div className="space-y-4">
+                  {chatMessages.map((message) => (
                     <div
-                      className={`max-w-[80%] rounded-lg p-3 ${
-                        message.type === 'user'
-                          ? 'bg-primary text-primary-foreground'
-                          : message.type === 'ai'
-                          ? 'bg-muted'
-                          : 'bg-accent text-accent-foreground'
-                      }`}
+                      key={message.id}
+                      className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <p className="text-sm">{message.content}</p>
-                      <span className="text-xs opacity-70 mt-1 block">
-                        {message.timestamp.toLocaleTimeString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-                
-                {isProcessing && (
-                  <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg p-3">
-                      <div className="flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-3 w-3 border-2 border-primary border-t-transparent"></div>
-                        <span className="text-sm text-muted-foreground">AI is thinking...</span>
+                      <div
+                        className={`max-w-[80%] rounded-lg p-3 ${
+                          message.type === 'user'
+                            ? 'bg-primary text-primary-foreground'
+                            : message.type === 'ai'
+                            ? 'bg-muted'
+                            : 'bg-accent text-accent-foreground'
+                        }`}
+                      >
+                        <p className="text-sm">{message.content}</p>
+                        <span className="text-xs opacity-70 mt-1 block">
+                          {message.timestamp.toLocaleTimeString()}
+                        </span>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
+                  ))}
+                  
+                  {isProcessing && (
+                    <div className="flex justify-start">
+                      <div className="bg-muted rounded-lg p-3">
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-3 w-3 border-2 border-primary border-t-transparent"></div>
+                          <span className="text-sm text-muted-foreground">AI is thinking...</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
 
-            {/* Quick Actions */}
-            <div className="px-6 py-3 border-t bg-muted/30">
-              <div className="mb-3">
-                <div className="text-xs font-medium text-muted-foreground mb-2">Quick Actions:</div>
+              {/* Auto-hide toggle and Quick Actions */}
+              <div className="px-6 py-3 border-t bg-muted/30">
+                {/* Auto-hide toggle */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-xs font-medium text-muted-foreground">Quick Actions:</div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setAutoHide(!autoHide)}
+                    className="text-xs flex items-center gap-1"
+                    title={autoHide ? "Turn off auto-hide" : "Turn on auto-hide"}
+                  >
+                    {autoHide ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                    Auto Hide {autoHide ? 'On' : 'Off'}
+                  </Button>
+                </div>
                 <div className="flex flex-wrap gap-1">
                   <Button
                     variant="outline"
@@ -525,35 +579,34 @@ export function AiChatDialog({
                     </Button>
                   ))}
                 </div>
-              </div>
 
-              {/* Message Input */}
-              <div className="flex gap-2">
-                <Input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Tell me how to improve your text..."
-                  disabled={isProcessing}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                  className="flex-1"
-                />
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!inputValue.trim() || isProcessing}
-                  size="sm"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
+                {/* Message Input */}
+                <div className="flex gap-2 px-6 py-3">
+                  <Input
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder="Tell me how to improve your text..."
+                    disabled={isProcessing}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
+                    className="flex-1"
+                  />
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={!inputValue.trim() || isProcessing}
+                    size="sm"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* History Sidebar */}
+            {/* History Sidebar */}
           {showHistory && (
             <div className="w-80 border-l bg-muted/30 flex flex-col">
               <div className="px-4 py-3 border-b">
@@ -594,7 +647,8 @@ export function AiChatDialog({
               </ScrollArea>
             </div>
           )}
-        </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
