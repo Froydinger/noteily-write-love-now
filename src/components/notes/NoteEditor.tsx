@@ -505,7 +505,12 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
                 // Update content without cursor position issues
                 contentRef.current.innerHTML = newHTML;
                 
-                // Create a custom event to mark this as an AI update for immediate saving
+                // Immediately save AI changes to cloud (non-silent save)
+                const sanitizedContent = sanitizeContent(newHTML);
+                updateNote(note.id, { content: sanitizedContent }, false); // false = non-silent save
+                setLastSavedContent(sanitizedContent);
+                
+                // Create a custom event to mark this as an AI update 
                 const customEvent = new Event('input', { bubbles: true }) as any;
                 customEvent.isAIUpdate = true;
                 contentRef.current.dispatchEvent(customEvent);
@@ -517,7 +522,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
                 }, 100);
                 
                 onSpellCheckApplied?.();
-                console.log('Content updated in editor');
+                console.log('Content updated in editor and saved to cloud');
               }
             }}
             noteTitle={title}
@@ -525,6 +530,9 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
               console.log('TextEnhancementMenu onTitleChange called with:', newTitle);
               setPreviousTitle(title); // Store previous title
               setTitle(newTitle);
+              // Immediately save AI title changes to cloud (non-silent save)
+              updateNote(note.id, { title: newTitle }, false); // false = non-silent save
+              console.log('Title updated and saved to cloud');
             }}
             previousContent={previousContent}
             previousTitle={previousTitle}

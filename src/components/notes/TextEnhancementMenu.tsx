@@ -7,7 +7,8 @@ import {
   BookOpen, 
   PenTool, 
   Undo2,
-  Wand2
+  Wand2,
+  Type
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -302,7 +303,7 @@ export function TextEnhancementMenu({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56 bg-background/95 backdrop-blur-sm border border-border/50">
           <DropdownMenuItem onClick={handleSpellCheck} disabled={isProcessing}>
-            <Brain className="mr-2 h-4 w-4" />
+            <Type className="mr-2 h-4 w-4" />
             Correct Spelling
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleGrammarCheck} disabled={isProcessing}>
