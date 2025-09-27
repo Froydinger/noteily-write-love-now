@@ -195,7 +195,7 @@ export function AppSidebar() {
                   >
                     <a href="/" className="flex items-center justify-center gap-1.5 px-2">
                       <BookOpen className="h-4 w-4 flex-shrink-0" />
-                      <span className="truncate">My Notes</span>
+                      <span className="truncate">All</span>
                     </a>
                   </Button>
                   <Button
@@ -206,7 +206,7 @@ export function AppSidebar() {
                   >
                     <a href="/prompts" className="flex items-center justify-center gap-1.5 px-2">
                       <Pencil className="h-4 w-4 flex-shrink-0" />
-                      <span className="truncate">Prompts</span>
+                      <span className="truncate">Ideas</span>
                     </a>
                   </Button>
                 </div>

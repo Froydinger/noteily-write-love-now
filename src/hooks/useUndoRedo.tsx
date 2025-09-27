@@ -17,11 +17,10 @@ export function useUndoRedo() {
   const undo = useCallback((): UndoRedoState | null => {
     if (undoStack.length === 0) return null;
     
-    const lastState = undoStack[undoStack.length - 1];
+    const previousState = undoStack[undoStack.length - 1];
     setUndoStack(prev => prev.slice(0, -1));
-    setRedoStack(prev => [...prev, lastState]);
     
-    return lastState;
+    return previousState;
   }, [undoStack]);
 
   const redo = useCallback((): UndoRedoState | null => {
@@ -29,7 +28,6 @@ export function useUndoRedo() {
     
     const nextState = redoStack[redoStack.length - 1];
     setRedoStack(prev => prev.slice(0, -1));
-    setUndoStack(prev => [...prev, nextState]);
     
     return nextState;
   }, [redoStack]);
