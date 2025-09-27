@@ -80,22 +80,35 @@ serve(async (req) => {
     console.log(`${action} completed successfully`);
 
     // Handle rewrite response that might include title
-    if (action === 'rewrite' && result.includes('TITLE:')) {
-      const lines = result.split('\n');
-      const titleLine = lines.find((line: string) => line.startsWith('TITLE:'));
-      const newTitle = titleLine ? titleLine.replace('TITLE:', '').trim() : null;
-      const correctedContent = lines.filter((line: string) => !line.startsWith('TITLE:')).join('\n').trim();
-      
-      return new Response(
-        JSON.stringify({ 
-          correctedContent,
-          newTitle,
-          hasChanges: true
-        }), 
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
+    if (action === 'rewrite') {
+      if (result.includes('TITLE:')) {
+        const lines = result.split('\n');
+        const titleLine = lines.find((line: string) => line.startsWith('TITLE:'));
+        const newTitle = titleLine ? titleLine.replace('TITLE:', '').trim() : null;
+        const correctedContent = lines.filter((line: string) => !line.startsWith('TITLE:')).join('\n').trim();
+        
+        return new Response(
+          JSON.stringify({ 
+            correctedContent,
+            newTitle,
+            hasChanges: true
+          }), 
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      } else {
+        // Rewrite without title change
+        return new Response(
+          JSON.stringify({ 
+            correctedContent: result,
+            hasChanges: true
+          }), 
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
     }
 
     return new Response(
