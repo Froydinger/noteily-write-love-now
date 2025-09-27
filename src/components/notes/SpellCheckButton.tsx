@@ -10,6 +10,7 @@ interface SpellCheckButtonProps {
   noteTitle: string;
   onTitleChange: (newTitle: string) => void;
   disabled?: boolean;
+  noteId: string;
 }
 
 export function SpellCheckButton(props: SpellCheckButtonProps) {

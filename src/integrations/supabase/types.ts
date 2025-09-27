@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      note_ai_history: {
+        Row: {
+          action_type: string
+          created_at: string
+          id: string
+          instruction: string | null
+          new_content: string
+          new_title: string | null
+          note_id: string
+          original_content: string
+          original_title: string | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          id?: string
+          instruction?: string | null
+          new_content: string
+          new_title?: string | null
+          note_id: string
+          original_content: string
+          original_title?: string | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          id?: string
+          instruction?: string | null
+          new_content?: string
+          new_title?: string | null
+          note_id?: string
+          original_content?: string
+          original_title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       notes: {
         Row: {
           content: string | null

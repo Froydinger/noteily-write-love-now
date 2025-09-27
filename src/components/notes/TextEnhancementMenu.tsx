@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { usePreferences } from '@/contexts/PreferencesContext';
+import { useAiHistory } from '@/hooks/useAiHistory';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TextEnhancementMenuProps {
@@ -37,6 +38,7 @@ interface TextEnhancementMenuProps {
   disabled?: boolean;
   previousContent?: string;
   previousTitle?: string;
+  noteId: string;
 }
 
 export function TextEnhancementMenu({
@@ -47,13 +49,16 @@ export function TextEnhancementMenu({
   onTitleChange,
   disabled = false,
   previousContent,
-  previousTitle
+  previousTitle,
+  noteId
 }: TextEnhancementMenuProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showRewriteDialog, setShowRewriteDialog] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [rewriteInstructions, setRewriteInstructions] = useState('');
   const { toast } = useToast();
   const { preferences } = usePreferences();
+  const { history, addHistoryEntry, revertToVersion, clearHistory } = useAiHistory(noteId);
 
   const handleSpellCheck = async () => {
     if (!content.trim()) {
@@ -78,6 +83,10 @@ export function TextEnhancementMenu({
 
       if (data.correctedContent && data.correctedContent !== content) {
         const preservedHTML = preserveHTMLStructure(originalHTML, data.correctedContent);
+        
+        // Add to history before changing content
+        await addHistoryEntry('spell', content, data.correctedContent, noteTitle, noteTitle);
+        
         onContentChange(preservedHTML);
         
         toast({
@@ -125,6 +134,10 @@ export function TextEnhancementMenu({
 
       if (data.correctedContent && data.correctedContent !== content) {
         const preservedHTML = preserveHTMLStructure(originalHTML, data.correctedContent);
+        
+        // Add to history before changing content
+        await addHistoryEntry('grammar', content, data.correctedContent, noteTitle, noteTitle);
+        
         onContentChange(preservedHTML);
         
         toast({
@@ -194,6 +207,17 @@ export function TextEnhancementMenu({
       if (response.data && response.data.correctedContent) {
         console.log('Success! Updating content with:', response.data.correctedContent);
         console.log('Original content was:', content);
+        
+        // Add to history before changing content
+        await addHistoryEntry(
+          'rewrite',
+          content,
+          response.data.correctedContent,
+          noteTitle,
+          response.data.newTitle || noteTitle,
+          instructionsToUse
+        );
+        
         console.log('Calling onContentChange...');
         onContentChange(response.data.correctedContent);
         console.log('onContentChange called');
@@ -227,20 +251,22 @@ export function TextEnhancementMenu({
   };
 
   const handleAIUndo = async () => {
-    if (!previousContent || !previousContent.trim()) {
+    // Use the most recent history entry instead of previousContent
+    if (history.length === 0) {
       toast({
         title: "Nothing to undo",
-        description: "No previous version available to restore.",
+        description: "No previous AI changes available to restore.",
         variant: "destructive",
       });
       return;
     }
 
-    // Directly revert to previous content without AI processing
-    onContentChange(previousContent);
+    const lastEntry = history[0];
+    const revertData = await revertToVersion(lastEntry);
     
-    if (previousTitle && previousTitle !== noteTitle) {
-      onTitleChange(previousTitle);
+    onContentChange(revertData.content);
+    if (revertData.title && revertData.title !== noteTitle) {
+      onTitleChange(revertData.title);
     }
     
     toast({
@@ -315,9 +341,13 @@ export function TextEnhancementMenu({
             Rewrite with AI
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleAIUndo} disabled={isProcessing}>
+          <DropdownMenuItem onClick={handleAIUndo} disabled={isProcessing || history.length === 0}>
             <Undo2 className="mr-2 h-4 w-4" />
-            AI Undo
+            AI Undo {history.length === 0 ? '(No history)' : ''}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setShowHistoryDialog(true)} disabled={isProcessing}>
+            <BookOpen className="mr-2 h-4 w-4" />
+            View AI History
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -325,9 +355,17 @@ export function TextEnhancementMenu({
       <Dialog open={showRewriteDialog} onOpenChange={setShowRewriteDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Rewrite with AI</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              Rewrite with AI
+              {isProcessing && (
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+              )}
+            </DialogTitle>
             <DialogDescription>
-              Tell the AI how you'd like to rewrite your content. The formatting and structure will be preserved unless you specify otherwise.
+              {isProcessing 
+                ? "AI is processing your request..." 
+                : "Tell the AI how you'd like to rewrite your content. The formatting and structure will be preserved unless you specify otherwise."
+              }
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
@@ -429,6 +467,104 @@ export function TextEnhancementMenu({
                 Rewrite
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* AI History Dialog */}
+      <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>AI Chat History</DialogTitle>
+            <DialogDescription>
+              View and revert to previous AI changes for this note.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-auto space-y-3 pr-2">
+            {history.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Brain className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No AI changes yet</p>
+                <p className="text-sm">AI changes will appear here as you use spell check, grammar correction, or rewriting features.</p>
+              </div>
+            ) : (
+              history.map((entry, index) => (
+                <div key={entry.id} className="border rounded-lg p-3 bg-card">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium capitalize">{entry.action_type}</span>
+                      {entry.instruction && (
+                        <span className="text-xs bg-muted px-2 py-1 rounded">{entry.instruction}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(entry.created_at).toLocaleString()}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => {
+                          const revertData = await revertToVersion(entry);
+                          onContentChange(revertData.content);
+                          if (revertData.title && revertData.title !== noteTitle) {
+                            onTitleChange(revertData.title);
+                          }
+                          setShowHistoryDialog(false);
+                          toast({
+                            title: "Reverted",
+                            description: "Content has been reverted to selected version.",
+                          });
+                        }}
+                        className="text-xs"
+                      >
+                        Revert
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {entry.original_title !== entry.new_title && (
+                      <div>
+                        <div className="text-xs font-medium text-muted-foreground mb-1">Title changed:</div>
+                        <div className="text-sm bg-muted/50 p-2 rounded">
+                          <div className="line-through text-muted-foreground">{entry.original_title}</div>
+                          <div>{entry.new_title}</div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <div className="text-xs font-medium text-muted-foreground mb-1">Content preview:</div>
+                      <div className="text-sm bg-muted/50 p-2 rounded max-h-20 overflow-hidden">
+                        {entry.new_content.substring(0, 150)}
+                        {entry.new_content.length > 150 && '...'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          
+          <div className="flex justify-between gap-2 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                await clearHistory();
+                setShowHistoryDialog(false);
+              }}
+              disabled={history.length === 0}
+              className="text-xs"
+            >
+              Clear History
+            </Button>
+            <Button
+              onClick={() => setShowHistoryDialog(false)}
+            >
+              Close
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

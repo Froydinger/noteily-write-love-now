@@ -491,6 +491,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
         
         {!isReadOnly && (
           <TextEnhancementMenu
+            noteId={note.id}
             content={contentRef.current?.textContent || ''}
             originalHTML={contentRef.current?.innerHTML || ''}
             onContentChange={(newHTML) => {
