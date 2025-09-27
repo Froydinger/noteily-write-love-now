@@ -414,17 +414,22 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
             content={contentRef.current?.textContent || ''}
             originalHTML={contentRef.current?.innerHTML || ''}
             onContentChange={(newHTML) => {
+              console.log('TextEnhancementMenu onContentChange called with:', newHTML);
               if (contentRef.current) {
                 onContentBeforeChange?.();
                 contentRef.current.innerHTML = newHTML;
                 contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
                 onSpellCheckApplied?.();
+                console.log('Content updated in editor');
               }
             }}
             onUndo={onUndo}
             canUndo={canUndo || false}
             noteTitle={title}
-            onTitleChange={(newTitle) => setTitle(newTitle)}
+            onTitleChange={(newTitle) => {
+              console.log('TextEnhancementMenu onTitleChange called with:', newTitle);
+              setTitle(newTitle);
+            }}
           />
         )}
       </div>
