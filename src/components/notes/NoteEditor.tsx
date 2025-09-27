@@ -417,7 +417,31 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
               console.log('TextEnhancementMenu onContentChange called with:', newHTML);
               if (contentRef.current) {
                 onContentBeforeChange?.();
+                
+                // Save cursor position
+                const selection = window.getSelection();
+                let range = null;
+                if (selection && selection.rangeCount > 0) {
+                  range = selection.getRangeAt(0).cloneRange();
+                }
+                
                 contentRef.current.innerHTML = newHTML;
+                
+                // Restore cursor position
+                if (range) {
+                  try {
+                    selection?.removeAllRanges();
+                    selection?.addRange(range);
+                  } catch (e) {
+                    // If restoring fails, place cursor at end
+                    const newRange = document.createRange();
+                    newRange.selectNodeContents(contentRef.current);
+                    newRange.collapse(false);
+                    selection?.removeAllRanges();
+                    selection?.addRange(newRange);
+                  }
+                }
+                
                 contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
                 onSpellCheckApplied?.();
                 console.log('Content updated in editor');
