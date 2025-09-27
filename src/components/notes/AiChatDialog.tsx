@@ -84,47 +84,11 @@ export function AiChatDialog({
     }
   }, [open]);
 
-  // Auto-hide functionality - only minimize after actual AI responses to user actions
+  // Auto-hide functionality - DISABLED to prevent unwanted minimizing
   useEffect(() => {
-    console.log('Auto-hide check:', { 
-      autoHide, 
-      open, 
-      isProcessing, 
-      hasUserInteracted, 
-      chatMessagesLength: chatMessages.length,
-      lastMessageType: chatMessages[chatMessages.length - 1]?.type
-    });
-    
-    // Only auto-hide if ALL conditions are met:
-    // 1. Auto-hide is enabled
-    // 2. Dialog is open
-    // 3. Not currently processing
-    // 4. User has actually interacted (not just opened dialog)
-    // 5. We have enough messages to check sequence
-    if (!autoHide || !open || isProcessing || !hasUserInteracted || chatMessages.length < 3) {
-      return;
-    }
-    
-    const lastMessage = chatMessages[chatMessages.length - 1];
-    const secondLastMessage = chatMessages[chatMessages.length - 2];
-    
-    console.log('Checking auto-hide conditions:', {
-      lastMessageType: lastMessage.type,
-      secondLastMessageType: secondLastMessage.type,
-      willAutoHide: lastMessage.type === 'ai' && secondLastMessage.type === 'user'
-    });
-    
-    // Only auto-hide if: last message is AI response AND second-last was user message (not system)
-    if (lastMessage.type === 'ai' && secondLastMessage.type === 'user') {
-      console.log('Auto-hiding in 3 seconds...');
-      const timer = setTimeout(() => {
-        console.log('Auto-hiding now');
-        setIsMinimized(true);
-      }, 3000); // 3 second delay to read response
-      
-      return () => clearTimeout(timer);
-    }
-  }, [chatMessages, autoHide, open, isProcessing, hasUserInteracted]);
+    // Completely disabled auto-hide to prevent issues
+    return;
+  }, []);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
