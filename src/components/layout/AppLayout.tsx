@@ -84,7 +84,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <SidebarProvider>
         <div className="flex min-h-screen w-full">
           <AppSidebar />
-          <main className="flex-1 transition-all duration-200">
+          <main className="flex-1 min-w-0">
             {children}
           </main>
         </div>
