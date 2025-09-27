@@ -46,9 +46,23 @@ export function TextEnhancementMenu({
 }: TextEnhancementMenuProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showChatDialog, setShowChatDialog] = useState(false);
+  const [selectedText, setSelectedText] = useState('');
   const { toast } = useToast();
   const { preferences } = usePreferences();
   const { history, addHistoryEntry, revertToVersion, clearHistory } = useAiHistory(noteId);
+
+  // Function to get selected text
+  const getSelectedText = () => {
+    const selection = window.getSelection();
+    return selection ? selection.toString().trim() : '';
+  };
+
+  // Handle opening chat dialog with text selection check
+  const handleOpenChatDialog = () => {
+    const selected = getSelectedText();
+    setSelectedText(selected);
+    setShowChatDialog(true);
+  };
 
   const handleSpellCheck = async () => {
     if (!content.trim()) {
@@ -238,7 +252,7 @@ export function TextEnhancementMenu({
             <BookOpen className="mr-2 h-4 w-4" />
             Correct Grammar
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setShowChatDialog(true)} disabled={isProcessing}>
+          <DropdownMenuItem onClick={handleOpenChatDialog} disabled={isProcessing}>
             <PenTool className="mr-2 h-4 w-4" />
             Chat with AI
           </DropdownMenuItem>
@@ -254,7 +268,7 @@ export function TextEnhancementMenu({
       <AiChatDialog
         open={showChatDialog}
         onOpenChange={setShowChatDialog}
-        content={content}
+        content={selectedText || content}
         originalHTML={originalHTML}
         noteTitle={noteTitle}
         onContentChange={onContentChange}

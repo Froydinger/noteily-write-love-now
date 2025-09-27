@@ -66,6 +66,9 @@ export function AiChatDialog({
   const isMobile = useIsMobile();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
+  // Check if working with selected text
+  const isSelectedText = content.length < originalHTML.length;
+
   // Initialize chat with welcome message and reset states when opening
   useEffect(() => {
     if (open) {
@@ -74,15 +77,18 @@ export function AiChatDialog({
       setHasUserInteracted(false); // Reset interaction flag
       setAutoHide(false); // Reset auto-hide on new session
       if (chatMessages.length === 0) {
+        const welcomeMessage = isSelectedText 
+          ? 'Hi! I can help you improve your selected text. Use the quick actions below or tell me what you\'d like me to do.'
+          : 'Hi! I can help you improve your writing. Use the quick actions below or tell me what you\'d like me to do with your text.';
         setChatMessages([{
           id: 'welcome',
           type: 'system',
-          content: 'Hi! I can help you improve your writing. Use the quick actions below or tell me what you\'d like me to do with your text.',
+          content: welcomeMessage,
           timestamp: new Date()
         }]);
       }
     }
-  }, [open]);
+  }, [open, isSelectedText]);
 
   // Auto-hide functionality - DISABLED to prevent unwanted minimizing
   useEffect(() => {
@@ -436,10 +442,14 @@ export function AiChatDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(newOpen) => {
-      console.log('Dialog onOpenChange called:', { from: open, to: newOpen });
-      onOpenChange(newOpen);
-    }}>
+    <Dialog 
+      open={open} 
+      onOpenChange={(newOpen) => {
+        console.log('Dialog onOpenChange called:', { from: open, to: newOpen });
+        onOpenChange(newOpen);
+      }}
+      modal={!isMinimized}
+    >
       <DialogContent
         className={`
           ${isMobile 
@@ -453,7 +463,16 @@ export function AiChatDialog({
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5" />
-              {!isMinimized && "AI Writing Assistant"}
+              {!isMinimized && (
+                <div className="flex items-center gap-2">
+                  <span>AI Writing Assistant</span>
+                  {isSelectedText && (
+                    <span className="text-xs bg-accent text-accent-foreground px-2 py-1 rounded">
+                      Selected Text
+                    </span>
+                  )}
+                </div>
+              )}
               {isProcessing && (
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
               )}
