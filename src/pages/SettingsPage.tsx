@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -13,12 +12,14 @@ import { usePreferences } from '@/contexts/PreferencesContext';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart, AtSign, Check, X, Loader2, Type } from 'lucide-react';
+import { useTitleFont } from '@/hooks/useTitleFont';
 import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { Input } from '@/components/ui/input';
 import { useUsername } from '@/hooks/useUsername';
 
 const SettingsPage = () => {
+  const titleFont = useTitleFont();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
@@ -30,7 +31,7 @@ const SettingsPage = () => {
   const { toast } = useToast();
   const { user, signOut } = useAuth();
   const { notes } = useNotes();
-  const { preferences, updateTitleFont } = usePreferences();
+  const { preferences, updateTitleFont, updateBodyFont } = usePreferences();
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -38,7 +39,6 @@ const SettingsPage = () => {
 
   // Check if we should show username section expanded
   const shouldShowUsernameSection = searchParams.get('section') === 'username';
-
 
   const getThemeLabel = (theme: string) => {
     switch (theme) {
@@ -59,10 +59,25 @@ const SettingsPage = () => {
     }
   };
 
+  const getBodyFontLabel = (font: string) => {
+    switch (font) {
+      case 'serif': return 'Serif (Playfair)';
+      case 'sans': return 'Sans (Inter)';
+      case 'mono': return 'Mono (JetBrains)';
+      default: return 'Sans (Inter)';
+    }
+  };
+
   const handleTitleFontChange = async () => {
     const currentIndex = ['serif', 'sans', 'mono'].indexOf(preferences.titleFont);
     const nextFont = ['serif', 'sans', 'mono'][(currentIndex + 1) % 3] as 'serif' | 'sans' | 'mono';
     await updateTitleFont(nextFont);
+  };
+
+  const handleBodyFontChange = async () => {
+    const currentIndex = ['serif', 'sans', 'mono'].indexOf(preferences.bodyFont);
+    const nextFont = ['serif', 'sans', 'mono'][(currentIndex + 1) % 3] as 'serif' | 'sans' | 'mono';
+    await updateBodyFont(nextFont);
   };
 
   const handleSignOut = async () => {
@@ -357,7 +372,7 @@ ${note.content}
                 </div>
               )}
             </div>
-            <h1 className="text-xl font-serif font-medium">Settings</h1>
+            <h1 className="text-xl font-light dynamic-title-font">Settings</h1>
           </div>
         </div>
 
@@ -378,13 +393,13 @@ ${note.content}
           </div>
 
           {/* Right side: Title */}
-          <h1 className="text-2xl font-serif font-medium">Settings</h1>
+          <h1 className="text-2xl font-light dynamic-title-font">Settings</h1>
         </div>
         
         <div className="max-w-2xl mx-auto">
           <div className="space-y-4 md:space-y-6">
           <div className="bg-card rounded-lg p-4 border">
-            <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
+            <h2 className="text-lg font-light mb-3 dynamic-title-font flex items-center gap-2">
               <span>Preferences</span>
             </h2>
             <div className="space-y-4">
@@ -422,6 +437,30 @@ ${note.content}
                     onClick={handleTitleFontChange}
                     className="p-2 h-8 w-8"
                     title="Change title font"
+                  >
+                    <Type className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Body font setting */}
+              <div className="flex items-start justify-between gap-3 border-t pt-4">
+                <div className="flex-1 min-w-0">
+                  <Label htmlFor="bodyFont" className="text-sm font-medium">Body Font</Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Choose your preferred font for note content and body text
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="text-sm text-muted-foreground hidden sm:inline">
+                    {getBodyFontLabel(preferences.bodyFont)}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleBodyFontChange}
+                    className="p-2 h-8 w-8"
+                    title="Change body font"
                   >
                     <Type className="h-3 w-3" />
                   </Button>

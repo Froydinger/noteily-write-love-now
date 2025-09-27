@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTitleFont } from '@/hooks/useTitleFont';
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   BookOpen, 
@@ -41,6 +42,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function AppSidebar() {
+  const titleFont = useTitleFont();
   const { notes, addNote, setCurrentNote, syncNotes } = useNotes();
   const navigate = useNavigate();
   const location = useLocation();
@@ -116,7 +118,7 @@ export function AppSidebar() {
           <Heart className="h-5 w-5 text-neon-blue" />
           {state !== "collapsed" && (
             <div className="flex items-center">
-              <h1 className="text-xl font-serif font-medium">Noteily</h1>
+              <h1 className="text-xl font-light dynamic-title-font">Noteily</h1>
               <span className="text-xs text-muted-foreground ml-0.5 -mt-2">™</span>
             </div>
           )}
@@ -249,7 +251,7 @@ export function AppSidebar() {
                                 animationFillMode: 'both'
                               }}
                             >
-                              <h3 className="text-sm font-medium truncate">{note.title || "Untitled Note"}</h3>
+                              <h3 className="text-sm font-light truncate dynamic-title-font">{note.title || "Untitled Note"}</h3>
                               <p className="text-xs text-muted-foreground truncate">
                                 {note.content ? 
                                   note.content

@@ -208,7 +208,7 @@ const Index = () => {
                 </div>
               )}
             </div>
-            <h1 className="text-2xl font-serif font-medium">My Notes</h1>
+            <h1 className="text-2xl font-light dynamic-title-font">My Notes</h1>
           </div>
 
           {/* Bottom row: All buttons */}
@@ -390,7 +390,7 @@ const Index = () => {
           </div>
 
           {/* Right side: My Notes text */}
-          <h1 className="text-2xl font-serif font-medium">My Notes</h1>
+          <h1 className="text-2xl font-light dynamic-title-font">My Notes</h1>
         </div>
 
         {/* Search Input - appears when search bubble is clicked */}

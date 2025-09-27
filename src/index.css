@@ -631,17 +631,41 @@
 
 }
 
-/* Dynamic title font classes based on preference */
+/* Dynamic font classes based on preferences */
 html[data-title-font="serif"] .dynamic-title-font {
   font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 300;
+  letter-spacing: -0.02em;
 }
 
 html[data-title-font="sans"] .dynamic-title-font {
   font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.01em;
 }
 
 html[data-title-font="mono"] .dynamic-title-font {
   font-family: 'JetBrains Mono', Menlo, Monaco, monospace;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+html[data-body-font="serif"] .dynamic-body-font {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}
+
+html[data-body-font="sans"] .dynamic-body-font {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.005em;
+}
+
+html[data-body-font="mono"] .dynamic-body-font {
+  font-family: 'JetBrains Mono', Menlo, Monaco, monospace;
+  font-weight: 300;
+  letter-spacing: -0.01em;
 }
 
 /* Enhanced spell check button positioning */

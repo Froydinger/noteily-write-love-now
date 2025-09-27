@@ -7,7 +7,7 @@ import { FeaturedImage } from './FeaturedImage';
 import { sanitizeContent, sanitizeForDisplay, sanitizeImageUrl, isValidImageUrl } from "@/lib/sanitization";
 import { BlockHandle, BlockType } from './BlockHandle';
 import { usePageLeave } from '@/hooks/usePageLeave';
-import { useTitleFont } from '@/hooks/useTitleFont';
+import { useTitleFont, useBodyFont } from '@/hooks/useTitleFont';
 import { SpellCheckButton } from './SpellCheckButton';
 
 interface NoteEditorProps {
@@ -18,6 +18,7 @@ interface NoteEditorProps {
 
 export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange }: NoteEditorProps) {
   const titleFont = useTitleFont();
+  const bodyFont = useBodyFont();
   const { updateNote } = useNotes();
   const [title, setTitle] = useState(note.title);
   const [lastSavedContent, setLastSavedContent] = useState(note.content);
@@ -397,7 +398,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
         <div
           ref={contentRef}
           contentEditable={!isReadOnly}
-          className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none pb-8 transition-none editor-anchor relative ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+          className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none pb-8 transition-none editor-anchor relative dynamic-body-font ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
           data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
           aria-label="Note content"
           onPaste={isReadOnly ? undefined : handlePaste}

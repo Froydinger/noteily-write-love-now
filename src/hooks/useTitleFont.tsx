@@ -11,3 +11,14 @@ export const useTitleFont = () => {
 
   return preferences.titleFont;
 };
+
+export const useBodyFont = () => {
+  const { preferences } = usePreferences();
+
+  useEffect(() => {
+    // Apply the body font to the document
+    document.documentElement.setAttribute('data-body-font', preferences.bodyFont);
+  }, [preferences.bodyFont]);
+
+  return preferences.bodyFont;
+};

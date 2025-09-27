@@ -4,16 +4,19 @@ import { useAuth } from './AuthContext';
 
 export type ThemeType = 'light' | 'dark' | 'navy';
 export type TitleFontType = 'serif' | 'sans' | 'mono';
+export type BodyFontType = 'serif' | 'sans' | 'mono';
 
 interface UserPreferences {
   theme: ThemeType;
   titleFont: TitleFontType;
+  bodyFont: BodyFontType;
 }
 
 interface PreferencesContextType {
   preferences: UserPreferences;
   updateTheme: (theme: ThemeType) => Promise<void>;
   updateTitleFont: (font: TitleFontType) => Promise<void>;
+  updateBodyFont: (font: BodyFontType) => Promise<void>;
   refreshPreferences: () => Promise<void>;
   loading: boolean;
 }
@@ -30,7 +33,7 @@ export const usePreferences = () => {
 
 export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const [preferences, setPreferences] = useState<UserPreferences>({ theme: 'navy', titleFont: 'serif' });
+  const [preferences, setPreferences] = useState<UserPreferences>({ theme: 'navy', titleFont: 'serif', bodyFont: 'sans' });
   const [loading, setLoading] = useState(false);
 
   // Load user preferences - prioritize localStorage, sync with Supabase
@@ -38,7 +41,8 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     // Always start with localStorage as primary source
     const localTheme = (localStorage.getItem('theme') as ThemeType) || 'navy';
     const localTitleFont = (localStorage.getItem('titleFont') as TitleFontType) || 'serif';
-    setPreferences({ theme: localTheme, titleFont: localTitleFont });
+    const localBodyFont = (localStorage.getItem('bodyFont') as BodyFontType) || 'sans';
+    setPreferences({ theme: localTheme, titleFont: localTitleFont, bodyFont: localBodyFont });
     
     // Apply theme immediately if not already applied
     const html = document.documentElement;
@@ -57,7 +61,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
       // Try to sync with Supabase for authenticated users
       const { data, error } = await supabase
         .from('user_preferences')
-        .select('theme, title_font')
+        .select('theme, title_font, body_font')
         .eq('user_id', user.id)
         .single();
 
@@ -67,15 +71,17 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
       } else if (data) {
         // Check if Supabase data differs from local
         const supabaseTitleFont = (data.title_font as TitleFontType) || 'serif';
-        if (data.theme !== localTheme || supabaseTitleFont !== localTitleFont) {
+        const supabaseBodyFont = (data.body_font as BodyFontType) || 'sans';
+        if (data.theme !== localTheme || supabaseTitleFont !== localTitleFont || supabaseBodyFont !== localBodyFont) {
           // Supabase has different preferences - use them and update localStorage
-          setPreferences({ theme: data.theme as ThemeType, titleFont: supabaseTitleFont });
+          setPreferences({ theme: data.theme as ThemeType, titleFont: supabaseTitleFont, bodyFont: supabaseBodyFont });
           applyTheme(data.theme as ThemeType);
           applyTitleFont(supabaseTitleFont);
+          applyBodyFont(supabaseBodyFont);
         }
       } else {
         // No preferences found in Supabase - sync local to Supabase
-        await createDefaultPreferences(localTheme, localTitleFont);
+        await createDefaultPreferences(localTheme, localTitleFont, localBodyFont);
       }
     } catch (error) {
       console.error('Error syncing preferences:', error);
@@ -100,7 +106,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
   }, [user]);
 
-  const createDefaultPreferences = async (theme: ThemeType = 'navy', titleFont: TitleFontType = 'serif') => {
+  const createDefaultPreferences = async (theme: ThemeType = 'navy', titleFont: TitleFontType = 'serif', bodyFont: BodyFontType = 'sans') => {
     if (!user) return;
 
     try {
@@ -109,7 +115,8 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
         .insert({
           user_id: user.id,
           theme: theme,
-          title_font: titleFont
+          title_font: titleFont,
+          body_font: bodyFont
         });
 
       if (error) {
@@ -150,6 +157,36 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
       // Revert local state on error
       setPreferences(prev => ({ ...prev, theme: preferences.theme }));
       applyTheme(preferences.theme);
+    }
+  };
+
+  const updateBodyFont = async (newBodyFont: BodyFontType) => {
+    // Update local state immediately for responsive UI
+    setPreferences(prev => ({ ...prev, bodyFont: newBodyFont }));
+    applyBodyFont(newBodyFont);
+
+    if (!user) {
+      // For non-authenticated users, only update local state
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('user_preferences')
+        .update({ body_font: newBodyFont })
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error updating body font preference:', error);
+        // Revert local state on error
+        setPreferences(prev => ({ ...prev, bodyFont: preferences.bodyFont }));
+        applyBodyFont(preferences.bodyFont);
+      }
+    } catch (error) {
+      console.error('Error updating body font preference:', error);
+      // Revert local state on error
+      setPreferences(prev => ({ ...prev, bodyFont: preferences.bodyFont }));
+      applyBodyFont(preferences.bodyFont);
     }
   };
 
@@ -212,6 +249,14 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     document.documentElement.setAttribute('data-title-font', titleFont);
   };
 
+  const applyBodyFont = (bodyFont: BodyFontType) => {
+    // Save to localStorage immediately
+    localStorage.setItem('bodyFont', bodyFont);
+    
+    // Apply the font preference to the document
+    document.documentElement.setAttribute('data-body-font', bodyFont);
+  };
+
   const updateBrowserThemeColor = (theme: ThemeType) => {
     const themeColors = {
       light: '#ffffff',
@@ -249,10 +294,11 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // Apply title font on mount
   useEffect(() => {
     applyTitleFont(preferences.titleFont);
-  }, [preferences.titleFont]);
+    applyBodyFont(preferences.bodyFont);
+  }, [preferences.titleFont, preferences.bodyFont]);
 
   return (
-    <PreferencesContext.Provider value={{ preferences, updateTheme, updateTitleFont, refreshPreferences, loading }}>
+    <PreferencesContext.Provider value={{ preferences, updateTheme, updateTitleFont, updateBodyFont, refreshPreferences, loading }}>
       {children}
     </PreferencesContext.Provider>
   );

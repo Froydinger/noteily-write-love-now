@@ -171,6 +171,7 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          body_font: string | null
           created_at: string
           daily_prompt_time: string | null
           email: string | null
@@ -186,6 +187,7 @@ export type Database = {
           username_prompt_last_shown: string | null
         }
         Insert: {
+          body_font?: string | null
           created_at?: string
           daily_prompt_time?: string | null
           email?: string | null
@@ -201,6 +203,7 @@ export type Database = {
           username_prompt_last_shown?: string | null
         }
         Update: {
+          body_font?: string | null
           created_at?: string
           daily_prompt_time?: string | null
           email?: string | null
