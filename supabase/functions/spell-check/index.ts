@@ -58,7 +58,8 @@ serve(async (req) => {
           }
         ],
         max_completion_tokens: Math.min(4000, content.length * 3),
-        temperature: 1.0
+        temperature: 1.0,
+        reasoning: "minimal"
       }),
     });
 
@@ -79,43 +80,26 @@ serve(async (req) => {
 
     console.log(`${action} completed successfully. Result:`, result);
 
-    // Handle rewrite response that might include title
-    if (action === 'rewrite') {
-      if (result.includes('TITLE:')) {
-        const lines = result.split('\n');
-        const titleLine = lines.find((line: string) => line.startsWith('TITLE:'));
-        const newTitle = titleLine ? titleLine.replace('TITLE:', '').trim() : null;
-        const correctedContent = lines.filter((line: string) => !line.startsWith('TITLE:')).join('\n').trim();
-        
-        return new Response(
-          JSON.stringify({ 
-            correctedContent,
-            newTitle,
-            hasChanges: true
-          }), 
-          {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
-      } else {
-        // Rewrite without title change
-        return new Response(
-          JSON.stringify({ 
-            correctedContent: result,
-            hasChanges: true
-          }), 
-          {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+    // Simple unified response for all actions
+    const responseData: any = {
+      correctedContent: result,
+      hasChanges: action === 'rewrite' || content !== result
+    };
+
+    // Add newTitle only if it's a rewrite with title change
+    if (action === 'rewrite' && result.includes('TITLE:')) {
+      const lines = result.split('\n');
+      const titleLine = lines.find((line: string) => line.startsWith('TITLE:'));
+      if (titleLine) {
+        responseData.newTitle = titleLine.replace('TITLE:', '').trim();
+        responseData.correctedContent = lines.filter((line: string) => !line.startsWith('TITLE:')).join('\n').trim();
       }
     }
 
+    console.log('Sending response:', responseData);
+
     return new Response(
-      JSON.stringify({ 
-        correctedContent: result,
-        hasChanges: content !== result
-      }), 
+      JSON.stringify(responseData), 
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }

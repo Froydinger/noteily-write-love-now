@@ -181,9 +181,12 @@ export function TextEnhancementMenu({
       console.log('Raw response from spell-check:', response);
       const { data, error } = response;
 
-      console.log('Rewrite response:', data, error);
+      console.log('Response data:', data);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
 
       if (data && data.correctedContent) {
         console.log('Updating content with:', data.correctedContent);
