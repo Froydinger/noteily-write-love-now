@@ -30,8 +30,6 @@ interface TextEnhancementMenuProps {
   content: string;
   originalHTML: string;
   onContentChange: (newContent: string) => void;
-  onUndo?: () => void;
-  canUndo?: boolean;
   noteTitle: string;
   onTitleChange: (newTitle: string) => void;
   disabled?: boolean;
@@ -41,8 +39,6 @@ export function TextEnhancementMenu({
   content,
   originalHTML,
   onContentChange,
-  onUndo,
-  canUndo = false,
   noteTitle,
   onTitleChange,
   disabled = false
@@ -223,6 +219,58 @@ export function TextEnhancementMenu({
     }
   };
 
+  const handleAIUndo = async () => {
+    if (!content.trim()) {
+      toast({
+        title: "Nothing to undo",
+        description: "No content to revert.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+    
+    try {
+      const response = await supabase.functions.invoke('spell-check', {
+        body: { 
+          content: content,
+          title: noteTitle,
+          action: 'rewrite',
+          instructions: 'Undo the last changes and return to the previous version of this content. Revert any recent modifications, corrections, or rewrites to restore the original text.'
+        }
+      });
+      
+      if (response.error) {
+        throw new Error(response.error.message || 'Undo failed');
+      }
+
+      if (response.data && response.data.correctedContent) {
+        onContentChange(response.data.correctedContent);
+        
+        if (response.data.newTitle && response.data.newTitle !== noteTitle) {
+          onTitleChange(response.data.newTitle);
+        }
+        
+        toast({
+          title: "Changes undone",
+          description: "Content has been reverted to previous version.",
+        });
+      } else {
+        throw new Error('No undone content received');
+      }
+    } catch (error) {
+      console.error('AI undo error:', error);
+      toast({
+        title: "Undo failed", 
+        description: error.message || "There was an error undoing your changes.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   // Preserve HTML structure while replacing text content
   const preserveHTMLStructure = (originalHTML: string, newText: string): string => {
     try {
@@ -284,9 +332,9 @@ export function TextEnhancementMenu({
             Rewrite with AI
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={onUndo} disabled={!canUndo || isProcessing}>
+          <DropdownMenuItem onClick={handleAIUndo} disabled={isProcessing}>
             <Undo2 className="mr-2 h-4 w-4" />
-            Undo
+            AI Undo
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

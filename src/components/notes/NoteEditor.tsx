@@ -514,8 +514,6 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
                 console.log('Content updated in editor');
               }
             }}
-            onUndo={onUndo}
-            canUndo={canUndo || false}
             noteTitle={title}
             onTitleChange={(newTitle) => {
               console.log('TextEnhancementMenu onTitleChange called with:', newTitle);
