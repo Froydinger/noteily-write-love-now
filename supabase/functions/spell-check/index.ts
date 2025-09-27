@@ -46,7 +46,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07', // Most powerful model with massive context
+        model: 'gpt-4o-mini', // Fast and efficient model
         messages: [
           {
             role: 'system',
@@ -57,8 +57,8 @@ serve(async (req) => {
             content: getUserPrompt(action, content, instructions, title)
           }
         ],
-        max_completion_tokens: 2048, // Faster responses
-        // Note: temperature is not supported by GPT-5, defaults to 1.0
+        max_tokens: 1500, // Fast responses
+        temperature: 0.3, // More focused output
       }),
     });
 
