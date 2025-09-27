@@ -65,34 +65,37 @@ export function AiChatDialog({
   const isMobile = useIsMobile();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Initialize chat with welcome message
+  // Initialize chat with welcome message and reset minimized state
   useEffect(() => {
-    if (open && chatMessages.length === 0) {
-      setChatMessages([{
-        id: 'welcome',
-        type: 'system',
-        content: 'Hi! I can help you improve your writing. Use the quick actions below or tell me what you\'d like me to do with your text.',
-        timestamp: new Date()
-      }]);
+    if (open) {
+      setIsMinimized(false); // Always start expanded when opening
+      if (chatMessages.length === 0) {
+        setChatMessages([{
+          id: 'welcome',
+          type: 'system',
+          content: 'Hi! I can help you improve your writing. Use the quick actions below or tell me what you\'d like me to do with your text.',
+          timestamp: new Date()
+        }]);
+      }
     }
   }, [open, chatMessages.length]);
 
-  // Auto-hide functionality - minimize dialog when AI responds
+  // Auto-hide functionality - only minimize after actual AI responses to user messages
   useEffect(() => {
-    if (autoHide && chatMessages.length > 2 && !isProcessing) {
-      const lastMessage = chatMessages[chatMessages.length - 1];
-      const secondLastMessage = chatMessages[chatMessages.length - 2];
+    if (!autoHide || !open || isProcessing || chatMessages.length < 3) return;
+    
+    const lastMessage = chatMessages[chatMessages.length - 1];
+    const secondLastMessage = chatMessages[chatMessages.length - 2];
+    
+    // Only auto-hide if: last message is AI response AND second-last was user message (not system)
+    if (lastMessage.type === 'ai' && secondLastMessage.type === 'user') {
+      const timer = setTimeout(() => {
+        setIsMinimized(true);
+      }, 3000); // 3 second delay to read response
       
-      // Only auto-hide if last message is AI response and second-last was user message
-      if (lastMessage.type === 'ai' && secondLastMessage.type === 'user') {
-        const timer = setTimeout(() => {
-          setIsMinimized(true);
-        }, 2000); // 2 second delay
-        
-        return () => clearTimeout(timer);
-      }
+      return () => clearTimeout(timer);
     }
-  }, [chatMessages, autoHide, isProcessing]);
+  }, [chatMessages, autoHide, open, isProcessing]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

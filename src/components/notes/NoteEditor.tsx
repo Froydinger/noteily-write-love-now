@@ -482,7 +482,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
         <div
           ref={contentRef}
           contentEditable={!isReadOnly}
-          className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none pb-8 transition-none editor-anchor relative dynamic-body-font ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+          className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none pb-32 transition-none editor-anchor relative dynamic-body-font ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
           data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
           aria-label="Note content"
           onPaste={isReadOnly ? undefined : handlePaste}
