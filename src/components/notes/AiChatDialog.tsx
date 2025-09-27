@@ -61,14 +61,18 @@ export function AiChatDialog({
   const [showHistory, setShowHistory] = useState(false);
   const [autoHide, setAutoHide] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Initialize chat with welcome message and reset minimized state
+  // Initialize chat with welcome message and reset states when opening
   useEffect(() => {
     if (open) {
+      console.log('Dialog opening - resetting states');
       setIsMinimized(false); // Always start expanded when opening
+      setHasUserInteracted(false); // Reset interaction flag
+      setAutoHide(false); // Reset auto-hide on new session
       if (chatMessages.length === 0) {
         setChatMessages([{
           id: 'welcome',
@@ -78,24 +82,49 @@ export function AiChatDialog({
         }]);
       }
     }
-  }, [open, chatMessages.length]);
+  }, [open]);
 
-  // Auto-hide functionality - only minimize after actual AI responses to user messages
+  // Auto-hide functionality - only minimize after actual AI responses to user actions
   useEffect(() => {
-    if (!autoHide || !open || isProcessing || chatMessages.length < 3) return;
+    console.log('Auto-hide check:', { 
+      autoHide, 
+      open, 
+      isProcessing, 
+      hasUserInteracted, 
+      chatMessagesLength: chatMessages.length,
+      lastMessageType: chatMessages[chatMessages.length - 1]?.type
+    });
+    
+    // Only auto-hide if ALL conditions are met:
+    // 1. Auto-hide is enabled
+    // 2. Dialog is open
+    // 3. Not currently processing
+    // 4. User has actually interacted (not just opened dialog)
+    // 5. We have enough messages to check sequence
+    if (!autoHide || !open || isProcessing || !hasUserInteracted || chatMessages.length < 3) {
+      return;
+    }
     
     const lastMessage = chatMessages[chatMessages.length - 1];
     const secondLastMessage = chatMessages[chatMessages.length - 2];
     
+    console.log('Checking auto-hide conditions:', {
+      lastMessageType: lastMessage.type,
+      secondLastMessageType: secondLastMessage.type,
+      willAutoHide: lastMessage.type === 'ai' && secondLastMessage.type === 'user'
+    });
+    
     // Only auto-hide if: last message is AI response AND second-last was user message (not system)
     if (lastMessage.type === 'ai' && secondLastMessage.type === 'user') {
+      console.log('Auto-hiding in 3 seconds...');
       const timer = setTimeout(() => {
+        console.log('Auto-hiding now');
         setIsMinimized(true);
       }, 3000); // 3 second delay to read response
       
       return () => clearTimeout(timer);
     }
-  }, [chatMessages, autoHide, open, isProcessing]);
+  }, [chatMessages, autoHide, open, isProcessing, hasUserInteracted]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -117,6 +146,9 @@ export function AiChatDialog({
   ];
 
   const handleQuickAction = async (instruction: string, actionLabel: string) => {
+    console.log('Quick action triggered:', actionLabel);
+    setHasUserInteracted(true);
+    setAutoHide(true);
     await handleRewrite(instruction, actionLabel);
   };
 
@@ -130,6 +162,9 @@ export function AiChatDialog({
       return;
     }
 
+    console.log('Spell check triggered');
+    setHasUserInteracted(true);
+    setAutoHide(true);
     setIsProcessing(true);
     
     // Add user message
@@ -207,6 +242,9 @@ export function AiChatDialog({
       return;
     }
 
+    console.log('Grammar check triggered');
+    setHasUserInteracted(true);
+    setAutoHide(true);
     setIsProcessing(true);
     
     const userMessage: ChatMessage = {
@@ -372,6 +410,9 @@ export function AiChatDialog({
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isProcessing) return;
     
+    console.log('Send message triggered');
+    setHasUserInteracted(true);
+    setAutoHide(true);
     const instruction = inputValue.trim();
     setInputValue('');
     await handleRewrite(instruction);
