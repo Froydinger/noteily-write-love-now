@@ -437,37 +437,17 @@ export function AiChatDialog({
   return (
     <Dialog 
       open={open} 
-      onOpenChange={(newOpen) => {
-        console.log('Dialog onOpenChange called:', { 
-          from: open, 
-          to: newOpen, 
-          isMinimized, 
-          hasTextSelected,
-          reason: newOpen ? 'opening' : 'closing attempt'
-        });
-        
-        // Always allow opening
-        if (newOpen) {
-          onOpenChange(newOpen);
-          return;
-        }
-        
-        // Only allow closing via explicit X button click, not other interactions
-        // When minimized, we want to keep the dialog open
-        if (!newOpen && isMinimized) {
-          console.log('Preventing close because dialog is minimized');
-          return; // Don't close when minimized
-        }
-        
-        // Allow explicit closing
-        onOpenChange(newOpen);
+      onOpenChange={() => {
+        // Completely prevent automatic closing - only allow manual close via X button
+        console.log('Dialog onOpenChange triggered but prevented automatic closing');
       }}
       modal={false}
     >
       <DialogContent
         className={`
           ${isMobile 
-            ? `fixed bottom-4 right-4 top-auto left-auto w-[90vw] max-w-sm ${isMinimized ? 'h-16' : 'h-[70vh]'} m-0 translate-x-0 translate-y-0 rounded-lg border shadow-lg` 
+            ? `fixed bottom-4 right-4 top-auto left-auto w-[90vw] max-w-sm m-0 translate-x-0 translate-y-0 rounded-lg border shadow-lg
+               ${isMinimized ? 'h-16' : 'h-[70vh]'}` 
             : 'sm:max-w-2xl h-[80vh]'
           } 
           flex flex-col p-0 transition-all duration-300 z-50 bg-background
