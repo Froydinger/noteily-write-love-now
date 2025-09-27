@@ -92,20 +92,38 @@ serve(async (req) => {
       );
     }
 
-    // Simple unified response for all actions
+    // Clean and process the response
+    let cleanedResult = result.trim();
+    let newTitle = null;
+
+    // Handle title extraction for rewrite actions
+    if (action === 'rewrite' && cleanedResult.includes('TITLE:')) {
+      const lines = cleanedResult.split('\n');
+      const titleLineIndex = lines.findIndex((line: string) => line.trim().startsWith('TITLE:'));
+      
+      if (titleLineIndex !== -1) {
+        const titleLine = lines[titleLineIndex];
+        newTitle = titleLine.replace(/^TITLE:\s*/, '').trim();
+        
+        // Remove the title line and any empty lines after it
+        lines.splice(titleLineIndex, 1);
+        while (lines[titleLineIndex] && lines[titleLineIndex].trim() === '') {
+          lines.splice(titleLineIndex, 1);
+        }
+        
+        cleanedResult = lines.join('\n').trim();
+      }
+    }
+
+    // Build response data
     const responseData: any = {
-      correctedContent: result.trim(),
-      hasChanges: action === 'rewrite' || content !== result.trim()
+      correctedContent: cleanedResult,
+      hasChanges: cleanedResult !== content.trim()
     };
 
-    // Add newTitle only if it's a rewrite with title change
-    if (action === 'rewrite' && result.includes('TITLE:')) {
-      const lines = result.split('\n');
-      const titleLine = lines.find((line: string) => line.startsWith('TITLE:'));
-      if (titleLine) {
-        responseData.newTitle = titleLine.replace('TITLE:', '').trim();
-        responseData.correctedContent = lines.filter((line: string) => !line.startsWith('TITLE:')).join('\n').trim();
-      }
+    // Add title only if it was extracted
+    if (newTitle) {
+      responseData.newTitle = newTitle;
     }
 
     console.log('Sending response:', responseData);
@@ -140,7 +158,8 @@ CRITICAL RULES:
 - Do NOT rewrite, rephrase, or change the meaning
 - Keep all formatting, line breaks, and structure exactly the same
 - If there are no spelling errors, return the text exactly as provided
-- Return ONLY the corrected text, no explanations`;
+- Return ONLY the corrected text, no explanations
+- Maintain exact character count and positioning when possible`;
 
     case 'grammar':
       return `You are a grammar checker. Your task is to fix grammar and punctuation errors in the provided text.
@@ -152,27 +171,25 @@ CRITICAL RULES:
 - Keep the original style, tone, and voice
 - Keep all formatting, line breaks, and structure exactly the same
 - If there are no grammar errors, return the text exactly as provided
-- Return ONLY the corrected text, no explanations`;
+- Return ONLY the corrected text, no explanations
+- Maintain exact character positioning and line breaks`;
 
     case 'rewrite':
-      return `You are a professional writer and editor. Your task is to rewrite the provided content according to the user's specific instructions while maintaining document structure and formatting consistency.
+      return `You are a professional writer and editor. Your task is to rewrite the provided content according to the user's specific instructions while maintaining the document's structural integrity.
 
 CRITICAL FORMATTING RULES:
-- Preserve existing HTML structure and formatting patterns from the document
-- Maintain consistent heading hierarchy (H1, H2, H3, etc.) that matches the document style
-- Respect line breaks as semantic blocks - they separate ideas and should be preserved
-- Keep consistent formatting with the rest of the document
-- Use the same title/heading style as found in the original document
-- For selected text: ensure the rewritten text flows naturally with surrounding content
+- Read the COMPLETE context including title, original HTML, and selected text carefully
+- Preserve the document's heading hierarchy and formatting patterns EXACTLY
+- Respect line breaks as semantic paragraph separators - DO NOT remove them
+- When working with titles: only change the title if explicitly asked to do so
+- When working with selected text: ensure it flows with the surrounding context
+- Maintain consistent tone and style with the rest of the document
 
-INSTRUCTIONS:
-- Follow the user's rewriting instructions precisely
-- If there's a title, you may update it to match the new content
-- If you update the title, format your response as:
-  TITLE: [new title]
-  [rewritten content]
-- Otherwise, just return the rewritten content
-- Be creative but maintain document consistency and flow`;
+RESPONSE FORMAT:
+- If title should be changed: Start with "TITLE: [new title]" on its own line, then content
+- Otherwise: Return only the rewritten content
+- Preserve all line breaks and paragraph structure from the original
+- Do not add explanations or metadata`;
 
     default:
       return `You are a text processor. Process the provided text according to the specified action.`;
@@ -182,27 +199,34 @@ INSTRUCTIONS:
 function getUserPrompt(action: string, content: string, instructions?: string, title?: string, originalHTML?: string, isSelectedText?: boolean): string {
   switch (action) {
     case 'rewrite':
-      let prompt = `Rewrite the following content according to these instructions: "${instructions}"\n\n`;
+      let prompt = `INSTRUCTIONS: ${instructions || 'Improve and enhance the content'}\n\n`;
       
+      // Provide clear context about the document structure
       if (title) {
-        prompt += `Current document title: ${title}\n\n`;
+        prompt += `DOCUMENT TITLE: "${title}"\n`;
+        prompt += `(Only change the title if the instructions specifically ask for a title change)\n\n`;
       }
       
-      if (originalHTML && isSelectedText) {
-        // Extract formatting context from the original HTML
+      if (originalHTML && originalHTML.trim()) {
         const htmlStructure = extractFormatContext(originalHTML);
-        prompt += `DOCUMENT CONTEXT:\n${htmlStructure}\n\n`;
-        prompt += `SELECTED TEXT TO REWRITE:\n${content}\n\n`;
-        prompt += `Note: This is selected text from within a larger document. Ensure the rewritten text maintains consistency with the document's existing formatting and style patterns.`;
-      } else if (originalHTML) {
-        const htmlStructure = extractFormatContext(originalHTML);
-        prompt += `DOCUMENT FORMATTING CONTEXT:\n${htmlStructure}\n\n`;
-        prompt += `CONTENT TO REWRITE:\n${content}`;
+        prompt += `DOCUMENT STRUCTURE & FORMAT:\n${htmlStructure}\n\n`;
+      }
+      
+      if (isSelectedText) {
+        prompt += `TASK: Rewrite only the selected portion below while maintaining consistency with the document structure:\n\n`;
+        prompt += `SELECTED TEXT:\n${content}\n\n`;
+        prompt += `IMPORTANT: Return only the rewritten selected text. Do not include the title or surrounding content.`;
       } else {
-        prompt += `${content}`;
+        prompt += `TASK: Rewrite the content below according to the instructions:\n\n`;
+        prompt += `CONTENT:\n${content}\n\n`;
+        prompt += `IMPORTANT: Preserve all line breaks and paragraph structure. Only return the rewritten content (and title if changed).`;
       }
       
       return prompt;
+    
+    case 'spell':
+    case 'grammar':
+      return `Fix ${action} issues in this text while preserving ALL formatting and structure:\n\n${content}`;
     
     default:
       return content;
