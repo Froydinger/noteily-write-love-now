@@ -46,7 +46,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-nano-2025-08-07',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',
@@ -57,7 +57,7 @@ serve(async (req) => {
             content: getUserPrompt(action, content, instructions, title)
           }
         ],
-        max_completion_tokens: Math.min(4000, content.length * 3),
+        max_tokens: Math.min(4000, content.length * 3),
         temperature: 1.0
       }),
     });
