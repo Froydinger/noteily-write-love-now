@@ -73,14 +73,20 @@ export function AiChatDialog({
 
   // Function to inject changed text back into the original content
   const injectChangedText = (originalContent: string, selectedText: string, newText: string): string => {
-    if (!isSelectedText || !selectedTextRange) {
+    if (!isSelectedText) {
       return newText; // If no selection, replace all content
     }
 
-    // Find the selected text in the original content and replace it
-    const beforeSelection = originalContent.substring(0, selectedTextRange.start);
-    const afterSelection = originalContent.substring(selectedTextRange.end);
-    return beforeSelection + newText + afterSelection;
+    // For selected text, find the exact text in the original content and replace it
+    const selectedTextIndex = originalContent.indexOf(selectedText);
+    if (selectedTextIndex !== -1) {
+      const beforeSelection = originalContent.substring(0, selectedTextIndex);
+      const afterSelection = originalContent.substring(selectedTextIndex + selectedText.length);
+      return beforeSelection + newText + afterSelection;
+    }
+    
+    // Fallback: if we can't find the exact text, replace all content
+    return newText;
   };
 
   // Initialize chat with welcome message and reset states when opening
@@ -185,15 +191,10 @@ export function AiChatDialog({
       if (data.correctedContent && data.correctedContent !== content) {
         await onAddHistoryEntry('spell', content, data.correctedContent, noteTitle, noteTitle);
         
-        // For spell check, preserve the original HTML structure but inject corrected text
-        if (isSelectedText && selectedTextRange) {
-          const beforeSelection = originalHTML.substring(0, selectedTextRange.start);
-          const afterSelection = originalHTML.substring(selectedTextRange.end);
-          const finalContent = beforeSelection + data.correctedContent + afterSelection;
-          onContentChange(finalContent);
-        } else {
-          onContentChange(data.correctedContent);
-        }
+        // For spell check, inject corrected text properly
+        const plainOriginal = originalHTML.replace(/<[^>]*>/g, '');
+        const finalContent = injectChangedText(plainOriginal, content, data.correctedContent);
+        onContentChange(finalContent);
         
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
@@ -274,15 +275,10 @@ export function AiChatDialog({
       if (data.correctedContent && data.correctedContent !== content) {
         await onAddHistoryEntry('grammar', content, data.correctedContent, noteTitle, noteTitle);
         
-        // For grammar check, preserve the original HTML structure but inject corrected text
-        if (isSelectedText && selectedTextRange) {
-          const beforeSelection = originalHTML.substring(0, selectedTextRange.start);
-          const afterSelection = originalHTML.substring(selectedTextRange.end);
-          const finalContent = beforeSelection + data.correctedContent + afterSelection;
-          onContentChange(finalContent);
-        } else {
-          onContentChange(data.correctedContent);
-        }
+        // For grammar check, inject corrected text properly
+        const plainOriginal = originalHTML.replace(/<[^>]*>/g, '');
+        const finalContent = injectChangedText(plainOriginal, content, data.correctedContent);
+        onContentChange(finalContent);
         
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
@@ -382,12 +378,11 @@ export function AiChatDialog({
           instruction
         );
         
-        // For rewrite operations, use the AI's HTML directly since it's properly formatted
-        if (isSelectedText && selectedTextRange) {
-          // For selected text, inject the HTML content properly
-          const beforeSelection = originalHTML.substring(0, selectedTextRange.start);
-          const afterSelection = originalHTML.substring(selectedTextRange.end);
-          const finalContent = beforeSelection + response.data.correctedContent + afterSelection;
+        // For rewrite operations, use the AI's HTML content properly
+        if (isSelectedText) {
+          // For selected text, inject the HTML content into the original HTML
+          const plainOriginal = originalHTML.replace(/<[^>]*>/g, '');
+          const finalContent = injectChangedText(plainOriginal, content, response.data.correctedContent);
           onContentChange(finalContent);
         } else {
           // For full content rewrite, use the AI's HTML directly
