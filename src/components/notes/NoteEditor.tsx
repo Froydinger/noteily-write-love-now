@@ -12,9 +12,10 @@ import { SpellCheckButton } from './SpellCheckButton';
 interface NoteEditorProps {
   note: Note;
   onBlockTypeChange?: (type: BlockType) => void;
+  onContentBeforeChange?: () => void;
 }
 
-export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps) {
+export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange }: NoteEditorProps) {
   const { updateNote } = useNotes();
   const [title, setTitle] = useState(note.title);
   const [lastSavedContent, setLastSavedContent] = useState(note.content);
@@ -131,6 +132,9 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
         
         clearTimeout(timeout);
         timeout = setTimeout(() => {
+          // Store undo state before making changes
+          onContentBeforeChange?.();
+          
           // Sanitize content before saving to database
           const sanitizedContent = sanitizeContent(content);
           updateNote(note.id, { content: sanitizedContent }, true); // Silent auto-save
@@ -339,7 +343,7 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-24">
+    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-8">
       <div className="relative">
         <textarea
           ref={titleRef}
@@ -358,6 +362,9 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
             inactivityTimerRef.current = setTimeout(() => {
               sendInactivityNotification();
             }, 5 * 60 * 1000); // 5 minutes
+            
+            // Store undo state before making changes
+            onContentBeforeChange?.();
             
             updateNote(note.id, { title: newTitle }, true); // Silent title update
           }}
@@ -388,7 +395,7 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
         <div
           ref={contentRef}
           contentEditable={!isReadOnly}
-          className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none pb-32 transition-none editor-anchor relative ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+          className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none pb-8 transition-none editor-anchor relative ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
           data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
           aria-label="Note content"
           onPaste={isReadOnly ? undefined : handlePaste}
@@ -396,19 +403,17 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
         />
         
         {!isReadOnly && (
-          <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-3 z-10">
-            <SpellCheckButton 
-              content={contentRef.current?.textContent || ''}
-              originalHTML={contentRef.current?.innerHTML || ''}
-              onContentChange={(newHTML) => {
-                if (contentRef.current) {
-                  contentRef.current.innerHTML = newHTML;
-                  contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-              }}
-            />
-            <ImageUploadButton onImageInsert={insertImageAtCursor} />
-          </div>
+          <SpellCheckButton 
+            content={contentRef.current?.textContent || ''}
+            originalHTML={contentRef.current?.innerHTML || ''}
+            onContentChange={(newHTML) => {
+              if (contentRef.current) {
+                onContentBeforeChange?.();
+                contentRef.current.innerHTML = newHTML;
+                contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+              }
+            }}
+          />
         )}
       </div>
     </div>

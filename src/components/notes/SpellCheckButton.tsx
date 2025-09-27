@@ -149,27 +149,24 @@ export function SpellCheckButton({ content, originalHTML, onContentChange, disab
       onClick={handleSpellCheck}
       disabled={disabled || isChecking}
       variant="outline"
-      size="sm"
+      size="icon"
       className={`
-        relative transition-all duration-300 hover:scale-105
+        fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full shadow-lg
+        transition-all duration-300 hover:scale-105
         ${isChecking 
           ? 'bg-primary/10 border-primary text-primary animate-pulse shadow-lg shadow-primary/30' 
-          : 'hover:bg-primary/5 hover:border-primary/50'
+          : 'hover:bg-primary/5 hover:border-primary/50 bg-background'
         }
       `}
+      title={isChecking ? 'Checking spelling...' : 'Spell Check'}
     >
       <FileCheck 
-        className={`h-4 w-4 mr-2 transition-all duration-300 ${
+        className={`h-5 w-5 transition-all duration-300 ${
           isChecking ? 'animate-pulse' : ''
         }`} 
       />
-      {isChecking ? (
-        <>
-          <span className="animate-pulse">Checking...</span>
-          <div className="absolute inset-0 rounded-md bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 animate-ping opacity-75"></div>
-        </>
-      ) : (
-        'Spell Check'
+      {isChecking && (
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 animate-ping opacity-75"></div>
       )}
     </Button>
   );

@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus, Users, Eye, Edit, Type } from 'lucide-react';
+import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus, Users, Eye, Edit, Type, Undo2 } from 'lucide-react';
 import { BlockHandle, BlockType } from '@/components/notes/BlockHandle';
 import { Badge } from '@/components/ui/badge';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
@@ -41,6 +41,7 @@ const NotePage = () => {
   const [entered, setEntered] = useState(false);
   const [showFormatHandle, setShowFormatHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
+  const [undoContent, setUndoContent] = useState<{title: string, content: string} | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   
   const note = getNote(id || '');
@@ -175,6 +176,30 @@ const NotePage = () => {
     }
   };
 
+  const handleUndo = () => {
+    if (undoContent && note) {
+      // Store current state before undo
+      const currentState = { title: note.title, content: note.content };
+      
+      // Apply undo
+      updateNote(note.id, { title: undoContent.title, content: undoContent.content }, false);
+      
+      // Set new undo state to current state
+      setUndoContent(currentState);
+      
+      toast({
+        title: "Undone",
+        description: "Note reverted to previous state.",
+      });
+    }
+  };
+
+  const storeUndoState = () => {
+    if (note) {
+      setUndoContent({ title: note.title, content: note.content });
+    }
+  };
+
   
   if (!note) {
     return <div className="p-8">Note not found</div>;
@@ -240,6 +265,19 @@ const NotePage = () => {
           </div>
           
           <div className="flex items-center gap-1">
+            {/* Undo button - only show if not read-only and has undo state */}
+            {(!note.isSharedWithUser || note.userPermission !== 'read') && undoContent && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleUndo}
+                className="btn-accessible p-2"
+                title="Undo last change"
+              >
+                <Undo2 className="h-4 w-4" />
+              </Button>
+            )}
+            
             {/* Formatting button - only show if not read-only */}
             {!note.isSharedWithUser || note.userPermission !== 'read' ? (
               <BlockHandle
@@ -307,6 +345,7 @@ const NotePage = () => {
         <NoteEditor 
           note={note} 
           onBlockTypeChange={setCurrentBlockType}
+          onContentBeforeChange={storeUndoState}
         />
       </div>
       
