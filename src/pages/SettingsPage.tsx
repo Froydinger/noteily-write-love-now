@@ -426,17 +426,17 @@ ${note.content}
                   <p className="text-xs text-muted-foreground mt-1">
                     Choose your preferred font for note titles
                   </p>
+                  <p className="text-xs text-primary mt-1 font-medium">
+                    Current: {getTitleFontLabel(preferences.titleFont)}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-sm text-muted-foreground hidden sm:inline">
-                    {getTitleFontLabel(preferences.titleFont)}
-                  </span>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleTitleFontChange}
                     className="p-2 h-8 w-8"
-                    title="Change title font"
+                    title={`Change title font (current: ${getTitleFontLabel(preferences.titleFont)})`}
                   >
                     <Type className="h-3 w-3" />
                   </Button>
@@ -450,17 +450,17 @@ ${note.content}
                   <p className="text-xs text-muted-foreground mt-1">
                     Choose your preferred font for note content and body text
                   </p>
+                  <p className="text-xs text-primary mt-1 font-medium">
+                    Current: {getBodyFontLabel(preferences.bodyFont)}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-sm text-muted-foreground hidden sm:inline">
-                    {getBodyFontLabel(preferences.bodyFont)}
-                  </span>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleBodyFontChange}
                     className="p-2 h-8 w-8"
-                    title="Change body font"
+                    title={`Change body font (current: ${getBodyFontLabel(preferences.bodyFont)})`}
                   >
                     <Type className="h-3 w-3" />
                   </Button>
