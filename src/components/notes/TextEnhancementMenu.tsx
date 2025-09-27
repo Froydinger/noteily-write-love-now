@@ -55,8 +55,8 @@ export function TextEnhancementMenu({
   const handleSpellCheck = async () => {
     if (!content.trim()) {
       toast({
-        title: "No content to check",
-        description: "Please write some content first.",
+        title: "No text to check",
+        description: "Please write some text first.",
         variant: "destructive",
       });
       return;
@@ -102,8 +102,8 @@ export function TextEnhancementMenu({
   const handleGrammarCheck = async () => {
     if (!content.trim()) {
       toast({
-        title: "No content to check",
-        description: "Please write some content first.",
+        title: "No text to check",
+        description: "Please write some text first.",
         variant: "destructive",
       });
       return;
@@ -149,8 +149,8 @@ export function TextEnhancementMenu({
   const handleRewrite = async () => {
     if (!content.trim()) {
       toast({
-        title: "No content to rewrite",
-        description: "Please write some content first.",
+        title: "No text to rewrite",
+        description: "Please write some text first.",
         variant: "destructive",
       });
       return;
