@@ -9,6 +9,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotifications } from '@/hooks/useNotifications';
 import { RefreshCw } from 'lucide-react';
+import { useTitleFont } from '@/hooks/useTitleFont';
+import { useBodyFont } from '@/hooks/useTitleFont';
 
 const PromptsPage = () => {
   const { dailyPrompts, addNote, updateNote, setCurrentNote, refreshDailyPrompts } = useNotes();
@@ -17,6 +19,8 @@ const PromptsPage = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { state } = useSidebar();
+  const titleFont = useTitleFont();
+  const bodyFont = useBodyFont();
   
   const handleUsePrompt = async (prompt: typeof dailyPrompts[0]) => {
     try {
@@ -61,7 +65,7 @@ const PromptsPage = () => {
               >
                 <RefreshCw className="h-4 w-4" />
               </Button>
-              <h1 className="text-2xl font-serif font-medium">Daily Writing Prompts</h1>
+              <h1 className="text-2xl font-thin tracking-tight dynamic-title-font">Daily Writing Prompts</h1>
             </div>
           </div>
         </div>
@@ -93,12 +97,12 @@ const PromptsPage = () => {
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <h1 className="text-2xl font-serif font-medium">Daily Writing Prompts</h1>
+            <h1 className="text-2xl font-thin tracking-tight dynamic-title-font">Daily Writing Prompts</h1>
           </div>
         </div>
         
         <div className="mb-6">
-          <p className="text-muted-foreground mb-6">
+          <p className="text-muted-foreground mb-6 dynamic-body-font font-light tracking-tight">
             Here are your three writing prompts for today. New prompts will be available at midnight. 
             Use these to inspire your writing and reflection.
           </p>

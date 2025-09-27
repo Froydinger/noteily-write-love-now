@@ -185,27 +185,27 @@ export function AppSidebar() {
           <SidebarGroup>
             <SidebarGroupContent>
               {/* Horizontal navigation buttons */}
-              <div className="flex gap-2 px-4 mb-4">
+              <div className="flex gap-1 px-4 mb-4">
                 <Button
                   variant={isActive('/') ? 'default' : 'outline'}
                   size="sm"
                   asChild
-                  className="flex-1 h-9 rounded-full font-medium"
+                  className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm"
                 >
-                  <a href="/" className="flex items-center gap-2">
+                  <a href="/" className="flex items-center justify-center gap-2">
                     <BookOpen className="h-4 w-4" />
-                    <span className="text-xs sm:text-sm">My Notes</span>
+                    <span>My Notes</span>
                   </a>
                 </Button>
                 <Button
                   variant={isActive('/prompts') ? 'default' : 'outline'}
                   size="sm"
                   asChild
-                  className="flex-1 h-9 rounded-full font-medium"
+                  className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm"
                 >
-                  <a href="/prompts" className="flex items-center gap-2">
+                  <a href="/prompts" className="flex items-center justify-center gap-2">
                     <Pencil className="h-4 w-4" />
-                    <span className="text-xs sm:text-sm">Prompts</span>
+                    <span>Prompts</span>
                   </a>
                 </Button>
               </div>
