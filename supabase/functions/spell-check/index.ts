@@ -57,7 +57,8 @@ serve(async (req) => {
             content: getUserPrompt(action, content, instructions, title)
           }
         ],
-        max_completion_tokens: Math.min(4000, content.length * 3)
+        max_completion_tokens: Math.min(4000, content.length * 3),
+        temperature: 1.0
       }),
     });
 
