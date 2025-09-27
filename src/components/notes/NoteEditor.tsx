@@ -79,12 +79,81 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
   useEffect(() => {
     setTitle(note.title);
     if (contentRef.current) {
-      // Always update content to ensure undo/redo works
+      // Only update content if it's actually different to avoid cursor jumping
       const sanitizedContent = sanitizeForDisplay(note.content);
-      contentRef.current.innerHTML = sanitizedContent;
+      const currentContent = contentRef.current.innerHTML;
       
-      // Trigger any additional update events
-      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+      if (sanitizedContent !== currentContent) {
+        // Save cursor position before updating
+        const selection = window.getSelection();
+        let savedRange = null;
+        let cursorOffset = 0;
+        
+        if (selection && selection.rangeCount > 0 && contentRef.current.contains(selection.anchorNode)) {
+          const range = selection.getRangeAt(0);
+          savedRange = range.cloneRange();
+          
+          // Calculate cursor offset in text content
+          const walker = document.createTreeWalker(
+            contentRef.current,
+            NodeFilter.SHOW_TEXT
+          );
+          
+          let node;
+          while (node = walker.nextNode()) {
+            if (node === range.startContainer) {
+              cursorOffset += range.startOffset;
+              break;
+            } else {
+              cursorOffset += node.textContent?.length || 0;
+            }
+          }
+        }
+        
+        contentRef.current.innerHTML = sanitizedContent;
+        
+        // Restore cursor position if we had one
+        if (savedRange && contentRef.current.contains(savedRange.startContainer)) {
+          try {
+            selection?.removeAllRanges();
+            selection?.addRange(savedRange);
+          } catch (e) {
+            // If exact position fails, try to restore by text offset
+            try {
+              const walker = document.createTreeWalker(
+                contentRef.current,
+                NodeFilter.SHOW_TEXT
+              );
+              
+              let node;
+              let currentOffset = 0;
+              
+              while (node = walker.nextNode()) {
+                const nodeLength = node.textContent?.length || 0;
+                if (currentOffset + nodeLength >= cursorOffset) {
+                  const range = document.createRange();
+                  range.setStart(node, Math.max(0, cursorOffset - currentOffset));
+                  range.collapse(true);
+                  selection?.removeAllRanges();
+                  selection?.addRange(range);
+                  break;
+                }
+                currentOffset += nodeLength;
+              }
+            } catch (e2) {
+              // Final fallback: place cursor at end
+              const range = document.createRange();
+              range.selectNodeContents(contentRef.current);
+              range.collapse(false);
+              selection?.removeAllRanges();
+              selection?.addRange(range);
+            }
+          }
+        }
+        
+        // Trigger any additional update events
+        contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+      }
     }
   }, [note.id, note.title, note.content]);
 
