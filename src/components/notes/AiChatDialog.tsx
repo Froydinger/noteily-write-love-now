@@ -492,16 +492,6 @@ export function AiChatDialog({
                   <History className="h-4 w-4" />
                 </Button>
               )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  console.log('Close button clicked - closing dialog');
-                  onOpenChange(false);
-                }}
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         </DialogHeader>
