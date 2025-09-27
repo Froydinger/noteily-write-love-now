@@ -7,6 +7,7 @@ import { FeaturedImage } from './FeaturedImage';
 import { sanitizeContent, sanitizeForDisplay, sanitizeImageUrl, isValidImageUrl } from "@/lib/sanitization";
 import { BlockHandle, BlockType } from './BlockHandle';
 import { usePageLeave } from '@/hooks/usePageLeave';
+import { SpellCheckButton } from './SpellCheckButton';
 
 interface NoteEditorProps {
   note: Note;
@@ -394,7 +395,28 @@ export default function NoteEditor({ note, onBlockTypeChange }: NoteEditorProps)
           onFocus={() => !isReadOnly && setShowHandle(true)}
         />
         
-        {!isReadOnly && <ImageUploadButton onImageInsert={insertImageAtCursor} />}
+        {!isReadOnly && (
+          <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-3 z-10">
+            <SpellCheckButton 
+              content={contentRef.current?.textContent || ''}
+              onContentChange={(newContent) => {
+                if (contentRef.current) {
+                  // Preserve formatting while updating text content
+                  const paragraphs = newContent.split('\n\n');
+                  const formattedContent = paragraphs
+                    .map(p => p.replace(/\n/g, '<br>'))
+                    .join('</p><p>')
+                    .replace(/^/, '<p>')
+                    .replace(/$/, '</p>');
+                  
+                  contentRef.current.innerHTML = formattedContent;
+                  contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+              }}
+            />
+            <ImageUploadButton onImageInsert={insertImageAtCursor} />
+          </div>
+        )}
       </div>
     </div>
   );
