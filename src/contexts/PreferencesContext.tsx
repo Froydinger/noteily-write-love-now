@@ -3,14 +3,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 
 export type ThemeType = 'light' | 'dark' | 'navy';
+export type TitleFontType = 'serif' | 'sans' | 'mono';
 
 interface UserPreferences {
   theme: ThemeType;
+  titleFont: TitleFontType;
 }
 
 interface PreferencesContextType {
   preferences: UserPreferences;
   updateTheme: (theme: ThemeType) => Promise<void>;
+  updateTitleFont: (font: TitleFontType) => Promise<void>;
   refreshPreferences: () => Promise<void>;
   loading: boolean;
 }
@@ -27,14 +30,15 @@ export const usePreferences = () => {
 
 export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const [preferences, setPreferences] = useState<UserPreferences>({ theme: 'navy' });
+  const [preferences, setPreferences] = useState<UserPreferences>({ theme: 'navy', titleFont: 'serif' });
   const [loading, setLoading] = useState(false);
 
   // Load user preferences - prioritize localStorage, sync with Supabase
   const loadPreferences = async () => {
     // Always start with localStorage as primary source
     const localTheme = (localStorage.getItem('theme') as ThemeType) || 'navy';
-    setPreferences({ theme: localTheme });
+    const localTitleFont = (localStorage.getItem('titleFont') as TitleFontType) || 'serif';
+    setPreferences({ theme: localTheme, titleFont: localTitleFont });
     
     // Apply theme immediately if not already applied
     const html = document.documentElement;
@@ -53,7 +57,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
       // Try to sync with Supabase for authenticated users
       const { data, error } = await supabase
         .from('user_preferences')
-        .select('theme')
+        .select('theme, title_font')
         .eq('user_id', user.id)
         .single();
 
@@ -61,15 +65,17 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
         // Error other than "not found" - keep local theme
         console.error('Error loading preferences:', error);
       } else if (data) {
-        // Check if Supabase theme differs from local
-        if (data.theme !== localTheme) {
-          // Supabase has different theme - use it and update localStorage
-          setPreferences({ theme: data.theme as ThemeType });
+        // Check if Supabase data differs from local
+        const supabaseTitleFont = (data.title_font as TitleFontType) || 'serif';
+        if (data.theme !== localTheme || supabaseTitleFont !== localTitleFont) {
+          // Supabase has different preferences - use them and update localStorage
+          setPreferences({ theme: data.theme as ThemeType, titleFont: supabaseTitleFont });
           applyTheme(data.theme as ThemeType);
+          applyTitleFont(supabaseTitleFont);
         }
       } else {
         // No preferences found in Supabase - sync local to Supabase
-        await createDefaultPreferences(localTheme);
+        await createDefaultPreferences(localTheme, localTitleFont);
       }
     } catch (error) {
       console.error('Error syncing preferences:', error);
@@ -94,7 +100,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
   }, [user]);
 
-  const createDefaultPreferences = async (theme: ThemeType = 'navy') => {
+  const createDefaultPreferences = async (theme: ThemeType = 'navy', titleFont: TitleFontType = 'serif') => {
     if (!user) return;
 
     try {
@@ -102,7 +108,8 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
         .from('user_preferences')
         .insert({
           user_id: user.id,
-          theme: theme
+          theme: theme,
+          title_font: titleFont
         });
 
       if (error) {
@@ -146,6 +153,36 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   };
 
+  const updateTitleFont = async (newTitleFont: TitleFontType) => {
+    // Update local state immediately for responsive UI
+    setPreferences(prev => ({ ...prev, titleFont: newTitleFont }));
+    applyTitleFont(newTitleFont);
+
+    if (!user) {
+      // For non-authenticated users, only update local state
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('user_preferences')
+        .update({ title_font: newTitleFont })
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error updating title font preference:', error);
+        // Revert local state on error
+        setPreferences(prev => ({ ...prev, titleFont: preferences.titleFont }));
+        applyTitleFont(preferences.titleFont);
+      }
+    } catch (error) {
+      console.error('Error updating title font preference:', error);
+      // Revert local state on error
+      setPreferences(prev => ({ ...prev, titleFont: preferences.titleFont }));
+      applyTitleFont(preferences.titleFont);
+    }
+  };
+
   const refreshPreferences = async () => {
     if (!user) return;
     await loadPreferences();
@@ -165,6 +202,14 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     
     // Update browser theme color to match the applied theme
     updateBrowserThemeColor(theme);
+  };
+
+  const applyTitleFont = (titleFont: TitleFontType) => {
+    // Save to localStorage immediately
+    localStorage.setItem('titleFont', titleFont);
+    
+    // Apply the font preference to the document
+    document.documentElement.setAttribute('data-title-font', titleFont);
   };
 
   const updateBrowserThemeColor = (theme: ThemeType) => {
@@ -201,8 +246,13 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     console.log('PreferencesContext updated browser color to:', color, 'for theme:', theme);
   };
 
+  // Apply title font on mount
+  useEffect(() => {
+    applyTitleFont(preferences.titleFont);
+  }, [preferences.titleFont]);
+
   return (
-    <PreferencesContext.Provider value={{ preferences, updateTheme, refreshPreferences, loading }}>
+    <PreferencesContext.Provider value={{ preferences, updateTheme, updateTitleFont, refreshPreferences, loading }}>
       {children}
     </PreferencesContext.Provider>
   );

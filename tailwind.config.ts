@@ -22,6 +22,7 @@ export default {
 			fontFamily: {
 				'serif': ['Playfair Display', 'Georgia', 'serif'],
 				'sans': ['Inter', 'system-ui', 'sans-serif'],
+				'mono': ['JetBrains Mono', 'Menlo', 'Monaco', 'monospace'],
 				'opensans': ['Open Sans', 'system-ui', 'sans-serif'],
 			},
 			colors: {
