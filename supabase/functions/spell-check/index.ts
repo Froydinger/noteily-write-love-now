@@ -175,21 +175,28 @@ CRITICAL RULES:
 - Maintain exact character positioning and line breaks`;
 
     case 'rewrite':
-      return `You are a professional writer and editor. Your task is to rewrite the provided content according to the user's specific instructions while maintaining the document's structural integrity.
+      return `You are a professional writer and editor. Your task is to rewrite content according to user instructions while maintaining proper HTML structure for a rich text editor.
 
-CRITICAL FORMATTING RULES:
-- Read the COMPLETE context including title, original HTML, and selected text carefully
-- Preserve the document's heading hierarchy and formatting patterns EXACTLY
-- Respect line breaks as semantic paragraph separators - DO NOT remove them
-- When working with titles: only change the title if explicitly asked to do so
-- When working with selected text: ensure it flows with the surrounding context
-- Maintain consistent tone and style with the rest of the document
+CRITICAL HTML FORMATTING RULES:
+- Return content in PROPER HTML FORMAT, NOT markdown
+- Use HTML tags for structure: <h1>, <h2>, <h3> for headings, <p> for paragraphs
+- NEVER use markdown syntax like **bold** or # headings - use HTML tags instead
+- Each paragraph should be wrapped in <p> tags
+- Headings should use appropriate HTML heading tags (h1, h2, h3, etc.)
+- Preserve line breaks as separate paragraphs using <p> tags
+- Use <strong> for bold text, <em> for italics, not markdown syntax
 
-RESPONSE FORMAT:
-- If title should be changed: Start with "TITLE: [new title]" on its own line, then content
-- Otherwise: Return only the rewritten content
-- Preserve all line breaks and paragraph structure from the original
-- Do not add explanations or metadata`;
+CONTENT RULES:
+- Follow user instructions precisely for the rewrite
+- Maintain document structure and hierarchy
+- If title should be changed, format as: TITLE: [new title]
+- Ensure content flows naturally and maintains consistency
+- Return clean HTML without unnecessary attributes or classes
+
+EXAMPLE OUTPUT FORMAT:
+<h2>Proper Heading</h2>
+<p>This is a paragraph with proper HTML structure.</p>
+<p>This is another paragraph that maintains formatting.</p>`;
 
     default:
       return `You are a text processor. Process the provided text according to the specified action.`;
@@ -199,7 +206,7 @@ RESPONSE FORMAT:
 function getUserPrompt(action: string, content: string, instructions?: string, title?: string, originalHTML?: string, isSelectedText?: boolean): string {
   switch (action) {
     case 'rewrite':
-      let prompt = `INSTRUCTIONS: ${instructions || 'Improve and enhance the content'}\n\n`;
+      let prompt = `REWRITE INSTRUCTIONS: ${instructions || 'Improve and enhance the content'}\n\n`;
       
       // Provide clear context about the document structure
       if (title) {
@@ -209,17 +216,29 @@ function getUserPrompt(action: string, content: string, instructions?: string, t
       
       if (originalHTML && originalHTML.trim()) {
         const htmlStructure = extractFormatContext(originalHTML);
-        prompt += `DOCUMENT STRUCTURE & FORMAT:\n${htmlStructure}\n\n`;
+        prompt += `DOCUMENT STRUCTURE:\n${htmlStructure}\n\n`;
       }
       
       if (isSelectedText) {
-        prompt += `TASK: Rewrite only the selected portion below while maintaining consistency with the document structure:\n\n`;
-        prompt += `SELECTED TEXT:\n${content}\n\n`;
-        prompt += `IMPORTANT: Return only the rewritten selected text. Do not include the title or surrounding content.`;
+        prompt += `TASK: Rewrite the selected text below. Return it in proper HTML format for a rich text editor:\n\n`;
+        prompt += `SELECTED TEXT TO REWRITE:\n${content}\n\n`;
+        prompt += `CRITICAL: 
+- Return ONLY the rewritten selected text in HTML format
+- Use <p> tags for paragraphs, <h1>-<h6> for headings
+- Do NOT use markdown syntax (no **, #, etc.)
+- Each paragraph should be wrapped in <p> tags
+- Use proper HTML heading tags if creating titles/headings`;
       } else {
-        prompt += `TASK: Rewrite the content below according to the instructions:\n\n`;
-        prompt += `CONTENT:\n${content}\n\n`;
-        prompt += `IMPORTANT: Preserve all line breaks and paragraph structure. Only return the rewritten content (and title if changed).`;
+        prompt += `TASK: Rewrite the entire content below in proper HTML format:\n\n`;
+        prompt += `CONTENT TO REWRITE:\n${content}\n\n`;
+        prompt += `CRITICAL FORMATTING REQUIREMENTS:
+- Return content in proper HTML format (not markdown)
+- Wrap paragraphs in <p> tags
+- Use <h1>, <h2>, <h3> etc. for headings (NOT markdown # syntax)
+- Use <strong> for bold, <em> for italics
+- If instructions ask for different paragraphs, create separate <p> tags
+- If instructions ask for titles/headings, use proper HTML heading tags
+- Preserve paragraph breaks as separate <p> elements`;
       }
       
       return prompt;
