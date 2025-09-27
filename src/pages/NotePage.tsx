@@ -48,8 +48,6 @@ const NotePage = () => {
   const [showFormatHandle, setShowFormatHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
   const { saveState, undo, redo, canUndo, canRedo, clearHistory } = useUndoRedo();
-  const [undoStack, setUndoStack] = useState<UndoRedoState[]>([]);
-  const [redoStack, setRedoStack] = useState<UndoRedoState[]>([]);
   const headerRef = useRef<HTMLElement>(null);
   
   const note = getNote(id || '');
@@ -187,14 +185,10 @@ const NotePage = () => {
   const handleUndo = () => {
     if (!note) return;
     
-    // Save current state to redo stack before undoing
     const currentState = { title: note.title, content: note.content };
+    const undoneState = undo(currentState);
     
-    const undoneState = undo();
     if (undoneState) {
-      // Add current state to redo stack
-      setRedoStack(prev => [...prev, currentState]);
-      
       updateNote(note.id, { title: undoneState.title, content: undoneState.content }, false);
       
       toast({
@@ -207,14 +201,10 @@ const NotePage = () => {
   const handleRedo = () => {
     if (!note) return;
     
-    // Save current state to undo stack before redoing
     const currentState = { title: note.title, content: note.content };
+    const redoneState = redo(currentState);
     
-    const redoneState = redo();
     if (redoneState) {
-      // Add current state back to undo stack
-      setUndoStack(prev => [...prev, currentState]);
-      
       updateNote(note.id, { title: redoneState.title, content: redoneState.content }, false);
       
       toast({

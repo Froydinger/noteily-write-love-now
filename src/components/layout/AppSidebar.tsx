@@ -153,7 +153,6 @@ export function AppSidebar() {
                 {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
               </Button>
             )}
-            {isMobile && <SidebarTrigger />}
           </div>
         )}
         {state === "collapsed" && isMobile && (

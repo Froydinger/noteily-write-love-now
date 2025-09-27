@@ -14,20 +14,30 @@ export function useUndoRedo() {
     setRedoStack([]); // Clear redo stack when new state is saved
   }, []);
 
-  const undo = useCallback((): UndoRedoState | null => {
+  const undo = useCallback((currentState?: UndoRedoState): UndoRedoState | null => {
     if (undoStack.length === 0) return null;
     
     const previousState = undoStack[undoStack.length - 1];
     setUndoStack(prev => prev.slice(0, -1));
     
+    // Add current state to redo stack if provided
+    if (currentState) {
+      setRedoStack(prev => [...prev, currentState]);
+    }
+    
     return previousState;
   }, [undoStack]);
 
-  const redo = useCallback((): UndoRedoState | null => {
+  const redo = useCallback((currentState?: UndoRedoState): UndoRedoState | null => {
     if (redoStack.length === 0) return null;
     
     const nextState = redoStack[redoStack.length - 1];
     setRedoStack(prev => prev.slice(0, -1));
+    
+    // Add current state to undo stack if provided
+    if (currentState) {
+      setUndoStack(prev => [...prev, currentState]);
+    }
     
     return nextState;
   }, [redoStack]);
