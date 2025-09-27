@@ -9,15 +9,20 @@ import { BlockHandle, BlockType } from './BlockHandle';
 import { usePageLeave } from '@/hooks/usePageLeave';
 import { useTitleFont, useBodyFont } from '@/hooks/useTitleFont';
 import { SpellCheckButton } from './SpellCheckButton';
+import { TextEnhancementMenu } from './TextEnhancementMenu';
 
 interface NoteEditorProps {
   note: Note;
   onBlockTypeChange?: (type: BlockType) => void;
   onContentBeforeChange?: () => void;
   onSpellCheckApplied?: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
-export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange, onSpellCheckApplied }: NoteEditorProps) {
+export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange, onSpellCheckApplied, onUndo, onRedo, canUndo, canRedo }: NoteEditorProps) {
   const titleFont = useTitleFont();
   const bodyFont = useBodyFont();
   const { updateNote } = useNotes();
@@ -407,22 +412,26 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
         />
         
         {!isReadOnly && (
-          <div className="fixed bottom-4 right-4 z-50">
-            <SpellCheckButton 
-              content={contentRef.current?.textContent || ''}
-              originalHTML={contentRef.current?.innerHTML || ''}
-              onContentChange={(newHTML) => {
-                if (contentRef.current) {
-                  onContentBeforeChange?.();
-                  contentRef.current.innerHTML = newHTML;
-                  contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-                  onSpellCheckApplied?.();
-                }
-              }}
-            />
-          </div>
+          <TextEnhancementMenu
+            content={contentRef.current?.textContent || ''}
+            originalHTML={contentRef.current?.innerHTML || ''}
+            onContentChange={(newHTML) => {
+              if (contentRef.current) {
+                onContentBeforeChange?.();
+                contentRef.current.innerHTML = newHTML;
+                contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+                onSpellCheckApplied?.();
+              }
+            }}
+            onUndo={onUndo}
+            onRedo={onRedo}
+            canUndo={canUndo || false}
+            canRedo={canRedo || false}
+            noteTitle={title}
+            onTitleChange={(newTitle) => setTitle(newTitle)}
+          />
         )}
       </div>
     </div>
   );
-}
+};

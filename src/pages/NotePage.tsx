@@ -322,32 +322,6 @@ const NotePage = () => {
           </div>
           
           <div className="flex items-center gap-1">
-            {/* Undo/Redo buttons - only show if not read-only */}
-            {(!note.isSharedWithUser || note.userPermission !== 'read') && (
-              <>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleUndo}
-                  disabled={!canUndo}
-                  className={`btn-accessible p-2 ${!canUndo ? 'opacity-30' : ''}`}
-                  title="Undo AI changes"
-                >
-                  <Undo2 className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleRedo}
-                  disabled={!canRedo}
-                  className={`btn-accessible p-2 ${!canRedo ? 'opacity-30' : ''}`}
-                  title="Redo AI changes"
-                >
-                  <Redo2 className="h-4 w-4" />
-                </Button>
-              </>
-            )}
-            
             {/* Formatting button - only show if not read-only */}
             {!note.isSharedWithUser || note.userPermission !== 'read' ? (
               <BlockHandle
