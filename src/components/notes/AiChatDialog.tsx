@@ -86,11 +86,8 @@ export function AiChatDialog({
   // Initialize chat with welcome message and reset states when opening
   useEffect(() => {
     if (open) {
-      console.log('Dialog opening - resetting states');
-      // Don't auto-minimize when opening - let user control this
-      if (!isMinimized) {
-        setIsMinimized(false); // Keep expanded when opening unless already minimized
-      }
+      console.log('Dialog opening - current state:', { isMinimized, hasTextSelected });
+      // Only reset minimized state if dialog was completely closed before
       setHasUserInteracted(false); // Reset interaction flag
       
       // Calculate text selection range if working with selected text
@@ -441,13 +438,29 @@ export function AiChatDialog({
     <Dialog 
       open={open} 
       onOpenChange={(newOpen) => {
-        console.log('Dialog onOpenChange called:', { from: open, to: newOpen, isMinimized });
-        // Only allow closing if user explicitly closes, not when minimizing
-        if (!newOpen && !isMinimized) {
+        console.log('Dialog onOpenChange called:', { 
+          from: open, 
+          to: newOpen, 
+          isMinimized, 
+          hasTextSelected,
+          reason: newOpen ? 'opening' : 'closing attempt'
+        });
+        
+        // Always allow opening
+        if (newOpen) {
           onOpenChange(newOpen);
-        } else if (newOpen) {
-          onOpenChange(newOpen);
+          return;
         }
+        
+        // Only allow closing via explicit X button click, not other interactions
+        // When minimized, we want to keep the dialog open
+        if (!newOpen && isMinimized) {
+          console.log('Preventing close because dialog is minimized');
+          return; // Don't close when minimized
+        }
+        
+        // Allow explicit closing
+        onOpenChange(newOpen);
       }}
       modal={false}
     >
@@ -502,7 +515,10 @@ export function AiChatDialog({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onOpenChange(false)}
+                onClick={() => {
+                  console.log('Close button clicked - closing dialog');
+                  onOpenChange(false);
+                }}
               >
                 <X className="h-4 w-4" />
               </Button>
