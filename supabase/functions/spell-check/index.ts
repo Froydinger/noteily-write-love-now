@@ -164,9 +164,9 @@ function getUserPrompt(action: string, content: string, instructions?: string, t
     case 'rewrite':
       let prompt = `Rewrite the following content according to these instructions: "${instructions}"\n\n`;
       if (title) {
-        prompt += `Title: ${title}\n`;
+        prompt += `Current title: ${title}\n\n`;
       }
-      prompt += `Content: ${content}`;
+      prompt += `${content}`;
       return prompt;
     
     default:
