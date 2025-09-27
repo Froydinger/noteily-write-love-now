@@ -79,10 +79,12 @@ export function AiChatDialog({
 
   // Auto-hide functionality - minimize dialog when AI responds
   useEffect(() => {
-    if (autoHide && chatMessages.length > 1) {
+    if (autoHide && chatMessages.length > 2 && !isProcessing) {
       const lastMessage = chatMessages[chatMessages.length - 1];
-      if (lastMessage.type === 'ai' && !isProcessing) {
-        // Auto-hide after AI response with a delay
+      const secondLastMessage = chatMessages[chatMessages.length - 2];
+      
+      // Only auto-hide if last message is AI response and second-last was user message
+      if (lastMessage.type === 'ai' && secondLastMessage.type === 'user') {
         const timer = setTimeout(() => {
           setIsMinimized(true);
         }, 2000); // 2 second delay
