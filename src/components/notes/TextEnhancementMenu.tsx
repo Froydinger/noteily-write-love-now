@@ -6,8 +6,7 @@ import {
   FileCheck, 
   BookOpen, 
   PenTool, 
-  Undo2, 
-  Redo2,
+  Undo2,
   Wand2
 } from 'lucide-react';
 import {
@@ -32,9 +31,7 @@ interface TextEnhancementMenuProps {
   originalHTML: string;
   onContentChange: (newContent: string) => void;
   onUndo?: () => void;
-  onRedo?: () => void;
   canUndo?: boolean;
-  canRedo?: boolean;
   noteTitle: string;
   onTitleChange: (newTitle: string) => void;
   disabled?: boolean;
@@ -45,9 +42,7 @@ export function TextEnhancementMenu({
   originalHTML,
   onContentChange,
   onUndo,
-  onRedo,
   canUndo = false,
-  canRedo = false,
   noteTitle,
   onTitleChange,
   disabled = false
@@ -275,10 +270,6 @@ export function TextEnhancementMenu({
           <DropdownMenuItem onClick={onUndo} disabled={!canUndo || isProcessing}>
             <Undo2 className="mr-2 h-4 w-4" />
             Undo
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={onRedo} disabled={!canRedo || isProcessing}>
-            <Redo2 className="mr-2 h-4 w-4" />
-            Redo
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

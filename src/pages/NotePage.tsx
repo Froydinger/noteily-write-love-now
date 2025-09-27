@@ -47,7 +47,7 @@ const NotePage = () => {
   const [entered, setEntered] = useState(false);
   const [showFormatHandle, setShowFormatHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
-  const { saveState, undo, redo, canUndo, canRedo, clearHistory } = useUndoRedo();
+  const { saveState, undo, canUndo, clearHistory } = useUndoRedo();
   const headerRef = useRef<HTMLElement>(null);
   
   const note = getNote(id || '');
@@ -213,40 +213,6 @@ const NotePage = () => {
       toast({
         title: "Undone",
         description: "Note reverted to previous state.",
-      });
-    }
-  };
-
-  const handleRedo = () => {
-    if (!note) return;
-    
-    const redoneState = redo();
-    if (redoneState) {
-      // Force update the note content directly
-      updateNote(note.id, { 
-        title: redoneState.title, 
-        content: redoneState.content 
-      }, false);
-      
-      // Force editor update by updating DOM directly
-      setTimeout(() => {
-        const titleInput = document.querySelector('[data-title-input]') as HTMLTextAreaElement;
-        const contentDiv = document.querySelector('[contenteditable="true"]') as HTMLDivElement;
-        
-        if (titleInput && titleInput.value !== redoneState.title) {
-          titleInput.value = redoneState.title;
-          titleInput.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-        
-        if (contentDiv && contentDiv.innerHTML !== redoneState.content) {
-          contentDiv.innerHTML = redoneState.content;
-          contentDiv.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-      }, 50);
-      
-      toast({
-        title: "Redone",
-        description: "Note restored to next state.",
       });
     }
   };

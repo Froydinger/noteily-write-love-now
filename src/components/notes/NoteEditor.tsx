@@ -17,12 +17,10 @@ interface NoteEditorProps {
   onContentBeforeChange?: () => void;
   onSpellCheckApplied?: () => void;
   onUndo?: () => void;
-  onRedo?: () => void;
   canUndo?: boolean;
-  canRedo?: boolean;
 }
 
-export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange, onSpellCheckApplied, onUndo, onRedo, canUndo, canRedo }: NoteEditorProps) {
+export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange, onSpellCheckApplied, onUndo, canUndo }: NoteEditorProps) {
   const titleFont = useTitleFont();
   const bodyFont = useBodyFont();
   const { updateNote } = useNotes();
@@ -424,9 +422,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
               }
             }}
             onUndo={onUndo}
-            onRedo={onRedo}
             canUndo={canUndo || false}
-            canRedo={canRedo || false}
             noteTitle={title}
             onTitleChange={(newTitle) => setTitle(newTitle)}
           />
