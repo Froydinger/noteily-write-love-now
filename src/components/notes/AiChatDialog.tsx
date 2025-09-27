@@ -436,8 +436,11 @@ export function AiChatDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
-      <DialogContent 
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      console.log('Dialog onOpenChange called:', { from: open, to: newOpen });
+      onOpenChange(newOpen);
+    }}>
+      <DialogContent
         className={`
           ${isMobile 
             ? `fixed bottom-4 right-4 top-auto left-auto w-[90vw] max-w-sm ${isMinimized ? 'h-16' : 'h-[70vh]'} m-0 translate-x-0 translate-y-0 rounded-lg border shadow-lg` 
