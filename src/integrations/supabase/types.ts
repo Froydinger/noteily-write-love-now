@@ -171,6 +171,7 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          ai_enabled: boolean | null
           body_font: string | null
           created_at: string
           daily_prompt_time: string | null
@@ -187,6 +188,7 @@ export type Database = {
           username_prompt_last_shown: string | null
         }
         Insert: {
+          ai_enabled?: boolean | null
           body_font?: string | null
           created_at?: string
           daily_prompt_time?: string | null
@@ -203,6 +205,7 @@ export type Database = {
           username_prompt_last_shown?: string | null
         }
         Update: {
+          ai_enabled?: boolean | null
           body_font?: string | null
           created_at?: string
           daily_prompt_time?: string | null

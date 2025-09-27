@@ -11,7 +11,7 @@ import { useNotes } from '@/contexts/NoteContext';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart, AtSign, Check, X, Loader2, Type } from 'lucide-react';
+import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart, AtSign, Check, X, Loader2, Type, Brain } from 'lucide-react';
 import { useTitleFont } from '@/hooks/useTitleFont';
 import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from '@/components/theme/ThemeToggle';
@@ -31,7 +31,7 @@ const SettingsPage = () => {
   const { toast } = useToast();
   const { user, signOut } = useAuth();
   const { notes } = useNotes();
-  const { preferences, updateTitleFont, updateBodyFont } = usePreferences();
+  const { preferences, updateTitleFont, updateBodyFont, updateAiEnabled } = usePreferences();
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -78,6 +78,10 @@ const SettingsPage = () => {
     const currentIndex = ['serif', 'sans', 'mono'].indexOf(preferences.bodyFont);
     const nextFont = ['serif', 'sans', 'mono'][(currentIndex + 1) % 3] as 'serif' | 'sans' | 'mono';
     await updateBodyFont(nextFont);
+  };
+
+  const handleAiEnabledToggle = async () => {
+    await updateAiEnabled(!preferences.aiEnabled);
   };
 
   const handleSignOut = async () => {
@@ -463,6 +467,30 @@ ${note.content}
                     title={`Change body font (current: ${getBodyFontLabel(preferences.bodyFont)})`}
                   >
                     <Type className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              
+              {/* AI Features setting */}
+              <div className="flex items-start justify-between gap-3 border-t pt-4">
+                <div className="flex-1 min-w-0">
+                  <Label htmlFor="aiEnabled" className="text-sm font-medium">AI Features</Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Enable or disable AI-powered writing assistance features like spell check, grammar correction, and text rewriting
+                  </p>
+                  <p className="text-xs text-primary mt-1 font-medium">
+                    Current: {preferences.aiEnabled ? 'Enabled' : 'Disabled'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAiEnabledToggle}
+                    className="p-2 h-8 w-8"
+                    title={`${preferences.aiEnabled ? 'Disable' : 'Enable'} AI features`}
+                  >
+                    <Brain className="h-3 w-3" />
                   </Button>
                 </div>
               </div>

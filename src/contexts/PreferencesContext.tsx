@@ -111,7 +111,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
   }, [user]);
 
-  const createDefaultPreferences = async (theme: ThemeType = 'navy', titleFont: TitleFontType = 'serif', bodyFont: BodyFontType = 'sans') => {
+  const createDefaultPreferences = async (theme: ThemeType = 'navy', titleFont: TitleFontType = 'serif', bodyFont: BodyFontType = 'sans', aiEnabled: boolean = true) => {
     if (!user) return;
 
     try {
@@ -121,7 +121,8 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
           user_id: user.id,
           theme: theme,
           title_font: titleFont,
-          body_font: bodyFont
+          body_font: bodyFont,
+          ai_enabled: aiEnabled
         });
 
       if (error) {
@@ -129,6 +130,36 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
     } catch (error) {
       console.error('Error creating default preferences:', error);
+    }
+  };
+
+  const updateAiEnabled = async (newAiEnabled: boolean) => {
+    // Update local state immediately for responsive UI
+    setPreferences(prev => ({ ...prev, aiEnabled: newAiEnabled }));
+    applyAiEnabled(newAiEnabled);
+
+    if (!user) {
+      // For non-authenticated users, only update local state
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('user_preferences')
+        .update({ ai_enabled: newAiEnabled })
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error updating AI enabled preference:', error);
+        // Revert local state on error
+        setPreferences(prev => ({ ...prev, aiEnabled: preferences.aiEnabled }));
+        applyAiEnabled(preferences.aiEnabled);
+      }
+    } catch (error) {
+      console.error('Error updating AI enabled preference:', error);
+      // Revert local state on error
+      setPreferences(prev => ({ ...prev, aiEnabled: preferences.aiEnabled }));
+      applyAiEnabled(preferences.aiEnabled);
     }
   };
 
@@ -262,6 +293,11 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     document.documentElement.setAttribute('data-body-font', bodyFont);
   };
 
+  const applyAiEnabled = (aiEnabled: boolean) => {
+    // Save to localStorage immediately
+    localStorage.setItem('aiEnabled', aiEnabled.toString());
+  };
+
   const updateBrowserThemeColor = (theme: ThemeType) => {
     const themeColors = {
       light: '#ffffff',
@@ -303,7 +339,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, [preferences.titleFont, preferences.bodyFont]);
 
   return (
-    <PreferencesContext.Provider value={{ preferences, updateTheme, updateTitleFont, updateBodyFont, refreshPreferences, loading }}>
+    <PreferencesContext.Provider value={{ preferences, updateTheme, updateTitleFont, updateBodyFont, updateAiEnabled, refreshPreferences, loading }}>
       {children}
     </PreferencesContext.Provider>
   );

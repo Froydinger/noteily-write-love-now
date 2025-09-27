@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
-  FileCheck, 
+  Brain, 
   BookOpen, 
   PenTool, 
   Undo2,
@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { usePreferences } from '@/contexts/PreferencesContext';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TextEnhancementMenuProps {
@@ -51,6 +52,7 @@ export function TextEnhancementMenu({
   const [showRewriteDialog, setShowRewriteDialog] = useState(false);
   const [rewriteInstructions, setRewriteInstructions] = useState('');
   const { toast } = useToast();
+  const { preferences } = usePreferences();
 
   const handleSpellCheck = async () => {
     if (!content.trim()) {
@@ -233,46 +235,17 @@ export function TextEnhancementMenu({
       return;
     }
 
-    setIsProcessing(true);
+    // Directly revert to previous content without AI processing
+    onContentChange(previousContent);
     
-    try {
-      const response = await supabase.functions.invoke('spell-check', {
-        body: { 
-          content: content,
-          title: noteTitle,
-          action: 'rewrite',
-          instructions: `Revert this content back to exactly this previous version:\n\n${previousContent}\n\nRestore the content to match this previous version exactly. If the previous title was "${previousTitle || 'Untitled'}", restore that title too.`
-        }
-      });
-      
-      if (response.error) {
-        throw new Error(response.error.message || 'Undo failed');
-      }
-
-      if (response.data && response.data.correctedContent) {
-        onContentChange(response.data.correctedContent);
-        
-        if (previousTitle && previousTitle !== noteTitle) {
-          onTitleChange(previousTitle);
-        }
-        
-        toast({
-          title: "Changes undone",
-          description: "Content has been reverted to previous version.",
-        });
-      } else {
-        throw new Error('No undone content received');
-      }
-    } catch (error) {
-      console.error('AI undo error:', error);
-      toast({
-        title: "Undo failed", 
-        description: error.message || "There was an error undoing your changes.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
+    if (previousTitle && previousTitle !== noteTitle) {
+      onTitleChange(previousTitle);
     }
+    
+    toast({
+      title: "Changes undone",
+      description: "Content has been reverted to previous version.",
+    });
   };
 
   // Preserve HTML structure while replacing text content
@@ -304,6 +277,11 @@ export function TextEnhancementMenu({
     }
   };
 
+  // Don't render if AI is disabled
+  if (!preferences.aiEnabled) {
+    return null;
+  }
+
   return (
     <>
       <DropdownMenu>
@@ -313,18 +291,18 @@ export function TextEnhancementMenu({
             size="sm"
             disabled={disabled || isProcessing}
             className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105"
-            title="Text Enhancement Menu"
+            title="AI Enhancement Menu"
           >
             {isProcessing ? (
               <Wand2 className="h-5 w-5 animate-spin" />
             ) : (
-              <FileCheck className="h-5 w-5" />
+              <Brain className="h-5 w-5" />
             )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56 bg-background/95 backdrop-blur-sm border border-border/50">
           <DropdownMenuItem onClick={handleSpellCheck} disabled={isProcessing}>
-            <FileCheck className="mr-2 h-4 w-4" />
+            <Brain className="mr-2 h-4 w-4" />
             Correct Spelling
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleGrammarCheck} disabled={isProcessing}>
