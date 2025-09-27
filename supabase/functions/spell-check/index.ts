@@ -75,14 +75,27 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    let result = data.choices[0].message.content;
+    let result = data.choices[0]?.message?.content;
 
-    console.log(`${action} completed successfully. Result:`, result);
+    console.log(`${action} completed successfully. Raw result:`, result);
+    console.log('Data choices:', data.choices);
+
+    // Ensure we have content
+    if (!result || result.trim() === '') {
+      console.error('No content received from AI');
+      return new Response(
+        JSON.stringify({ error: 'No rewritten content received' }), 
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
 
     // Simple unified response for all actions
     const responseData: any = {
-      correctedContent: result,
-      hasChanges: action === 'rewrite' || content !== result
+      correctedContent: result.trim(),
+      hasChanges: action === 'rewrite' || content !== result.trim()
     };
 
     // Add newTitle only if it's a rewrite with title change

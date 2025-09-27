@@ -361,7 +361,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Professional'}
+                Professional
               </Button>
               <Button
                 variant="outline"
@@ -370,7 +370,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Casual'}
+                Casual
               </Button>
               <Button
                 variant="outline"
@@ -379,7 +379,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Expand'}
+                Expand
               </Button>
               <Button
                 variant="outline"
@@ -388,7 +388,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Shorten'}
+                Shorten
               </Button>
               <Button
                 variant="outline"
@@ -397,7 +397,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Happier'}
+                Happier
               </Button>
               <Button
                 variant="outline"
@@ -406,7 +406,7 @@ export function TextEnhancementMenu({
                 disabled={isProcessing}
                 className="text-xs"
               >
-                {isProcessing ? <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent"></div> : 'Formal'}
+                Formal
               </Button>
             </div>
             
@@ -425,18 +425,12 @@ export function TextEnhancementMenu({
               <Label htmlFor="instructions">Custom Rewrite Instructions</Label>
               <Input
                 id="instructions"
-                placeholder={isProcessing ? "AI is processing..." : "e.g., add more examples, change tone, fix structure..."}
+                placeholder="e.g., add more examples, change tone, fix structure..."
                 value={rewriteInstructions}
                 onChange={(e) => setRewriteInstructions(e.target.value)}
                 className="mt-1"
                 disabled={isProcessing}
               />
-              {isProcessing && (
-                <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
-                  Processing with AI...
-                </div>
-              )}
             </div>
             <div className="flex justify-end gap-2">
               <Button
@@ -452,21 +446,21 @@ export function TextEnhancementMenu({
               <Button
                 onClick={() => handleRewrite()}
                 disabled={isProcessing || !rewriteInstructions.trim()}
-                className="min-w-[100px]"
               >
-                {isProcessing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-foreground border-t-transparent mr-2"></div>
-                    Processing...
-                  </>
-                ) : (
-                  'Rewrite'
-                )}
+                Rewrite
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Bottom left loading indicator */}
+      {isProcessing && (
+        <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2 bg-background/90 backdrop-blur-sm border border-border/50 rounded-lg px-3 py-2 shadow-lg">
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+          <span className="text-sm text-muted-foreground">Processing with AI...</span>
+        </div>
+      )}
     </>
   );
 }
