@@ -183,20 +183,27 @@ CRITICAL HTML FORMATTING RULES:
 - NEVER use markdown syntax like **bold** or # headings - use HTML tags instead
 - Each paragraph should be wrapped in <p> tags
 - Headings should use appropriate HTML heading tags (h1, h2, h3, etc.)
+- HEADINGS MUST be separated with empty <p></p> tags above AND below for proper spacing
 - Preserve line breaks as separate paragraphs using <p> tags
 - Use <strong> for bold text, <em> for italics, not markdown syntax
 
+HEADING FORMATTING EXAMPLE:
+<p></p>
+<h2>This is a Properly Formatted Heading</h2>
+<p></p>
+<p>This paragraph follows the heading with proper spacing.</p>
+
 CONTENT RULES:
 - Follow user instructions precisely for the rewrite
-- Maintain document structure and hierarchy
+- When creating titles/headings, always add empty <p></p> tags above and below
 - If title should be changed, format as: TITLE: [new title]
 - Ensure content flows naturally and maintains consistency
 - Return clean HTML without unnecessary attributes or classes
 
-EXAMPLE OUTPUT FORMAT:
-<h2>Proper Heading</h2>
-<p>This is a paragraph with proper HTML structure.</p>
-<p>This is another paragraph that maintains formatting.</p>`;
+SPACING REQUIREMENTS:
+- Empty paragraphs <p></p> before and after every heading
+- Regular content paragraphs wrapped in <p> tags
+- No extra spacing between regular paragraphs unless semantically needed`;
 
     default:
       return `You are a text processor. Process the provided text according to the specified action.`;
@@ -227,7 +234,11 @@ function getUserPrompt(action: string, content: string, instructions?: string, t
 - Use <p> tags for paragraphs, <h1>-<h6> for headings
 - Do NOT use markdown syntax (no **, #, etc.)
 - Each paragraph should be wrapped in <p> tags
-- Use proper HTML heading tags if creating titles/headings`;
+- If creating headings, format them with empty lines above and below:
+  <p></p>
+  <h2>Heading Text</h2>
+  <p></p>
+- Use proper HTML heading tags with proper spacing like format buttons create`;
       } else {
         prompt += `TASK: Rewrite the entire content below in proper HTML format:\n\n`;
         prompt += `CONTENT TO REWRITE:\n${content}\n\n`;
@@ -235,10 +246,15 @@ function getUserPrompt(action: string, content: string, instructions?: string, t
 - Return content in proper HTML format (not markdown)
 - Wrap paragraphs in <p> tags
 - Use <h1>, <h2>, <h3> etc. for headings (NOT markdown # syntax)
+- ALWAYS add empty <p></p> tags above AND below headings for proper spacing
 - Use <strong> for bold, <em> for italics
 - If instructions ask for different paragraphs, create separate <p> tags
-- If instructions ask for titles/headings, use proper HTML heading tags
-- Preserve paragraph breaks as separate <p> elements`;
+- If instructions ask for titles/headings, use this exact format:
+  <p></p>
+  <h2>Your Heading Text</h2>
+  <p></p>
+- Preserve paragraph breaks as separate <p> elements
+- Headings should have breathing room just like when users create them with format buttons`;
       }
       
       return prompt;
