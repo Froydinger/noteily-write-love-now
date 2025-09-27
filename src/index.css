@@ -668,6 +668,40 @@ html[data-body-font="mono"] .dynamic-body-font {
   letter-spacing: -0.01em;
 }
 
+/* Header blocks in notes should use the title font */
+html[data-title-font="serif"] .note-editor h1,
+html[data-title-font="serif"] .note-editor h2,
+html[data-title-font="serif"] .note-editor h3,
+html[data-title-font="serif"] .note-editor h4,
+html[data-title-font="serif"] .note-editor h5,
+html[data-title-font="serif"] .note-editor h6 {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.02em !important;
+}
+
+html[data-title-font="sans"] .note-editor h1,
+html[data-title-font="sans"] .note-editor h2,
+html[data-title-font="sans"] .note-editor h3,
+html[data-title-font="sans"] .note-editor h4,
+html[data-title-font="sans"] .note-editor h5,
+html[data-title-font="sans"] .note-editor h6 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.01em !important;
+}
+
+html[data-title-font="mono"] .note-editor h1,
+html[data-title-font="mono"] .note-editor h2,
+html[data-title-font="mono"] .note-editor h3,
+html[data-title-font="mono"] .note-editor h4,
+html[data-title-font="mono"] .note-editor h5,
+html[data-title-font="mono"] .note-editor h6 {
+  font-family: 'JetBrains Mono', Menlo, Monaco, monospace !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.02em !important;
+}
+
 /* Enhanced spell check button positioning */
 .spell-check-fab {
   position: fixed !important;
