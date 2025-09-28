@@ -19,7 +19,7 @@ interface ChatMessage {
   type: 'user' | 'ai' | 'system';
   content: string;
   instruction?: string;
-  actionType?: 'spell' | 'grammar' | 'rewrite';
+  actionType?: 'spell' | 'grammar' | 'rewrite' | 'restore';
   timestamp: Date;
 }
 
@@ -62,6 +62,7 @@ export function AiChatDialog({
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [originalContentBackup, setOriginalContentBackup] = useState<{content: string, title: string} | null>(null);
   
   const [isMinimized, setIsMinimized] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
@@ -108,6 +109,14 @@ export function AiChatDialog({
       console.log('Dialog opening - current state:', { isMinimized, hasTextSelected });
       // Only reset minimized state if dialog was completely closed before
       setHasUserInteracted(false); // Reset interaction flag
+      
+      // Store original content backup when opening dialog
+      if (!originalContentBackup) {
+        setOriginalContentBackup({
+          content: content,
+          title: noteTitle
+        });
+      }
       
       // Calculate text selection range if working with selected text
       if (isSelectedText) {
@@ -165,6 +174,19 @@ export function AiChatDialog({
     await handleRewrite(instruction, actionLabel);
   };
 
+  const addInitialRestorePoint = () => {
+    if (originalContentBackup && !chatMessages.some(msg => msg.id === 'initial-restore')) {
+      const restoreMessage: ChatMessage = {
+        id: 'initial-restore',
+        type: 'system',
+        content: '↺ Restore to original',
+        actionType: 'restore',
+        timestamp: new Date()
+      };
+      setChatMessages(prev => [restoreMessage, ...prev.filter(msg => msg.id !== 'initial-restore')]);
+    }
+  };
+
   const handleSpellCheck = async () => {
     if (!content.trim()) {
       toast({
@@ -215,7 +237,7 @@ export function AiChatDialog({
         const plainOriginal = originalHTML.replace(/<[^>]*>/g, '');
         const finalContent = injectChangedText(plainOriginal, content, data.correctedContent);
         onContentChange(finalContent);
-        
+        addInitialRestorePoint();
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
@@ -310,7 +332,7 @@ export function AiChatDialog({
           timestamp: new Date()
         };
         setChatMessages(prev => [...prev, aiMessage]);
-        
+        addInitialRestorePoint();
         toast({
           title: "Grammar corrected",
           description: "Fixed grammar issues in your note.",
@@ -450,7 +472,7 @@ export function AiChatDialog({
         timestamp: new Date()
       };
       setChatMessages(prev => [...prev, errorMessage]);
-      
+        addInitialRestorePoint();
       toast({
         title: "Rewrite failed", 
         description: error.message || "There was an error rewriting your text.",
@@ -753,25 +775,44 @@ export function AiChatDialog({
                             ? 'bg-muted text-muted-foreground border border-border'
                             : 'bg-muted'
                         }`}>
-                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                          {message.type === 'ai' && message.actionType && (
-                            <div className="mt-2 pt-2 border-t border-border/50">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={async () => {
-                                  if (history.length > 0) {
-                                    const lastEntry = history[0];
-                                    await handleRevertToHistoryVersion(lastEntry);
-                                  }
-                                }}
-                                disabled={history.length === 0}
-                                className="text-xs text-muted-foreground hover:text-foreground"
-                              >
-                                Undo
-                              </Button>
-                            </div>
-                          )}
+                           <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                           {message.type === 'ai' && message.actionType && (
+                             <div className="mt-2 pt-2 border-t border-border/50">
+                               <Button
+                                 variant="ghost"
+                                 size="sm"
+                                 onClick={async () => {
+                                   if (history.length > 0) {
+                                     const lastEntry = history[0];
+                                     await handleRevertToHistoryVersion(lastEntry);
+                                   }
+                                 }}
+                                 disabled={history.length === 0}
+                                 className="text-xs text-muted-foreground hover:text-foreground"
+                               >
+                                 Undo
+                               </Button>
+                             </div>
+                           )}
+                           {message.type === 'system' && message.actionType === 'restore' && originalContentBackup && (
+                             <div className="mt-2 pt-2 border-t border-border/50">
+                               <Button
+                                 variant="ghost"
+                                 size="sm"
+                                 onClick={async () => {
+                                   onContentChange(originalContentBackup.content);
+                                   onTitleChange(originalContentBackup.title);
+                                   toast({
+                                     title: "Restored to original",
+                                     description: "Your content has been restored to its original state.",
+                                   });
+                                 }}
+                                 className="text-xs text-muted-foreground hover:text-foreground"
+                               >
+                                 Restore Original
+                               </Button>
+                             </div>
+                           )}
                         </div>
                       </div>
                     ))}
