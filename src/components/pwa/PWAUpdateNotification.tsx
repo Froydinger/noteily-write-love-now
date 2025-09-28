@@ -25,6 +25,13 @@ export const PWAUpdateNotification = () => {
                   setUpdateAvailable(true);
                   setShowUpdatePrompt(true);
                   console.log('PWA update detected and notification shown');
+                  
+                  // Show toast for automatic updates
+                  toast({
+                    title: "App Updated",
+                    description: "A new version is available. Click 'Update Now' or refresh to get the latest features.",
+                    duration: 8000,
+                  });
                 }
               });
             }

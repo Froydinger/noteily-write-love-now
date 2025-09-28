@@ -257,8 +257,8 @@
       .apple-pwa-content {
         padding-left: max(env(safe-area-inset-left), 12px);
         padding-right: max(env(safe-area-inset-right), 12px);
-        /* Avoid content touching window edges */
-        margin: 0 4px;
+        /* Only add margin on small screens */
+        margin: 0;
       }
       
       @media (min-width: 768px) {
@@ -293,7 +293,7 @@
         .apple-pwa-content {
           padding-left: max(env(safe-area-inset-left), 16px);
           padding-right: max(env(safe-area-inset-right), 16px);
-          margin: 0 8px;
+          margin: 0;
         }
       }
       
@@ -329,7 +329,7 @@
         .apple-pwa-content {
           padding-left: max(env(safe-area-inset-left), 20px);
           padding-right: max(env(safe-area-inset-right), 20px);
-          margin: 0 12px;
+          margin: 0;
         }
       }
       
