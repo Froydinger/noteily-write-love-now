@@ -257,8 +257,9 @@ export function TextEnhancementMenu({
             variant="ghost"
             size="sm"
             disabled={disabled || isProcessing}
+            onClick={!isDropdownOpen ? handleOpenChatDialog : undefined}
             className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105"
-            title={hasTextSelected ? "AI Enhancement Menu - Text Selected" : "AI Enhancement Menu"}
+            title={isDropdownOpen ? (hasTextSelected ? "AI Enhancement Menu - Text Selected" : "AI Enhancement Menu") : "Chat with AI"}
           >
             {isProcessing ? (
               <Wand2 className="h-5 w-5 animate-spin" />
@@ -276,6 +277,10 @@ export function TextEnhancementMenu({
             <BookOpen className="mr-2 h-4 w-4" />
             Correct Grammar
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleOpenChatDialog} disabled={isProcessing}>
+            <PenTool className="mr-2 h-4 w-4" />
+            Chat with AI
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleAIUndo} disabled={isProcessing || history.length === 0}>
             <Undo2 className="mr-2 h-4 w-4" />
@@ -283,20 +288,6 @@ export function TextEnhancementMenu({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      {/* Separate floating AI Chat button - appears when dropdown is closed */}
-      {!isDropdownOpen && (
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={disabled || isProcessing}
-          onClick={handleOpenChatDialog}
-          className="fixed bottom-4 right-16 z-50 h-12 w-12 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/90 transition-all duration-200 hover:scale-105"
-          title="Chat with AI"
-        >
-          <Brain className="h-5 w-5" />
-        </Button>
-      )}
 
       {/* AI Chat Dialog */}
       <AiChatDialog
