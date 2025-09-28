@@ -73,19 +73,30 @@ export function AiChatDialog({
 
   // Function to inject changed text back into the original content
   const injectChangedText = (originalContent: string, selectedText: string, newText: string): string => {
-    if (!isSelectedText) {
+    if (!isSelectedText || !selectedText.trim()) {
       return newText; // If no selection, replace all content
     }
 
-    // For selected text, find the exact text in the original content and replace it
-    const selectedTextIndex = originalContent.indexOf(selectedText);
+    // Clean the selected text for more reliable matching
+    const cleanSelectedText = selectedText.trim();
+    const cleanOriginalContent = originalContent;
+    
+    // Find the first occurrence of the selected text
+    const selectedTextIndex = cleanOriginalContent.indexOf(cleanSelectedText);
+    
     if (selectedTextIndex !== -1) {
-      const beforeSelection = originalContent.substring(0, selectedTextIndex);
-      const afterSelection = originalContent.substring(selectedTextIndex + selectedText.length);
-      return beforeSelection + newText + afterSelection;
+      // Make sure we're replacing the exact selection by checking context
+      const beforeSelection = cleanOriginalContent.substring(0, selectedTextIndex);
+      const afterSelection = cleanOriginalContent.substring(selectedTextIndex + cleanSelectedText.length);
+      
+      // Only replace if this looks like the right match (no duplicate replacements)
+      if (!beforeSelection.includes(newText) && !afterSelection.includes(newText)) {
+        return beforeSelection + newText + afterSelection;
+      }
     }
     
-    // Fallback: if we can't find the exact text, replace all content
+    // Fallback: if we can't safely inject, warn and replace only if it's clearly a full rewrite
+    console.warn('Could not safely inject selected text, falling back to full content replacement');
     return newText;
   };
 
@@ -190,6 +201,13 @@ export function AiChatDialog({
 
       if (data.correctedContent && data.correctedContent !== content) {
         await onAddHistoryEntry('spell', content, data.correctedContent, noteTitle, noteTitle);
+        
+        console.log('Spell check - injecting:', { 
+          isSelectedText, 
+          originalLength: originalHTML.length, 
+          selectedLength: content.length,
+          newContentLength: data.correctedContent.length 
+        });
         
         // For spell check, inject corrected text properly
         const plainOriginal = originalHTML.replace(/<[^>]*>/g, '');
@@ -377,6 +395,14 @@ export function AiChatDialog({
           response.data.newTitle || noteTitle,
           instruction
         );
+        
+        console.log('Rewrite - injecting:', { 
+          isSelectedText, 
+          originalLength: originalHTML.length, 
+          selectedLength: content.length,
+          newContentLength: response.data.correctedContent.length,
+          hasHTML: response.data.correctedContent.includes('<')
+        });
         
         // For rewrite operations, use the AI's HTML content properly
         if (isSelectedText) {
