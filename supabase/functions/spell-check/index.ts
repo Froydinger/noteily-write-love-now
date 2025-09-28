@@ -46,7 +46,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-mini-2025-04-14', // Fast and efficient model
+        model: 'gpt-4.1-nano', // Testing nano variant
         messages: [
           {
             role: 'system',
