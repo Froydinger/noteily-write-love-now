@@ -702,13 +702,13 @@ export function AiChatDialog({
       ) : (
         /* Desktop: Use fixed positioned div instead of modal */
         open && (
-          <div className="fixed bottom-4 right-16 z-[9998] w-96 max-h-[70vh] bg-background border border-border rounded-lg shadow-xl flex flex-col transition-all duration-300">
+          <div className={`fixed bottom-4 right-16 z-[9998] w-96 bg-background border border-border rounded-lg shadow-xl flex flex-col transition-all duration-300 ${isMinimized ? 'h-16' : 'max-h-[70vh]'}`}>
             {/* Header */}
             <div className="px-6 py-4 border-b">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Brain className="h-5 w-5" />
-                  <span className="font-semibold">NoteBot</span>
+                  {!isMinimized && <span className="font-semibold">NoteBot</span>}
                   {isProcessing && (
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
                   )}
@@ -717,11 +717,11 @@ export function AiChatDialog({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onHide?.()}
-                    title="Hide chat"
+                    onClick={() => setIsMinimized(!isMinimized)}
+                    title={isMinimized ? "Expand chat" : "Minimize chat"}
                     className="transition-all duration-300"
                   >
-                    ↓
+                    {isMinimized ? "↑" : "↓"}
                   </Button>
                   <Button
                     variant="ghost"
@@ -739,126 +739,130 @@ export function AiChatDialog({
               </div>
             </div>
 
-            {/* Chat Messages */}
-            <ScrollArea ref={scrollAreaRef} className="flex-1 p-6">
-              <div className="space-y-4">
-                {chatMessages.map((message) => (
-                  <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-lg p-3 ${
-                      message.type === 'user' 
-                        ? 'bg-primary text-primary-foreground' 
-                        : message.type === 'system'
-                        ? 'bg-muted text-muted-foreground border border-border'
-                        : 'bg-muted'
-                    }`}>
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      {message.type === 'ai' && message.actionType && (
-                        <div className="mt-2 pt-2 border-t border-border/50">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={async () => {
-                              if (history.length > 0) {
-                                const lastEntry = history[0];
-                                await handleRevertToHistoryVersion(lastEntry);
-                              }
-                            }}
-                            disabled={history.length === 0}
-                            className="text-xs text-muted-foreground hover:text-foreground"
-                          >
-                            Undo
-                          </Button>
+            {/* Chat Messages - Only show when not minimized */}
+            {!isMinimized && (
+              <>
+                <ScrollArea ref={scrollAreaRef} className="flex-1 p-6">
+                  <div className="space-y-4">
+                    {chatMessages.map((message) => (
+                      <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] rounded-lg p-3 ${
+                          message.type === 'user' 
+                            ? 'bg-primary text-primary-foreground' 
+                            : message.type === 'system'
+                            ? 'bg-muted text-muted-foreground border border-border'
+                            : 'bg-muted'
+                        }`}>
+                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                          {message.type === 'ai' && message.actionType && (
+                            <div className="mt-2 pt-2 border-t border-border/50">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={async () => {
+                                  if (history.length > 0) {
+                                    const lastEntry = history[0];
+                                    await handleRevertToHistoryVersion(lastEntry);
+                                  }
+                                }}
+                                disabled={history.length === 0}
+                                className="text-xs text-muted-foreground hover:text-foreground"
+                              >
+                                Undo
+                              </Button>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                
-                {isProcessing && (
-                  <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg p-3">
-                      <div className="flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-3 w-3 border-2 border-primary border-t-transparent"></div>
-                        <span className="text-sm text-muted-foreground">AI is thinking...</span>
                       </div>
+                    ))}
+                    
+                    {isProcessing && (
+                      <div className="flex justify-start">
+                        <div className="bg-muted rounded-lg p-3">
+                          <div className="flex items-center gap-2">
+                            <div className="animate-spin rounded-full h-3 w-3 border-2 border-primary border-t-transparent"></div>
+                            <span className="text-sm text-muted-foreground">AI is thinking...</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+
+                {/* Status and Input */}
+                <div className="px-6 py-3 border-t bg-muted/30">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="text-xs font-medium text-muted-foreground">Quick Actions:</div>
+                    <div 
+                      className={`text-xs text-muted-foreground px-2 py-1 bg-background/50 rounded transition-all duration-300 ${
+                        hasTextSelected ? 'ring-1 ring-blue-400 shadow-blue-400/30' : ''
+                      }`}
+                      style={{
+                        animation: hasTextSelected ? 'glowBlue 2s ease-in-out infinite alternate' : 'none'
+                      }}
+                    >
+                      {hasTextSelected ? "Text is selected" : "Editing whole page"}
                     </div>
                   </div>
-                )}
-              </div>
-            </ScrollArea>
+                  <div className="flex flex-wrap gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSpellCheck}
+                      disabled={isProcessing}
+                      className="text-xs"
+                    >
+                      Spelling
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGrammarCheck}
+                      disabled={isProcessing}
+                      className="text-xs"
+                    >
+                      Grammar
+                    </Button>
+                    {quickActions.map((action) => (
+                      <Button
+                        key={action.label}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuickAction(action.instruction, action.label)}
+                        disabled={isProcessing}
+                        className="text-xs"
+                      >
+                        {action.label}
+                      </Button>
+                    ))}
+                  </div>
 
-            {/* Status and Input */}
-            <div className="px-6 py-3 border-t bg-muted/30">
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-xs font-medium text-muted-foreground">Quick Actions:</div>
-                <div 
-                  className={`text-xs text-muted-foreground px-2 py-1 bg-background/50 rounded transition-all duration-300 ${
-                    hasTextSelected ? 'ring-1 ring-blue-400 shadow-blue-400/30' : ''
-                  }`}
-                  style={{
-                    animation: hasTextSelected ? 'glowBlue 2s ease-in-out infinite alternate' : 'none'
-                  }}
-                >
-                  {hasTextSelected ? "Text is selected" : "Editing whole page"}
+                  {/* Message Input */}
+                  <div className="flex gap-2 mt-3">
+                    <Input
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      placeholder="Tell me how to improve your text..."
+                      disabled={isProcessing}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      className="flex-1 bg-background text-foreground border-border placeholder:text-muted-foreground focus:ring-ring focus:border-ring"
+                    />
+                    <Button
+                      onClick={handleSendMessage}
+                      disabled={!inputValue.trim() || isProcessing}
+                      size="sm"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-wrap gap-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSpellCheck}
-                  disabled={isProcessing}
-                  className="text-xs"
-                >
-                  Spelling
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleGrammarCheck}
-                  disabled={isProcessing}
-                  className="text-xs"
-                >
-                  Grammar
-                </Button>
-                {quickActions.map((action) => (
-                  <Button
-                    key={action.label}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuickAction(action.instruction, action.label)}
-                    disabled={isProcessing}
-                    className="text-xs"
-                  >
-                    {action.label}
-                  </Button>
-                ))}
-              </div>
-
-              {/* Message Input */}
-              <div className="flex gap-2 mt-3">
-                <Input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Tell me how to improve your text..."
-                  disabled={isProcessing}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                  className="flex-1 bg-background text-foreground border-border placeholder:text-muted-foreground focus:ring-ring focus:border-ring"
-                />
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!inputValue.trim() || isProcessing}
-                  size="sm"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         )
       )}
