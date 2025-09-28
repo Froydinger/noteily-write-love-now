@@ -46,7 +46,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-mini-2025-08-07', // Fast and efficient model
+        model: 'gpt-4o-mini', // Fast and efficient legacy model
         messages: [
           {
             role: 'system',
@@ -57,7 +57,7 @@ serve(async (req) => {
             content: getUserPrompt(action, content, instructions, title, originalHTML, isSelectedText)
           }
         ],
-        max_completion_tokens: 1500, // Fast responses
+        max_tokens: 1500, // Fast responses
       }),
     });
 
