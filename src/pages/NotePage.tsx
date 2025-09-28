@@ -233,7 +233,7 @@ const NotePage = () => {
       <header 
         ref={headerRef}
         data-note-header
-        className="sticky top-0 z-[100] bg-background border-b p-3 apple-pwa-header-spacing"
+        className="sticky top-0 z-[100] bg-background border-b p-3"
         style={{ position: 'sticky', top: 0, zIndex: 100 }}
       >
         <div className="flex items-center justify-between">
