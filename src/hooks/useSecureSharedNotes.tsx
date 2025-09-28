@@ -24,11 +24,15 @@ export function useSecureSharedNotes(noteId: string | null) {
     setError(null);
 
     try {
+      console.log('Loading shares for noteId:', noteId);
+      
       // First get the basic share records (which we're allowed to see via RLS)
       const { data: shareRecords, error: shareError } = await supabase
         .from('shared_notes')
-        .select('id, note_id, permission, shared_with_user_id')
+        .select('id, note_id, permission, shared_with_user_id, shared_with_email, shared_with_username')
         .eq('note_id', noteId);
+
+      console.log('Share records from DB:', shareRecords, 'Error:', shareError);
 
       if (shareError) throw shareError;
 
@@ -36,8 +40,12 @@ export function useSecureSharedNotes(noteId: string | null) {
       const secureShares: SecureShareInfo[] = [];
       
       for (const share of shareRecords || []) {
+        console.log('Getting display info for share:', share.id);
+        
         const { data: displayInfo, error: displayError } = await supabase
           .rpc('get_shared_note_display_info', { share_id: share.id });
+
+        console.log('Display info result:', displayInfo, 'Error:', displayError);
 
         if (displayError) {
           console.error('Error getting display info for share:', displayError);
@@ -46,9 +54,20 @@ export function useSecureSharedNotes(noteId: string | null) {
 
         if (displayInfo && displayInfo.length > 0) {
           secureShares.push(displayInfo[0]);
+        } else {
+          // Fallback: create display info from share record directly
+          console.log('No display info returned, using fallback for share:', share);
+          secureShares.push({
+            id: share.id,
+            note_id: share.note_id,
+            display_name: share.shared_with_username || share.shared_with_email || 'Unknown User',
+            permission: share.permission,
+            is_registered_user: !!share.shared_with_user_id
+          });
         }
       }
 
+      console.log('Final secure shares:', secureShares);
       setShares(secureShares);
     } catch (err: any) {
       console.error('Error loading secure shares:', err);
