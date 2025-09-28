@@ -183,15 +183,27 @@ CRITICAL HTML FORMATTING RULES:
 - NEVER use markdown syntax like **bold** or # headings - use HTML tags instead
 - Each paragraph should be wrapped in <p> tags
 - Headings should use appropriate HTML heading tags (h1, h2, h3, etc.)
-- HEADINGS MUST be separated with empty <p></p> tags above AND below for proper spacing
-- Preserve line breaks as separate paragraphs using <p> tags
 - Use <strong> for bold text, <em> for italics, not markdown syntax
 
-HEADING FORMATTING EXAMPLE:
+HEADING AND SECTION FORMATTING:
+- When creating multiple titles/sections, break them up naturally throughout the content
+- Use h1 for main titles, h2 for section headers, h3 for subsections
+- Add empty <p></p> tags between sections for proper spacing
+- Don't duplicate titles - create distinct section headings that organize the content logically
+
+EXAMPLE FOR MULTIPLE SECTIONS:
 <p></p>
-<h2>This is a Properly Formatted Heading</h2>
+<h1>Main Title</h1>
 <p></p>
-<p>This paragraph follows the heading with proper spacing.</p>
+<p>Introductory content goes here.</p>
+<p></p>
+<h2>First Section</h2>
+<p></p>
+<p>Content for first section.</p>
+<p></p>
+<h2>Second Section</h2>
+<p></p>
+<p>Content for second section.</p>
 
 LENGTH PRESERVATION RULES:
 - For TONE CHANGES (professional, casual, formal, friendly, positive, happier): Keep approximately the same length as original
@@ -201,15 +213,11 @@ LENGTH PRESERVATION RULES:
 
 CONTENT RULES:
 - Follow user instructions precisely for the rewrite
-- When creating titles/headings, always add empty <p></p> tags above and below
-- If title should be changed, format as: TITLE: [new title]
+- When asked to "break up with titles" or create sections, organize content logically under distinct headings
+- If main title should be changed, format as: TITLE: [new title]
 - Ensure content flows naturally and maintains consistency
 - Return clean HTML without unnecessary attributes or classes
-
-SPACING REQUIREMENTS:
-- Empty paragraphs <p></p> before and after every heading
-- Regular content paragraphs wrapped in <p> tags
-- No extra spacing between regular paragraphs unless semantically needed`;
+- Don't repeat titles - create meaningful section breaks instead`;
 
     default:
       return `You are a text processor. Process the provided text according to the specified action.`;
