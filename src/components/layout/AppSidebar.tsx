@@ -297,7 +297,7 @@ export function AppSidebar() {
       )}
 
 
-      <SidebarFooter className="px-4 py-4 border-t border-white/10">
+      <SidebarFooter className="px-4 py-4 border-t border-white/10 apple-pwa-bottom-safe">
         <div className="flex justify-between w-full px-4 md:px-6">
           <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
             <Button

@@ -85,7 +85,7 @@ export const PWAUpdateNotification = () => {
   if (!showUpdatePrompt || !updateAvailable) return null;
 
   return (
-    <Card className="fixed bottom-4 left-4 z-50 w-80 animate-slide-up shadow-lg border-neon-blue/20">
+    <Card className="fixed z-50 w-80 animate-slide-up shadow-lg border-neon-blue/20 apple-pwa-floating" style={{ right: 'auto', left: 'max(env(safe-area-inset-left), 16px)' }}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-serif">Update Available</CardTitle>

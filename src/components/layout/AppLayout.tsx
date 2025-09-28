@@ -82,7 +82,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <NoteProvider>
       <SidebarProvider>
-        <div className="flex min-h-screen w-full">
+        <div className="flex min-h-screen w-full apple-pwa-content">
           <AppSidebar />
           <main className="flex-1 min-w-0">
             {children}

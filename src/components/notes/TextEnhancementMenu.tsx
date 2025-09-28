@@ -265,7 +265,7 @@ export function TextEnhancementMenu({
                 setIsChatHidden(false);
                 handleOpenChatDialog();
               }) : undefined}
-              className="!fixed !bottom-4 !right-4 !z-[9999] h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105"
+              className="!fixed !z-[9999] h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105 apple-pwa-floating"
               title={isDropdownOpen ? (hasTextSelected ? "AI Enhancement Menu - Text Selected" : "AI Enhancement Menu") : "Chat with AI"}
             >
               {isProcessing ? (
@@ -321,7 +321,7 @@ export function TextEnhancementMenu({
 
       {/* Bottom left loading indicator */}
       {isProcessing && (
-        <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2 bg-background/90 backdrop-blur-sm border border-border/50 rounded-lg px-3 py-2 shadow-lg">
+        <div className="fixed z-50 flex items-center gap-2 bg-background/90 backdrop-blur-sm border border-border/50 rounded-lg px-3 py-2 shadow-lg apple-pwa-floating" style={{ bottom: 'auto', top: 'auto', left: 'max(env(safe-area-inset-left), 16px)' }}>
           <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
           <span className="text-sm text-muted-foreground">Processing with AI...</span>
         </div>

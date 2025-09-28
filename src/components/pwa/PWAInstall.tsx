@@ -82,7 +82,7 @@ export const PWAInstall = () => {
   // Show native install prompt if available
   if (showInstallPrompt) {
     return (
-      <Card className="fixed bottom-4 right-4 z-50 w-80 animate-slide-up shadow-lg border-neon-blue/20">
+      <Card className="fixed z-50 w-80 animate-slide-up shadow-lg border-neon-blue/20 apple-pwa-floating">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-serif">Install Noteily</CardTitle>
@@ -115,7 +115,7 @@ export const PWAInstall = () => {
 
   // Show add to home screen prompt for non-PWA users
   return (
-    <Card className="fixed bottom-4 right-4 z-50 w-80 animate-slide-up shadow-lg border-neon-blue/20">
+    <Card className="fixed z-50 w-80 animate-slide-up shadow-lg border-neon-blue/20 apple-pwa-floating">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-serif">Add to Home Screen</CardTitle>
