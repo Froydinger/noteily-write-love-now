@@ -428,7 +428,7 @@ export function AiChatDialog({
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
-          content: 'I\'ve rewritten your text according to your instructions. The changes have been applied to your note.',
+          content: 'I\'ve rewritten your text according to your instructions.',
           actionType: 'rewrite',
           timestamp: new Date()
         };
