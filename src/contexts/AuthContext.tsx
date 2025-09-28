@@ -94,14 +94,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         return { error };
       } else {
-        // If it's a username, look up the email in user_preferences
-        const { data: userPrefs, error: lookupError } = await supabase
-          .from('user_preferences')
-          .select('email, user_id')
-          .eq('username', cleanIdentifier.toLowerCase())
-          .single();
-
-        if (lookupError || !userPrefs) {
+        // If it's a username, we need to get the user's email for authentication
+        // First check if user exists
+        const userExists = await supabase.rpc('verify_user_exists', {
+          p_identifier: cleanIdentifier
+        });
+        
+        if (!userExists.data) {
           toast({
             title: "Sign in failed",
             description: "No account found with this username or email.",
@@ -110,11 +109,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { error: { message: 'No account found with this username or email.' } };
         }
 
-        // If user has no email in preferences, check if they might need to use their actual email
-        if (!userPrefs.email) {
-          // Try to find the user's auth record to get their email
+        // Get the user's email securely (only works for own username)
+        const { data: userEmail } = await supabase.rpc('get_own_user_email_by_username', {
+          p_username: cleanIdentifier
+        });
+
+        if (!userEmail) {
+          // Try with temp email format for legacy accounts
           try {
-            // First try with the temp email format
             const tempEmail = `${cleanIdentifier.toLowerCase()}@temp.noteily.app`;
             const { error: tempError } = await supabase.auth.signInWithPassword({
               email: tempEmail,
@@ -136,9 +138,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { error: { message: 'Account email not found.' } };
         }
 
-        // Sign in with the email from user preferences
+        // Sign in with the user's email
         const { error } = await supabase.auth.signInWithPassword({
-          email: userPrefs.email,
+          email: userEmail,
           password,
         });
 
@@ -239,13 +241,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // If successful and user is created, update their preferences
       if (data.user) {
-        // Create or update user preferences with username
+        // Create or update user preferences with username only
         const { error: prefError } = await supabase
           .from('user_preferences')
           .upsert({
             user_id: data.user.id,
-            username: username.toLowerCase(),
-            email: email || null
+            username: username.toLowerCase()
           });
 
         if (prefError) {

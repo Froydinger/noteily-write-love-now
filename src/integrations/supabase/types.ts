@@ -247,7 +247,6 @@ export type Database = {
           body_font: string | null
           created_at: string
           daily_prompt_time: string | null
-          email: string | null
           id: string
           notification_daily_prompt: boolean | null
           notification_note_shared: boolean | null
@@ -264,7 +263,6 @@ export type Database = {
           body_font?: string | null
           created_at?: string
           daily_prompt_time?: string | null
-          email?: string | null
           id?: string
           notification_daily_prompt?: boolean | null
           notification_note_shared?: boolean | null
@@ -281,7 +279,6 @@ export type Database = {
           body_font?: string | null
           created_at?: string
           daily_prompt_time?: string | null
-          email?: string | null
           id?: string
           notification_daily_prompt?: boolean | null
           notification_note_shared?: boolean | null
@@ -341,6 +338,10 @@ export type Database = {
           user_permission: string
         }[]
       }
+      get_own_user_email_by_username: {
+        Args: { p_username: string }
+        Returns: string
+      }
       get_shared_note_display_info: {
         Args: { share_id: string }
         Returns: {
@@ -359,10 +360,6 @@ export type Database = {
           user_id: string
           username: string
         }[]
-      }
-      get_user_email_by_username: {
-        Args: { p_username: string }
-        Returns: string
       }
       get_user_id_by_username: {
         Args: { p_username: string }
@@ -398,6 +395,10 @@ export type Database = {
       }
       user_has_note_write_access: {
         Args: { p_note_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      verify_user_exists: {
+        Args: { p_identifier: string }
         Returns: boolean
       }
     }
