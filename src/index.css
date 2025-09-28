@@ -247,8 +247,8 @@
       /* Floating controls and FABs */
       .apple-pwa-floating {
         bottom: max(env(safe-area-inset-bottom), 16px);
-        left: max(env(safe-area-inset-left), 16px);
         right: max(env(safe-area-inset-right), 16px);
+        /* Remove left positioning for right-aligned FABs */
         /* Ensure floating elements stay within rounded corners */
         margin: 0 8px;
       }
@@ -285,8 +285,8 @@
         
         .apple-pwa-floating {
           bottom: max(env(safe-area-inset-bottom), 20px);
-          left: max(env(safe-area-inset-left), 20px);
           right: max(env(safe-area-inset-right), 20px);
+          /* Remove left positioning for right-aligned FABs */
           margin: 0 12px;
         }
         
@@ -321,8 +321,8 @@
         
         .apple-pwa-floating {
           bottom: max(env(safe-area-inset-bottom), 24px);
-          left: max(env(safe-area-inset-left), 24px);
           right: max(env(safe-area-inset-right), 24px);
+          /* Remove left positioning for right-aligned FABs */
           margin: 0 16px;
         }
         
@@ -342,10 +342,6 @@
       }
     }
   }
-
-}
-
-@layer base {
   * {
     @apply border-border;
   }
