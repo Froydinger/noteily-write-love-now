@@ -251,44 +251,47 @@ export function TextEnhancementMenu({
   }
 
   return createPortal(
-    <>
-      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={disabled || isProcessing}
-            onClick={!isDropdownOpen ? handleOpenChatDialog : undefined}
-            className="!fixed !bottom-4 !right-4 !z-[9999] h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105"
-            title={isDropdownOpen ? (hasTextSelected ? "AI Enhancement Menu - Text Selected" : "AI Enhancement Menu") : "Chat with AI"}
-          >
-            {isProcessing ? (
-              <Wand2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Brain className="h-5 w-5" />
-            )}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 bg-background/95 backdrop-blur-sm border border-border/50">
-          <DropdownMenuItem onClick={handleSpellCheck} disabled={isProcessing}>
-            <Type className="mr-2 h-4 w-4" />
-            Correct Spelling
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleGrammarCheck} disabled={isProcessing}>
-            <BookOpen className="mr-2 h-4 w-4" />
-            Correct Grammar
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleOpenChatDialog} disabled={isProcessing}>
-            <PenTool className="mr-2 h-4 w-4" />
-            Chat with AI
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleAIUndo} disabled={isProcessing || history.length === 0}>
-            <Undo2 className="mr-2 h-4 w-4" />
-            AI Undo {history.length === 0 ? '(No history)' : ''}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+     <>
+      {/* Only show floating button when chat dialog is not open */}
+      {!showChatDialog && (
+        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={disabled || isProcessing}
+              onClick={!isDropdownOpen ? handleOpenChatDialog : undefined}
+              className="!fixed !bottom-4 !right-4 !z-[9999] h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105"
+              title={isDropdownOpen ? (hasTextSelected ? "AI Enhancement Menu - Text Selected" : "AI Enhancement Menu") : "Chat with AI"}
+            >
+              {isProcessing ? (
+                <Wand2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Brain className="h-5 w-5" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 bg-background/95 backdrop-blur-sm border border-border/50">
+            <DropdownMenuItem onClick={handleSpellCheck} disabled={isProcessing}>
+              <Type className="mr-2 h-4 w-4" />
+              Correct Spelling
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleGrammarCheck} disabled={isProcessing}>
+              <BookOpen className="mr-2 h-4 w-4" />
+              Correct Grammar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleOpenChatDialog} disabled={isProcessing}>
+              <PenTool className="mr-2 h-4 w-4" />
+              Chat with AI
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleAIUndo} disabled={isProcessing || history.length === 0}>
+              <Undo2 className="mr-2 h-4 w-4" />
+              AI Undo {history.length === 0 ? '(No history)' : ''}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
 
       {/* AI Chat Dialog */}
       <AiChatDialog
