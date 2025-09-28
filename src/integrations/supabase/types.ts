@@ -135,7 +135,7 @@ export type Database = {
           note_id: string
           owner_id: string
           permission: string
-          shared_with_email: string
+          shared_with_email: string | null
           shared_with_user_id: string | null
           shared_with_username: string | null
           updated_at: string
@@ -146,7 +146,7 @@ export type Database = {
           note_id: string
           owner_id: string
           permission: string
-          shared_with_email: string
+          shared_with_email?: string | null
           shared_with_user_id?: string | null
           shared_with_username?: string | null
           updated_at?: string
@@ -157,7 +157,7 @@ export type Database = {
           note_id?: string
           owner_id?: string
           permission?: string
-          shared_with_email?: string
+          shared_with_email?: string | null
           shared_with_user_id?: string | null
           shared_with_username?: string | null
           updated_at?: string
@@ -171,6 +171,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shared_notes_audit: {
+        Row: {
+          accessed_email: string | null
+          action: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          shared_note_id: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accessed_email?: string | null
+          action: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          shared_note_id: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accessed_email?: string | null
+          action?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          shared_note_id?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       subscribers: {
         Row: {
@@ -292,12 +325,30 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      create_secure_share: {
+        Args: {
+          p_email_or_username: string
+          p_note_id: string
+          p_permission: string
+        }
+        Returns: string
+      }
       get_note_sharing_info: {
         Args: { note_id_param: string }
         Returns: {
           share_count: number
           user_has_access: boolean
           user_permission: string
+        }[]
+      }
+      get_shared_note_display_info: {
+        Args: { share_id: string }
+        Returns: {
+          display_name: string
+          id: string
+          is_registered_user: boolean
+          note_id: string
+          permission: string
         }[]
       }
       get_user_by_identifier: {

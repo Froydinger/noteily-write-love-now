@@ -167,11 +167,10 @@ export function useSharedNotes(noteId?: string) {
         }
       }
 
-      // Create the share using the database function that handles both emails and usernames
-      const { data, error } = await supabase.rpc('add_share_with_user_link', {
+      // Create the share using the new secure function
+      const { data, error } = await supabase.rpc('create_secure_share', {
         p_note_id: noteId,
-        p_owner_id: user.id,
-        p_shared_with_email_or_username: trimmedInput,
+        p_email_or_username: trimmedInput,
         p_permission: permission
       });
 

@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useSharedNotes } from '@/hooks/useSharedNotes';
+import { useSecureSharedNotes } from '@/hooks/useSecureSharedNotes';
 import { ShareStatus, SharePermissionIcon, ShareStatusText } from './ShareStatus';
 import { Loader2, UserPlus, Mail, Trash2, Users, UserX, AlertCircle } from 'lucide-react';
 import type { NoteWithSharing } from '@/types/sharing';
@@ -32,14 +33,24 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
     removeShare,
   } = useSharedNotes(note.id);
 
+  // Use secure shares for display (with email masking)
+  const { 
+    shares: secureShares, 
+    loading: secureLoading, 
+    reload: reloadSecureShares,
+    removeShare: removeSecureShare,
+    updateSharePermission: updateSecurePermission
+  } = useSecureSharedNotes(note?.id || null);
+
   
 
   // Load shares when dialog opens
   useEffect(() => {
     if (isOpen && note.isOwnedByUser) {
       loadShares(note.id);
+      reloadSecureShares();
     }
-  }, [isOpen, note.id, note.isOwnedByUser, loadShares]);
+  }, [isOpen, note.id, note.isOwnedByUser, loadShares, reloadSecureShares]);
 
   // Prevent auto-focus on input when dialog opens
   useEffect(() => {
@@ -69,8 +80,9 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
         // Email notification will be automatically triggered by database trigger
         setEmailOrUsername('');
         setPermission('read');
-        // Refresh the shares list locally instead of triggering parent re-render
+        // Refresh both shares lists
         loadShares(note.id);
+        reloadSecureShares();
       }
     } finally {
       setIsAdding(false);
@@ -78,15 +90,19 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
   };
 
   const handleUpdatePermission = async (shareId: string, newPermission: 'read' | 'write') => {
-    await updateShare({ shareId, permission: newPermission });
-    // Refresh the shares list locally instead of triggering parent re-render
-    loadShares(note.id);
+    const success = await updateSecurePermission(shareId, newPermission);
+    if (success) {
+      // Also reload the original shares for consistency
+      loadShares(note.id);
+    }
   };
 
   const handleRemoveShare = async (shareId: string) => {
-    await removeShare({ shareId });
-    // Refresh the shares list locally instead of triggering parent re-render
-    loadShares(note.id);
+    const success = await removeSecureShare(shareId);
+    if (success) {
+      // Also reload the original shares for consistency  
+      loadShares(note.id);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -205,20 +221,20 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
 
               {/* Current shares list - scrollable */}
               <div className="space-y-3 min-h-0">
-                <h3 className="font-medium">Shared with ({sharedUsers.length})</h3>
+                <h3 className="font-medium">Shared with ({secureShares.length})</h3>
 
-                {loading ? (
+                {(loading || secureLoading) ? (
                   <div className="flex items-center justify-center py-6">
                     <Loader2 className="h-5 w-5 animate-spin" />
                   </div>
-                ) : sharedUsers.length === 0 ? (
+                ) : secureShares.length === 0 ? (
                   <div className="text-center py-6 text-muted-foreground">
                     <AlertCircle className="h-6 w-6 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">Not shared with anyone yet</p>
                   </div>
                 ) : (
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {sharedUsers.map((share) => (
+                    {secureShares.map((share) => (
                       <div 
                         key={share.id}
                         className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg gap-2"
@@ -227,10 +243,10 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
                            <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                            <div className="min-w-0">
                              <div className="font-medium truncate text-sm">
-                               {share.shared_with_username ? `@${share.shared_with_username}` : share.shared_with_email}
+                               {share.display_name}
                              </div>
                              <div className="text-xs text-muted-foreground">
-                               {share.shared_with_user_id ? 'Active user' : 'Pending invitation'}
+                               {share.is_registered_user ? 'Active user' : 'Pending invitation'}
                              </div>
                            </div>
                          </div>
