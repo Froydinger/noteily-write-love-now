@@ -24,16 +24,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
   const [permission, setPermission] = useState<'read' | 'write'>('read');
   const [isAdding, setIsAdding] = useState(false);
   
-  const {
-    sharedUsers,
-    loading,
-    loadShares,
-    addShare,
-    updateShare,
-    removeShare,
-  } = useSharedNotes(note.id);
-
-  // Use secure shares for display (with email masking)
+  // Only use the secure shares hook for display and management
   const { 
     shares: secureShares, 
     loading: secureLoading, 
@@ -42,15 +33,15 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
     updateSharePermission: updateSecurePermission
   } = useSecureSharedNotes(note?.id || null);
 
-  
+  // Import the add share function from useSharedNotes but don't use the state
+  const { addShare } = useSharedNotes();
 
   // Load shares when dialog opens
   useEffect(() => {
     if (isOpen && note.isOwnedByUser) {
-      loadShares(note.id);
       reloadSecureShares();
     }
-  }, [isOpen, note.id, note.isOwnedByUser, loadShares, reloadSecureShares]);
+  }, [isOpen, note.id, note.isOwnedByUser, reloadSecureShares]);
 
   // Prevent auto-focus on input when dialog opens
   useEffect(() => {
@@ -80,8 +71,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
         // Email notification will be automatically triggered by database trigger
         setEmailOrUsername('');
         setPermission('read');
-        // Refresh both shares lists
-        loadShares(note.id);
+        // Refresh the shares list
         reloadSecureShares();
       }
     } finally {
@@ -90,19 +80,11 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
   };
 
   const handleUpdatePermission = async (shareId: string, newPermission: 'read' | 'write') => {
-    const success = await updateSecurePermission(shareId, newPermission);
-    if (success) {
-      // Also reload the original shares for consistency
-      loadShares(note.id);
-    }
+    await updateSecurePermission(shareId, newPermission);
   };
 
   const handleRemoveShare = async (shareId: string) => {
-    const success = await removeSecureShare(shareId);
-    if (success) {
-      // Also reload the original shares for consistency  
-      loadShares(note.id);
-    }
+    await removeSecureShare(shareId);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -223,7 +205,7 @@ export function ShareManager({ isOpen, onClose, note, onShareUpdate }: ShareMana
               <div className="space-y-3 min-h-0">
                 <h3 className="font-medium">Shared with ({secureShares.length})</h3>
 
-                {(loading || secureLoading) ? (
+                {secureLoading ? (
                   <div className="flex items-center justify-center py-6">
                     <Loader2 className="h-5 w-5 animate-spin" />
                   </div>
