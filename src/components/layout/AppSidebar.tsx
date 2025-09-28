@@ -113,7 +113,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar className={`transition-all duration-300 ease-in-out bg-black/20 dark:bg-white/10 backdrop-blur-2xl border-r border-white/20 dark:border-white/10 supports-[backdrop-filter]:bg-black/20 supports-[backdrop-filter]:dark:bg-white/10`} collapsible="offcanvas">
-      <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0 [@media(display-mode:standalone)]:lg:pt-11">{/* Added standalone PWA padding for large devices */}
+      <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0 apple-pwa-sidebar-header">{/* Apple PWA Liquid Glass UI spacing */}
         <div className={`flex items-center space-x-3 flex-1 ${state === "collapsed" ? "justify-center" : ""}`}>
           <Heart className="h-5 w-5 text-neon-blue" />
           {state !== "collapsed" && (
@@ -173,7 +173,7 @@ export function AppSidebar() {
           <div className="px-4 mb-4">
             <Button 
               variant="outline" 
-              className="w-full justify-start gap-3 h-10 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md rounded-full bg-gradient-to-r from-accent/5 to-accent/10 hover:from-accent/10 hover:to-accent/20 border-accent/20 hover:border-accent/40"
+              className="w-full justify-start gap-3 h-10 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md rounded-full bg-gradient-to-r from-accent/5 to-accent/10 hover:from-accent/10 hover:to-accent/20 border-accent/20 hover:border-accent/40 apple-pwa-button-spacing"
               onClick={handleCreateNote}
             >
               <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-90" />
@@ -190,7 +190,7 @@ export function AppSidebar() {
                     variant={isActive('/') ? 'default' : 'outline'}
                     size="sm"
                     asChild
-                    className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm min-w-0"
+                    className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm min-w-0 apple-pwa-button-spacing"
                   >
                     <a href="/" className="flex items-center justify-center gap-1.5 px-2">
                       <BookOpen className="h-4 w-4 flex-shrink-0" />
@@ -201,7 +201,7 @@ export function AppSidebar() {
                     variant={isActive('/prompts') ? 'default' : 'outline'}
                     size="sm"
                     asChild
-                    className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm min-w-0"
+                    className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm min-w-0 apple-pwa-button-spacing"
                   >
                     <a href="/prompts" className="flex items-center justify-center gap-1.5 px-2">
                       <Pencil className="h-4 w-4 flex-shrink-0" />

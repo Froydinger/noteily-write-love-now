@@ -203,6 +203,58 @@
     padding-right: env(safe-area-inset-right);
   }
 
+  /* Apple platform detection for Liquid Glass UI spacing */
+  @supports (-webkit-touch-callout: none) {
+    /* iOS/iPadOS/macOS Safari only */
+    @media (display-mode: standalone) {
+      /* PWA mode on Apple platforms */
+      .apple-pwa-header-spacing {
+        padding-top: 8px;
+      }
+      
+      .apple-pwa-button-spacing {
+        padding: 10px 16px;
+        margin: 2px 0;
+      }
+      
+      .apple-pwa-sidebar-header {
+        padding-top: 16px;
+      }
+      
+      @media (min-width: 768px) {
+        /* iPad and larger screens */
+        .apple-pwa-header-spacing {
+          padding-top: 12px;
+        }
+        
+        .apple-pwa-button-spacing {
+          padding: 12px 20px;
+          margin: 4px 0;
+        }
+        
+        .apple-pwa-sidebar-header {
+          padding-top: 20px;
+        }
+      }
+      
+      @media (min-width: 1024px) {
+        /* macOS and large screens */
+        .apple-pwa-header-spacing {
+          padding-top: 16px;
+        }
+        
+        .apple-pwa-button-spacing {
+          padding: 14px 24px;
+          margin: 6px 0;
+        }
+        
+        .apple-pwa-sidebar-header {
+          padding-top: 24px;
+        }
+      }
+    }
+  }
+
 }
 
 @layer base {

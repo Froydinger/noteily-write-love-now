@@ -195,7 +195,7 @@ const Index = () => {
         {/* Mobile layout: My Notes text on far right, buttons underneath */}
         <div className="md:hidden mb-6">
           {/* Top row: Menu button left, My Notes text far right */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 apple-pwa-header-spacing">
             <div className="flex items-center">
               {(isMobile || state === "collapsed") && (
                 <div className="relative">
@@ -215,7 +215,7 @@ const Index = () => {
           <div className="flex items-center gap-2 mt-6 px-2 py-2">
             <Button 
               onClick={handleCreateNote} 
-              className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full whitespace-nowrap"
+              className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full whitespace-nowrap apple-pwa-button-spacing"
             >
               <Plus className="h-4 w-4" />
               New Note
@@ -294,7 +294,7 @@ const Index = () => {
         </div>
 
         {/* Desktop layout: Menu button, buttons with space, My Notes text far right */}
-        <div className="hidden md:flex items-center justify-between mb-6">
+        <div className="hidden md:flex items-center justify-between mb-6 apple-pwa-header-spacing">
           {/* Left side: Menu button + buttons */}
           <div className="flex items-center gap-4">
             {(isMobile || state === "collapsed") && (
@@ -311,7 +311,7 @@ const Index = () => {
             <div className="flex items-center gap-2 px-2 py-2">
               <Button 
                 onClick={handleCreateNote} 
-                className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full"
+                className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full apple-pwa-button-spacing"
               >
                 <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                 New Note
