@@ -137,7 +137,6 @@ export type Database = {
           permission: string
           shared_with_email: string | null
           shared_with_user_id: string | null
-          shared_with_username: string | null
           updated_at: string
         }
         Insert: {
@@ -148,7 +147,6 @@ export type Database = {
           permission: string
           shared_with_email?: string | null
           shared_with_user_id?: string | null
-          shared_with_username?: string | null
           updated_at?: string
         }
         Update: {
@@ -159,7 +157,6 @@ export type Database = {
           permission?: string
           shared_with_email?: string | null
           shared_with_user_id?: string | null
-          shared_with_username?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -270,28 +267,16 @@ export type Database = {
         }
         Returns: string
       }
-      check_identifier_exists: {
-        Args: { p_identifier: string }
-        Returns: boolean
-      }
       check_username_available_for_user: {
         Args: { p_user_email: string; p_username: string }
-        Returns: boolean
-      }
-      check_username_exists: {
-        Args: { p_username: string }
         Returns: boolean
       }
       cleanup_old_deleted_notes: {
         Args: Record<PropertyKey, never>
         Returns: number
       }
-      create_secure_share: {
-        Args: {
-          p_email_or_username: string
-          p_note_id: string
-          p_permission: string
-        }
+      create_email_share: {
+        Args: { p_email: string; p_note_id: string; p_permission: string }
         Returns: string
       }
       get_note_sharing_info: {
@@ -301,37 +286,6 @@ export type Database = {
           user_has_access: boolean
           user_permission: string
         }[]
-      }
-      get_own_user_email_by_username: {
-        Args: { p_username: string }
-        Returns: string
-      }
-      get_shared_note_display_info: {
-        Args: { share_id: string }
-        Returns: {
-          display_name: string
-          id: string
-          is_registered_user: boolean
-          note_id: string
-          permission: string
-        }[]
-      }
-      get_user_by_identifier: {
-        Args: { p_identifier: string }
-        Returns: {
-          email: string
-          has_google_auth: boolean
-          user_id: string
-          username: string
-        }[]
-      }
-      get_user_id_by_username: {
-        Args: { p_username: string }
-        Returns: string
-      }
-      is_google_user: {
-        Args: { p_identifier: string }
-        Returns: boolean
       }
       link_existing_shared_notes: {
         Args: Record<PropertyKey, never>
@@ -359,10 +313,6 @@ export type Database = {
       }
       user_has_note_write_access: {
         Args: { p_note_id: string; p_user_id: string }
-        Returns: boolean
-      }
-      verify_user_exists: {
-        Args: { p_identifier: string }
         Returns: boolean
       }
     }

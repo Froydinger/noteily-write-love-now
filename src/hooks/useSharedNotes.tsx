@@ -167,10 +167,10 @@ export function useSharedNotes(noteId?: string) {
         }
       }
 
-      // Create the share using the new secure function
-      const { data, error } = await supabase.rpc('create_secure_share', {
+      // Create the share using the new email-only function
+      const { data, error } = await supabase.rpc('create_email_share', {
         p_note_id: noteId,
-        p_email_or_username: trimmedInput,
+        p_email: trimmedInput,
         p_permission: permission
       });
 
