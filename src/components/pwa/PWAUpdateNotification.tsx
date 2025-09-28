@@ -11,27 +11,55 @@ export const PWAUpdateNotification = () => {
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then((registration) => {
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          if (newWorker) {
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                setUpdateAvailable(true);
-                setShowUpdatePrompt(true);
-              }
-            });
-          }
+      // More aggressive update checking
+      const checkForUpdates = () => {
+        navigator.serviceWorker.ready.then((registration) => {
+          // Force check for updates
+          registration.update();
+          
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  setUpdateAvailable(true);
+                  setShowUpdatePrompt(true);
+                  console.log('PWA update detected and notification shown');
+                }
+              });
+            }
+          });
         });
-      });
+      };
+
+      // Check immediately
+      checkForUpdates();
+      
+      // Check every 30 seconds when app is active
+      const interval = setInterval(checkForUpdates, 30000);
 
       // Listen for messages from the service worker
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data && event.data.type === 'SKIP_WAITING') {
           setUpdateAvailable(true);
           setShowUpdatePrompt(true);
+          console.log('PWA skip waiting message received');
         }
       });
+
+      // Listen for visibility changes to check for updates when app becomes visible
+      const handleVisibilityChange = () => {
+        if (!document.hidden) {
+          checkForUpdates();
+        }
+      };
+      
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+
+      return () => {
+        clearInterval(interval);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
     }
   }, []);
 
@@ -53,27 +81,31 @@ export const PWAUpdateNotification = () => {
       title: "Updating...",
       description: (
         <div className="space-y-2">
-          <p>Close and reopen the web app or refresh your browser to finish the update.</p>
-          <p className="text-xs text-muted-foreground">iOS users may need to tap the refresh button twice</p>
+          <p>Updating to the latest version. This will refresh automatically.</p>
+          <p className="text-xs text-muted-foreground">If the update doesn't work, try closing and reopening the app</p>
           <Button 
             variant="outline" 
             size="sm" 
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              setTimeout(() => {
-                window.location.reload();
-              }, 0);
+              // Force hard refresh to clear all caches
+              window.location.href = window.location.href;
             }}
             className="w-full mt-3"
           >
             <RefreshCw className="h-4 w-4 mr-1" />
-            Refresh
+            Force Refresh
           </Button>
         </div>
       ),
-      duration: Infinity, // Never expire
+      duration: 10000, // 10 seconds instead of infinity
     });
+    
+    // Auto-refresh after 2 seconds
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
     
     setShowUpdatePrompt(false);
   };
