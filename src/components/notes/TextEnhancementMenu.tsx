@@ -265,7 +265,7 @@ export function TextEnhancementMenu({
                 setIsChatHidden(false);
                 handleOpenChatDialog();
               }) : undefined}
-              className="!fixed !z-[9999] h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105 flex items-center justify-center block"
+              className="!fixed !z-[9999] h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105 flex items-center justify-center p-0"
               style={{
                 bottom: 'max(env(safe-area-inset-bottom), 16px)',
                 right: 'max(env(safe-area-inset-right), 16px)',
@@ -275,7 +275,7 @@ export function TextEnhancementMenu({
               title={isDropdownOpen ? (hasTextSelected ? "AI Enhancement Menu - Text Selected" : "AI Enhancement Menu") : "Chat with AI"}
             >
               {isProcessing ? (
-                <Wand2 className="h-5 w-5 animate-spin" />
+                <Wand2 className="h-5 w-5" />
               ) : (
                 <Brain className="h-5 w-5" />
               )}
