@@ -229,7 +229,7 @@ const NotePage = () => {
   }
   
   return (
-    <div key={id} className={`min-h-screen transform transition-all duration-300 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}>
+    <div key={id} className={`min-h-screen transform transition-all duration-200 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-1 opacity-90'}`}>
       <header 
         ref={headerRef}
         data-note-header
