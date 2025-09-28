@@ -25,6 +25,7 @@ import RecentlyDeletedPage from "./pages/RecentlyDeletedPage";
 import { PreferencesProvider } from "./contexts/PreferencesContext";
 import { NotificationToastListener } from "./components/notifications/NotificationToastListener";
 import { useAuth } from "./contexts/AuthContext";
+import { LoadingSpinner } from "./components/ui/loading-spinner";
 
 const queryClient = new QueryClient();
 
@@ -45,7 +46,16 @@ const App = () => {
 };
 
 const AppContent = () => {
-  const { user } = useAuth();
+  const { user, initializing } = useAuth();
+
+  // Show loading spinner during authentication initialization
+  if (initializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoadingSpinner size="lg" text="Loading..." />
+      </div>
+    );
+  }
 
   // Show marketing splash for unregistered users
   if (!user) {
