@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
@@ -297,7 +297,24 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_preferences_public: {
+        Row: {
+          created_at: string | null
+          user_id: string | null
+          username: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          user_id?: string | null
+          username?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          user_id?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_share_with_user_link: {
@@ -367,6 +384,26 @@ export type Database = {
       get_user_id_by_username: {
         Args: { p_username: string }
         Returns: string
+      }
+      get_user_preferences_safe: {
+        Args: { requesting_user_id?: string }
+        Returns: {
+          ai_enabled: boolean
+          body_font: string
+          created_at: string
+          daily_prompt_time: string
+          email: string
+          id: string
+          notification_daily_prompt: boolean
+          notification_note_shared: boolean
+          notification_note_updated: boolean
+          theme: string
+          title_font: string
+          updated_at: string
+          user_id: string
+          username: string
+          username_prompt_last_shown: string
+        }[]
       }
       is_google_user: {
         Args: { p_identifier: string }
