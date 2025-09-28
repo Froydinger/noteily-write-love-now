@@ -46,7 +46,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-nano', // Testing nano variant
+        model: 'gpt-4o-mini', // Fast and efficient model
         messages: [
           {
             role: 'system',
@@ -57,7 +57,8 @@ serve(async (req) => {
             content: getUserPrompt(action, content, instructions, title, originalHTML, isSelectedText)
           }
         ],
-        max_completion_tokens: 1500, // Fast responses
+        max_tokens: 1500, // Fast responses
+        temperature: 0.3, // More focused output
       }),
     });
 
