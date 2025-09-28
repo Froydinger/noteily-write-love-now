@@ -702,7 +702,7 @@ export function AiChatDialog({
       ) : (
         /* Desktop: Use fixed positioned div instead of modal */
         open && (
-          <div className={`fixed bottom-4 right-16 z-[9998] w-96 bg-background border border-border rounded-lg shadow-xl flex flex-col transition-all duration-300 ${isMinimized ? 'h-16' : 'max-h-[70vh]'}`}>
+          <div className={`fixed bottom-4 right-16 z-[9998] w-96 bg-background border border-border rounded-lg shadow-xl flex flex-col transition-all duration-300 ${isMinimized ? 'h-16' : 'h-[70vh]'}`}>
             {/* Header */}
             <div className="px-6 py-4 border-b">
               <div className="flex items-center justify-between">
@@ -742,7 +742,7 @@ export function AiChatDialog({
             {/* Chat Messages - Only show when not minimized */}
             {!isMinimized && (
               <>
-                <ScrollArea ref={scrollAreaRef} className="flex-1 p-6">
+                <ScrollArea ref={scrollAreaRef} className="flex-1 p-6 min-h-0 overflow-y-auto">
                   <div className="space-y-4">
                     {chatMessages.map((message) => (
                       <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
