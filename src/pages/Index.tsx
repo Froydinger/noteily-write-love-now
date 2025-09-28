@@ -189,7 +189,7 @@ const Index = () => {
 
   const content = (
     <div className="min-h-full apple-pwa-content">
-      <div className="p-6 md:p-10 animate-fade-in apple-pwa-content"
+      <div className="p-3 md:p-6 animate-fade-in apple-pwa-content"
            style={{ animationDelay: '0.1s', animationFillMode: 'both' }}
            onClick={() => setSelectedNoteId(null)}>
         {/* Mobile layout: My Notes text on far right, buttons underneath */}
