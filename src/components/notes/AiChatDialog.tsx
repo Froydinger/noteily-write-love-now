@@ -60,7 +60,7 @@ export function AiChatDialog({
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
+  
   const [isMinimized, setIsMinimized] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [selectedTextRange, setSelectedTextRange] = useState<{start: number, end: number} | null>(null);
@@ -218,6 +218,7 @@ export function AiChatDialog({
           id: (Date.now() + 1).toString(),
           type: 'ai',
           content: 'I found and corrected some spelling errors in your text.',
+          actionType: 'spell',
           timestamp: new Date()
         };
         setChatMessages(prev => [...prev, aiMessage]);
@@ -231,6 +232,7 @@ export function AiChatDialog({
           id: (Date.now() + 1).toString(),
           type: 'ai',
           content: 'No spelling errors found. Your text looks good!',
+          actionType: 'spell',
           timestamp: new Date()
         };
         setChatMessages(prev => [...prev, aiMessage]);
@@ -302,6 +304,7 @@ export function AiChatDialog({
           id: (Date.now() + 1).toString(),
           type: 'ai',
           content: 'I found and corrected some grammar issues in your text.',
+          actionType: 'grammar',
           timestamp: new Date()
         };
         setChatMessages(prev => [...prev, aiMessage]);
@@ -315,6 +318,7 @@ export function AiChatDialog({
           id: (Date.now() + 1).toString(),
           type: 'ai',
           content: 'No grammar errors found. Your text looks good!',
+          actionType: 'grammar',
           timestamp: new Date()
         };
         setChatMessages(prev => [...prev, aiMessage]);
@@ -423,6 +427,7 @@ export function AiChatDialog({
           id: (Date.now() + 1).toString(),
           type: 'ai',
           content: 'I\'ve rewritten your text according to your instructions. The changes have been applied to your note.',
+          actionType: 'rewrite',
           timestamp: new Date()
         };
         setChatMessages(prev => [...prev, aiMessage]);
@@ -534,17 +539,6 @@ export function AiChatDialog({
                   {isMinimized ? "↑" : "↓"}
                 </Button>
               )}
-              {!isMinimized && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowHistory(!showHistory)}
-                  disabled={isProcessing}
-                  title="Toggle history view"
-                >
-                  <History className="h-4 w-4" />
-                </Button>
-              )}
               <Button
                 variant="ghost"
                 size="sm"
@@ -566,7 +560,7 @@ export function AiChatDialog({
               {/* Messages */}
               <ScrollArea ref={scrollAreaRef} className="flex-1 px-6 py-4">
                 <div className="space-y-4">
-                  {chatMessages.map((message) => (
+                  {chatMessages.map((message, index) => (
                     <div
                       key={message.id}
                       className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -581,9 +575,33 @@ export function AiChatDialog({
                         }`}
                       >
                         <p className="text-sm">{message.content}</p>
-                        <span className="text-xs opacity-70 mt-1 block">
-                          {message.timestamp.toLocaleTimeString()}
-                        </span>
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-xs opacity-70">
+                            {message.timestamp.toLocaleTimeString()}
+                          </span>
+                          
+                          {/* Add rollback button for AI messages that correspond to history entries */}
+                          {message.type === 'ai' && message.actionType && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                // Find the corresponding history entry and revert
+                                const correspondingEntry = history.find(entry => 
+                                  entry.action_type === message.actionType &&
+                                  Math.abs(new Date(entry.created_at).getTime() - message.timestamp.getTime()) < 10000 // within 10 seconds
+                                );
+                                if (correspondingEntry) {
+                                  handleRevertToHistoryVersion(correspondingEntry);
+                                }
+                              }}
+                              className="text-xs h-6 px-2 ml-2 opacity-60 hover:opacity-100"
+                              title="Undo this change"
+                            >
+                              Undo
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -675,47 +693,6 @@ export function AiChatDialog({
               </div>
             </div>
 
-            {/* History Sidebar */}
-          {showHistory && (
-            <div className="w-80 border-l bg-muted/30 flex flex-col">
-              <div className="px-4 py-3 border-b">
-                <h3 className="font-medium text-sm">Change History</h3>
-              </div>
-              <ScrollArea className="flex-1 px-4 py-3">
-                {history.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p className="text-sm">No changes yet</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {history.map((entry) => (
-                      <div key={entry.id} className="border rounded-lg p-3 bg-card">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-medium capitalize">{entry.action_type}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleRevertToHistoryVersion(entry)}
-                            className="text-xs h-6"
-                          >
-                            Revert
-                          </Button>
-                        </div>
-                        {entry.instruction && (
-                          <div className="text-xs bg-muted px-2 py-1 rounded mb-2">
-                            {entry.instruction}
-                          </div>
-                        )}
-                        <div className="text-xs text-muted-foreground">
-                          {new Date(entry.created_at).toLocaleString()}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
-            </div>
-          )}
           </div>
         )}
       </DialogContent>
