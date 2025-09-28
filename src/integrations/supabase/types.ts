@@ -297,21 +297,7 @@ export type Database = {
       }
     }
     Views: {
-      user_preferences_public: {
-        Row: {
-          created_at: string | null
-          username: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          username?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          username?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       add_share_with_user_link: {
