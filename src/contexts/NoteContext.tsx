@@ -269,6 +269,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('NoteContext useEffect: user changed', { hasUser: !!user });
     if (user) {
       console.log('NoteContext useEffect: calling loadNotes');
+      setHasInitialLoad(false); // Reset initial load state when user changes
       loadNotes();
     } else {
       console.log('NoteContext useEffect: no user, clearing state');
@@ -276,6 +277,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setDeletedNotes([]);
       setCurrentNote(null);
       setLoading(false);
+      setHasInitialLoad(false); // Reset when user logs out
     }
   }, [user]);
 
