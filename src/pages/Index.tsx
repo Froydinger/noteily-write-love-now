@@ -175,16 +175,15 @@ const Index = () => {
   // Debug logging to track the race condition
   console.log('Index render state:', { loading, notesLength: notes.length, hasUser: !!user, hasInitialLoad });
 
-  // Only show empty state when we've completed the initial load AND notes are actually empty AND we have a user
-  if (hasInitialLoad && !loading && notes.length === 0 && user) {
-    console.log('Showing EmptyNotesPlaceholder - hasInitialLoad:', hasInitialLoad);
-    return <EmptyNotesPlaceholder />;
+  // Simplified rendering logic - always show content when user exists
+  if (!user) {
+    return null; // This shouldn't happen since we're inside authenticated route
   }
 
-  // Don't render anything during loading or before initial load to prevent flashing
-  if (loading || !hasInitialLoad) {
-    console.log('Still loading or no initial load, returning null', { loading, hasInitialLoad });
-    return null;
+  // Show empty state when we've completed the initial load AND notes are actually empty
+  if (hasInitialLoad && !loading && notes.length === 0) {
+    console.log('Showing EmptyNotesPlaceholder - hasInitialLoad:', hasInitialLoad);
+    return <EmptyNotesPlaceholder />;
   }
 
   const content = (

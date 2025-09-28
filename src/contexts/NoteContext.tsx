@@ -532,7 +532,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
     } finally {
-      console.log('loadNotes: Finished, setting loading to false');
+      console.log('loadNotes: Finished, setting loading to false and hasInitialLoad to true');
       setLoading(false);
       setHasInitialLoad(true);
     }
