@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Brain, Send, History, X } from 'lucide-react';
+import { Brain, Send, History, X, Minus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { AiHistoryEntry } from '@/hooks/useAiHistory';
@@ -26,6 +26,7 @@ interface ChatMessage {
 interface AiChatDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onHide?: () => void;
   content: string;
   originalHTML: string;
   noteTitle: string;
@@ -47,6 +48,7 @@ interface AiChatDialogProps {
 export function AiChatDialog({
   open,
   onOpenChange,
+  onHide,
   content,
   originalHTML,
   noteTitle,
@@ -492,25 +494,25 @@ export function AiChatDialog({
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onOpenChange={() => {
-        // Completely prevent automatic closing - only allow manual close via X button
-        console.log('Dialog onOpenChange triggered but prevented automatic closing');
-      }}
-      modal={false}
-    >
-      <DialogContent
-        className={`
-          ${isMobile 
-            ? `fixed bottom-4 right-4 top-auto left-auto w-[90vw] max-w-sm m-0 translate-x-0 translate-y-0 rounded-lg border shadow-lg
-               ${isMinimized ? 'h-16' : 'h-[70vh]'}` 
-            : 'sm:max-w-2xl h-[80vh]'
-          } 
-          flex flex-col p-0 transition-all duration-300 z-50 bg-background
-          [&>button]:hidden
-        `}
-      >
+    <>
+      {/* Mobile: Use Dialog for full screen */}
+      {isMobile ? (
+        <Dialog 
+          open={open} 
+          onOpenChange={() => {
+            // Completely prevent automatic closing - only allow manual close via X button
+            console.log('Dialog onOpenChange triggered but prevented automatic closing');
+          }}
+          modal={false}
+        >
+          <DialogContent
+            className={`
+              fixed bottom-4 right-4 top-auto left-auto w-[90vw] max-w-sm m-0 translate-x-0 translate-y-0 rounded-lg border shadow-lg
+              ${isMinimized ? 'h-16' : 'h-[70vh]'}
+              flex flex-col p-0 transition-all duration-300 z-50 bg-background
+              [&>button]:hidden
+            `}
+          >
         <DialogHeader className="px-6 py-4 border-b">
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2">
@@ -693,9 +695,173 @@ export function AiChatDialog({
               </div>
             </div>
 
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      ) : (
+        /* Desktop: Use fixed positioned div instead of modal */
+        open && (
+          <div className="fixed bottom-4 right-16 z-[9998] w-96 max-h-[70vh] bg-background border border-border rounded-lg shadow-xl flex flex-col transition-all duration-300">
+            {/* Header */}
+            <div className="px-6 py-4 border-b">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Brain className="h-5 w-5" />
+                  <span className="font-semibold">NoteBot</span>
+                  {isProcessing && (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onHide?.()}
+                    title="Hide chat"
+                    className="transition-all duration-300"
+                  >
+                    ↓
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      console.log('Close button clicked');
+                      onOpenChange(false);
+                    }}
+                    title="Close chat"
+                    className="transition-all duration-300"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Chat Messages */}
+            <ScrollArea ref={scrollAreaRef} className="flex-1 p-6">
+              <div className="space-y-4">
+                {chatMessages.map((message) => (
+                  <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[80%] rounded-lg p-3 ${
+                      message.type === 'user' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : message.type === 'system'
+                        ? 'bg-muted text-muted-foreground border border-border'
+                        : 'bg-muted'
+                    }`}>
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      {message.type === 'ai' && message.actionType && (
+                        <div className="mt-2 pt-2 border-t border-border/50">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={async () => {
+                              if (history.length > 0) {
+                                const lastEntry = history[0];
+                                await handleRevertToHistoryVersion(lastEntry);
+                              }
+                            }}
+                            disabled={history.length === 0}
+                            className="text-xs text-muted-foreground hover:text-foreground"
+                          >
+                            Undo
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                
+                {isProcessing && (
+                  <div className="flex justify-start">
+                    <div className="bg-muted rounded-lg p-3">
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-3 w-3 border-2 border-primary border-t-transparent"></div>
+                        <span className="text-sm text-muted-foreground">AI is thinking...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+
+            {/* Status and Input */}
+            <div className="px-6 py-3 border-t bg-muted/30">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-xs font-medium text-muted-foreground">Quick Actions:</div>
+                <div 
+                  className={`text-xs text-muted-foreground px-2 py-1 bg-background/50 rounded transition-all duration-300 ${
+                    hasTextSelected ? 'ring-1 ring-blue-400 shadow-blue-400/30' : ''
+                  }`}
+                  style={{
+                    animation: hasTextSelected ? 'glowBlue 2s ease-in-out infinite alternate' : 'none'
+                  }}
+                >
+                  {hasTextSelected ? "Text is selected" : "Editing whole page"}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSpellCheck}
+                  disabled={isProcessing}
+                  className="text-xs"
+                >
+                  Spelling
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGrammarCheck}
+                  disabled={isProcessing}
+                  className="text-xs"
+                >
+                  Grammar
+                </Button>
+                {quickActions.map((action) => (
+                  <Button
+                    key={action.label}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleQuickAction(action.instruction, action.label)}
+                    disabled={isProcessing}
+                    className="text-xs"
+                  >
+                    {action.label}
+                  </Button>
+                ))}
+              </div>
+
+              {/* Message Input */}
+              <div className="flex gap-2 mt-3">
+                <Input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="Tell me how to improve your text..."
+                  disabled={isProcessing}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  className="flex-1 bg-background text-foreground border-border placeholder:text-muted-foreground focus:ring-ring focus:border-ring"
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!inputValue.trim() || isProcessing}
+                  size="sm"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
-        )}
-      </DialogContent>
-    </Dialog>
+        )
+      )}
+    </>
   );
 }

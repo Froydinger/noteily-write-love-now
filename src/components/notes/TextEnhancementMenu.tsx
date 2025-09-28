@@ -50,6 +50,7 @@ export function TextEnhancementMenu({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedText, setSelectedText] = useState('');
   const [hasTextSelected, setHasTextSelected] = useState(false);
+  const [isChatHidden, setIsChatHidden] = useState(false);
   const { toast } = useToast();
   const { preferences } = usePreferences();
   const { history, addHistoryEntry, revertToVersion, clearHistory } = useAiHistory(noteId);
@@ -252,15 +253,18 @@ export function TextEnhancementMenu({
 
   return createPortal(
      <>
-      {/* Only show floating button when chat dialog is not open */}
-      {!showChatDialog && (
+      {/* Floating AI button - always visible when chat is hidden */}
+      {(!showChatDialog || isChatHidden) && (
         <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
               size="sm"
               disabled={disabled || isProcessing}
-              onClick={!isDropdownOpen ? handleOpenChatDialog : undefined}
+              onClick={!isDropdownOpen ? (() => {
+                setIsChatHidden(false);
+                handleOpenChatDialog();
+              }) : undefined}
               className="!fixed !bottom-4 !right-4 !z-[9999] h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105"
               title={isDropdownOpen ? (hasTextSelected ? "AI Enhancement Menu - Text Selected" : "AI Enhancement Menu") : "Chat with AI"}
             >
@@ -280,7 +284,10 @@ export function TextEnhancementMenu({
               <BookOpen className="mr-2 h-4 w-4" />
               Correct Grammar
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleOpenChatDialog} disabled={isProcessing}>
+            <DropdownMenuItem onClick={() => {
+              setIsChatHidden(false);
+              handleOpenChatDialog();
+            }} disabled={isProcessing}>
               <PenTool className="mr-2 h-4 w-4" />
               Chat with AI
             </DropdownMenuItem>
@@ -295,8 +302,12 @@ export function TextEnhancementMenu({
 
       {/* AI Chat Dialog */}
       <AiChatDialog
-        open={showChatDialog}
-        onOpenChange={setShowChatDialog}
+        open={showChatDialog && !isChatHidden}
+        onOpenChange={(open) => {
+          setShowChatDialog(open);
+          if (!open) setIsChatHidden(false);
+        }}
+        onHide={() => setIsChatHidden(true)}
         content={selectedText || content}
         originalHTML={originalHTML}
         noteTitle={noteTitle}
