@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { 
   Brain, 
@@ -249,7 +250,7 @@ export function TextEnhancementMenu({
     return null;
   }
 
-  return (
+  return createPortal(
     <>
       <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
         <DropdownMenuTrigger asChild>
@@ -311,6 +312,7 @@ export function TextEnhancementMenu({
           <span className="text-sm text-muted-foreground">Processing with AI...</span>
         </div>
       )}
-    </>
+    </>,
+    document.body
   );
 }
