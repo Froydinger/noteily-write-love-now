@@ -46,6 +46,7 @@ export function TextEnhancementMenu({
 }: TextEnhancementMenuProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showChatDialog, setShowChatDialog] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedText, setSelectedText] = useState('');
   const [hasTextSelected, setHasTextSelected] = useState(false);
   const { toast } = useToast();
@@ -250,7 +251,7 @@ export function TextEnhancementMenu({
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
@@ -275,10 +276,6 @@ export function TextEnhancementMenu({
             <BookOpen className="mr-2 h-4 w-4" />
             Correct Grammar
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleOpenChatDialog} disabled={isProcessing}>
-            <PenTool className="mr-2 h-4 w-4" />
-            Chat with AI
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleAIUndo} disabled={isProcessing || history.length === 0}>
             <Undo2 className="mr-2 h-4 w-4" />
@@ -286,6 +283,20 @@ export function TextEnhancementMenu({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Separate floating AI Chat button - appears when dropdown is closed */}
+      {!isDropdownOpen && (
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={disabled || isProcessing}
+          onClick={handleOpenChatDialog}
+          className="fixed bottom-4 right-16 z-50 h-12 w-12 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/90 transition-all duration-200 hover:scale-105"
+          title="Chat with AI"
+        >
+          <Brain className="h-5 w-5" />
+        </Button>
+      )}
 
       {/* AI Chat Dialog */}
       <AiChatDialog
