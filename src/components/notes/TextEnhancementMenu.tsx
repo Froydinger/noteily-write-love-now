@@ -115,7 +115,7 @@ export function TextEnhancementMenu({
     try {
       const { data, error } = await supabase.functions.invoke('spell-check', {
         body: { 
-          content: content,
+          content: originalHTML,
           originalHTML: originalHTML,
           action: 'spell'
         }
@@ -123,14 +123,14 @@ export function TextEnhancementMenu({
 
       if (error) throw error;
 
-      if (data.correctedContent && data.correctedContent !== content) {
+      if (data.correctedContent && data.correctedContent !== originalHTML) {
         // Use AI's HTML output directly - it preserves structure better
         const correctedHTML = data.correctedContent;
         
         // Add to history before changing content
-        await addHistoryEntry('spell', content, data.correctedContent, noteTitle, noteTitle);
+        await addHistoryEntry('spell', originalHTML, data.correctedContent, noteTitle, noteTitle);
         
-        onContentChange(correctedHTML, hasTextSelected);
+        onContentChange(correctedHTML, false);
         
         toast({
           title: "Spelling corrected",
@@ -168,7 +168,7 @@ export function TextEnhancementMenu({
     try {
       const { data, error } = await supabase.functions.invoke('spell-check', {
         body: { 
-          content: content,
+          content: originalHTML,
           originalHTML: originalHTML,
           action: 'grammar'
         }
@@ -176,14 +176,14 @@ export function TextEnhancementMenu({
 
       if (error) throw error;
 
-      if (data.correctedContent && data.correctedContent !== content) {
+      if (data.correctedContent && data.correctedContent !== originalHTML) {
         // Use AI's HTML output directly - it preserves structure better
         const correctedHTML = data.correctedContent;
         
         // Add to history before changing content
-        await addHistoryEntry('grammar', content, data.correctedContent, noteTitle, noteTitle);
+        await addHistoryEntry('grammar', originalHTML, data.correctedContent, noteTitle, noteTitle);
         
-        onContentChange(correctedHTML, hasTextSelected);
+        onContentChange(correctedHTML, false);
         
         toast({
           title: "Grammar corrected",
@@ -238,7 +238,7 @@ export function TextEnhancementMenu({
   React.useEffect(() => {
     if (!originalContentBackup) {
       setOriginalContentBackup({
-        content: content,
+        content: originalHTML,
         title: noteTitle
       });
     }
@@ -341,7 +341,7 @@ export function TextEnhancementMenu({
           if (!open) setIsChatHidden(false);
         }}
         onHide={() => setIsChatHidden(true)}
-        content={getEnhancedSelectedContent()}
+        content={content}
         originalHTML={originalHTML}
         noteTitle={noteTitle}
         onContentChange={onContentChange}

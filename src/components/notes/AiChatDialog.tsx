@@ -125,9 +125,7 @@ export function AiChatDialog({
       }
       
       if (chatMessages.length === 0) {
-        const welcomeMessage = isSelectedText 
-          ? 'Hi! I can help you improve your selected text. Use the quick actions below or tell me what you\'d like me to do.'
-          : 'Hi! I can help you improve your writing. Use the quick actions below or tell me what you\'d like me to do with your text.';
+        const welcomeMessage = 'Hi! I can help you improve your writing. Use the quick actions below or tell me what you\'d like me to do with your text.';
         setChatMessages([{
           id: 'welcome',
           type: 'system',
@@ -197,27 +195,22 @@ export function AiChatDialog({
     try {
       const { data, error } = await supabase.functions.invoke('spell-check', {
         body: { 
-          content: content,
+          content: originalHTML,
           action: 'spell',
           originalHTML: originalHTML,
-          isSelectedText: isSelectedText
+          isSelectedText: false
         }
       });
 
       if (error) throw error;
 
-      if (data.correctedContent && data.correctedContent !== content) {
-        await onAddHistoryEntry('spell', content, data.correctedContent, noteTitle, noteTitle);
+      if (data.correctedContent && data.correctedContent !== originalHTML) {
+        await onAddHistoryEntry('spell', originalHTML, data.correctedContent, noteTitle, noteTitle);
         
-        console.log('Spell check - sending to editor:', { 
-          isSelectedText, 
-          originalLength: originalHTML.length, 
-          selectedLength: content.length,
-          newContentLength: data.correctedContent.length 
-        });
+        console.log('Spell check - sending to editor - full page replacement');
         
-        // Send corrected content to editor with selection awareness
-        onContentChange(data.correctedContent, isSelectedText);
+        // Always replace full content, never use selection replacement
+        onContentChange(data.correctedContent, false);
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
@@ -287,20 +280,20 @@ export function AiChatDialog({
     try {
       const { data, error } = await supabase.functions.invoke('spell-check', {
         body: { 
-          content: content,
+          content: originalHTML,
           action: 'grammar',
           originalHTML: originalHTML,
-          isSelectedText: isSelectedText
+          isSelectedText: false
         }
       });
 
       if (error) throw error;
 
-      if (data.correctedContent && data.correctedContent !== content) {
-        await onAddHistoryEntry('grammar', content, data.correctedContent, noteTitle, noteTitle);
+      if (data.correctedContent && data.correctedContent !== originalHTML) {
+        await onAddHistoryEntry('grammar', originalHTML, data.correctedContent, noteTitle, noteTitle);
         
-        // Send corrected content to editor with selection awareness
-        onContentChange(data.correctedContent, isSelectedText);
+        // Always replace full content, never use selection replacement
+        onContentChange(data.correctedContent, false);
         
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
@@ -379,12 +372,12 @@ export function AiChatDialog({
     try {
       const response = await supabase.functions.invoke('spell-check', {
         body: { 
-          content: content,
+          content: originalHTML,
           title: noteTitle,
           action: 'rewrite',
           instructions: instruction,
           originalHTML: originalHTML,
-          isSelectedText: isSelectedText
+          isSelectedText: false
         }
       });
 
@@ -395,24 +388,17 @@ export function AiChatDialog({
       if (response.data && response.data.correctedContent) {
         await onAddHistoryEntry(
           'rewrite',
-          content,
+          originalHTML,
           response.data.correctedContent,
           noteTitle,
           response.data.newTitle || noteTitle,
           instruction
         );
         
-        console.log('Rewrite - sending to editor:', { 
-          isSelectedText, 
-          originalLength: originalHTML.length, 
-          selectedLength: content.length,
-          newContentLength: response.data.correctedContent.length,
-          hasHTML: response.data.correctedContent.includes('<')
-        });
+        console.log('Rewrite - sending to editor - full page replacement');
         
-        // Always send the AI's content to the editor with selection awareness
-        // The editor will handle selection replacement properly
-        onContentChange(response.data.correctedContent, isSelectedText);
+        // Always replace the full page content, never use selection replacement
+        onContentChange(response.data.correctedContent, false);
         
         if (response.data.newTitle && response.data.newTitle !== noteTitle) {
           onTitleChange(response.data.newTitle);
