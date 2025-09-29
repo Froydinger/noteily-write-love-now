@@ -291,27 +291,105 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
     }
   };
 
-  // Handle paste events to strip formatting and normalize line breaks
+  // Handle paste events with HTML formatting preservation
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
     
-    const text = e.clipboardData.getData('text/plain');
-    if (!text) return;
+    // Try to get HTML content first, then fallback to plain text
+    const htmlData = e.clipboardData.getData('text/html');
+    const textData = e.clipboardData.getData('text/plain');
     
-    // Normalize line breaks: allow single and double, but collapse 3+ to double
-    const normalizedText = text
-      .replace(/\r\n/g, '\n')  // Normalize Windows line endings
-      .replace(/\n{3,}/g, '\n\n') // Replace 3+ line breaks with double (paragraph break)
-      .trim();
+    if (!htmlData && !textData) return;
     
     // Get current selection
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return;
     
     const range = selection.getRangeAt(0);
-    
-    // Delete current selection if any
     range.deleteContents();
+    
+    if (htmlData) {
+      // Create a temporary div to parse HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlData;
+      
+      // Preserve semantic elements like headings and paragraphs
+      const allowedTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'strong', 'em', 'b', 'i', 'u'];
+      const walker = document.createTreeWalker(
+        tempDiv,
+        NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: (node) => {
+            if (node.nodeType === Node.TEXT_NODE) return NodeFilter.FILTER_ACCEPT;
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const tagName = (node as Element).tagName.toLowerCase();
+              return allowedTags.includes(tagName) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+            }
+            return NodeFilter.FILTER_REJECT;
+          }
+        }
+      );
+      
+      // Extract and sanitize content while preserving structure
+      const fragment = document.createDocumentFragment();
+      let node;
+      while (node = walker.nextNode()) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          fragment.appendChild(node.cloneNode(true));
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const element = node as Element;
+          const tagName = element.tagName.toLowerCase();
+          
+          if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'].includes(tagName)) {
+            const newElement = document.createElement(tagName);
+            newElement.textContent = element.textContent || '';
+            fragment.appendChild(newElement);
+          } else if (tagName === 'br') {
+            fragment.appendChild(document.createElement('br'));
+          } else if (['strong', 'b'].includes(tagName)) {
+            const strong = document.createElement('strong');
+            strong.textContent = element.textContent || '';
+            fragment.appendChild(strong);
+          } else if (['em', 'i'].includes(tagName)) {
+            const em = document.createElement('em');
+            em.textContent = element.textContent || '';
+            fragment.appendChild(em);
+          } else if (tagName === 'u') {
+            const u = document.createElement('u');
+            u.textContent = element.textContent || '';
+            fragment.appendChild(u);
+          }
+        }
+      }
+      
+      // If we got some formatted content, use it
+      if (fragment.childNodes.length > 0) {
+        range.insertNode(fragment);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      } else {
+        // Fallback to plain text if HTML parsing failed
+        insertPlainText(textData, range, selection);
+      }
+    } else {
+      // Handle plain text with line break normalization
+      insertPlainText(textData, range, selection);
+    }
+    
+    // Trigger content change to save
+    if (contentRef.current) {
+      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  };
+  
+  // Helper function for plain text insertion
+  const insertPlainText = (text: string, range: Range, selection: Selection) => {
+    // Normalize line breaks: allow single and double, but collapse 3+ to double
+    const normalizedText = text
+      .replace(/\r\n/g, '\n')  // Normalize Windows line endings
+      .replace(/\n{3,}/g, '\n\n') // Replace 3+ line breaks with double (paragraph break)
+      .trim();
     
     // Split by single line breaks and insert
     const lines = normalizedText.split('\n');
@@ -334,11 +412,6 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
     range.collapse(false);
     selection.removeAllRanges();
     selection.addRange(range);
-    
-    // Trigger content change to save
-    if (contentRef.current) {
-      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-    }
   };
 
   // Handle existing images in loaded content
