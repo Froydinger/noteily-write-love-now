@@ -333,19 +333,30 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
               const heading = document.createElement(tagName);
               heading.textContent = childElement.textContent || '';
               fragment.appendChild(heading);
-              // Add line break after heading
-              fragment.appendChild(document.createElement('br'));
+              // Only add line break if there's more content after this heading
+              const nextSibling = child.nextSibling;
+              if (nextSibling && nextSibling.textContent?.trim()) {
+                fragment.appendChild(document.createElement('br'));
+              }
             } else if (tagName === 'p') {
               const para = document.createElement('p');
               para.textContent = childElement.textContent || '';
               fragment.appendChild(para);
             } else if (tagName === 'div') {
-              // Process div content recursively
-              const divContent = processElement(childElement);
-              fragment.appendChild(divContent);
-              // Add line break after div if it has content
-              if (childElement.textContent?.trim()) {
-                fragment.appendChild(document.createElement('br'));
+              // Process div content recursively but don't add extra breaks
+              const text = childElement.textContent?.trim();
+              if (text) {
+                // Check if this div contains block-level content or just text
+                const hasBlockElements = childElement.querySelector('h1, h2, h3, h4, h5, h6, p');
+                if (hasBlockElements) {
+                  const divContent = processElement(childElement);
+                  fragment.appendChild(divContent);
+                } else {
+                  // Just text content, treat as paragraph
+                  const para = document.createElement('p');
+                  para.textContent = text;
+                  fragment.appendChild(para);
+                }
               }
             } else if (['strong', 'b'].includes(tagName)) {
               const strong = document.createElement('strong');
