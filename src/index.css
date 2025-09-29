@@ -371,13 +371,13 @@
   }
 
   /* Text selection highlight */
-  :root ::selection {
-    background: hsl(0 0% 25%);
-    color: hsl(var(--primary-foreground));
+  ::selection {
+    background: hsl(var(--accent) / 0.3);
+    color: hsl(var(--foreground));
   }
-  :root ::-moz-selection {
-    background: hsl(0 0% 25%);
-    color: hsl(var(--primary-foreground));
+  ::-moz-selection {
+    background: hsl(var(--accent) / 0.3);
+    color: hsl(var(--foreground));
   }
 
 
