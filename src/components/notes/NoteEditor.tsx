@@ -313,58 +313,72 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = htmlData;
       
-      // Preserve semantic elements like headings and paragraphs
-      const allowedTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'strong', 'em', 'b', 'i', 'u'];
-      const walker = document.createTreeWalker(
-        tempDiv,
-        NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
-        {
-          acceptNode: (node) => {
-            if (node.nodeType === Node.TEXT_NODE) return NodeFilter.FILTER_ACCEPT;
-            if (node.nodeType === Node.ELEMENT_NODE) {
-              const tagName = (node as Element).tagName.toLowerCase();
-              return allowedTags.includes(tagName) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      // Clean up the content and process it properly
+      const processElement = (element: Element): DocumentFragment => {
+        const fragment = document.createDocumentFragment();
+        
+        // Process all child nodes
+        for (const child of Array.from(element.childNodes)) {
+          if (child.nodeType === Node.TEXT_NODE) {
+            const text = child.textContent?.trim();
+            if (text) {
+              fragment.appendChild(document.createTextNode(text));
             }
-            return NodeFilter.FILTER_REJECT;
+          } else if (child.nodeType === Node.ELEMENT_NODE) {
+            const childElement = child as Element;
+            const tagName = childElement.tagName.toLowerCase();
+            
+            // Handle different element types
+            if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tagName)) {
+              const heading = document.createElement(tagName);
+              heading.textContent = childElement.textContent || '';
+              fragment.appendChild(heading);
+              // Add line break after heading
+              fragment.appendChild(document.createElement('br'));
+            } else if (tagName === 'p') {
+              const para = document.createElement('p');
+              para.textContent = childElement.textContent || '';
+              fragment.appendChild(para);
+            } else if (tagName === 'div') {
+              // Process div content recursively
+              const divContent = processElement(childElement);
+              fragment.appendChild(divContent);
+              // Add line break after div if it has content
+              if (childElement.textContent?.trim()) {
+                fragment.appendChild(document.createElement('br'));
+              }
+            } else if (['strong', 'b'].includes(tagName)) {
+              const strong = document.createElement('strong');
+              strong.textContent = childElement.textContent || '';
+              fragment.appendChild(strong);
+            } else if (['em', 'i'].includes(tagName)) {
+              const em = document.createElement('em');
+              em.textContent = childElement.textContent || '';
+              fragment.appendChild(em);
+            } else if (tagName === 'u') {
+              const u = document.createElement('u');
+              u.textContent = childElement.textContent || '';
+              fragment.appendChild(u);
+            } else if (tagName === 'br') {
+              fragment.appendChild(document.createElement('br'));
+            } else {
+              // For other elements, just extract text content
+              const text = childElement.textContent?.trim();
+              if (text) {
+                fragment.appendChild(document.createTextNode(text));
+              }
+            }
           }
         }
-      );
+        
+        return fragment;
+      };
       
-      // Extract and sanitize content while preserving structure
-      const fragment = document.createDocumentFragment();
-      let node;
-      while (node = walker.nextNode()) {
-        if (node.nodeType === Node.TEXT_NODE) {
-          fragment.appendChild(node.cloneNode(true));
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-          const element = node as Element;
-          const tagName = element.tagName.toLowerCase();
-          
-          if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'].includes(tagName)) {
-            const newElement = document.createElement(tagName);
-            newElement.textContent = element.textContent || '';
-            fragment.appendChild(newElement);
-          } else if (tagName === 'br') {
-            fragment.appendChild(document.createElement('br'));
-          } else if (['strong', 'b'].includes(tagName)) {
-            const strong = document.createElement('strong');
-            strong.textContent = element.textContent || '';
-            fragment.appendChild(strong);
-          } else if (['em', 'i'].includes(tagName)) {
-            const em = document.createElement('em');
-            em.textContent = element.textContent || '';
-            fragment.appendChild(em);
-          } else if (tagName === 'u') {
-            const u = document.createElement('u');
-            u.textContent = element.textContent || '';
-            fragment.appendChild(u);
-          }
-        }
-      }
+      const processedFragment = processElement(tempDiv);
       
-      // If we got some formatted content, use it
-      if (fragment.childNodes.length > 0) {
-        range.insertNode(fragment);
+      // If we got some content, use it
+      if (processedFragment.childNodes.length > 0) {
+        range.insertNode(processedFragment);
         range.collapse(false);
         selection.removeAllRanges();
         selection.addRange(range);
