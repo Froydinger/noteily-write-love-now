@@ -167,16 +167,7 @@ export function AiChatDialog({
   };
 
   const addInitialRestorePoint = () => {
-    if (originalContentBackup && !chatMessages.some(msg => msg.id === 'initial-restore')) {
-      const restoreMessage: ChatMessage = {
-        id: 'initial-restore',
-        type: 'system',
-        content: '↺ Restore to original',
-        actionType: 'restore',
-        timestamp: new Date()
-      };
-      setChatMessages(prev => [restoreMessage, ...prev.filter(msg => msg.id !== 'initial-restore')]);
-    }
+    // Removed restore point functionality - using main undo/redo system instead
   };
 
   const handleSpellCheck = async () => {
@@ -218,18 +209,15 @@ export function AiChatDialog({
       if (data.correctedContent && data.correctedContent !== content) {
         await onAddHistoryEntry('spell', content, data.correctedContent, noteTitle, noteTitle);
         
-        console.log('Spell check - injecting:', { 
+        console.log('Spell check - sending to editor:', { 
           isSelectedText, 
           originalLength: originalHTML.length, 
           selectedLength: content.length,
           newContentLength: data.correctedContent.length 
         });
         
-        // For spell check, inject corrected text properly
-        const plainOriginal = originalHTML.replace(/<[^>]*>/g, '');
-        const finalContent = injectChangedText(plainOriginal, content, data.correctedContent);
-        onContentChange(finalContent);
-        addInitialRestorePoint();
+        // Send corrected content directly to editor for handling
+        onContentChange(data.correctedContent);
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
@@ -311,10 +299,8 @@ export function AiChatDialog({
       if (data.correctedContent && data.correctedContent !== content) {
         await onAddHistoryEntry('grammar', content, data.correctedContent, noteTitle, noteTitle);
         
-        // For grammar check, inject corrected text properly
-        const plainOriginal = originalHTML.replace(/<[^>]*>/g, '');
-        const finalContent = injectChangedText(plainOriginal, content, data.correctedContent);
-        onContentChange(finalContent);
+        // Send corrected content directly to editor for handling
+        onContentChange(data.correctedContent);
         
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
@@ -324,7 +310,7 @@ export function AiChatDialog({
           timestamp: new Date()
         };
         setChatMessages(prev => [...prev, aiMessage]);
-        addInitialRestorePoint();
+        // Removed restore point call
         toast({
           title: "Grammar corrected",
           description: "Fixed grammar issues in your note.",
@@ -457,7 +443,7 @@ export function AiChatDialog({
         timestamp: new Date()
       };
       setChatMessages(prev => [...prev, errorMessage]);
-        addInitialRestorePoint();
+        // Removed restore point call
       toast({
         title: "Rewrite failed", 
         description: error.message || "There was an error rewriting your text.",

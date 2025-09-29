@@ -89,7 +89,33 @@ export function TextEnhancementMenu({
     };
   }, []);
 
-  // Handle opening chat dialog with text selection check
+  // Handle opening chat dialog with enhanced text selection
+  const getEnhancedSelectedContent = () => {
+    const selection = getSelectedText();
+    if (selection.text.length > 0) {
+      // If we have selected text, try to get better context about what was selected
+      const selectionContainer = selection.range?.commonAncestorContainer;
+      if (selectionContainer) {
+        // Check if selection includes headers
+        const parentElement = selectionContainer.nodeType === Node.TEXT_NODE 
+          ? selectionContainer.parentElement 
+          : selectionContainer as Element;
+        
+        if (parentElement) {
+          const hasHeader = parentElement.closest('h1, h2, h3, h4, h5, h6') || 
+                           parentElement.querySelector('h1, h2, h3, h4, h5, h6');
+          const hasParagraph = parentElement.closest('p') || 
+                              parentElement.querySelector('p');
+          
+          // Return the selected text with context about its structure
+          return selection.text;
+        }
+      }
+      return selection.text;
+    }
+    return content;
+  };
+
   const handleOpenChatDialog = () => {
     const selection = getSelectedText();
     setSelectedText(selection.text);
@@ -203,29 +229,41 @@ export function TextEnhancementMenu({
   };
 
   const handleAIUndo = async () => {
-    // Use the most recent history entry instead of previousContent
-    if (history.length === 0) {
+    // Revert to the original content before any AI changes
+    if (!originalContentBackup) {
       toast({
-        title: "Nothing to undo",
-        description: "No previous AI changes available to restore.",
+        title: "Nothing to revert",
+        description: "No original content available to restore.",
         variant: "destructive",
       });
       return;
     }
 
-    const lastEntry = history[0];
-    const revertData = await revertToVersion(lastEntry);
-    
-    onContentChange(revertData.content);
-    if (revertData.title && revertData.title !== noteTitle) {
-      onTitleChange(revertData.title);
+    onContentChange(originalContentBackup.content);
+    if (originalContentBackup.title && originalContentBackup.title !== noteTitle) {
+      onTitleChange(originalContentBackup.title);
     }
     
+    // Clear the backup since we've reverted
+    setOriginalContentBackup(null);
+    
     toast({
-      title: "Changes undone",
-      description: "Content has been reverted to previous version.",
+      title: "Reverted to original",
+      description: "Content has been restored to original state before AI changes.",
     });
   };
+
+  // Store original content backup when AI operations start
+  const [originalContentBackup, setOriginalContentBackup] = React.useState<{content: string, title: string} | null>(null);
+  
+  React.useEffect(() => {
+    if (!originalContentBackup) {
+      setOriginalContentBackup({
+        content: content,
+        title: noteTitle
+      });
+    }
+  }, []);
 
   // Preserve HTML structure while replacing text content
   const preserveHTMLStructure = (originalHTML: string, newText: string): string => {
@@ -308,9 +346,9 @@ export function TextEnhancementMenu({
               Chat with AI
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleAIUndo} disabled={isProcessing || history.length === 0}>
+            <DropdownMenuItem onClick={handleAIUndo} disabled={isProcessing || !originalContentBackup}>
               <Undo2 className="mr-2 h-4 w-4" />
-              AI Undo {history.length === 0 ? '(No history)' : ''}
+              Revert to Original {!originalContentBackup ? '(No backup)' : ''}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -324,7 +362,7 @@ export function TextEnhancementMenu({
           if (!open) setIsChatHidden(false);
         }}
         onHide={() => setIsChatHidden(true)}
-        content={selectedText || content}
+        content={getEnhancedSelectedContent()}
         originalHTML={originalHTML}
         noteTitle={noteTitle}
         onContentChange={onContentChange}

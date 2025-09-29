@@ -287,17 +287,31 @@ function getUserPrompt(action: string, content: string, instructions?: string, t
       }
       
       if (isSelectedText) {
-        prompt += `TASK: Rewrite the selected text below. You can create headers and paragraphs as appropriate:\n\n`;
+        prompt += `TASK: Rewrite the selected text below. Analyze the content structure and respond appropriately:\n\n`;
         prompt += `SELECTED TEXT TO REWRITE:\n${content}\n\n`;
-        prompt += `SELECTED TEXT INSTRUCTIONS: 
-- Return ONLY the rewritten selected text in HTML format
-- You CAN create <h1>, <h2>, <h3> headers if the content calls for titles or sections
-- You CAN create <p> paragraphs for body text
+        
+        // Analyze if the selected content contains headers or body text
+        const hasHeaderText = content.match(/^[A-Z][^.!?]*$/m) || content.length < 100; // Short text might be a header
+        const hasBodyText = content.includes('.') || content.length > 50; // Longer text with sentences is likely body
+        
+        prompt += `CONTENT ANALYSIS:\n`;
+        if (hasHeaderText && !hasBodyText) {
+          prompt += `- Selected text appears to be a HEADER/TITLE - respond with appropriate header tags\n`;
+        } else if (hasBodyText && !hasHeaderText) {
+          prompt += `- Selected text appears to be BODY TEXT - respond with paragraph tags\n`;
+        } else {
+          prompt += `- Selected text contains both HEADER and BODY elements - structure appropriately\n`;
+        }
+        
+        prompt += `\nSELECTED TEXT INSTRUCTIONS: 
+- Return ONLY the rewritten selected text in proper HTML format
+- If content is clearly a title/header, use <h1>, <h2>, or <h3> tags as appropriate
+- If content is body text, use <p> tags for paragraphs
+- If content has both, create proper structure with headers and paragraphs
 - Do NOT use markdown syntax (no **, #, etc.)
-- If user asks for "title" or "header", create <h1> or <h2> tags
-- If user asks for "body" or "content", create <p> tags
-- If user asks for "sections", create multiple <h2> + <p> combinations
-- Clean HTML output, no extra empty paragraphs needed for selected text`;
+- Match the formatting intent: titles become headers, body becomes paragraphs
+- Example: "My Title" + body text → <h2>Enhanced Title</h2><p>Enhanced body content</p>
+- Clean HTML output, no extra spacing elements needed for selected text`;
       } else {
         prompt += `TASK: Rewrite the entire content below. You have full HTML formatting capabilities:\n\n`;
         prompt += `CONTENT TO REWRITE:\n${content}\n\n`;
