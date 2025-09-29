@@ -187,35 +187,40 @@ Input: <h1>My Title</h1><p>This are a sentence that need fix.</p>
 Output: <h1>My Title</h1><p>This is a sentence that needs fixing.</p>`;
 
     case 'rewrite':
-      return `You are a professional writer and editor. Your task is to rewrite content according to user instructions while maintaining proper HTML structure for a rich text editor.
+      return `You are a professional writer and editor with FULL HTML formatting capabilities. Your task is to rewrite content according to user instructions while creating proper HTML structure.
 
-CRITICAL HTML FORMATTING RULES:
-- Return content in PROPER HTML FORMAT, NOT markdown
-- Use HTML tags for structure: <h1>, <h2>, <h3> for headings, <p> for paragraphs
-- NEVER use markdown syntax like **bold** or # headings - use HTML tags instead
+CRITICAL HTML FORMATTING CAPABILITIES:
+- You CAN and SHOULD create headers using HTML heading tags: <h1>, <h2>, <h3>, <h4>, <h5>, <h6>
+- You CAN and SHOULD create body paragraphs using <p> tags
+- You CAN create lists, emphasis, and other formatting as needed
+- NEVER use markdown syntax like **bold** or # headings - ALWAYS use HTML tags
+- You have FULL AUTHORITY to create proper document structure with headers and body text
+
+WHEN TO CREATE HEADERS:
+- When user asks for "titles", "headings", "headers", or "sections"
+- When content naturally needs structure and organization
+- When user asks to "break up" content or create multiple parts
+- When creating outlines, lists of topics, or organized content
+- When user asks for "professional" formatting that would benefit from headers
+
+HTML STRUCTURE RULES:
+- Main titles: <h1>Title</h1>
+- Section headers: <h2>Section Title</h2>
+- Subsections: <h3>Subsection</h3>
+- Body paragraphs: <p>Content here</p>
+- Use <strong> for bold, <em> for italics
 - Each paragraph should be wrapped in <p> tags
-- Headings should use appropriate HTML heading tags (h1, h2, h3, etc.)
-- Use <strong> for bold text, <em> for italics, not markdown syntax
+- Headers should stand alone without extra spacing tags
 
-HEADING AND SECTION FORMATTING:
-- When creating multiple titles/sections, break them up naturally throughout the content
-- Use h1 for main titles, h2 for section headers, h3 for subsections
-- Add empty <p></p> tags between sections for proper spacing
-- Don't duplicate titles - create distinct section headings that organize the content logically
+FORMATTING EXAMPLES:
+User asks: "Make this professional with a title and sections"
+You create: <h1>Professional Title</h1><p>Intro paragraph</p><h2>Section One</h2><p>Section content</p><h2>Section Two</h2><p>More content</p>
 
-EXAMPLE FOR MULTIPLE SECTIONS:
-<p></p>
-<h1>Main Title</h1>
-<p></p>
-<p>Introductory content goes here.</p>
-<p></p>
-<h2>First Section</h2>
-<p></p>
-<p>Content for first section.</p>
-<p></p>
-<h2>Second Section</h2>
-<p></p>
-<p>Content for second section.</p>
+User asks: "Break this up with headers"
+You create: <h2>First Topic</h2><p>Content about first topic</p><h2>Second Topic</h2><p>Content about second topic</p>
+
+User asks: "Create a title and body"
+You create: <h1>Main Title</h1><p>Body content goes here</p>
 
 LENGTH PRESERVATION RULES:
 - For TONE CHANGES (professional, casual, formal, friendly, positive, happier): Keep approximately the same length as original
@@ -225,11 +230,11 @@ LENGTH PRESERVATION RULES:
 
 CONTENT RULES:
 - Follow user instructions precisely for the rewrite
-- When asked to "break up with titles" or create sections, organize content logically under distinct headings
+- You have FULL PERMISSION to create any HTML structure needed (headers, paragraphs, lists, etc.)
+- When asked to organize content, USE HEADERS to create clear structure
 - If main title should be changed, format as: TITLE: [new title]
 - Ensure content flows naturally and maintains consistency
-- Return clean HTML without unnecessary attributes or classes
-- Don't repeat titles - create meaningful section breaks instead`;
+- Return clean HTML without unnecessary attributes or classes`;
 
     default:
       return `You are a text processor. Process the provided text according to the specified action.`;
@@ -262,41 +267,51 @@ function getUserPrompt(action: string, content: string, instructions?: string, t
         prompt += `(Only change the title if the instructions specifically ask for a title change)\n\n`;
       }
       
+      // Analyze existing content structure to inform the AI
+      const hasHeaders = originalHTML && (originalHTML.includes('<h1>') || originalHTML.includes('<h2>') || originalHTML.includes('<h3>'));
+      const hasParagraphs = originalHTML && originalHTML.includes('<p>');
+      
       if (originalHTML && originalHTML.trim()) {
-        const htmlStructure = extractFormatContext(originalHTML);
-        prompt += `DOCUMENT STRUCTURE:\n${htmlStructure}\n\n`;
+        prompt += `CURRENT DOCUMENT STRUCTURE ANALYSIS:\n`;
+        if (hasHeaders) {
+          const headers = originalHTML.match(/<h[1-6][^>]*>.*?<\/h[1-6]>/gi) || [];
+          prompt += `- Document currently has ${headers.length} headers: ${headers.slice(0,2).map(h => h.replace(/<[^>]*>/g, '')).join(', ')}${headers.length > 2 ? '...' : ''}\n`;
+        } else {
+          prompt += `- Document currently has NO headers (you can add them if needed)\n`;
+        }
+        if (hasParagraphs) {
+          prompt += `- Document has paragraph structure\n`;
+        }
+        prompt += `- You CAN create headers (<h1>, <h2>, etc.) and paragraphs (<p>) as needed\n`;
+        prompt += `- You have FULL AUTHORITY to add structure with headers if the content needs organization\n\n`;
       }
       
       if (isSelectedText) {
-        prompt += `TASK: Rewrite the selected text below. Return it in proper HTML format for a rich text editor:\n\n`;
+        prompt += `TASK: Rewrite the selected text below. You can create headers and paragraphs as appropriate:\n\n`;
         prompt += `SELECTED TEXT TO REWRITE:\n${content}\n\n`;
-        prompt += `CRITICAL INSTRUCTIONS FOR SELECTED TEXT: 
-- Return ONLY the rewritten selected text in proper HTML format
-- Use <p> tags for paragraphs, <h1>-<h6> for headings as appropriate
+        prompt += `SELECTED TEXT INSTRUCTIONS: 
+- Return ONLY the rewritten selected text in HTML format
+- You CAN create <h1>, <h2>, <h3> headers if the content calls for titles or sections
+- You CAN create <p> paragraphs for body text
 - Do NOT use markdown syntax (no **, #, etc.)
-- If creating titles/headings, use proper HTML: <h1>Title</h1>, <h2>Subtitle</h2>
-- For body text, wrap in <p>paragraph text</p>
-- If instructions ask for titles/headers, create them with proper HTML tags
-- Example for title + body: <h1>New Title</h1><p>Body content here</p>
-- Example for multiple sections: <h2>Section 1</h2><p>Content</p><h2>Section 2</h2><p>More content</p>
-- Return clean HTML without extra spacing or empty paragraphs
-- Make the content match exactly what the user is asking for (titles as headers, content as paragraphs)`;
+- If user asks for "title" or "header", create <h1> or <h2> tags
+- If user asks for "body" or "content", create <p> tags
+- If user asks for "sections", create multiple <h2> + <p> combinations
+- Clean HTML output, no extra empty paragraphs needed for selected text`;
       } else {
-        prompt += `TASK: Rewrite the entire content below in proper HTML format:\n\n`;
+        prompt += `TASK: Rewrite the entire content below. You have full HTML formatting capabilities:\n\n`;
         prompt += `CONTENT TO REWRITE:\n${content}\n\n`;
-        prompt += `CRITICAL FORMATTING REQUIREMENTS:
+        prompt += `FULL CONTENT INSTRUCTIONS:
 - Return content in proper HTML format (not markdown)
-- Wrap paragraphs in <p> tags
-- Use <h1>, <h2>, <h3> etc. for headings (NOT markdown # syntax)
-- ALWAYS add empty <p></p> tags above AND below headings for proper spacing
+- You CAN and SHOULD create headers (<h1>, <h2>, <h3>) when appropriate
+- You CAN and SHOULD create paragraphs (<p>) for body text
+- Use <h1> for main titles, <h2> for section headers, <h3> for subsections
 - Use <strong> for bold, <em> for italics
-- If instructions ask for different paragraphs, create separate <p> tags
-- If instructions ask for titles/headings, use this exact format:
-  <p></p>
-  <h2>Your Heading Text</h2>
-  <p></p>
-- Preserve paragraph breaks as separate <p> elements
-- Headings should have breathing room just like when users create them with format buttons`;
+- If instructions mention "title", "header", "sections" - CREATE THEM with proper HTML tags
+- If user asks to "break up" content or "organize" it - USE HEADERS to structure it
+- Headers help organize content and you should use them liberally when it makes sense
+- Each paragraph should be wrapped in <p> tags
+- Clean HTML structure without unnecessary empty elements`;
       }
       
       return prompt;
