@@ -72,7 +72,7 @@ export function AiChatDialog({
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
   // Check if working with selected text
-  const isSelectedText = content.length < originalHTML.length;
+  const isSelectedText = content.length < originalHTML.length && content.trim().length > 0;
 
   // Function to inject changed text back into the original content
   const injectChangedText = (originalContent: string, selectedText: string, newText: string): string => {
@@ -80,25 +80,38 @@ export function AiChatDialog({
       return newText; // If no selection, replace all content
     }
 
-    // Clean the selected text for more reliable matching
-    const cleanSelectedText = selectedText.trim();
-    const cleanOriginalContent = originalContent;
-    
-    // Find the first occurrence of the selected text
-    const selectedTextIndex = cleanOriginalContent.indexOf(cleanSelectedText);
-    
-    if (selectedTextIndex !== -1) {
-      // Make sure we're replacing the exact selection by checking context
-      const beforeSelection = cleanOriginalContent.substring(0, selectedTextIndex);
-      const afterSelection = cleanOriginalContent.substring(selectedTextIndex + cleanSelectedText.length);
+    // Get current selection range from DOM
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+      // Use the actual selection range instead of text matching
+      const range = selection.getRangeAt(0);
       
-      // Only replace if this looks like the right match (no duplicate replacements)
-      if (!beforeSelection.includes(newText) && !afterSelection.includes(newText)) {
-        return beforeSelection + newText + afterSelection;
+      // Create a temporary container for the new content
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = newText;
+      
+      // Create document fragment from new content
+      const fragment = document.createDocumentFragment();
+      while (tempDiv.firstChild) {
+        fragment.appendChild(tempDiv.firstChild);
       }
+      
+      // This will be handled by the calling code that has access to contentRef
+      // Return a special marker that indicates selection-based replacement
+      return `REPLACE_SELECTION:${newText}`;
     }
     
-    // Fallback: if we can't safely inject, warn and replace only if it's clearly a full rewrite
+    // Fallback to text-based replacement if no active selection
+    const cleanSelectedText = selectedText.trim();
+    const selectedTextIndex = originalContent.indexOf(cleanSelectedText);
+    
+    if (selectedTextIndex !== -1) {
+      const beforeSelection = originalContent.substring(0, selectedTextIndex);
+      const afterSelection = originalContent.substring(selectedTextIndex + cleanSelectedText.length);
+      return beforeSelection + newText + afterSelection;
+    }
+    
+    // Final fallback
     console.warn('Could not safely inject selected text, falling back to full content replacement');
     return newText;
   };

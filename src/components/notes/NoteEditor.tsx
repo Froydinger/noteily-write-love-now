@@ -601,21 +601,59 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
                 
                 onContentBeforeChange?.();
                 
-                // Update content without cursor position issues
-                contentRef.current.innerHTML = newHTML;
-                
-                // Immediately save AI changes to cloud (non-silent save)
-                const sanitizedContent = sanitizeContent(newHTML);
-                updateNote(note.id, { content: sanitizedContent }, false); // false = non-silent save
-                setLastSavedContent(sanitizedContent);
+                // Check if we have a text selection
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+                  // Replace only selected content
+                  const range = selection.getRangeAt(0);
+                  if (contentRef.current.contains(range.commonAncestorContainer)) {
+                    try {
+                      // Delete selected content and insert new HTML
+                      range.deleteContents();
+                      
+                      // Create a temporary container to parse the new HTML
+                      const tempDiv = document.createElement('div');
+                      tempDiv.innerHTML = newHTML;
+                      
+                      // Insert each node from the new content
+                      const fragment = document.createDocumentFragment();
+                      while (tempDiv.firstChild) {
+                        fragment.appendChild(tempDiv.firstChild);
+                      }
+                      
+                      range.insertNode(fragment);
+                      range.collapse(false);
+                      selection.removeAllRanges();
+                      selection.addRange(range);
+                      
+                      // Get the updated content and save
+                      const updatedContent = contentRef.current.innerHTML;
+                      const sanitizedContent = sanitizeContent(updatedContent);
+                      updateNote(note.id, { content: sanitizedContent }, false);
+                      setLastSavedContent(sanitizedContent);
+                    } catch (error) {
+                      console.error('Error replacing selected content:', error);
+                      // Fallback to full content replacement
+                      contentRef.current.innerHTML = newHTML;
+                      const sanitizedContent = sanitizeContent(newHTML);
+                      updateNote(note.id, { content: sanitizedContent }, false);
+                      setLastSavedContent(sanitizedContent);
+                    }
+                  }
+                } else {
+                  // No selection, replace all content
+                  contentRef.current.innerHTML = newHTML;
+                  const sanitizedContent = sanitizeContent(newHTML);
+                  updateNote(note.id, { content: sanitizedContent }, false);
+                  setLastSavedContent(sanitizedContent);
+                }
                 
                 // Create a custom event to mark this as an AI update 
                 const customEvent = new Event('input', { bubbles: true }) as any;
                 customEvent.isAIUpdate = true;
                 contentRef.current.dispatchEvent(customEvent);
                 
-                // Trigger undo state update by calling onContentBeforeChange again
-                // This ensures the undo button becomes active after AI changes
+                // Trigger undo state update
                 setTimeout(() => {
                   onContentBeforeChange?.();
                 }, 100);
@@ -627,10 +665,9 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
             noteTitle={title}
             onTitleChange={(newTitle) => {
               console.log('TextEnhancementMenu onTitleChange called with:', newTitle);
-              setPreviousTitle(title); // Store previous title
+              setPreviousTitle(title);
               setTitle(newTitle);
-              // Immediately save AI title changes to cloud (non-silent save)
-              updateNote(note.id, { title: newTitle }, false); // false = non-silent save
+              updateNote(note.id, { title: newTitle }, false);
               console.log('Title updated and saved to cloud');
             }}
             previousContent={previousContent}

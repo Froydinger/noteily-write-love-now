@@ -55,17 +55,23 @@ export function TextEnhancementMenu({
   const { preferences } = usePreferences();
   const { history, addHistoryEntry, revertToVersion, clearHistory } = useAiHistory(noteId);
 
-  // Function to get selected text
+  // Function to get selected text and range
   const getSelectedText = () => {
     const selection = window.getSelection();
-    return selection ? selection.toString().trim() : '';
+    if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+      return {
+        text: selection.toString().trim(),
+        range: selection.getRangeAt(0).cloneRange()
+      };
+    }
+    return { text: '', range: null };
   };
 
   // Check for text selection periodically
   React.useEffect(() => {
     const checkSelection = () => {
-      const selected = getSelectedText();
-      setHasTextSelected(selected.length > 0);
+      const selection = getSelectedText();
+      setHasTextSelected(selection.text.length > 0);
     };
 
     // Check immediately
@@ -85,8 +91,8 @@ export function TextEnhancementMenu({
 
   // Handle opening chat dialog with text selection check
   const handleOpenChatDialog = () => {
-    const selected = getSelectedText();
-    setSelectedText(selected);
+    const selection = getSelectedText();
+    setSelectedText(selection.text);
     setShowChatDialog(true);
   };
 

@@ -270,16 +270,17 @@ function getUserPrompt(action: string, content: string, instructions?: string, t
       if (isSelectedText) {
         prompt += `TASK: Rewrite the selected text below. Return it in proper HTML format for a rich text editor:\n\n`;
         prompt += `SELECTED TEXT TO REWRITE:\n${content}\n\n`;
-        prompt += `CRITICAL: 
-- Return ONLY the rewritten selected text in HTML format
-- Use <p> tags for paragraphs, <h1>-<h6> for headings
+        prompt += `CRITICAL INSTRUCTIONS FOR SELECTED TEXT: 
+- Return ONLY the rewritten selected text in proper HTML format
+- Use <p> tags for paragraphs, <h1>-<h6> for headings as appropriate
 - Do NOT use markdown syntax (no **, #, etc.)
-- Each paragraph should be wrapped in <p> tags
-- If creating headings, format them with empty lines above and below:
-  <p></p>
-  <h2>Heading Text</h2>
-  <p></p>
-- Use proper HTML heading tags with proper spacing like format buttons create`;
+- If creating titles/headings, use proper HTML: <h1>Title</h1>, <h2>Subtitle</h2>
+- For body text, wrap in <p>paragraph text</p>
+- If instructions ask for titles/headers, create them with proper HTML tags
+- Example for title + body: <h1>New Title</h1><p>Body content here</p>
+- Example for multiple sections: <h2>Section 1</h2><p>Content</p><h2>Section 2</h2><p>More content</p>
+- Return clean HTML without extra spacing or empty paragraphs
+- Make the content match exactly what the user is asking for (titles as headers, content as paragraphs)`;
       } else {
         prompt += `TASK: Rewrite the entire content below in proper HTML format:\n\n`;
         prompt += `CONTENT TO REWRITE:\n${content}\n\n`;
