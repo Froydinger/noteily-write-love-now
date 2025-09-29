@@ -48,6 +48,7 @@ const NotePage = () => {
   const [showFormatHandle, setShowFormatHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
   const { saveState, undo, redo, canUndo, canRedo, clearHistory } = useUndoRedo();
+  const [aiReplacementFunction, setAiReplacementFunction] = useState<((newContent: string, isSelectionReplacement: boolean) => void) | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   
   const note = getNote(id || '');
@@ -413,6 +414,7 @@ const NotePage = () => {
           onBlockTypeChange={setCurrentBlockType}
           onContentBeforeChange={storeUndoState}
           onSpellCheckApplied={storeUndoState}
+          onAIContentReplace={(replacementFn) => setAiReplacementFunction(() => replacementFn)}
         />
       </div>
       

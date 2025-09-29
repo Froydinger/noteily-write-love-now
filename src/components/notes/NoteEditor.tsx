@@ -18,9 +18,10 @@ interface NoteEditorProps {
   onSpellCheckApplied?: () => void;
   onUndo?: () => void;
   canUndo?: boolean;
+  onAIContentReplace?: (replacementFunction: (newContent: string, isSelectionReplacement: boolean) => void) => void;
 }
 
-export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange, onSpellCheckApplied, onUndo, canUndo }: NoteEditorProps) {
+export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange, onSpellCheckApplied, onUndo, canUndo, onAIContentReplace }: NoteEditorProps) {
   const titleFont = useTitleFont();
   const bodyFont = useBodyFont();
   const { updateNote } = useNotes();
@@ -35,6 +36,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
   const containerRef = useRef<HTMLDivElement>(null);
   const [showHandle, setShowHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
+  const [aiReplacementFunction, setAiReplacementFunction] = useState<((newContent: string, isSelectionReplacement: boolean) => void) | null>(null);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
@@ -245,6 +247,54 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
       }
     };
   }, [note.id, updateNote, lastNotifiedContent, lastNotifiedTitle, title]);
+
+  // Handle AI content replacement - both selection and full content
+  const replaceContentFromAI = (newContent: string, isSelectionReplacement: boolean = false) => {
+    if (!contentRef.current) return;
+    
+    if (isSelectionReplacement) {
+      // Replace only selected text
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        
+        // Delete the selected content
+        range.deleteContents();
+        
+        // Create a temporary div to parse the HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newContent;
+        
+        // Insert the new content preserving HTML structure and line breaks
+        const fragment = document.createDocumentFragment();
+        while (tempDiv.firstChild) {
+          fragment.appendChild(tempDiv.firstChild);
+        }
+        
+        range.insertNode(fragment);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    } else {
+      // Replace entire content
+      const sanitizedContent = sanitizeContent(newContent);
+      contentRef.current.innerHTML = sanitizedContent;
+    }
+    
+    // Trigger content change to save
+    const event = new Event('input', { bubbles: true }) as any;
+    event.isAIUpdate = true;
+    contentRef.current.dispatchEvent(event);
+  };
+
+  // Store the AI replacement function locally and expose to parent
+  useEffect(() => {
+    setAiReplacementFunction(() => replaceContentFromAI);
+    if (onAIContentReplace) {
+      onAIContentReplace(replaceContentFromAI);
+    }
+  }, [onAIContentReplace]);
 
   // Handle image insertion at cursor position with validation
   const insertImageAtCursor = (imageUrl: string) => {
@@ -592,8 +642,8 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
             noteId={note.id}
             content={contentRef.current?.innerHTML || ''}
             originalHTML={contentRef.current?.innerHTML || ''}
-            onContentChange={(newHTML) => {
-              console.log('TextEnhancementMenu onContentChange called with:', newHTML);
+            onContentChange={(newHTML, isSelectionReplacement = false) => {
+              console.log('TextEnhancementMenu onContentChange called with:', { newHTML, isSelectionReplacement });
               if (contentRef.current) {
                 // Store previous state before making AI changes
                 setPreviousContent(contentRef.current.innerHTML);
@@ -601,9 +651,13 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
                 
                 onContentBeforeChange?.();
                 
-                // Check if we have a text selection and handle it properly
-                const selection = window.getSelection();
-                if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+                // Use the AI replacement function if available, otherwise fall back to old method
+                if (aiReplacementFunction) {
+                  aiReplacementFunction(newHTML, isSelectionReplacement);
+                } else {
+                  // Fallback to old method - check if we have a text selection and handle it properly
+                  const selection = window.getSelection();
+                  if (isSelectionReplacement && selection && selection.rangeCount > 0 && !selection.isCollapsed) {
                   // Replace only selected content
                   const range = selection.getRangeAt(0);
                   if (contentRef.current.contains(range.commonAncestorContainer)) {
@@ -647,12 +701,13 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
                       setLastSavedContent(sanitizedContent);
                     }
                   }
-                } else {
-                  // No selection, replace all content
-                  contentRef.current.innerHTML = newHTML;
-                  const sanitizedContent = sanitizeContent(newHTML);
-                  updateNote(note.id, { content: sanitizedContent }, false);
-                  setLastSavedContent(sanitizedContent);
+                  } else {
+                    // No selection, replace all content
+                    contentRef.current.innerHTML = newHTML;
+                    const sanitizedContent = sanitizeContent(newHTML);
+                    updateNote(note.id, { content: sanitizedContent }, false);
+                    setLastSavedContent(sanitizedContent);
+                  }
                 }
                 
                 // Create a custom event to mark this as an AI update 

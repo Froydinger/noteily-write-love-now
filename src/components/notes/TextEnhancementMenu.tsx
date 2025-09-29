@@ -25,7 +25,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface TextEnhancementMenuProps {
   content: string;
   originalHTML: string;
-  onContentChange: (newContent: string) => void;
+  onContentChange: (newContent: string, isSelectionReplacement?: boolean) => void;
   noteTitle: string;
   onTitleChange: (newTitle: string) => void;
   disabled?: boolean;
@@ -151,7 +151,7 @@ export function TextEnhancementMenu({
         // Add to history before changing content
         await addHistoryEntry('spell', content, data.correctedContent, noteTitle, noteTitle);
         
-        onContentChange(correctedHTML);
+        onContentChange(correctedHTML, hasTextSelected);
         
         toast({
           title: "Spelling corrected",
@@ -204,7 +204,7 @@ export function TextEnhancementMenu({
         // Add to history before changing content
         await addHistoryEntry('grammar', content, data.correctedContent, noteTitle, noteTitle);
         
-        onContentChange(correctedHTML);
+        onContentChange(correctedHTML, hasTextSelected);
         
         toast({
           title: "Grammar corrected",

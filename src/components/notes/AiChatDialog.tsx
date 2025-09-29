@@ -30,7 +30,7 @@ interface AiChatDialogProps {
   content: string;
   originalHTML: string;
   noteTitle: string;
-  onContentChange: (newContent: string) => void;
+  onContentChange: (newContent: string, isSelectionReplacement?: boolean) => void;
   onTitleChange: (newTitle: string) => void;
   history: AiHistoryEntry[];
   onRevertToVersion: (entry: AiHistoryEntry) => Promise<{ content: string; title?: string }>;
@@ -216,8 +216,8 @@ export function AiChatDialog({
           newContentLength: data.correctedContent.length 
         });
         
-        // Send corrected content directly to editor for handling
-        onContentChange(data.correctedContent);
+        // Send corrected content to editor with selection awareness
+        onContentChange(data.correctedContent, isSelectedText);
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
@@ -299,8 +299,8 @@ export function AiChatDialog({
       if (data.correctedContent && data.correctedContent !== content) {
         await onAddHistoryEntry('grammar', content, data.correctedContent, noteTitle, noteTitle);
         
-        // Send corrected content directly to editor for handling
-        onContentChange(data.correctedContent);
+        // Send corrected content to editor with selection awareness
+        onContentChange(data.correctedContent, isSelectedText);
         
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
@@ -410,9 +410,9 @@ export function AiChatDialog({
           hasHTML: response.data.correctedContent.includes('<')
         });
         
-        // Always send the AI's content directly to the editor
+        // Always send the AI's content to the editor with selection awareness
         // The editor will handle selection replacement properly
-        onContentChange(response.data.correctedContent);
+        onContentChange(response.data.correctedContent, isSelectedText);
         
         if (response.data.newTitle && response.data.newTitle !== noteTitle) {
           onTitleChange(response.data.newTitle);
