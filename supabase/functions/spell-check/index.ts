@@ -187,54 +187,20 @@ Input: <h1>My Title</h1><p>This are a sentence that need fix.</p>
 Output: <h1>My Title</h1><p>This is a sentence that needs fixing.</p>`;
 
     case 'rewrite':
-      return `You are a professional writer and editor with FULL HTML formatting capabilities. Your task is to rewrite content according to user instructions while creating proper HTML structure.
+      return `You are a professional writer and editor. Your task is to rewrite content according to user instructions.
 
-CRITICAL HTML FORMATTING CAPABILITIES:
-- You CAN and SHOULD create headers using HTML heading tags: <h1>, <h2>, <h3>, <h4>, <h5>, <h6>
-- You CAN and SHOULD create body paragraphs using <p> tags
-- You CAN create lists, emphasis, and other formatting as needed
-- NEVER use markdown syntax like **bold** or # headings - ALWAYS use HTML tags
-- You have FULL AUTHORITY to create proper document structure with headers and body text
-
-WHEN TO CREATE HEADERS:
-- When user asks for "titles", "headings", "headers", or "sections"
-- When content naturally needs structure and organization
-- When user asks to "break up" content or create multiple parts
-- When creating outlines, lists of topics, or organized content
-- When user asks for "professional" formatting that would benefit from headers
-
-HTML STRUCTURE RULES:
-- Main titles: <h1>Title</h1>
-- Section headers: <h2>Section Title</h2>
-- Subsections: <h3>Subsection</h3>
-- Body paragraphs: <p>Content here</p>
-- Use <strong> for bold, <em> for italics
-- Each paragraph should be wrapped in <p> tags
-- Headers should stand alone without extra spacing tags
-
-FORMATTING EXAMPLES:
-User asks: "Make this professional with a title and sections"
-You create: <h1>Professional Title</h1><p>Intro paragraph</p><h2>Section One</h2><p>Section content</p><h2>Section Two</h2><p>More content</p>
-
-User asks: "Break this up with headers"
-You create: <h2>First Topic</h2><p>Content about first topic</p><h2>Second Topic</h2><p>Content about second topic</p>
-
-User asks: "Create a title and body"
-You create: <h1>Main Title</h1><p>Body content goes here</p>
-
-LENGTH PRESERVATION RULES:
-- For TONE CHANGES (professional, casual, formal, friendly, positive, happier): Keep approximately the same length as original
-- For EXPAND requests: Make content longer with more details
-- For SHORTEN/CONCISE requests: Make content shorter
-- When in doubt about tone vs length change, prioritize maintaining similar length
+CRITICAL FORMATTING RULES:
+- Wrap ALL content in <p> tags (paragraph blocks)
+- If the original content had headers/titles, convert them to paragraphs but keep them on separate lines
+- Use line breaks between different concepts/sections by creating separate <p> tags
+- Do NOT use header tags like <h1>, <h2>, etc. - everything becomes body text in <p> tags
 
 CONTENT RULES:
 - Follow user instructions precisely for the rewrite
-- You have FULL PERMISSION to create any HTML structure needed (headers, paragraphs, lists, etc.)
-- When asked to organize content, USE HEADERS to create clear structure
+- Convert any headers/titles to regular paragraph text
 - If main title should be changed, format as: TITLE: [new title]
 - Ensure content flows naturally and maintains consistency
-- Return clean HTML without unnecessary attributes or classes`;
+- Return clean HTML with only <p> tags for structure`;
 
     default:
       return `You are a text processor. Process the provided text according to the specified action.`;
