@@ -115,7 +115,7 @@ export function MarketingSplashScreen() {
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             "name": "Noteily",
-            "description": "A minimalist notes app focused on creative expression and passionate writing. Beautiful, secure, and designed for writers who love their craft.",
+            "description": "A simple notes app focused on creative expression and passionate writing. Beautiful, secure, and designed for writers who love their craft.",
             "applicationCategory": "Productivity",
             "operatingSystem": "Web Browser",
             "offers": {
