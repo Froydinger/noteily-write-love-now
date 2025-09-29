@@ -80,28 +80,7 @@ export function AiChatDialog({
       return newText; // If no selection, replace all content
     }
 
-    // Get current selection range from DOM
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-      // Use the actual selection range instead of text matching
-      const range = selection.getRangeAt(0);
-      
-      // Create a temporary container for the new content
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = newText;
-      
-      // Create document fragment from new content
-      const fragment = document.createDocumentFragment();
-      while (tempDiv.firstChild) {
-        fragment.appendChild(tempDiv.firstChild);
-      }
-      
-      // This will be handled by the calling code that has access to contentRef
-      // Return a special marker that indicates selection-based replacement
-      return `REPLACE_SELECTION:${newText}`;
-    }
-    
-    // Fallback to text-based replacement if no active selection
+    // Simple text replacement for selected content
     const cleanSelectedText = selectedText.trim();
     const selectedTextIndex = originalContent.indexOf(cleanSelectedText);
     
@@ -111,8 +90,8 @@ export function AiChatDialog({
       return beforeSelection + newText + afterSelection;
     }
     
-    // Final fallback
-    console.warn('Could not safely inject selected text, falling back to full content replacement');
+    // Fallback to full replacement if we can't find the selection
+    console.warn('Could not locate selected text for replacement, using full content');
     return newText;
   };
 
@@ -437,7 +416,7 @@ export function AiChatDialog({
           instruction
         );
         
-        console.log('Rewrite - injecting:', { 
+        console.log('Rewrite - sending to editor:', { 
           isSelectedText, 
           originalLength: originalHTML.length, 
           selectedLength: content.length,
@@ -445,16 +424,9 @@ export function AiChatDialog({
           hasHTML: response.data.correctedContent.includes('<')
         });
         
-        // For rewrite operations, use the AI's HTML content properly
-        if (isSelectedText) {
-          // For selected text, inject the HTML content into the original HTML
-          const plainOriginal = originalHTML.replace(/<[^>]*>/g, '');
-          const finalContent = injectChangedText(plainOriginal, content, response.data.correctedContent);
-          onContentChange(finalContent);
-        } else {
-          // For full content rewrite, use the AI's HTML directly
-          onContentChange(response.data.correctedContent);
-        }
+        // Always send the AI's content directly to the editor
+        // The editor will handle selection replacement properly
+        onContentChange(response.data.correctedContent);
         
         if (response.data.newTitle && response.data.newTitle !== noteTitle) {
           onTitleChange(response.data.newTitle);

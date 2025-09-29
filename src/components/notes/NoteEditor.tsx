@@ -601,14 +601,17 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
                 
                 onContentBeforeChange?.();
                 
-                // Check if we have a text selection
+                // Check if we have a text selection and handle it properly
                 const selection = window.getSelection();
                 if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
                   // Replace only selected content
                   const range = selection.getRangeAt(0);
                   if (contentRef.current.contains(range.commonAncestorContainer)) {
                     try {
-                      // Delete selected content and insert new HTML
+                      // Save the range before we modify content
+                      const savedRange = range.cloneRange();
+                      
+                      // Delete selected content
                       range.deleteContents();
                       
                       // Create a temporary container to parse the new HTML
@@ -622,6 +625,8 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
                       }
                       
                       range.insertNode(fragment);
+                      
+                      // Position cursor after inserted content
                       range.collapse(false);
                       selection.removeAllRanges();
                       selection.addRange(range);
@@ -631,6 +636,8 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
                       const sanitizedContent = sanitizeContent(updatedContent);
                       updateNote(note.id, { content: sanitizedContent }, false);
                       setLastSavedContent(sanitizedContent);
+                      
+                      console.log('Selected content replaced successfully');
                     } catch (error) {
                       console.error('Error replacing selected content:', error);
                       // Fallback to full content replacement
