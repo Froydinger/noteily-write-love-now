@@ -152,7 +152,7 @@ export function MarketingSplashScreen() {
 
         <div className="space-y-6">
           <p className="text-base sm:text-lg text-muted-foreground max-w-md mx-auto px-4">
-            A minimalist notes app focused on creative expression and passionate writing. 
+            A simple notes app focused on creative expression and passionate writing. 
             Beautiful, secure, and designed for writers who love their craft.
           </p>
           
