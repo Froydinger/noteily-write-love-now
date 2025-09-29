@@ -91,28 +91,7 @@ export function TextEnhancementMenu({
 
   // Handle opening chat dialog with enhanced text selection
   const getEnhancedSelectedContent = () => {
-    const selection = getSelectedText();
-    if (selection.text.length > 0) {
-      // If we have selected text, try to get better context about what was selected
-      const selectionContainer = selection.range?.commonAncestorContainer;
-      if (selectionContainer) {
-        // Check if selection includes headers
-        const parentElement = selectionContainer.nodeType === Node.TEXT_NODE 
-          ? selectionContainer.parentElement 
-          : selectionContainer as Element;
-        
-        if (parentElement) {
-          const hasHeader = parentElement.closest('h1, h2, h3, h4, h5, h6') || 
-                           parentElement.querySelector('h1, h2, h3, h4, h5, h6');
-          const hasParagraph = parentElement.closest('p') || 
-                              parentElement.querySelector('p');
-          
-          // Return the selected text with context about its structure
-          return selection.text;
-        }
-      }
-      return selection.text;
-    }
+    // Always return full content - selected text editing disabled for now
     return content;
   };
 
@@ -370,7 +349,7 @@ export function TextEnhancementMenu({
         history={history}
         onRevertToVersion={revertToVersion}
         onAddHistoryEntry={addHistoryEntry}
-        hasTextSelected={hasTextSelected}
+        hasTextSelected={false}
       />
 
       {/* Bottom left loading indicator */}

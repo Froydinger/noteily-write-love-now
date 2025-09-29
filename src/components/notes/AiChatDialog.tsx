@@ -71,8 +71,8 @@ export function AiChatDialog({
   const isMobile = useIsMobile();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
-  // Check if working with selected text
-  const isSelectedText = content.length < originalHTML.length && content.trim().length > 0;
+  // Disable selected text editing - only allow full page rewrites
+  const isSelectedText = false;
 
   // Function to inject changed text back into the original content
   const injectChangedText = (originalContent: string, selectedText: string, newText: string): string => {
