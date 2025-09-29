@@ -150,29 +150,41 @@ serve(async (req) => {
 function getSystemPrompt(action: string): string {
   switch (action) {
     case 'spell':
-      return `You are a spell checker. Your ONLY task is to fix spelling errors in the provided text.
+      return `You are a spell checker that works with HTML content. Your ONLY task is to fix spelling errors.
 
 CRITICAL RULES:
-- ONLY fix spelling errors
+- Input will be HTML content - PRESERVE ALL HTML STRUCTURE 
+- ONLY fix spelling errors within text content
 - Do NOT fix grammar, punctuation, or style
 - Do NOT rewrite, rephrase, or change the meaning
-- Keep all formatting, line breaks, and structure exactly the same
-- If there are no spelling errors, return the text exactly as provided
-- Return ONLY the corrected text, no explanations
-- Maintain exact character count and positioning when possible`;
+- Keep ALL HTML tags, attributes, and structure EXACTLY the same
+- Preserve headings (<h1>, <h2>, etc.), paragraphs (<p>), line breaks, formatting
+- If there are no spelling errors, return the HTML exactly as provided
+- Return ONLY the corrected HTML content, no explanations
+- Maintain exact HTML structure and tag positioning
+
+EXAMPLE:
+Input: <h1>My Grat Title</h1><p>This is a sentance with erors.</p>
+Output: <h1>My Great Title</h1><p>This is a sentence with errors.</p>`;
 
     case 'grammar':
-      return `You are a grammar checker. Your task is to fix grammar and punctuation errors in the provided text.
+      return `You are a grammar checker that works with HTML content. Your task is to fix grammar and punctuation errors.
 
 CRITICAL RULES:
-- Fix grammar mistakes and punctuation errors
+- Input will be HTML content - PRESERVE ALL HTML STRUCTURE
+- Fix grammar mistakes and punctuation errors within text content
 - Do NOT fix spelling (assume it's correct)
 - Do NOT rewrite, rephrase, or change the meaning
+- Keep ALL HTML tags, attributes, and structure EXACTLY the same
+- Preserve headings (<h1>, <h2>, etc.), paragraphs (<p>), line breaks, formatting
 - Keep the original style, tone, and voice
-- Keep all formatting, line breaks, and structure exactly the same
-- If there are no grammar errors, return the text exactly as provided
-- Return ONLY the corrected text, no explanations
-- Maintain exact character positioning and line breaks`;
+- If there are no grammar errors, return the HTML exactly as provided
+- Return ONLY the corrected HTML content, no explanations
+- Maintain exact HTML structure and tag positioning
+
+EXAMPLE:
+Input: <h1>My Title</h1><p>This are a sentence that need fix.</p>
+Output: <h1>My Title</h1><p>This is a sentence that needs fixing.</p>`;
 
     case 'rewrite':
       return `You are a professional writer and editor. Your task is to rewrite content according to user instructions while maintaining proper HTML structure for a rich text editor.
@@ -290,7 +302,7 @@ function getUserPrompt(action: string, content: string, instructions?: string, t
     
     case 'spell':
     case 'grammar':
-      return `Fix ${action} issues in this text while preserving ALL formatting and structure:\n\n${content}`;
+      return `CURRENT HTML CONTENT:\n${originalHTML || content}\n\nINSTRUCTIONS: Fix ${action} issues in the text content while preserving ALL HTML structure, tags, and formatting exactly as they are. Return the corrected HTML.`;
     
     default:
       return content;

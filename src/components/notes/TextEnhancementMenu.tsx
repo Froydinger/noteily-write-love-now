@@ -105,6 +105,7 @@ export function TextEnhancementMenu({
       const { data, error } = await supabase.functions.invoke('spell-check', {
         body: { 
           content: content,
+          originalHTML: originalHTML,
           action: 'spell'
         }
       });
@@ -112,12 +113,13 @@ export function TextEnhancementMenu({
       if (error) throw error;
 
       if (data.correctedContent && data.correctedContent !== content) {
-        const preservedHTML = preserveHTMLStructure(originalHTML, data.correctedContent);
+        // Use AI's HTML output directly - it preserves structure better
+        const correctedHTML = data.correctedContent;
         
         // Add to history before changing content
         await addHistoryEntry('spell', content, data.correctedContent, noteTitle, noteTitle);
         
-        onContentChange(preservedHTML);
+        onContentChange(correctedHTML);
         
         toast({
           title: "Spelling corrected",
@@ -156,6 +158,7 @@ export function TextEnhancementMenu({
       const { data, error } = await supabase.functions.invoke('spell-check', {
         body: { 
           content: content,
+          originalHTML: originalHTML,
           action: 'grammar'
         }
       });
@@ -163,12 +166,13 @@ export function TextEnhancementMenu({
       if (error) throw error;
 
       if (data.correctedContent && data.correctedContent !== content) {
-        const preservedHTML = preserveHTMLStructure(originalHTML, data.correctedContent);
+        // Use AI's HTML output directly - it preserves structure better
+        const correctedHTML = data.correctedContent;
         
         // Add to history before changing content
         await addHistoryEntry('grammar', content, data.correctedContent, noteTitle, noteTitle);
         
-        onContentChange(preservedHTML);
+        onContentChange(correctedHTML);
         
         toast({
           title: "Grammar corrected",
