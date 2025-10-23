@@ -16,9 +16,6 @@ import PullToRefresh from 'react-simple-pull-to-refresh';
 import { ShareManager } from '@/components/notes/ShareManager';
 import { toast } from '@/components/ui/sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { UsernamePrompt } from '@/components/notes/UsernamePrompt';
-import { useUsername } from '@/hooks/useUsername';
-import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { user } = useAuth();
@@ -35,50 +32,6 @@ const Index = () => {
   const [shareChanged, setShareChanged] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [openSelect, setOpenSelect] = useState<string | null>(null);
-  const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
-  const { username } = useUsername();
-
-  // Show username prompt logic - only for users without username, and either new accounts or every 7 days
-  useEffect(() => {
-    if (user && username === null && !showUsernamePrompt) {
-      const checkPromptEligibility = async () => {
-        // Check if user has preferences (determines if new user)
-        const { data: prefs } = await supabase
-          .from('user_preferences')
-          .select('username_prompt_last_shown, created_at')
-          .eq('user_id', user.id)
-          .single();
-        
-        if (!prefs) return; // No preferences found
-        
-        const now = new Date();
-        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const isNewUser = new Date(prefs.created_at) > sevenDaysAgo;
-        
-        // Show prompt if new user OR if it's been 7+ days since last shown
-        const shouldShow = isNewUser || 
-          !prefs.username_prompt_last_shown || 
-          new Date(prefs.username_prompt_last_shown) < sevenDaysAgo;
-        
-        if (shouldShow) {
-          setShowUsernamePrompt(true);
-        }
-      };
-      
-      checkPromptEligibility();
-    }
-  }, [user, username, showUsernamePrompt]);
-
-  const handleDismissUsernamePrompt = async () => {
-    if (user) {
-      // Update the last shown timestamp in the database
-      await supabase
-        .from('user_preferences')
-        .update({ username_prompt_last_shown: new Date().toISOString() })
-        .eq('user_id', user.id);
-    }
-    setShowUsernamePrompt(false);
-  };
 
   const filteredAndSortedNotes = useMemo(() => {
     let filtered = notes.filter(note => {
@@ -414,13 +367,6 @@ const Index = () => {
         {searchTerm && (
           <div className="text-sm text-muted-foreground mb-4">
             {filteredAndSortedNotes.length} of {notes.length} notes shown
-          </div>
-        )}
-
-        {/* Username Prompt - only for users without username */}
-        {showUsernamePrompt && user && username === null && (
-          <div className="mb-6">
-            <UsernamePrompt onDismiss={handleDismissUsernamePrompt} />
           </div>
         )}
         
