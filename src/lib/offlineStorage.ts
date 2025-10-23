@@ -1,5 +1,4 @@
 import { Note } from '@/contexts/NoteContext';
-import { encryptionManager } from './encryption';
 
 export class OfflineStorage {
   private getStorageKey(userId: string): string {
@@ -9,8 +8,7 @@ export class OfflineStorage {
   async saveNotes(notes: Note[], userId: string): Promise<void> {
     try {
       const notesData = JSON.stringify(notes);
-      const encrypted = await encryptionManager.encryptLegacy(notesData, userId);
-      localStorage.setItem(this.getStorageKey(userId), encrypted);
+      localStorage.setItem(this.getStorageKey(userId), notesData);
       localStorage.setItem(`${this.getStorageKey(userId)}_timestamp`, Date.now().toString());
     } catch (error) {
       console.error('Failed to save notes offline:', error);
@@ -19,11 +17,10 @@ export class OfflineStorage {
 
   async loadNotes(userId: string): Promise<Note[]> {
     try {
-      const encrypted = localStorage.getItem(this.getStorageKey(userId));
-      if (!encrypted) return [];
+      const data = localStorage.getItem(this.getStorageKey(userId));
+      if (!data) return [];
 
-      const decrypted = await encryptionManager.decrypt(encrypted, userId);
-      return JSON.parse(decrypted);
+      return JSON.parse(data);
     } catch (error) {
       console.error('Failed to load offline notes:', error);
       return [];
@@ -52,7 +49,6 @@ export class OfflineStorage {
   clearUserData(userId: string): void {
     localStorage.removeItem(this.getStorageKey(userId));
     localStorage.removeItem(`${this.getStorageKey(userId)}_timestamp`);
-    encryptionManager.clearKey(userId);
   }
 
   getLastSyncTime(userId: string): number {
