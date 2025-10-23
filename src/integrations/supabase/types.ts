@@ -175,7 +175,7 @@ export type Database = {
           action: string
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           shared_note_id: string
           user_agent: string | null
           user_id: string
@@ -185,7 +185,7 @@ export type Database = {
           action: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           shared_note_id: string
           user_agent?: string | null
           user_id: string
@@ -195,7 +195,7 @@ export type Database = {
           action?: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           shared_note_id?: string
           user_agent?: string | null
           user_id?: string
@@ -271,10 +271,7 @@ export type Database = {
         Args: { p_user_email: string; p_username: string }
         Returns: boolean
       }
-      cleanup_old_deleted_notes: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      cleanup_old_deleted_notes: { Args: never; Returns: number }
       create_email_share: {
         Args: { p_email: string; p_note_id: string; p_permission: string }
         Returns: string
@@ -287,10 +284,7 @@ export type Database = {
           user_permission: string
         }[]
       }
-      link_existing_shared_notes: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      link_existing_shared_notes: { Args: never; Returns: number }
       permanently_delete_note: {
         Args: { note_id_param: string }
         Returns: boolean
@@ -299,14 +293,8 @@ export type Database = {
         Args: { note_id_param: string }
         Returns: boolean
       }
-      restore_note: {
-        Args: { note_id_param: string }
-        Returns: boolean
-      }
-      soft_delete_note: {
-        Args: { note_id_param: string }
-        Returns: boolean
-      }
+      restore_note: { Args: { note_id_param: string }; Returns: boolean }
+      soft_delete_note: { Args: { note_id_param: string }; Returns: boolean }
       user_has_note_access: {
         Args: { p_note_id: string; p_user_id: string }
         Returns: boolean
