@@ -123,48 +123,22 @@ export function AppSidebar() {
             </div>
           )}
         </div>
-        {state !== "collapsed" && (
-          <div className="flex items-center gap-2">
-            {user && (
-              <NotificationsPanel>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="btn-accessible h-8 w-8 rounded-full flex-shrink-0 relative"
-                  title="Notifications"
-                >
-                  <Bell className="h-4 w-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                  )}
-                </Button>
-              </NotificationsPanel>
-            )}
-            {!isMobile && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleSidebar}
-                className="sidebar-toggle h-8 w-8 p-0 rounded-full"
-                title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
-              >
-                {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
-              </Button>
-            )}
-          </div>
-        )}
-        {state === "collapsed" && isMobile && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleSidebar}
-            className="sidebar-toggle h-8 w-8 p-0 rounded-full"
-            title="Expand sidebar"
-          >
-            <PanelLeft size={16} />
-          </Button>
+        {state !== "collapsed" && user && (
+          <NotificationsPanel>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="btn-accessible h-8 w-8 rounded-full flex-shrink-0 relative"
+              title="Notifications"
+            >
+              <Bell className="h-4 w-4" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </Button>
+          </NotificationsPanel>
         )}
       </SidebarHeader>
       

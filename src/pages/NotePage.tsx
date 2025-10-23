@@ -84,13 +84,10 @@ const NotePage = () => {
   useEffect(() => {
     if (note) {
       setCurrentNote(note);
-    } else if (id) {
-      // Navigate home if note doesn't exist
-      navigate('/');
     }
     
     return () => setCurrentNote(null);
-  }, [id, note, navigate, setCurrentNote]);
+  }, [id, note, setCurrentNote]);
 
   // Always start at top when opening a note + play enter transition (no autofocus)
   useEffect(() => {
