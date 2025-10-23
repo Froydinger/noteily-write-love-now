@@ -54,6 +54,30 @@ serve(async (req) => {
       );
     }
 
+    // Validate content length (50,000 characters max)
+    if (content.length > 50000) {
+      return new Response(
+        JSON.stringify({ error: 'Content exceeds maximum length of 50,000 characters' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate instructions length (500 characters max)
+    if (instructions && typeof instructions === 'string' && instructions.length > 500) {
+      return new Response(
+        JSON.stringify({ error: 'Instructions exceed maximum length of 500 characters' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate title length (200 characters max)
+    if (title && typeof title === 'string' && title.length > 200) {
+      return new Response(
+        JSON.stringify({ error: 'Title exceeds maximum length of 200 characters' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
       console.error('OPENAI_API_KEY is not set');
