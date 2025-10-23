@@ -371,11 +371,29 @@
   }
 
   /* Text selection highlight */
-  ::selection {
+  :root ::selection {
+    background: hsl(0 0% 80%);
+    color: hsl(0 0% 10%);
+  }
+  :root ::-moz-selection {
+    background: hsl(0 0% 80%);
+    color: hsl(0 0% 10%);
+  }
+
+  .dark ::selection {
     background: hsl(var(--accent) / 0.3);
     color: hsl(var(--foreground));
   }
-  ::-moz-selection {
+  .dark ::-moz-selection {
+    background: hsl(var(--accent) / 0.3);
+    color: hsl(var(--foreground));
+  }
+
+  .navy ::selection {
+    background: hsl(var(--accent) / 0.3);
+    color: hsl(var(--foreground));
+  }
+  .navy ::-moz-selection {
     background: hsl(var(--accent) / 0.3);
     color: hsl(var(--foreground));
   }
