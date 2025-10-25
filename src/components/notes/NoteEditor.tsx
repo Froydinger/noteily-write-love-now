@@ -38,6 +38,8 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
   const [aiReplacementFunction, setAiReplacementFunction] = useState<((newContent: string, isSelectionReplacement: boolean) => void) | null>(null);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const titleSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const undoStateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
 
@@ -194,6 +196,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
   // Handle content updates with debounce and inactivity tracking
   useEffect(() => {
     let timeout: NodeJS.Timeout;
+    let undoTimeout: NodeJS.Timeout;
     
     const handleContentChange = (e?: Event) => {
       if (contentRef.current) {
@@ -210,15 +213,18 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
         }, 5 * 60 * 1000); // 5 minutes
         
         clearTimeout(timeout);
+        clearTimeout(undoTimeout);
         
         // Check if this is an AI update (has special data attribute)
         const isAIUpdate = e && (e as any).isAIUpdate;
         const delay = isAIUpdate ? 0 : 500; // Immediate save for AI updates, debounced for user typing
         
-        timeout = setTimeout(() => {
-          // Store undo state before making changes
+        // Debounce undo state save (only save after 1 second of no typing)
+        undoTimeout = setTimeout(() => {
           onContentBeforeChange?.();
-          
+        }, 1000);
+        
+        timeout = setTimeout(() => {
           // Sanitize content before saving to database
           const sanitizedContent = sanitizeContent(content);
           
@@ -239,6 +245,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
     
     return () => {
       clearTimeout(timeout);
+      clearTimeout(undoTimeout);
       if (inactivityTimerRef.current) {
         clearTimeout(inactivityTimerRef.current);
       }
@@ -588,6 +595,16 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
             const newTitle = e.target.value;
             setTitle(newTitle);
             
+            // Clear any existing save timeout
+            if (titleSaveTimeoutRef.current) {
+              clearTimeout(titleSaveTimeoutRef.current);
+            }
+            
+            // Clear any existing undo state timeout
+            if (undoStateTimeoutRef.current) {
+              clearTimeout(undoStateTimeoutRef.current);
+            }
+            
             // Clear any existing inactivity timer
             if (inactivityTimerRef.current) {
               clearTimeout(inactivityTimerRef.current);
@@ -598,10 +615,15 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
               sendInactivityNotification();
             }, 5 * 60 * 1000); // 5 minutes
             
-            // Store undo state before making changes
-            onContentBeforeChange?.();
+            // Debounce undo state save (only save after 1 second of no typing)
+            undoStateTimeoutRef.current = setTimeout(() => {
+              onContentBeforeChange?.();
+            }, 1000);
             
-            updateNote(note.id, { title: newTitle }, true); // Silent title update
+            // Debounce title save (500ms delay)
+            titleSaveTimeoutRef.current = setTimeout(() => {
+              updateNote(note.id, { title: newTitle }, true); // Silent title update
+            }, 500);
           }}
           placeholder="Untitled Note"
           className={`w-full text-3xl font-${titleFont} font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden dynamic-title-font ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
