@@ -83,85 +83,29 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
 
   // Update title and content when note changes (force update for undo/redo)
   useEffect(() => {
-    setTitle(note.title);
+    // Always update title unless it's currently focused
+    const titleHasFocus = document.activeElement === titleRef.current;
+    if (!titleHasFocus && note.title !== title) {
+      setTitle(note.title);
+    }
+    
     if (contentRef.current) {
-      // Only update content if it's actually different to avoid cursor jumping
+      // Only update content if it's actually different AND user is not actively editing
       const sanitizedContent = sanitizeForDisplay(note.content);
       const currentContent = contentRef.current.innerHTML;
       
-      if (sanitizedContent !== currentContent) {
-        // Save cursor position before updating
-        const selection = window.getSelection();
-        let savedRange = null;
-        let cursorOffset = 0;
-        
-        if (selection && selection.rangeCount > 0 && contentRef.current.contains(selection.anchorNode)) {
-          const range = selection.getRangeAt(0);
-          savedRange = range.cloneRange();
-          
-          // Calculate cursor offset in text content
-          const walker = document.createTreeWalker(
-            contentRef.current,
-            NodeFilter.SHOW_TEXT
-          );
-          
-          let node;
-          while (node = walker.nextNode()) {
-            if (node === range.startContainer) {
-              cursorOffset += range.startOffset;
-              break;
-            } else {
-              cursorOffset += node.textContent?.length || 0;
-            }
-          }
-        }
-        
+      // Check if user is currently typing/editing in this element
+      const selection = window.getSelection();
+      const contentHasFocus = contentRef.current.contains(document.activeElement) ||
+                             (selection && selection.rangeCount > 0 && contentRef.current.contains(selection.anchorNode));
+      
+      // Only update if content is different AND user is not focused in the editor
+      if (sanitizedContent !== currentContent && !contentHasFocus) {
         contentRef.current.innerHTML = sanitizedContent;
-        
-        // Restore cursor position if we had one
-        if (savedRange && contentRef.current.contains(savedRange.startContainer)) {
-          try {
-            selection?.removeAllRanges();
-            selection?.addRange(savedRange);
-          } catch (e) {
-            // If exact position fails, try to restore by text offset
-            try {
-              const walker = document.createTreeWalker(
-                contentRef.current,
-                NodeFilter.SHOW_TEXT
-              );
-              
-              let node;
-              let currentOffset = 0;
-              
-              while (node = walker.nextNode()) {
-                const nodeLength = node.textContent?.length || 0;
-                if (currentOffset + nodeLength >= cursorOffset) {
-                  const range = document.createRange();
-                  range.setStart(node, Math.max(0, cursorOffset - currentOffset));
-                  range.collapse(true);
-                  selection?.removeAllRanges();
-                  selection?.addRange(range);
-                  break;
-                }
-                currentOffset += nodeLength;
-              }
-            } catch (e2) {
-              // Final fallback: place cursor at end
-              const range = document.createRange();
-              range.selectNodeContents(contentRef.current);
-              range.collapse(false);
-              selection?.removeAllRanges();
-              selection?.addRange(range);
-            }
-          }
-        }
-        
-        // Trigger any additional update events
         contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
       }
     }
-  }, [note.id, note.title, note.content]);
+  }, [note.id, note.title, note.content, note.featured_image, title]);
 
 
   // Send notifications after 5 minutes of inactivity

@@ -67,38 +67,91 @@ export const exportNoteToPDF = async (note: NoteForExport): Promise<void> => {
     }
   }
   
-  // Add content
-  pdf.setFontSize(12);
-  pdf.setFont('helvetica', 'normal');
-  
-  // Convert HTML content to clean plain text
+  // Add content - preserve HTML structure (headers, paragraphs, line breaks)
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = note.content;
   
-  // Handle images in content
-  const images = tempDiv.querySelectorAll('img');
-  for (const img of Array.from(images)) {
-    const imgPlaceholder = document.createElement('div');
-    imgPlaceholder.textContent = '[Image]';
-    img.parentNode?.replaceChild(imgPlaceholder, img);
+  // Process each element while preserving structure
+  const elements = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6, p, div, br, img');
+  const processedElements: Array<{ type: 'heading' | 'paragraph' | 'linebreak' | 'image'; text: string; level?: number }> = [];
+  
+  // If no structured elements, process as paragraphs split by line breaks
+  if (elements.length === 0) {
+    const text = tempDiv.textContent || '';
+    const paragraphs = text.split('\n').filter(p => p.trim());
+    paragraphs.forEach(p => {
+      processedElements.push({ type: 'paragraph', text: p.trim() });
+    });
+  } else {
+    elements.forEach(el => {
+      const tagName = el.tagName.toLowerCase();
+      
+      if (tagName === 'br') {
+        processedElements.push({ type: 'linebreak', text: '' });
+      } else if (tagName === 'img') {
+        processedElements.push({ type: 'paragraph', text: '[Image]' });
+      } else if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tagName)) {
+        const level = parseInt(tagName.charAt(1));
+        const text = (el.textContent || '').trim();
+        if (text) {
+          processedElements.push({ type: 'heading', text, level });
+        }
+      } else {
+        const text = (el.textContent || '').trim();
+        if (text) {
+          processedElements.push({ type: 'paragraph', text });
+        }
+      }
+    });
   }
   
-  // Extract text and normalize whitespace to remove artificial line breaks from wrapping
-  const textContent = tempDiv.textContent || tempDiv.innerText || '';
-  const plainTextContent = textContent.replace(/\s+/g, ' ').trim();
-  
-  // Split content into lines that fit the page width
-  const contentLines = pdf.splitTextToSize(plainTextContent, contentWidth);
-  
-  for (let i = 0; i < contentLines.length; i++) {
-    // Check if we need a new page
-    if (yPosition + 6 > pageHeight - margin) {
-      pdf.addPage();
-      yPosition = margin;
+  // Render processed elements
+  for (const element of processedElements) {
+    if (element.type === 'linebreak') {
+      yPosition += 6; // Add spacing for line break
+      continue;
     }
     
-    pdf.text(contentLines[i], margin, yPosition);
-    yPosition += 6;
+    if (element.type === 'heading') {
+      // Add spacing before heading
+      yPosition += 6;
+      
+      // Check if we need a new page
+      if (yPosition + 10 > pageHeight - margin) {
+        pdf.addPage();
+        yPosition = margin;
+      }
+      
+      // Set heading font size based on level
+      const headingSize = Math.max(16, 22 - (element.level || 1) * 2);
+      pdf.setFontSize(headingSize);
+      pdf.setFont('helvetica', 'bold');
+      
+      const headingLines = pdf.splitTextToSize(element.text, contentWidth);
+      pdf.text(headingLines, margin, yPosition);
+      yPosition += headingLines.length * (headingSize / 2) + 6;
+      
+      // Reset to normal font
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+    } else {
+      // Paragraph
+      const paragraphLines = pdf.splitTextToSize(element.text, contentWidth);
+      
+      for (const line of paragraphLines) {
+        // Check if we need a new page
+        if (yPosition + 6 > pageHeight - margin) {
+          pdf.addPage();
+          yPosition = margin;
+        }
+        
+        pdf.text(line, margin, yPosition);
+        yPosition += 6;
+      }
+      
+      // Add spacing after paragraph
+      yPosition += 3;
+    }
   }
   
   // Add metadata footer
