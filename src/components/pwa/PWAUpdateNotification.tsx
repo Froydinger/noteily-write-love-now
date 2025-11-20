@@ -41,9 +41,9 @@ export const PWAUpdateNotification = () => {
 
       // Check immediately
       checkForUpdates();
-      
-      // Check every 30 seconds when app is active
-      const interval = setInterval(checkForUpdates, 30000);
+
+      // Check every 10 minutes when app is active (reduced from 30 seconds to prevent frequent restarts)
+      const interval = setInterval(checkForUpdates, 10 * 60 * 1000);
 
       // Listen for messages from the service worker
       navigator.serviceWorker.addEventListener('message', (event) => {
@@ -84,36 +84,7 @@ export const PWAUpdateNotification = () => {
       });
     }
     
-    toast({
-      title: "Updating...",
-      description: (
-        <div className="space-y-2">
-          <p>Updating to the latest version. This will refresh automatically.</p>
-          <p className="text-xs text-muted-foreground">If the update doesn't work, try closing and reopening the app</p>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // Force hard refresh to clear all caches
-              window.location.href = window.location.href;
-            }}
-            className="w-full mt-3"
-          >
-            <RefreshCw className="h-4 w-4 mr-1" />
-            Force Refresh
-          </Button>
-        </div>
-      ),
-      duration: 10000, // 10 seconds instead of infinity
-    });
-    
-    // Auto-refresh after 2 seconds
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
-    
+    // Wait for service worker activation, then reload
     setShowUpdatePrompt(false);
   };
 

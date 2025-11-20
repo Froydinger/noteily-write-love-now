@@ -10,6 +10,11 @@ interface FloatingFormatBarProps {
   editorRef: React.RefObject<HTMLDivElement>;
 }
 
+// Check if device is mobile/tablet
+const isMobileDevice = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+};
+
 export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
   visible,
   onFormat,
@@ -17,7 +22,14 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
 }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [currentFormats, setCurrentFormats] = useState<Set<FormatType>>(new Set());
+  const [isMobile, setIsMobile] = useState(isMobileDevice());
   const barRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(isMobileDevice());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (!visible || !editorRef.current) return;
@@ -37,8 +49,10 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
 
       if (!editorRect) return;
 
-      // Calculate position above the selection
-      const top = rect.top - editorRect.top - 50; // 50px above selection
+      // On mobile, position below selection to avoid native menu
+      // On desktop, position above selection
+      const offset = isMobile ? 40 : -50;
+      const top = rect.top - editorRect.top + (isMobile ? rect.height : 0) + offset;
       const left = rect.left - editorRect.left + (rect.width / 2);
 
       setPosition({ top, left });
@@ -59,13 +73,22 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
         formats.add('p');
       }
 
-      // Check for bold
-      const bold = (element as Element).closest('strong, b');
-      if (bold) formats.add('bold');
+      // Use queryCommandState for reliable formatting detection
+      try {
+        if (document.queryCommandState('bold')) {
+          formats.add('bold');
+        }
+        if (document.queryCommandState('italic')) {
+          formats.add('italic');
+        }
+      } catch (e) {
+        // Fallback to DOM traversal if queryCommandState fails
+        const bold = (element as Element).closest('strong, b');
+        if (bold) formats.add('bold');
 
-      // Check for italic
-      const italic = (element as Element).closest('em, i');
-      if (italic) formats.add('italic');
+        const italic = (element as Element).closest('em, i');
+        if (italic) formats.add('italic');
+      }
 
       setCurrentFormats(formats);
     };
@@ -81,7 +104,7 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
       window.removeEventListener('resize', handleUpdate);
       document.removeEventListener('selectionchange', handleUpdate);
     };
-  }, [visible, editorRef]);
+  }, [visible, editorRef, isMobile]);
 
   if (!visible) return null;
 

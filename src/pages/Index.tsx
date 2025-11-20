@@ -34,7 +34,7 @@ const Index = () => {
   const [openSelect, setOpenSelect] = useState<string | null>(null);
 
   const filteredAndSortedNotes = useMemo(() => {
-    let filtered = notes.filter(note => {
+    const filtered = notes.filter(note => {
       // First apply search filter
       const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (note.content && note.content.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -114,7 +114,10 @@ const Index = () => {
     setSelectedNoteId(note.id);
   };
 
-  const handleDeleteNote = async (note: Note) => {
+  const handleDeleteNote = async (note: Note, e?: React.MouseEvent) => {
+    // Prevent event bubbling to avoid navigating to the note
+    e?.stopPropagation();
+
     try {
       await deleteNote(note.id);
       setSelectedNoteId(null);
