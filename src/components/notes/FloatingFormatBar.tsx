@@ -122,7 +122,10 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
         variant={currentFormats.has('p') ? 'default' : 'ghost'}
         size="sm"
         className="h-8 w-8 p-0"
-        onClick={() => onFormat('p')}
+        onMouseDown={(e) => {
+          e.preventDefault(); // Prevent focus loss
+          onFormat('p');
+        }}
         title="Paragraph"
       >
         <Type className="h-4 w-4" />
@@ -132,7 +135,10 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
         variant={currentFormats.has('h1') ? 'default' : 'ghost'}
         size="sm"
         className="h-8 w-8 p-0"
-        onClick={() => onFormat('h1')}
+        onMouseDown={(e) => {
+          e.preventDefault(); // Prevent focus loss
+          onFormat('h1');
+        }}
         title="Title"
       >
         <Heading1 className="h-4 w-4" />
@@ -144,7 +150,10 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
         variant={currentFormats.has('bold') ? 'default' : 'ghost'}
         size="sm"
         className="h-8 w-8 p-0 font-bold"
-        onClick={() => onFormat('bold')}
+        onMouseDown={(e) => {
+          e.preventDefault(); // Prevent focus loss
+          onFormat('bold');
+        }}
         title="Bold"
       >
         <Bold className="h-4 w-4" />
@@ -154,7 +163,10 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
         variant={currentFormats.has('italic') ? 'default' : 'ghost'}
         size="sm"
         className="h-8 w-8 p-0 italic"
-        onClick={() => onFormat('italic')}
+        onMouseDown={(e) => {
+          e.preventDefault(); // Prevent focus loss
+          onFormat('italic');
+        }}
         title="Italic"
       >
         <Italic className="h-4 w-4" />

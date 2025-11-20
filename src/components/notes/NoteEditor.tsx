@@ -564,11 +564,12 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
   const handleFormat = useCallback((type: FormatType) => {
     if (!contentRef.current) return;
 
-    contentRef.current.focus();
-
     try {
       const selection = window.getSelection();
       if (!selection || selection.rangeCount === 0) return;
+
+      // Ensure editor has focus
+      contentRef.current.focus();
 
       switch (type) {
         case 'p':
@@ -578,15 +579,21 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
           document.execCommand('formatBlock', false, 'h1');
           break;
         case 'bold':
-          document.execCommand('bold', false);
+          // Just toggle - execCommand should handle it
+          document.execCommand('bold', false, undefined);
           break;
         case 'italic':
-          document.execCommand('italic', false);
+          // Just toggle - execCommand should handle it
+          document.execCommand('italic', false, undefined);
           break;
       }
 
-      // Trigger content save
-      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+      // Small delay before triggering save to let DOM update
+      setTimeout(() => {
+        if (contentRef.current) {
+          contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }, 50);
     } catch (error) {
       console.error('Error applying format:', error);
     }
