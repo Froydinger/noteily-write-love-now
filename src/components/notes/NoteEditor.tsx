@@ -578,45 +578,11 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
         case 'h1':
           document.execCommand('formatBlock', false, 'h1');
           break;
-        case 'bold': {
-          // Check if already bold
-          const isBold = document.queryCommandState('bold');
-
-          if (isBold) {
-            // If bold, we need to remove it
-            // Get the selected range
-            const range = selection.getRangeAt(0);
-            const container = range.commonAncestorContainer;
-
-            // Find the parent bold element
-            let boldElement = container.nodeType === Node.TEXT_NODE
-              ? container.parentElement
-              : container as HTMLElement;
-
-            // Traverse up to find <b> or <strong>
-            while (boldElement && boldElement !== contentRef.current) {
-              if (boldElement.tagName === 'B' || boldElement.tagName === 'STRONG') {
-                // Replace bold element with its text content
-                const textNode = document.createTextNode(boldElement.textContent || '');
-                boldElement.parentNode?.replaceChild(textNode, boldElement);
-
-                // Restore selection on the text
-                const newRange = document.createRange();
-                newRange.selectNodeContents(textNode);
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-                break;
-              }
-              boldElement = boldElement.parentElement as HTMLElement;
-            }
-          } else {
-            // Not bold, apply it
-            document.execCommand('bold', false, undefined);
-          }
+        case 'bold':
+          // Use the same simple toggle as italic - it works!
+          document.execCommand('bold', false, undefined);
           break;
-        }
         case 'italic':
-          // Italic works fine with just execCommand
           document.execCommand('italic', false, undefined);
           break;
       }
