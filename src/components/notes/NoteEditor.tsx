@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Component, ErrorInfo, ReactNode } from 'react';
 import { useNotes, Note } from '@/contexts/NoteContext';
 import DOMPurify from 'dompurify';
 import { ImageUploadButton } from './ImageUploadButton';
@@ -10,6 +10,63 @@ import { usePageLeave } from '@/hooks/usePageLeave';
 import { useTitleFont, useBodyFont } from '@/hooks/useTitleFont';
 import { SpellCheckButton } from './SpellCheckButton';
 import { TextEnhancementMenu } from './TextEnhancementMenu';
+
+// Error boundary for the editor
+class EditorErrorBoundary extends Component<
+  { children: ReactNode; fallback?: ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: { children: ReactNode; fallback?: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Editor error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || (
+        <div className="p-4 text-red-500">
+          <p>Something went wrong with the editor.</p>
+          <p className="text-sm mt-2">Try refreshing the page.</p>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Debounce utility
+function debounce<T extends (...args: unknown[]) => unknown>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
+
+// Safe content getter - reduces direct innerHTML access
+function getEditorContent(editor: HTMLDivElement | null): string {
+  if (!editor) return '';
+  return editor.innerHTML;
+}
+
+// Safe content setter - sanitizes before setting
+function setEditorContent(editor: HTMLDivElement | null, content: string): void {
+  if (!editor) return;
+  const sanitized = sanitizeForDisplay(content);
+  editor.innerHTML = sanitized;
+}
 
 interface NoteEditorProps {
   note: Note;
@@ -25,40 +82,55 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
   const titleFont = useTitleFont();
   const bodyFont = useBodyFont();
   const { updateNote } = useNotes();
+
+  // Core state
   const [title, setTitle] = useState(note.title);
   const [lastSavedContent, setLastSavedContent] = useState(note.content);
-  const [lastNotifiedContent, setLastNotifiedContent] = useState(note.content);
-  const [lastNotifiedTitle, setLastNotifiedTitle] = useState(note.title);
-  const [previousContent, setPreviousContent] = useState(note.content);
-  const [previousTitle, setPreviousTitle] = useState(note.title);
+
+  // Notification tracking (consolidated)
+  const lastNotifiedStateRef = useRef({
+    content: note.content,
+    title: note.title
+  });
+
+  // Previous state for undo (consolidated)
+  const previousStateRef = useRef({
+    content: note.content,
+    title: note.title
+  });
+
+  // DOM refs
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // UI state
   const [showHandle, setShowHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
-  const [aiReplacementFunction, setAiReplacementFunction] = useState<((newContent: string, isSelectionReplacement: boolean) => void) | null>(null);
+
+  // Timers
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const titleSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const undoStateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
 
   // Handle page leave - save with notification
-  const handlePageLeave = () => {
-    if (contentRef.current) {
-      const content = contentRef.current.innerHTML;
+  const handlePageLeave = useCallback(() => {
+    const content = getEditorContent(contentRef.current);
+    if (content) {
       const sanitizedContent = sanitizeContent(content);
       if (sanitizedContent !== lastSavedContent) {
         updateNote(note.id, { content: sanitizedContent }, false); // Non-silent save on page leave
       }
     }
-    
+
     // Send final notification if there are unsent changes
     if (inactivityTimerRef.current) {
       clearTimeout(inactivityTimerRef.current);
       sendInactivityNotification();
     }
-  };
+  }, [note.id, lastSavedContent, updateNote, sendInactivityNotification]);
 
   usePageLeave({ onPageLeave: handlePageLeave });
   
@@ -88,105 +160,105 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
     if (!titleHasFocus && note.title !== title) {
       setTitle(note.title);
     }
-    
-    if (contentRef.current) {
-      // Only update content if it's actually different AND user is not actively editing
-      const sanitizedContent = sanitizeForDisplay(note.content);
-      const currentContent = contentRef.current.innerHTML;
-      
-      // Check if user is currently typing/editing in this element
-      const selection = window.getSelection();
-      const contentHasFocus = contentRef.current.contains(document.activeElement) ||
-                             (selection && selection.rangeCount > 0 && contentRef.current.contains(selection.anchorNode));
-      
-      // Only update if content is different AND user is not focused in the editor
-      if (sanitizedContent !== currentContent && !contentHasFocus) {
-        contentRef.current.innerHTML = sanitizedContent;
-        contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-      }
+
+    // Only update content if it's actually different AND user is not actively editing
+    const currentContent = getEditorContent(contentRef.current);
+    const sanitizedContent = sanitizeForDisplay(note.content);
+
+    // Check if user is currently typing/editing in this element
+    const selection = window.getSelection();
+    const contentHasFocus = contentRef.current?.contains(document.activeElement) ||
+                           (selection && selection.rangeCount > 0 && contentRef.current?.contains(selection.anchorNode));
+
+    // Only update if content is different AND user is not focused in the editor
+    if (sanitizedContent !== currentContent && !contentHasFocus) {
+      setEditorContent(contentRef.current, sanitizedContent);
+      contentRef.current?.dispatchEvent(new Event('input', { bubbles: true }));
     }
   }, [note.id, note.title, note.content, note.featured_image, title]);
 
 
   // Send notifications after 5 minutes of inactivity
-  const sendInactivityNotification = async () => {
+  const sendInactivityNotification = useCallback(async () => {
     if (!note.isSharedWithUser && (!note.shares || note.shares.length === 0)) {
       return; // No one to notify
     }
 
     try {
       const { supabase } = await import('@/integrations/supabase/client');
-      
+      const currentContent = getEditorContent(contentRef.current);
+
       await supabase.functions.invoke('notify-note-update', {
         body: {
           noteId: note.id,
-          originalContent: lastNotifiedContent,
-          currentContent: contentRef.current?.innerHTML || '',
-          originalTitle: lastNotifiedTitle,
+          originalContent: lastNotifiedStateRef.current.content,
+          currentContent,
+          originalTitle: lastNotifiedStateRef.current.title,
           currentTitle: title
         }
       });
 
       // Update our tracking state
-      setLastNotifiedContent(contentRef.current?.innerHTML || '');
-      setLastNotifiedTitle(title);
-      
+      lastNotifiedStateRef.current = {
+        content: currentContent,
+        title
+      };
+
       console.log('Inactivity notification sent for note:', note.id);
     } catch (error) {
       console.error('Failed to send inactivity notification:', error);
     }
-  };
+  }, [note.id, note.isSharedWithUser, note.shares, title]);
 
   // Handle content updates with debounce and inactivity tracking
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     let undoTimeout: NodeJS.Timeout;
-    
+
     const handleContentChange = (e?: Event) => {
-      if (contentRef.current) {
-        const content = contentRef.current.innerHTML;
-        
-        // Clear any existing inactivity timer
-        if (inactivityTimerRef.current) {
-          clearTimeout(inactivityTimerRef.current);
-        }
-        
-        // Start 5-minute inactivity timer
-        inactivityTimerRef.current = setTimeout(() => {
-          sendInactivityNotification();
-        }, 5 * 60 * 1000); // 5 minutes
-        
-        clearTimeout(timeout);
-        clearTimeout(undoTimeout);
-        
-        // Check if this is an AI update (has special data attribute)
-        const isAIUpdate = e && (e as any).isAIUpdate;
-        const delay = isAIUpdate ? 0 : 500; // Immediate save for AI updates, debounced for user typing
-        
-        // Debounce undo state save (only save after 1 second of no typing)
-        undoTimeout = setTimeout(() => {
-          onContentBeforeChange?.();
-        }, 1000);
-        
-        timeout = setTimeout(() => {
-          // Sanitize content before saving to database
-          const sanitizedContent = sanitizeContent(content);
-          
-          // Force save for AI updates even if content seems unchanged
-          if (isAIUpdate || sanitizedContent !== lastSavedContent) {
-            updateNote(note.id, { content: sanitizedContent }, true); // Silent auto-save
-            setLastSavedContent(sanitizedContent);
-          }
-        }, delay);
+      const content = getEditorContent(contentRef.current);
+      if (!content && content !== '') return;
+
+      // Clear any existing inactivity timer
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current);
       }
+
+      // Start 5-minute inactivity timer
+      inactivityTimerRef.current = setTimeout(() => {
+        sendInactivityNotification();
+      }, 5 * 60 * 1000); // 5 minutes
+
+      clearTimeout(timeout);
+      clearTimeout(undoTimeout);
+
+      // Check if this is an AI update (has special data attribute)
+      const isAIUpdate = e && (e as Event & { isAIUpdate?: boolean }).isAIUpdate;
+      const delay = isAIUpdate ? 0 : 500; // Immediate save for AI updates, debounced for user typing
+
+      // Debounce undo state save (only save after 1 second of no typing)
+      undoTimeout = setTimeout(() => {
+        onContentBeforeChange?.();
+      }, 1000);
+
+      timeout = setTimeout(() => {
+        // Sanitize content before saving to database
+        const sanitizedContent = sanitizeContent(content);
+
+        // Force save for AI updates even if content seems unchanged
+        if (isAIUpdate || sanitizedContent !== lastSavedContent) {
+          updateNote(note.id, { content: sanitizedContent }, true); // Silent auto-save
+          setLastSavedContent(sanitizedContent);
+        }
+      }, delay);
     };
 
     const currentRef = contentRef.current;
-    
+
     if (currentRef) {
       currentRef.addEventListener('input', handleContentChange);
     }
-    
+
     return () => {
       clearTimeout(timeout);
       clearTimeout(undoTimeout);
@@ -197,55 +269,60 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
         currentRef.removeEventListener('input', handleContentChange);
       }
     };
-  }, [note.id, updateNote, lastNotifiedContent, lastNotifiedTitle, title]);
+  }, [note.id, updateNote, lastSavedContent, onContentBeforeChange, sendInactivityNotification]);
 
   // Handle AI content replacement - both selection and full content
-  const replaceContentFromAI = (newContent: string, isSelectionReplacement: boolean = false) => {
+  const replaceContentFromAI = useCallback((newContent: string, isSelectionReplacement: boolean = false) => {
     if (!contentRef.current) return;
-    
-    if (isSelectionReplacement) {
-      // Replace only selected text
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        
-        // Delete the selected content
-        range.deleteContents();
-        
-        // Create a temporary div to parse the HTML
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = newContent;
-        
-        // Insert the new content preserving HTML structure and line breaks
-        const fragment = document.createDocumentFragment();
-        while (tempDiv.firstChild) {
-          fragment.appendChild(tempDiv.firstChild);
-        }
-        
-        range.insertNode(fragment);
-        range.collapse(false);
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
-    } else {
-      // Replace entire content
-      const sanitizedContent = sanitizeContent(newContent);
-      contentRef.current.innerHTML = sanitizedContent;
-    }
-    
-    // Trigger content change to save
-    const event = new Event('input', { bubbles: true }) as any;
-    event.isAIUpdate = true;
-    contentRef.current.dispatchEvent(event);
-  };
 
-  // Store the AI replacement function locally and expose to parent
+    try {
+      if (isSelectionReplacement) {
+        // Replace only selected text
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+
+          // Delete the selected content
+          range.deleteContents();
+
+          // Create a temporary div to parse the HTML (sanitize first)
+          const sanitizedContent = sanitizeContent(newContent);
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = sanitizedContent;
+
+          // Insert the new content preserving HTML structure and line breaks
+          const fragment = document.createDocumentFragment();
+          while (tempDiv.firstChild) {
+            fragment.appendChild(tempDiv.firstChild);
+          }
+
+          range.insertNode(fragment);
+          range.collapse(false);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      } else {
+        // Replace entire content
+        setEditorContent(contentRef.current, newContent);
+      }
+
+      // Trigger content change to save
+      const event = new Event('input', { bubbles: true }) as Event & { isAIUpdate?: boolean };
+      event.isAIUpdate = true;
+      contentRef.current.dispatchEvent(event);
+    } catch (error) {
+      console.error('Error replacing content from AI:', error);
+      // Fallback to simple replacement
+      setEditorContent(contentRef.current, newContent);
+    }
+  }, []);
+
+  // Expose AI replacement function to parent
   useEffect(() => {
-    setAiReplacementFunction(() => replaceContentFromAI);
     if (onAIContentReplace) {
       onAIContentReplace(replaceContentFromAI);
     }
-  }, [onAIContentReplace]);
+  }, [onAIContentReplace, replaceContentFromAI]);
 
   // Handle image insertion at cursor position with validation
   const insertImageAtCursor = (imageUrl: string) => {
@@ -409,23 +486,24 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
     }
   };
   
-  // Helper function for plain text insertion
+  // Helper function for plain text insertion - preserves ALL blank lines
   const insertPlainText = (text: string, range: Range, selection: Selection) => {
-    // Normalize line breaks: allow single and double, but collapse 3+ to double
+    // Normalize line breaks: only standardize Windows line endings, preserve all blank lines
     const normalizedText = text
-      .replace(/\r\n/g, '\n')  // Normalize Windows line endings
-      .replace(/\n{3,}/g, '\n\n') // Replace 3+ line breaks with double (paragraph break)
-      .trim();
-    
-    // Split by single line breaks and insert
+      .replace(/\r\n/g, '\n')  // Normalize Windows line endings to \n
+      .replace(/\r/g, '\n');   // Normalize old Mac line endings to \n
+
+    // Split by line breaks (don't trim to preserve leading/trailing newlines)
     const lines = normalizedText.split('\n');
-    
+
     lines.forEach((line, index) => {
-      // Insert text node for each line (including empty ones)
-      const textNode = document.createTextNode(line);
-      range.insertNode(textNode);
-      range.setStartAfter(textNode);
-      
+      // Insert text node for each line (including empty ones for blank lines)
+      if (line.length > 0) {
+        const textNode = document.createTextNode(line);
+        range.insertNode(textNode);
+        range.setStartAfter(textNode);
+      }
+
       // Add line break except for the last line
       if (index < lines.length - 1) {
         const br = document.createElement('br');
@@ -433,7 +511,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
         range.setStartAfter(br);
       }
     });
-    
+
     // Collapse range to end
     range.collapse(false);
     selection.removeAllRanges();
@@ -454,10 +532,10 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
 
   }, [note.id]);
 
-  // Simple block type detection when editing
+  // Block type detection with debouncing for performance
   useEffect(() => {
     if (isReadOnly) return;
-    
+
     const updateBlockType = () => {
       const editor = contentRef.current;
       if (!editor) return;
@@ -477,13 +555,22 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
       // Check if we're in an H1
       const h1 = (element as Element).closest('h1');
       const newType: BlockType = h1 ? 'h1' : 'p';
-      setCurrentBlockType(newType);
-      onBlockTypeChange?.(newType);
+
+      setCurrentBlockType(prevType => {
+        if (prevType !== newType) {
+          onBlockTypeChange?.(newType);
+          return newType;
+        }
+        return prevType;
+      });
     };
+
+    // Debounced version for input events (150ms delay)
+    const debouncedUpdateBlockType = debounce(updateBlockType, 150);
 
     const handleFocus = () => {
       setShowHandle(true);
-      updateBlockType();
+      updateBlockType(); // Immediate update on focus
     };
 
     const handleBlur = () => {
@@ -499,22 +586,23 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
     if (editor) {
       editor.addEventListener('focus', handleFocus);
       editor.addEventListener('blur', handleBlur);
-      editor.addEventListener('input', updateBlockType);
-      editor.addEventListener('keyup', updateBlockType);
+      editor.addEventListener('input', debouncedUpdateBlockType);
+      editor.addEventListener('keyup', debouncedUpdateBlockType);
     }
-    
-    document.addEventListener('selectionchange', updateBlockType);
-    
+
+    // Use debounced version for selection change as well
+    document.addEventListener('selectionchange', debouncedUpdateBlockType);
+
     return () => {
       if (editor) {
         editor.removeEventListener('focus', handleFocus);
         editor.removeEventListener('blur', handleBlur);
-        editor.removeEventListener('input', updateBlockType);
-        editor.removeEventListener('keyup', updateBlockType);
+        editor.removeEventListener('input', debouncedUpdateBlockType);
+        editor.removeEventListener('keyup', debouncedUpdateBlockType);
       }
-      document.removeEventListener('selectionchange', updateBlockType);
+      document.removeEventListener('selectionchange', debouncedUpdateBlockType);
     };
-  }, [isReadOnly]);
+  }, [isReadOnly, onBlockTypeChange]);
 
   const handleBlockTypeSelect = (type: BlockType) => {
     if (!contentRef.current) return;
@@ -528,8 +616,9 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-8">
-      <div className="relative">
+    <EditorErrorBoundary>
+      <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-8">
+        <div className="relative">
         <textarea
           data-title-input
           ref={titleRef}
@@ -593,15 +682,28 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
           />
         )}
         
-        <div
-          ref={contentRef}
-          contentEditable={!isReadOnly}
-          className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none pb-32 transition-none editor-anchor relative dynamic-body-font ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
-          data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
-          aria-label="Note content"
-          onPaste={isReadOnly ? undefined : handlePaste}
-          onFocus={() => !isReadOnly && setShowHandle(true)}
-        />
+        <div className="relative">
+          <div
+            ref={contentRef}
+            contentEditable={!isReadOnly}
+            className={`note-editor prose prose-sm md:prose-base max-w-none outline-none focus:outline-none pb-32 transition-colors duration-200 editor-anchor relative dynamic-body-font ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+            data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
+            aria-label="Note content"
+            onPaste={isReadOnly ? undefined : handlePaste}
+            onFocus={() => !isReadOnly && setShowHandle(true)}
+          />
+
+          {/* Block formatting handle */}
+          {!isReadOnly && showHandle && (
+            <div className="absolute left-0 top-0 -ml-12 mt-1">
+              <BlockHandle
+                visible={showHandle}
+                currentType={currentBlockType}
+                onSelect={handleBlockTypeSelect}
+              />
+            </div>
+          )}
+        </div>
         
         {!isReadOnly && (
           <TextEnhancementMenu
@@ -612,80 +714,16 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
               console.log('TextEnhancementMenu onContentChange called with:', { newHTML, isSelectionReplacement });
               if (contentRef.current) {
                 // Store previous state before making AI changes
-                setPreviousContent(contentRef.current.innerHTML);
-                setPreviousTitle(title);
-                
+                previousStateRef.current = {
+                  content: getEditorContent(contentRef.current),
+                  title
+                };
+
                 onContentBeforeChange?.();
-                
-                // Use the AI replacement function if available, otherwise fall back to old method
-                if (aiReplacementFunction) {
-                  aiReplacementFunction(newHTML, isSelectionReplacement);
-                } else {
-                  // Fallback to old method - check if we have a text selection and handle it properly
-                  const selection = window.getSelection();
-                  if (isSelectionReplacement && selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-                  // Replace only selected content
-                  const range = selection.getRangeAt(0);
-                  if (contentRef.current.contains(range.commonAncestorContainer)) {
-                    try {
-                      // Save the range before we modify content
-                      const savedRange = range.cloneRange();
-                      
-                      // Delete selected content
-                      range.deleteContents();
-                      
-                      // Create a temporary container to parse the new HTML
-                      const tempDiv = document.createElement('div');
-                      tempDiv.innerHTML = newHTML;
-                      
-                      // Insert each node from the new content
-                      const fragment = document.createDocumentFragment();
-                      while (tempDiv.firstChild) {
-                        fragment.appendChild(tempDiv.firstChild);
-                      }
-                      
-                      range.insertNode(fragment);
-                      
-                      // Position cursor after inserted content
-                      range.collapse(false);
-                      selection.removeAllRanges();
-                      selection.addRange(range);
-                      
-                      // Get the updated content and save
-                      const updatedContent = contentRef.current.innerHTML;
-                      const sanitizedContent = sanitizeContent(updatedContent);
-                      updateNote(note.id, { content: sanitizedContent }, false);
-                      setLastSavedContent(sanitizedContent);
-                      
-                      console.log('Selected content replaced successfully');
-                    } catch (error) {
-                      console.error('Error replacing selected content:', error);
-                      // Fallback to full content replacement
-                      contentRef.current.innerHTML = newHTML;
-                      const sanitizedContent = sanitizeContent(newHTML);
-                      updateNote(note.id, { content: sanitizedContent }, false);
-                      setLastSavedContent(sanitizedContent);
-                    }
-                  }
-                  } else {
-                    // No selection, replace all content
-                    contentRef.current.innerHTML = newHTML;
-                    const sanitizedContent = sanitizeContent(newHTML);
-                    updateNote(note.id, { content: sanitizedContent }, false);
-                    setLastSavedContent(sanitizedContent);
-                  }
-                }
-                
-                // Create a custom event to mark this as an AI update 
-                const customEvent = new Event('input', { bubbles: true }) as any;
-                customEvent.isAIUpdate = true;
-                contentRef.current.dispatchEvent(customEvent);
-                
-                // Trigger undo state update
-                setTimeout(() => {
-                  onContentBeforeChange?.();
-                }, 100);
-                
+
+                // Use the AI replacement function
+                replaceContentFromAI(newHTML, isSelectionReplacement);
+
                 onSpellCheckApplied?.();
                 console.log('Content updated in editor and saved to cloud');
               }
@@ -693,16 +731,17 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
             noteTitle={title}
             onTitleChange={(newTitle) => {
               console.log('TextEnhancementMenu onTitleChange called with:', newTitle);
-              setPreviousTitle(title);
+              previousStateRef.current.title = title;
               setTitle(newTitle);
               updateNote(note.id, { title: newTitle }, false);
               console.log('Title updated and saved to cloud');
             }}
-            previousContent={previousContent}
-            previousTitle={previousTitle}
+            previousContent={previousStateRef.current.content}
+            previousTitle={previousStateRef.current.title}
           />
         )}
       </div>
     </div>
+    </EditorErrorBoundary>
   );
 };
