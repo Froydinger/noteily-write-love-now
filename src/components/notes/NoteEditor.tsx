@@ -115,25 +115,6 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
 
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
 
-  // Handle page leave - save with notification
-  const handlePageLeave = useCallback(() => {
-    const content = getEditorContent(contentRef.current);
-    if (content) {
-      const sanitizedContent = sanitizeContent(content);
-      if (sanitizedContent !== lastSavedContent) {
-        updateNote(note.id, { content: sanitizedContent }, false); // Non-silent save on page leave
-      }
-    }
-
-    // Send final notification if there are unsent changes
-    if (inactivityTimerRef.current) {
-      clearTimeout(inactivityTimerRef.current);
-      sendInactivityNotification();
-    }
-  }, [note.id, lastSavedContent, updateNote, sendInactivityNotification]);
-
-  usePageLeave({ onPageLeave: handlePageLeave });
-  
   // Apply iOS zoom prevention on mount
   useEffect(() => {
     // Ensure title and content have proper font size to prevent zoom
@@ -177,7 +158,6 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
     }
   }, [note.id, note.title, note.content, note.featured_image, title]);
 
-
   // Send notifications after 5 minutes of inactivity
   const sendInactivityNotification = useCallback(async () => {
     if (!note.isSharedWithUser && (!note.shares || note.shares.length === 0)) {
@@ -209,6 +189,25 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
       console.error('Failed to send inactivity notification:', error);
     }
   }, [note.id, note.isSharedWithUser, note.shares, title]);
+
+  // Handle page leave - save with notification
+  const handlePageLeave = useCallback(() => {
+    const content = getEditorContent(contentRef.current);
+    if (content) {
+      const sanitizedContent = sanitizeContent(content);
+      if (sanitizedContent !== lastSavedContent) {
+        updateNote(note.id, { content: sanitizedContent }, false); // Non-silent save on page leave
+      }
+    }
+
+    // Send final notification if there are unsent changes
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+      sendInactivityNotification();
+    }
+  }, [note.id, lastSavedContent, updateNote, sendInactivityNotification]);
+
+  usePageLeave({ onPageLeave: handlePageLeave });
 
   // Handle content updates with debounce and inactivity tracking
   useEffect(() => {
