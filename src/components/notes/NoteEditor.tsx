@@ -6,6 +6,7 @@ import { ImageUploadButton } from './ImageUploadButton';
 import { FeaturedImage } from './FeaturedImage';
 import { sanitizeContent, sanitizeForDisplay, sanitizeImageUrl, isValidImageUrl } from "@/lib/sanitization";
 import { BlockHandle, BlockType } from './BlockHandle';
+import { FloatingFormatBar, FormatType } from './FloatingFormatBar';
 import { usePageLeave } from '@/hooks/usePageLeave';
 import { useTitleFont, useBodyFont } from '@/hooks/useTitleFont';
 import { SpellCheckButton } from './SpellCheckButton';
@@ -107,6 +108,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
   // UI state
   const [showHandle, setShowHandle] = useState(false);
   const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
+  const [showFloatingBar, setShowFloatingBar] = useState(false);
 
   // Timers
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -614,6 +616,69 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
     contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
   };
 
+  // Track text selection for floating format bar
+  useEffect(() => {
+    if (isReadOnly) return;
+
+    const handleSelectionChange = () => {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) {
+        setShowFloatingBar(false);
+        return;
+      }
+
+      const range = selection.getRangeAt(0);
+      const selectedText = range.toString().trim();
+
+      // Show floating bar only if:
+      // 1. There's selected text
+      // 2. The selection is within the editor
+      // 3. The editor has focus
+      const isInEditor = contentRef.current?.contains(range.commonAncestorContainer);
+      const hasSelection = selectedText.length > 0 && !range.collapsed;
+
+      setShowFloatingBar(isInEditor && hasSelection);
+    };
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+  }, [isReadOnly]);
+
+  // Handle formatting from floating bar
+  const handleFormat = useCallback((type: FormatType) => {
+    if (!contentRef.current) return;
+
+    contentRef.current.focus();
+
+    try {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+
+      switch (type) {
+        case 'p':
+          document.execCommand('formatBlock', false, 'p');
+          break;
+        case 'h1':
+          document.execCommand('formatBlock', false, 'h1');
+          break;
+        case 'bold':
+          document.execCommand('bold', false);
+          break;
+        case 'italic':
+          document.execCommand('italic', false);
+          break;
+      }
+
+      // Trigger content save
+      contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+    } catch (error) {
+      console.error('Error applying format:', error);
+    }
+  }, []);
+
   return (
     <EditorErrorBoundary>
       <div className="w-full max-w-3xl mx-auto px-4 pt-8 pb-8">
@@ -691,6 +756,15 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
             onPaste={isReadOnly ? undefined : handlePaste}
             onFocus={() => !isReadOnly && setShowHandle(true)}
           />
+
+          {/* Floating format bar - appears above selected text */}
+          {!isReadOnly && (
+            <FloatingFormatBar
+              visible={showFloatingBar}
+              onFormat={handleFormat}
+              editorRef={contentRef}
+            />
+          )}
 
           {/* Block formatting handle */}
           {!isReadOnly && showHandle && (
