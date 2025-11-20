@@ -5,7 +5,6 @@ import DOMPurify from 'dompurify';
 import { ImageUploadButton } from './ImageUploadButton';
 import { FeaturedImage } from './FeaturedImage';
 import { sanitizeContent, sanitizeForDisplay, sanitizeImageUrl, isValidImageUrl } from "@/lib/sanitization";
-import { BlockHandle, BlockType } from './BlockHandle';
 import { FloatingFormatBar, FormatType } from './FloatingFormatBar';
 import { usePageLeave } from '@/hooks/usePageLeave';
 import { useTitleFont, useBodyFont } from '@/hooks/useTitleFont';
@@ -71,7 +70,6 @@ function setEditorContent(editor: HTMLDivElement | null, content: string): void 
 
 interface NoteEditorProps {
   note: Note;
-  onBlockTypeChange?: (type: BlockType) => void;
   onContentBeforeChange?: () => void;
   onSpellCheckApplied?: () => void;
   onUndo?: () => void;
@@ -79,7 +77,7 @@ interface NoteEditorProps {
   onAIContentReplace?: (replacementFunction: (newContent: string, isSelectionReplacement: boolean) => void) => void;
 }
 
-export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeChange, onSpellCheckApplied, onUndo, canUndo, onAIContentReplace }: NoteEditorProps) {
+export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckApplied, onUndo, canUndo, onAIContentReplace }: NoteEditorProps) {
   const titleFont = useTitleFont();
   const bodyFont = useBodyFont();
   const { updateNote } = useNotes();
@@ -106,8 +104,6 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
   const containerRef = useRef<HTMLDivElement>(null);
 
   // UI state
-  const [showHandle, setShowHandle] = useState(false);
-  const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
   const [showFloatingBar, setShowFloatingBar] = useState(false);
 
   // Timers
@@ -533,89 +529,6 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
 
   }, [note.id]);
 
-  // Block type detection with debouncing for performance
-  useEffect(() => {
-    if (isReadOnly) return;
-
-    const updateBlockType = () => {
-      const editor = contentRef.current;
-      if (!editor) return;
-
-      const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) return;
-
-      const range = selection.getRangeAt(0);
-      if (!editor.contains(range.commonAncestorContainer)) return;
-
-      // Find the current block element
-      let element = range.commonAncestorContainer;
-      if (element.nodeType === Node.TEXT_NODE) {
-        element = element.parentElement!;
-      }
-
-      // Check if we're in an H1
-      const h1 = (element as Element).closest('h1');
-      const newType: BlockType = h1 ? 'h1' : 'p';
-
-      setCurrentBlockType(prevType => {
-        if (prevType !== newType) {
-          onBlockTypeChange?.(newType);
-          return newType;
-        }
-        return prevType;
-      });
-    };
-
-    // Debounced version for input events (150ms delay)
-    const debouncedUpdateBlockType = debounce(updateBlockType, 150);
-
-    const handleFocus = () => {
-      setShowHandle(true);
-      updateBlockType(); // Immediate update on focus
-    };
-
-    const handleBlur = () => {
-      // Delay hiding to allow for popover interactions
-      setTimeout(() => {
-        if (!document.activeElement?.closest('[data-radix-popper-content-wrapper]')) {
-          setShowHandle(false);
-        }
-      }, 100);
-    };
-
-    const editor = contentRef.current;
-    if (editor) {
-      editor.addEventListener('focus', handleFocus);
-      editor.addEventListener('blur', handleBlur);
-      editor.addEventListener('input', debouncedUpdateBlockType);
-      editor.addEventListener('keyup', debouncedUpdateBlockType);
-    }
-
-    // Use debounced version for selection change as well
-    document.addEventListener('selectionchange', debouncedUpdateBlockType);
-
-    return () => {
-      if (editor) {
-        editor.removeEventListener('focus', handleFocus);
-        editor.removeEventListener('blur', handleBlur);
-        editor.removeEventListener('input', debouncedUpdateBlockType);
-        editor.removeEventListener('keyup', debouncedUpdateBlockType);
-      }
-      document.removeEventListener('selectionchange', debouncedUpdateBlockType);
-    };
-  }, [isReadOnly, onBlockTypeChange]);
-
-  const handleBlockTypeSelect = (type: BlockType) => {
-    if (!contentRef.current) return;
-    contentRef.current.focus();
-    try {
-      document.execCommand('formatBlock', false, type === 'p' ? 'p' : type);
-    } catch (e) {
-      // no-op
-    }
-    contentRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-  };
-
   // Track text selection for floating format bar
   useEffect(() => {
     if (isReadOnly) return;
@@ -723,7 +636,7 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
             }, 500);
           }}
           placeholder="Untitled Note"
-          className={`w-full text-3xl font-${titleFont} font-medium mb-6 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden dynamic-title-font ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+          className={`w-full text-3xl font-${titleFont} font-bold mb-3 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden dynamic-title-font ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
           readOnly={isReadOnly}
           style={{ 
             minHeight: 'auto',
@@ -754,7 +667,6 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
             data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
             aria-label="Note content"
             onPaste={isReadOnly ? undefined : handlePaste}
-            onFocus={() => !isReadOnly && setShowHandle(true)}
           />
 
           {/* Floating format bar - appears above selected text */}
@@ -764,17 +676,6 @@ export default function NoteEditor({ note, onBlockTypeChange, onContentBeforeCha
               onFormat={handleFormat}
               editorRef={contentRef}
             />
-          )}
-
-          {/* Block formatting handle */}
-          {!isReadOnly && showHandle && (
-            <div className="absolute left-0 top-0 -ml-12 mt-1">
-              <BlockHandle
-                visible={showHandle}
-                currentType={currentBlockType}
-                onSelect={handleBlockTypeSelect}
-              />
-            </div>
           )}
         </div>
         
