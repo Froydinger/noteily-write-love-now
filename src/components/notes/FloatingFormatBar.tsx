@@ -134,7 +134,7 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
       <Button
         variant={currentFormats.has('p') ? 'default' : 'ghost'}
         size="sm"
-        className="h-9 w-9 p-0 rounded-lg"
+        className="h-9 w-9 p-0 rounded-full"
         onMouseDown={(e) => {
           e.preventDefault(); // Prevent focus loss
           onFormat('p');
@@ -147,7 +147,7 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
       <Button
         variant={currentFormats.has('h1') ? 'default' : 'ghost'}
         size="sm"
-        className="h-9 w-9 p-0 rounded-lg"
+        className="h-9 w-9 p-0 rounded-full"
         onMouseDown={(e) => {
           e.preventDefault(); // Prevent focus loss
           onFormat('h1');
