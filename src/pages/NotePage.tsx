@@ -269,17 +269,17 @@ const NotePage = () => {
       <header
         ref={headerRef}
         data-note-header
-        className="sticky top-0 z-[100] p-3"
+        className="sticky top-0 z-[100] p-4"
         style={{ position: 'sticky', top: 0, zIndex: 100 }}
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <div className="relative">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleSidebar}
-                className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
+                className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
                 title="Toggle sidebar"
               >
                 <Menu className="h-5 w-5" />
@@ -294,7 +294,7 @@ const NotePage = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/')}
-              className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
+              className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
               title="Back to notes"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -312,14 +312,14 @@ const NotePage = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             {/* Show people icon for owned notes (to share) or shared notes (to manage) */}
             {(note.isOwnedByUser || (note.isSharedWithUser && !note.isOwnedByUser)) && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowShareManager(true)}
-                className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
+                className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
                 title={note.isOwnedByUser ? "Share note" : "Manage sharing"}
               >
                 <Users className="h-5 w-5" />
@@ -339,7 +339,7 @@ const NotePage = () => {
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full text-destructive hover:bg-destructive/15 hover:border-destructive/40 transition-all duration-200 shadow-sm glass-shimmer">
+                <Button variant="ghost" size="sm" className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full text-destructive hover:bg-destructive/15 hover:border-destructive/40 transition-all duration-200 shadow-sm glass-shimmer">
                   <Trash className="h-5 w-5" />
                 </Button>
               </AlertDialogTrigger>

@@ -617,6 +617,12 @@
     opacity: 0.6;
   }
 
+  /* Extra bold for note editor - make bold more noticeable */
+  .note-editor b,
+  .note-editor strong {
+    font-weight: 800;
+  }
+
   /* Prevent browser repositioning during dynamic edits */
   .editor-anchor {
     overflow-anchor: none;
