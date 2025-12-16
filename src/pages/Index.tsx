@@ -263,11 +263,12 @@ const Index = () => {
 
         {/* Desktop layout */}
         <div className="hidden md:block mb-8 apple-pwa-header-spacing">
-          {/* Top row: Menu button + Logo (logo always on right) */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
+          {/* Top row: Left buttons + Logo on right */}
+          <div className="flex items-center justify-between">
+            {/* Left side: Menu + Action buttons */}
+            <div className="flex items-center gap-2">
               {state === "collapsed" && (
-                <div className="relative">
+                <div className="relative mr-2">
                   <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
                   {user && unreadCount > 0 && (
                     <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
@@ -276,35 +277,25 @@ const Index = () => {
                   )}
                 </div>
               )}
-            </div>
-            <button
-              onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
-            >
-              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
-            </button>
-          </div>
 
-          {/* Centered action buttons */}
-          <div className="flex items-center justify-center gap-2">
-            {/* Hide New Note button when sidebar is open (desktop only) to avoid duplicate */}
-            {state === "collapsed" && (
-              <Button
-                onClick={handleCreateNote}
-                variant="outline"
-                className="flex items-center justify-center gap-2.5 h-11 px-5 group
-                  bg-accent/10 hover:bg-accent/20
-                  border-2 border-accent
-                  text-accent font-medium
-                  rounded-full shadow-glow-sm hover:shadow-glow
-                  transition-all duration-250 ease-bounce-out
-                  hover:scale-[1.02] active:scale-[0.98]
-                  apple-pwa-button-spacing"
-              >
-                <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
-                New Note
-              </Button>
-            )}
+              {/* Hide New Note button when sidebar is open (desktop only) to avoid duplicate */}
+              {state === "collapsed" && (
+                <Button
+                  onClick={handleCreateNote}
+                  variant="outline"
+                  className="flex items-center justify-center gap-2.5 h-11 px-5 group
+                    bg-accent/10 hover:bg-accent/20
+                    border-2 border-accent
+                    text-accent font-medium
+                    rounded-full shadow-glow-sm hover:shadow-glow
+                    transition-all duration-250 ease-bounce-out
+                    hover:scale-[1.02] active:scale-[0.98]
+                    apple-pwa-button-spacing"
+                >
+                  <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
+                  New Note
+                </Button>
+              )}
 
               <Button
                 size="sm"
@@ -343,7 +334,7 @@ const Index = () => {
                 >
                   <ArrowUpDown className="h-4 w-4" />
                 </SelectTrigger>
-                <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="center" sideOffset={8}>
+                <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="start" sideOffset={8}>
                   <SelectItem value="latest" className="rounded-lg">Latest</SelectItem>
                   <SelectItem value="oldest" className="rounded-lg">Oldest</SelectItem>
                   <SelectItem value="alphabetical" className="rounded-lg">A-Z</SelectItem>
@@ -370,12 +361,21 @@ const Index = () => {
                 >
                   <Filter className="h-4 w-4" />
                 </SelectTrigger>
-                <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="center" sideOffset={8}>
+                <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="start" sideOffset={8}>
                   <SelectItem value="all" className="rounded-lg">All Notes</SelectItem>
                   <SelectItem value="shared-with-me" className="rounded-lg">Shared with Me</SelectItem>
                   <SelectItem value="shared-with-others" className="rounded-lg">My Shared Notes</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Right side: Logo */}
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+            >
+              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+            </button>
           </div>
         </div>
 
