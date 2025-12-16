@@ -8,7 +8,7 @@ import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotifications } from '@/hooks/useNotifications';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Heart } from 'lucide-react';
 import { useTitleFont } from '@/hooks/useTitleFont';
 import { useBodyFont } from '@/hooks/useTitleFont';
 
@@ -39,73 +39,73 @@ const PromptsPage = () => {
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-4 md:p-8 animate-fade-in">
-        {/* Mobile layout: Daily Writing Prompts text on far right, refresh icon next to it */}
-        <div className="md:hidden mb-6">
-          {/* Top row: Menu button left, refresh icon + title far right */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              {(isMobile || state === "collapsed") && (
-                <div className="relative">
-                  <SidebarTrigger />
-                  {user && unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="rounded-full hover:scale-105 transition-all duration-150 px-2 py-2"
-                onClick={refreshDailyPrompts}
-                title="Refresh prompts"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-              <h1 className="text-2xl font-thin tracking-tight dynamic-title-font">Daily Writing Prompts</h1>
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop layout: Menu button left, refresh icon + title far right */}
-        <div className="hidden md:flex items-center justify-between mb-6">
-          {/* Left side: Menu button */}
-          <div className="flex items-center gap-4 px-2 py-2">
+        {/* Mobile layout */}
+        <div className="md:hidden mb-8">
+          {/* Top row: Menu button + Logo */}
+          <div className="flex items-center justify-between mb-6">
             {(isMobile || state === "collapsed") && (
               <div className="relative">
-                <SidebarTrigger />
+                <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
                 {user && unreadCount > 0 && (
-                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </div>
                 )}
               </div>
             )}
+            <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+            </div>
           </div>
 
-          {/* Right side: Refresh icon + Title */}
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
+          {/* Centered refresh button */}
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              variant="secondary"
               size="sm"
-              className="rounded-full hover:scale-105 transition-all duration-150 px-2 py-2"
+              className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250"
               onClick={refreshDailyPrompts}
               title="Refresh prompts"
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <h1 className="text-2xl font-thin tracking-tight dynamic-title-font">Daily Writing Prompts</h1>
           </div>
         </div>
-        
+
+        {/* Desktop layout */}
+        <div className="hidden md:block mb-8">
+          {/* Top row: Menu button + Logo */}
+          <div className="flex items-center justify-between mb-6">
+            {state === "collapsed" && (
+              <div className="relative">
+                <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
+                {user && unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+            </div>
+          </div>
+
+          {/* Centered refresh button */}
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250"
+              onClick={refreshDailyPrompts}
+              title="Refresh prompts"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
         <div className="mb-6">
-          <p className="text-muted-foreground mb-6 dynamic-body-font font-light tracking-tight">
-            Here are your three writing prompts for today. New prompts will be available at midnight. 
-            Use these to inspire your writing and reflection.
-          </p>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
             {dailyPrompts.map((prompt) => (

@@ -7,7 +7,7 @@ import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, ArrowUpDown, Filter, X } from 'lucide-react';
+import { Plus, Search, ArrowUpDown, Filter, X, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -149,8 +149,8 @@ const Index = () => {
            onClick={() => setSelectedNoteId(null)}>
         {/* Mobile layout */}
         <div className="md:hidden mb-8">
-          {/* Top row: Menu button */}
-          <div className="flex items-center mb-6 apple-pwa-header-spacing">
+          {/* Top row: Menu button + Logo */}
+          <div className="flex items-center justify-between mb-6 apple-pwa-header-spacing">
             {(isMobile || state === "collapsed") && (
               <div className="relative">
                 <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
@@ -161,6 +161,9 @@ const Index = () => {
                 )}
               </div>
             )}
+            <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+            </div>
           </div>
 
           {/* Action buttons */}
@@ -256,9 +259,9 @@ const Index = () => {
 
         {/* Desktop layout */}
         <div className="hidden md:block mb-8 apple-pwa-header-spacing">
-          {/* Menu button when sidebar collapsed */}
-          {state === "collapsed" && (
-            <div className="flex items-center mb-6">
+          {/* Top row: Menu button + Logo */}
+          <div className="flex items-center justify-between mb-6">
+            {state === "collapsed" && (
               <div className="relative">
                 <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
                 {user && unreadCount > 0 && (
@@ -267,8 +270,11 @@ const Index = () => {
                   </div>
                 )}
               </div>
+            )}
+            <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
             </div>
-          )}
+          </div>
 
           {/* Centered action buttons */}
           <div className="flex items-center justify-center gap-2">
