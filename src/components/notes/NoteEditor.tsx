@@ -676,7 +676,7 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
             }, 500);
           }}
           placeholder="Untitled Note"
-          className={`w-full text-3xl font-${titleFont} font-bold mb-3 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden dynamic-title-font ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
+          className={`w-full text-3xl font-${titleFont} font-bold mb-3 bg-transparent border-none outline-none px-0 focus:ring-0 focus:outline-none resize-none overflow-hidden dynamic-title-font text-accent ${isReadOnly ? 'cursor-not-allowed opacity-70' : ''}`}
           readOnly={isReadOnly}
           style={{ 
             minHeight: 'auto',
