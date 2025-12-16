@@ -68,16 +68,18 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
         </div>
       </SheetTrigger>
       
-      <SheetContent side="right" className="w-80 sm:w-96 p-0">
-        <SheetHeader className="p-4 border-b border-border/40">
+      <SheetContent side="right" className="w-80 sm:w-96 p-0 bg-background/80 backdrop-blur-xl border-l border-border/30">
+        <SheetHeader className="p-4 border-b border-border/20 bg-background/40 backdrop-blur-md">
           <div className="space-y-3">
-            <SheetTitle className="flex items-center gap-3 text-lg font-serif">
-              <Bell className="h-5 w-5" />
+            <SheetTitle className="flex items-center gap-3 text-lg font-serif tracking-tight">
+              <div className="h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 flex items-center justify-center shadow-sm">
+                <Bell className="h-4 w-4" />
+              </div>
               Notifications
             </SheetTitle>
             {unreadCount > 0 && (
               <div className="flex items-center justify-between">
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20 rounded-full px-3">
                   {unreadCount} new
                 </Badge>
                 <div className="flex items-center gap-2">
@@ -85,7 +87,7 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
                     variant="ghost"
                     size="sm"
                     onClick={markAllAsRead}
-                    className="h-8 text-xs btn-accessible rounded-full"
+                    className="h-8 text-xs btn-accessible rounded-full bg-background/40 backdrop-blur-sm border border-border/20 hover:bg-background/60"
                   >
                     <CheckCheck className="h-3 w-3 mr-1" />
                     Read all
@@ -95,7 +97,7 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
                       variant="ghost"
                       size="sm"
                       onClick={handleDeleteAll}
-                      className="h-8 text-xs btn-accessible rounded-full text-destructive hover:text-destructive"
+                      className="h-8 text-xs btn-accessible rounded-full bg-background/40 backdrop-blur-sm border border-border/20 text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-3 w-3 mr-1" />
                       Delete all
@@ -107,15 +109,17 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
           </div>
         </SheetHeader>
 
-        <div className="p-4">
-          <ScrollArea className="h-[calc(100vh-140px)]">
+        <div className="p-4 bg-background/20">
+          <ScrollArea className="h-[calc(100vh-160px)]">
             {notifications.length === 0 ? (
-              <div className="text-center py-8">
-                <Bell className="h-8 w-8 mx-auto mb-4 opacity-50" />
-                <p className="text-muted-foreground text-sm font-medium">
+              <div className="text-center py-12 px-4">
+                <div className="h-16 w-16 rounded-full bg-background/60 backdrop-blur-md border border-border/30 flex items-center justify-center mx-auto mb-4 shadow-sm">
+                  <Bell className="h-7 w-7 opacity-50" />
+                </div>
+                <p className="text-foreground/80 text-sm font-medium tracking-tight">
                   No notifications yet
                 </p>
-                <p className="text-muted-foreground text-xs mt-1">
+                <p className="text-muted-foreground text-xs mt-2 leading-relaxed">
                   You'll see updates when notes are shared with you
                 </p>
               </div>
@@ -124,50 +128,54 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 rounded-xl cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm border ${
-                      !notification.read 
-                        ? 'bg-primary/5 border-primary/20 shadow-sm' 
-                        : 'bg-background border-border/60 hover:bg-accent/30'
+                    className={`p-4 rounded-2xl cursor-pointer transition-all duration-200 hover:scale-[1.01] border backdrop-blur-sm ${
+                      !notification.read
+                        ? 'bg-primary/8 border-primary/25 shadow-sm'
+                        : 'bg-background/50 border-border/30 hover:bg-background/70 hover:border-border/40'
                     }`}
                     onClick={() => handleNotificationClick(notification)}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 mt-1">
-                        {getNotificationIcon(notification.type)}
+                      <div className="flex-shrink-0 mt-0.5">
+                        <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
+                          !notification.read ? 'bg-primary/15' : 'bg-background/60 border border-border/30'
+                        }`}>
+                          {getNotificationIcon(notification.type)}
+                        </div>
                       </div>
-                      
-                      <div className="flex-1 min-w-0 space-y-2">
+
+                      <div className="flex-1 min-w-0 space-y-1.5">
                         <div className="flex items-start justify-between gap-2">
-                          <h3 className="text-sm font-semibold text-foreground leading-tight">
+                          <h3 className="text-sm font-semibold text-foreground leading-tight tracking-tight">
                             {notification.title}
                           </h3>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5">
                             {!notification.read && (
-                              <div className="w-2.5 h-2.5 bg-primary rounded-full flex-shrink-0 mt-1" />
+                              <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 animate-pulse" />
                             )}
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={(e) => handleDeleteNotification(e, notification.id)}
-                              className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                              className="h-6 w-6 p-0 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                             >
                               <X className="h-3 w-3" />
                             </Button>
                           </div>
                         </div>
-                        
+
                         <p className="text-sm text-muted-foreground leading-relaxed">
                           {notification.message}
                         </p>
-                        
+
                         <div className="flex items-center justify-between pt-1">
-                          <span className="text-xs text-muted-foreground font-medium">
-                            {formatDistanceToNow(new Date(notification.created_at), { 
-                              addSuffix: true 
+                          <span className="text-xs text-muted-foreground/80 font-medium">
+                            {formatDistanceToNow(new Date(notification.created_at), {
+                              addSuffix: true
                             })}
                           </span>
                           {notification.from_user_email && (
-                            <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-md truncate max-w-32">
+                            <span className="text-xs text-muted-foreground bg-background/60 backdrop-blur-sm px-2 py-1 rounded-full border border-border/20 truncate max-w-32">
                               {notification.from_user_email}
                             </span>
                           )}

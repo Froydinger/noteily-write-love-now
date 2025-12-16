@@ -568,8 +568,15 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
       const selection = window.getSelection();
       if (!selection || selection.rangeCount === 0) return;
 
+      // Save the current selection range before any focus changes
+      const savedRange = selection.getRangeAt(0).cloneRange();
+
       // Ensure editor has focus
       contentRef.current.focus();
+
+      // Restore the selection after focus
+      selection.removeAllRanges();
+      selection.addRange(savedRange);
 
       switch (type) {
         case 'p':
