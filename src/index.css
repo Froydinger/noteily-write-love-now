@@ -841,10 +841,11 @@
     padding: 1px;
     background: linear-gradient(
       135deg,
-      hsl(var(--foreground) / 0.15) 0%,
-      transparent 40%,
-      transparent 60%,
-      hsl(var(--foreground) / 0.08) 100%
+      hsl(var(--foreground) / 0.35) 0%,
+      hsl(var(--foreground) / 0.12) 25%,
+      transparent 50%,
+      hsl(var(--foreground) / 0.08) 75%,
+      hsl(var(--foreground) / 0.2) 100%
     );
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -857,10 +858,11 @@
   .navy .glass-shimmer::before {
     background: linear-gradient(
       135deg,
-      hsl(var(--foreground) / 0.12) 0%,
-      transparent 40%,
-      transparent 60%,
-      hsl(var(--foreground) / 0.06) 100%
+      hsl(var(--foreground) / 0.3) 0%,
+      hsl(var(--foreground) / 0.1) 25%,
+      transparent 50%,
+      hsl(var(--foreground) / 0.06) 75%,
+      hsl(var(--foreground) / 0.15) 100%
     );
   }
 
