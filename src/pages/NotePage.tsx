@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus, Users, Eye, Edit } from 'lucide-react';
+import { ChevronLeft, Trash, Menu, Users, Eye, Edit } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
@@ -273,38 +273,27 @@ const NotePage = () => {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
-            {isMobile ? (
-              <div className="relative">
-                <SidebarTrigger />
-                {user && unreadCount > 0 && (
-                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="relative">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleSidebar}
-                  className="btn-accessible p-2 bg-card/30 backdrop-blur-md border border-border/15 rounded-xl hover:bg-card/50 hover:border-border/30 transition-all duration-200"
-                  title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
-                >
-                  {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
-                </Button>
-                {user && unreadCount > 0 && state === "collapsed" && (
-                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleSidebar}
+                className="btn-accessible p-2 bg-background/60 backdrop-blur-md border border-border/30 rounded-xl hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
+                title="Toggle sidebar"
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+              {user && unreadCount > 0 && state === "collapsed" && (
+                <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </div>
+              )}
+            </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate('/')}
-              className="btn-accessible p-2 bg-card/30 backdrop-blur-md border border-border/15 rounded-xl hover:bg-card/50 hover:border-border/30 transition-all duration-200"
+              className="btn-accessible p-2 bg-background/60 backdrop-blur-md border border-border/30 rounded-xl hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
               title="Back to notes"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -329,7 +318,7 @@ const NotePage = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowShareManager(true)}
-                className="btn-accessible p-2 bg-card/30 backdrop-blur-md border border-border/15 rounded-xl hover:bg-card/50 hover:border-border/30 transition-all duration-200"
+                className="btn-accessible p-2 bg-background/60 backdrop-blur-md border border-border/30 rounded-xl hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
                 title={note.isOwnedByUser ? "Share note" : "Manage sharing"}
               >
                 <Users className="h-4 w-4" />
@@ -349,7 +338,7 @@ const NotePage = () => {
             
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-2 bg-card/30 backdrop-blur-md border border-border/15 rounded-xl text-destructive hover:bg-destructive/20 hover:border-destructive/30 transition-all duration-200">
+                <Button variant="ghost" size="sm" className="p-2 bg-background/60 backdrop-blur-md border border-border/30 rounded-xl text-destructive hover:bg-destructive/15 hover:border-destructive/40 transition-all duration-200 shadow-sm">
                   <Trash className="h-4 w-4" />
                 </Button>
               </AlertDialogTrigger>
