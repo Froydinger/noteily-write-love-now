@@ -4,8 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus, Users, Eye, Edit, Type, Undo2, Redo2 } from 'lucide-react';
-import { BlockHandle, BlockType } from '@/components/notes/BlockHandle';
+import { ChevronLeft, Trash, PanelLeft, PanelLeftClose, ImagePlus, Users, Eye, Edit } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
@@ -45,8 +44,6 @@ const NotePage = () => {
   const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
   const [entered, setEntered] = useState(false);
-  const [showFormatHandle, setShowFormatHandle] = useState(false);
-  const [currentBlockType, setCurrentBlockType] = useState<BlockType>('p');
   const { saveState, undo, redo, canUndo, canRedo, clearHistory } = useUndoRedo();
   const [aiReplacementFunction, setAiReplacementFunction] = useState<((newContent: string, isSelectionReplacement: boolean) => void) | null>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -102,22 +99,6 @@ const NotePage = () => {
     });
   }, [id]);
 
-
-  const handleBlockTypeSelect = (type: BlockType) => {
-    // Find the content editor and apply formatting
-    const contentEditor = document.querySelector('[contenteditable="true"]') as HTMLElement;
-    if (!contentEditor) return;
-    
-    contentEditor.focus();
-    try {
-      document.execCommand('formatBlock', false, type === 'p' ? 'p' : type);
-    } catch (e) {
-      // no-op
-    }
-    
-    // Trigger content change event
-    contentEditor.dispatchEvent(new Event('input', { bubbles: true }));
-  };
 
   const handleDelete = () => {
     if (id) {
@@ -342,15 +323,6 @@ const NotePage = () => {
           </div>
           
           <div className="flex items-center gap-1">
-            {/* Formatting button - only show if not read-only */}
-            {!note.isSharedWithUser || note.userPermission !== 'read' ? (
-              <BlockHandle
-                visible={true}
-                currentType={currentBlockType}
-                onSelect={handleBlockTypeSelect}
-              />
-            ) : null}
-            
             {/* Show people icon for owned notes (to share) or shared notes (to manage) */}
             {(note.isOwnedByUser || (note.isSharedWithUser && !note.isOwnedByUser)) && (
               <Button 
@@ -406,9 +378,8 @@ const NotePage = () => {
       </header>
       
       <div className="relative">
-        <NoteEditor 
-          note={note} 
-          onBlockTypeChange={setCurrentBlockType}
+        <NoteEditor
+          note={note}
           onContentBeforeChange={storeUndoState}
           onSpellCheckApplied={storeUndoState}
           onAIContentReplace={(replacementFn) => setAiReplacementFunction(() => replacementFn)}
