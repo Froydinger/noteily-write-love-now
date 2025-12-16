@@ -271,7 +271,7 @@ const NotePage = () => {
         className="sticky top-0 z-[100] p-3"
         style={{ position: 'sticky', top: 0, zIndex: 100 }}
       >
-        <div className="flex items-center justify-center gap-1">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             <div className="relative">
               <Button
@@ -312,7 +312,6 @@ const NotePage = () => {
           </div>
 
           <div className="flex items-center gap-1">
-            <div className="w-2" /> {/* Small spacer between button groups */}
             {/* Show people icon for owned notes (to share) or shared notes (to manage) */}
             {(note.isOwnedByUser || (note.isSharedWithUser && !note.isOwnedByUser)) && (
               <Button

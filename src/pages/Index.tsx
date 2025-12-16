@@ -170,10 +170,11 @@ const Index = () => {
           <div className="flex items-center justify-center gap-2 mt-4">
             <Button
               onClick={handleCreateNote}
+              variant="outline"
               className="flex items-center gap-2 h-11 px-5
-                bg-gradient-to-r from-accent to-accent/90
-                hover:from-accent/90 hover:to-accent
-                text-accent-foreground font-medium
+                bg-accent/10 hover:bg-accent/20
+                border-2 border-accent
+                text-accent font-medium
                 rounded-full shadow-glow-sm hover:shadow-glow
                 transition-all duration-250 ease-bounce-out
                 hover:scale-[1.02] active:scale-[0.98]
