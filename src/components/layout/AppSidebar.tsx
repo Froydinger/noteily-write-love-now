@@ -11,7 +11,7 @@ import {
   RefreshCw,
   Trash2,
   Bell,
-  PanelLeftClose,
+  X,
 } from "lucide-react";
 import {
   Sidebar,
@@ -147,7 +147,7 @@ export function AppSidebar() {
               title="Hide sidebar"
               onClick={toggleSidebar}
             >
-              <PanelLeftClose className="h-4 w-4" />
+              <X className="h-4 w-4" />
             </Button>
           </div>
         )}
