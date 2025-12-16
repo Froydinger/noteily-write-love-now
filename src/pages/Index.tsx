@@ -7,7 +7,7 @@ import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, ArrowUpDown, Filter, X, Heart, FileText, CheckSquare, ChevronDown } from 'lucide-react';
+import { Plus, Search, ArrowUpDown, Filter, X, Heart, FileText, CheckSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -198,7 +198,6 @@ const Index = () => {
                 >
                   <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
                   <span>New</span>
-                  <ChevronDown className="h-3 w-3 ml-1 opacity-70" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -335,7 +334,6 @@ const Index = () => {
                     >
                       <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
                       <span>New</span>
-                      <ChevronDown className="h-3 w-3 ml-1 opacity-70" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
