@@ -11,7 +11,7 @@ import { useNotes } from '@/contexts/NoteContext';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart, Check, X, Loader2, Type, Brain } from 'lucide-react';
+import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart, Check, X, Loader2, Brain } from 'lucide-react';
 import { useTitleFont } from '@/hooks/useTitleFont';
 import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from '@/components/theme/ThemeToggle';
@@ -41,36 +41,6 @@ const SettingsPage = () => {
       case 'sepia': return 'Fresh Page';
       default: return 'Night Mode';
     }
-  };
-
-  const getTitleFontLabel = (font: string) => {
-    switch (font) {
-      case 'serif': return 'Serif (Playfair)';
-      case 'sans': return 'Sans (Inter)';
-      case 'mono': return 'Mono (JetBrains)';
-      default: return 'Serif (Playfair)';
-    }
-  };
-
-  const getBodyFontLabel = (font: string) => {
-    switch (font) {
-      case 'serif': return 'Serif (Playfair)';
-      case 'sans': return 'Sans (Inter)';
-      case 'mono': return 'Mono (JetBrains)';
-      default: return 'Sans (Inter)';
-    }
-  };
-
-  const handleTitleFontChange = async () => {
-    const currentIndex = ['serif', 'sans', 'mono'].indexOf(preferences.titleFont);
-    const nextFont = ['serif', 'sans', 'mono'][(currentIndex + 1) % 3] as 'serif' | 'sans' | 'mono';
-    await updateTitleFont(nextFont);
-  };
-
-  const handleBodyFontChange = async () => {
-    const currentIndex = ['serif', 'sans', 'mono'].indexOf(preferences.bodyFont);
-    const nextFont = ['serif', 'sans', 'mono'][(currentIndex + 1) % 3] as 'serif' | 'sans' | 'mono';
-    await updateBodyFont(nextFont);
   };
 
   const handleAiEnabledToggle = async () => {
@@ -380,54 +350,6 @@ ${note.content}
                     {getThemeLabel(preferences.theme)}
                   </span>
                   <ThemeToggle variant="settings" />
-                </div>
-              </div>
-              
-              {/* Title font setting */}
-              <div className="flex items-start justify-between gap-3 border-t pt-4">
-                <div className="flex-1 min-w-0">
-                  <Label htmlFor="titleFont" className="text-sm font-medium">Title Font</Label>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Choose your preferred font for note titles
-                  </p>
-                  <p className="text-xs text-primary mt-1 font-medium">
-                    Current: {getTitleFontLabel(preferences.titleFont)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleTitleFontChange}
-                    className="p-2 h-8 w-8"
-                    title={`Change title font (current: ${getTitleFontLabel(preferences.titleFont)})`}
-                  >
-                    <Type className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-              
-              {/* Body font setting */}
-              <div className="flex items-start justify-between gap-3 border-t pt-4">
-                <div className="flex-1 min-w-0">
-                  <Label htmlFor="bodyFont" className="text-sm font-medium">Body Font</Label>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Choose your preferred font for note content and body text
-                  </p>
-                  <p className="text-xs text-primary mt-1 font-medium">
-                    Current: {getBodyFontLabel(preferences.bodyFont)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleBodyFontChange}
-                    className="p-2 h-8 w-8"
-                    title={`Change body font (current: ${getBodyFontLabel(preferences.bodyFont)})`}
-                  >
-                    <Type className="h-3 w-3" />
-                  </Button>
                 </div>
               </div>
               

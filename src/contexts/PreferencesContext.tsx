@@ -35,14 +35,14 @@ export const usePreferences = () => {
 
 export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const [preferences, setPreferences] = useState<UserPreferences>({ theme: 'navy', titleFont: 'serif', bodyFont: 'sans', aiEnabled: true });
+  const [preferences, setPreferences] = useState<UserPreferences>({ theme: 'navy', titleFont: 'sans', bodyFont: 'sans', aiEnabled: true });
   const [loading, setLoading] = useState(false);
 
   // Load user preferences - prioritize localStorage, sync with Supabase
   const loadPreferences = async () => {
     // Always start with localStorage as primary source
     const localTheme = (localStorage.getItem('theme') as ThemeType) || 'navy';
-    const localTitleFont = (localStorage.getItem('titleFont') as TitleFontType) || 'serif';
+    const localTitleFont = (localStorage.getItem('titleFont') as TitleFontType) || 'sans';
     const localBodyFont = (localStorage.getItem('bodyFont') as BodyFontType) || 'sans';
     const localAiEnabled = localStorage.getItem('aiEnabled') !== 'false'; // Default to true
     setPreferences({ theme: localTheme, titleFont: localTitleFont, bodyFont: localBodyFont, aiEnabled: localAiEnabled });
@@ -73,7 +73,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
         console.error('Error loading preferences:', error);
       } else if (data) {
         // Check if Supabase data differs from local
-        const supabaseTitleFont = (data.title_font as TitleFontType) || 'serif';
+        const supabaseTitleFont = (data.title_font as TitleFontType) || 'sans';
         const supabaseBodyFont = (data.body_font as BodyFontType) || 'sans';
         const supabaseAiEnabled = data.ai_enabled !== false; // Default to true
         if (data.theme !== localTheme || supabaseTitleFont !== localTitleFont || supabaseBodyFont !== localBodyFont || supabaseAiEnabled !== localAiEnabled) {
@@ -111,7 +111,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
   }, [user]);
 
-  const createDefaultPreferences = async (theme: ThemeType = 'navy', titleFont: TitleFontType = 'serif', bodyFont: BodyFontType = 'sans', aiEnabled: boolean = true) => {
+  const createDefaultPreferences = async (theme: ThemeType = 'navy', titleFont: TitleFontType = 'sans', bodyFont: BodyFontType = 'sans', aiEnabled: boolean = true) => {
     if (!user) return;
 
     try {
