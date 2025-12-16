@@ -707,6 +707,13 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
             data-placeholder={isReadOnly ? "This note is read-only" : "Just start typing…"}
             aria-label="Note content"
             onPaste={isReadOnly ? undefined : handlePaste}
+            onKeyDown={isReadOnly ? undefined : (e) => {
+              // Handle Cmd/Ctrl+B for bold
+              if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+                e.preventDefault();
+                handleFormat('bold');
+              }
+            }}
           />
 
           {/* Floating format bar - appears above selected text */}
