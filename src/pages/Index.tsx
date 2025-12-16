@@ -149,25 +149,22 @@ const Index = () => {
            onClick={() => setSelectedNoteId(null)}>
         {/* Mobile layout */}
         <div className="md:hidden mb-8">
-          {/* Top row: Menu button left, My Notes text far right */}
-          <div className="flex items-center justify-between mb-6 apple-pwa-header-spacing">
-            <div className="flex items-center">
-              {(isMobile || state === "collapsed") && (
-                <div className="relative">
-                  <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
-                  {user && unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            <h1 className="text-2xl font-display font-medium tracking-tight dynamic-title-font">My Notes</h1>
+          {/* Top row: Menu button */}
+          <div className="flex items-center mb-6 apple-pwa-header-spacing">
+            {(isMobile || state === "collapsed") && (
+              <div className="relative">
+                <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
+                {user && unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center justify-center gap-2 mt-4">
+          <div className="flex items-center justify-center gap-2">
             <Button
               onClick={handleCreateNote}
               variant="outline"
@@ -259,9 +256,9 @@ const Index = () => {
 
         {/* Desktop layout */}
         <div className="hidden md:block mb-8 apple-pwa-header-spacing">
-          {/* Top row: Menu button left, My Notes right */}
-          <div className="flex items-center justify-between mb-6">
-            {(isMobile || state === "collapsed") && (
+          {/* Menu button when sidebar collapsed */}
+          {state === "collapsed" && (
+            <div className="flex items-center mb-6">
               <div className="relative">
                 <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
                 {user && unreadCount > 0 && (
@@ -270,27 +267,29 @@ const Index = () => {
                   </div>
                 )}
               </div>
-            )}
-            <h1 className="text-3xl font-display font-medium tracking-tight dynamic-title-font">My Notes</h1>
-          </div>
+            </div>
+          )}
 
           {/* Centered action buttons */}
           <div className="flex items-center justify-center gap-2">
-            <Button
-              onClick={handleCreateNote}
-              variant="outline"
-              className="flex items-center justify-center gap-2.5 h-11 px-5 group
-                bg-accent/10 hover:bg-accent/20
-                border-2 border-accent
-                text-accent font-medium
-                rounded-full shadow-glow-sm hover:shadow-glow
-                transition-all duration-250 ease-bounce-out
-                hover:scale-[1.02] active:scale-[0.98]
-                apple-pwa-button-spacing"
-            >
-              <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
-              New Note
-            </Button>
+            {/* Hide New Note button when sidebar is open (desktop only) to avoid duplicate */}
+            {state === "collapsed" && (
+              <Button
+                onClick={handleCreateNote}
+                variant="outline"
+                className="flex items-center justify-center gap-2.5 h-11 px-5 group
+                  bg-accent/10 hover:bg-accent/20
+                  border-2 border-accent
+                  text-accent font-medium
+                  rounded-full shadow-glow-sm hover:shadow-glow
+                  transition-all duration-250 ease-bounce-out
+                  hover:scale-[1.02] active:scale-[0.98]
+                  apple-pwa-button-spacing"
+              >
+                <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
+                New Note
+              </Button>
+            )}
 
               <Button
                 size="sm"
