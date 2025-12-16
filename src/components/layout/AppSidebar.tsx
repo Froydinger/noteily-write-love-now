@@ -182,11 +182,11 @@ export function AppSidebar() {
                     variant={isActive('/') ? 'default' : 'ghost'}
                     size="sm"
                     asChild
-                    className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250
-                      ${isActive('/') ? 'bg-card shadow-sm' : 'hover:bg-card/50'}
+                    className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250 text-foreground
+                      ${isActive('/') ? 'bg-card shadow-sm text-foreground' : 'hover:bg-card/50'}
                     `}
                   >
-                    <a href="/" className="flex items-center justify-center gap-2">
+                    <a href="/" className="flex items-center justify-center gap-2 text-foreground">
                       <BookOpen className="h-4 w-4" />
                       <span>All</span>
                     </a>
@@ -195,11 +195,11 @@ export function AppSidebar() {
                     variant={isActive('/prompts') ? 'default' : 'ghost'}
                     size="sm"
                     asChild
-                    className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250
-                      ${isActive('/prompts') ? 'bg-card shadow-sm' : 'hover:bg-card/50'}
+                    className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250 text-foreground
+                      ${isActive('/prompts') ? 'bg-card shadow-sm text-foreground' : 'hover:bg-card/50'}
                     `}
                   >
-                    <a href="/prompts" className="flex items-center justify-center gap-2">
+                    <a href="/prompts" className="flex items-center justify-center gap-2 text-foreground">
                       <Pencil className="h-4 w-4" />
                       <span>Ideas</span>
                     </a>
