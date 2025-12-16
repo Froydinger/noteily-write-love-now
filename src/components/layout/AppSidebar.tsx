@@ -177,16 +177,16 @@ export function AppSidebar() {
             <SidebarGroupContent>
               {/* Horizontal navigation buttons */}
               <div className="flex justify-center mb-5">
-                <div className="flex gap-2 w-full p-1 bg-secondary/50 rounded-xl">
+                <div className="flex gap-1 w-full p-1 bg-secondary/30 rounded-xl">
                   <Button
                     variant={isActive('/') ? 'default' : 'ghost'}
                     size="sm"
                     asChild
-                    className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250 text-foreground
-                      ${isActive('/') ? 'bg-card shadow-sm text-foreground' : 'hover:bg-card/50'}
+                    className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250
+                      ${isActive('/') ? 'bg-card shadow-md text-foreground' : 'text-muted-foreground/70 hover:text-foreground hover:bg-card/30'}
                     `}
                   >
-                    <a href="/" className="flex items-center justify-center gap-2 text-foreground">
+                    <a href="/" className="flex items-center justify-center gap-2">
                       <BookOpen className="h-4 w-4" />
                       <span>All</span>
                     </a>
@@ -195,11 +195,11 @@ export function AppSidebar() {
                     variant={isActive('/prompts') ? 'default' : 'ghost'}
                     size="sm"
                     asChild
-                    className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250 text-foreground
-                      ${isActive('/prompts') ? 'bg-card shadow-sm text-foreground' : 'hover:bg-card/50'}
+                    className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250
+                      ${isActive('/prompts') ? 'bg-card shadow-md text-foreground' : 'text-muted-foreground/70 hover:text-foreground hover:bg-card/30'}
                     `}
                   >
-                    <a href="/prompts" className="flex items-center justify-center gap-2 text-foreground">
+                    <a href="/prompts" className="flex items-center justify-center gap-2">
                       <Pencil className="h-4 w-4" />
                       <span>Ideas</span>
                     </a>
