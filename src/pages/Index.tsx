@@ -171,7 +171,7 @@ const Index = () => {
             <Button
               onClick={handleCreateNote}
               variant="outline"
-              className="flex items-center gap-2 h-11 px-5
+              className="flex items-center justify-center gap-2.5 h-11 px-5 group
                 bg-accent/10 hover:bg-accent/20
                 border-2 border-accent
                 text-accent font-medium
@@ -180,7 +180,7 @@ const Index = () => {
                 hover:scale-[1.02] active:scale-[0.98]
                 apple-pwa-button-spacing"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
               New Note
             </Button>
 
