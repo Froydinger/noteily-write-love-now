@@ -4,11 +4,23 @@ export interface SharedNote {
   owner_id: string;
   shared_with_email: string;
   shared_with_user_id: string | null;
-  shared_with_username?: string | null; // Add username field for display
+  shared_with_username?: string | null;
   permission: 'read' | 'write';
   created_at: string;
   updated_at: string;
 }
+
+export interface ChecklistItem {
+  id: string;
+  note_id: string;
+  content: string;
+  completed: boolean;
+  position: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type NoteType = 'note' | 'checklist';
 
 export interface NoteWithSharing {
   id: string;
@@ -18,13 +30,15 @@ export interface NoteWithSharing {
   updatedAt: string;
   featured_image?: string;
   user_id: string;
-  pinned: boolean; // Add pinned field
+  pinned: boolean;
+  note_type: NoteType;
+  checklist_items?: ChecklistItem[];
   
   // Sharing properties
   isOwnedByUser: boolean;
   isSharedWithUser: boolean;
   userPermission?: 'read' | 'write';
-  shares?: SharedNote[]; // For owned notes, list of who it's shared with
+  shares?: SharedNote[];
   
   // Soft delete property
   deleted_at?: string | null;

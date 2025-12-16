@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      checklist_items: {
+        Row: {
+          completed: boolean
+          content: string
+          created_at: string
+          id: string
+          note_id: string
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          completed?: boolean
+          content?: string
+          created_at?: string
+          id?: string
+          note_id: string
+          position?: number
+          updated_at?: string
+        }
+        Update: {
+          completed?: boolean
+          content?: string
+          created_at?: string
+          id?: string
+          note_id?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_items_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       note_ai_history: {
         Row: {
           action_type: string
@@ -60,6 +98,7 @@ export type Database = {
           deleted_at: string | null
           featured_image: string | null
           id: string
+          note_type: string
           pinned: boolean
           title: string
           updated_at: string
@@ -71,6 +110,7 @@ export type Database = {
           deleted_at?: string | null
           featured_image?: string | null
           id?: string
+          note_type?: string
           pinned?: boolean
           title?: string
           updated_at?: string
@@ -82,6 +122,7 @@ export type Database = {
           deleted_at?: string | null
           featured_image?: string | null
           id?: string
+          note_type?: string
           pinned?: boolean
           title?: string
           updated_at?: string
