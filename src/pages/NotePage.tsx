@@ -268,7 +268,7 @@ const NotePage = () => {
       <header
         ref={headerRef}
         data-note-header
-        className="sticky top-0 z-[100] bg-background/70 backdrop-blur-xl border-b border-border/30 p-3"
+        className="sticky top-0 z-[100] p-3"
         style={{ position: 'sticky', top: 0, zIndex: 100 }}
       >
         <div className="flex items-center justify-between">
@@ -288,7 +288,7 @@ const NotePage = () => {
                   variant="ghost"
                   size="sm"
                   onClick={toggleSidebar}
-                  className="btn-accessible p-2 bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg hover:bg-card/80 hover:border-border/40 transition-all duration-200"
+                  className="btn-accessible p-2 bg-card/30 backdrop-blur-md border border-border/15 rounded-xl hover:bg-card/50 hover:border-border/30 transition-all duration-200"
                   title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
                 >
                   {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
@@ -304,7 +304,7 @@ const NotePage = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/')}
-              className="btn-accessible p-2 bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg hover:bg-card/80 hover:border-border/40 transition-all duration-200"
+              className="btn-accessible p-2 bg-card/30 backdrop-blur-md border border-border/15 rounded-xl hover:bg-card/50 hover:border-border/30 transition-all duration-200"
               title="Back to notes"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -329,7 +329,7 @@ const NotePage = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowShareManager(true)}
-                className="btn-accessible p-2 bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg hover:bg-card/80 hover:border-border/40 transition-all duration-200"
+                className="btn-accessible p-2 bg-card/30 backdrop-blur-md border border-border/15 rounded-xl hover:bg-card/50 hover:border-border/30 transition-all duration-200"
                 title={note.isOwnedByUser ? "Share note" : "Manage sharing"}
               >
                 <Users className="h-4 w-4" />
@@ -349,7 +349,7 @@ const NotePage = () => {
             
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-2 bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg text-destructive hover:bg-destructive/20 hover:border-destructive/30 transition-all duration-200">
+                <Button variant="ghost" size="sm" className="p-2 bg-card/30 backdrop-blur-md border border-border/15 rounded-xl text-destructive hover:bg-destructive/20 hover:border-destructive/30 transition-all duration-200">
                   <Trash className="h-4 w-4" />
                 </Button>
               </AlertDialogTrigger>
