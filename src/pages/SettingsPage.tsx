@@ -32,6 +32,7 @@ const SettingsPage = () => {
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [showSupportDialog, setShowSupportDialog] = useState(false);
 
   const getThemeLabel = (theme: string) => {
     switch (theme) {
@@ -304,9 +305,12 @@ ${note.content}
                 )}
               </div>
             )}
-            <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+            >
               <Heart className="h-6 w-6 text-accent" fill="currentColor" />
-            </div>
+            </button>
           </div>
         </div>
 
@@ -326,12 +330,15 @@ ${note.content}
                 </div>
               )}
             </div>
-            <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+            >
               <Heart className="h-6 w-6 text-accent" fill="currentColor" />
-            </div>
+            </button>
           </div>
         </div>
-        
+
         <div className="max-w-2xl mx-auto">
           <div className="space-y-4 md:space-y-6">
           <div className="bg-card rounded-lg p-4 border">
@@ -567,6 +574,30 @@ ${note.content}
           )}
           </div>
         </div>
+
+        {/* Support Dialog */}
+        <AlertDialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
+          <AlertDialogContent className="max-w-sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2 justify-center">
+                <Heart className="h-5 w-5 text-accent" fill="currentColor" />
+                Support Noteily!
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center">
+                Noteily is made with love by Win The Night. If you enjoy using Noteily, consider supporting our work!
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-col sm:flex-col gap-2">
+              <AlertDialogAction
+                onClick={() => window.open('https://winthenight.org/support', '_blank')}
+                className="w-full bg-accent hover:bg-accent/90"
+              >
+                Support Us
+              </AlertDialogAction>
+              <AlertDialogCancel className="w-full">Maybe Later</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
