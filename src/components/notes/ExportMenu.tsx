@@ -48,7 +48,7 @@ export function ExportMenu({ note, onShare, onShareUpdate }: ExportMenuProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="btn-accessible"
+            className="btn-accessible p-2 bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg hover:bg-card/80 hover:border-border/40 transition-all duration-200"
             title="Share note"
           >
             <Share className="h-4 w-4" />
