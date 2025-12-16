@@ -279,7 +279,7 @@ const NotePage = () => {
                 variant="ghost"
                 size="sm"
                 onClick={toggleSidebar}
-                className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
+                className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
                 title="Toggle sidebar"
               >
                 <Menu className="h-5 w-5" />
@@ -294,7 +294,7 @@ const NotePage = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/')}
-              className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
+              className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
               title="Back to notes"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -319,7 +319,7 @@ const NotePage = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowShareManager(true)}
-                className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
+                className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
                 title={note.isOwnedByUser ? "Share note" : "Manage sharing"}
               >
                 <Users className="h-5 w-5" />
@@ -339,7 +339,7 @@ const NotePage = () => {
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full text-destructive hover:bg-destructive/15 hover:border-destructive/40 transition-all duration-200 shadow-sm">
+                <Button variant="ghost" size="sm" className="p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full text-destructive hover:bg-destructive/15 hover:border-destructive/40 transition-all duration-200 shadow-sm glass-shimmer">
                   <Trash className="h-5 w-5" />
                 </Button>
               </AlertDialogTrigger>

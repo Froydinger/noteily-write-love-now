@@ -30,7 +30,7 @@ const Index = () => {
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('latest');
   const [shareFilter, setShareFilter] = useState('all');
@@ -88,6 +88,10 @@ const Index = () => {
 
   const handleCreateNote = async (noteType: NoteType = 'note') => {
     try {
+      // Hide sidebar on mobile before navigating
+      if (isMobile && state === "expanded") {
+        toggleSidebar();
+      }
       const newNote = await addNote(noteType);
       setCurrentNote(newNote);
       navigate(`/note/${newNote.id}`);
@@ -161,7 +165,7 @@ const Index = () => {
           <div className="flex items-center justify-between mb-4">
             {(isMobile || state === "collapsed") && (
               <div className="relative">
-                <SidebarTrigger className="h-10 w-10 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm" />
+                <SidebarTrigger className="h-10 w-10 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer" />
                 {user && unreadCount > 0 && (
                   <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
                     {unreadCount > 99 ? '99+' : unreadCount}
@@ -171,7 +175,7 @@ const Index = () => {
             )}
             <button
               onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm"
+              className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer"
             >
               <Heart className="h-5 w-5 text-accent" fill="currentColor" />
             </button>
@@ -227,7 +231,7 @@ const Index = () => {
             <Button
               size="sm"
               variant="ghost"
-              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm"
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
               onClick={() => {
                 setOpenSelect(null);
                 setShowSearch(true);
@@ -253,7 +257,7 @@ const Index = () => {
               }}
             >
               <SelectTrigger
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'sort-mobile' ? null : 'sort-mobile');
@@ -280,7 +284,7 @@ const Index = () => {
               }}
             >
               <SelectTrigger
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'filter-mobile' ? null : 'filter-mobile');
@@ -305,7 +309,7 @@ const Index = () => {
             <div className="flex items-center gap-2">
               {state === "collapsed" && (
                 <div className="relative mr-1">
-                  <SidebarTrigger className="h-10 w-10 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm" />
+                  <SidebarTrigger className="h-10 w-10 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer" />
                   {user && unreadCount > 0 && (
                     <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
                       {unreadCount > 99 ? '99+' : unreadCount}
@@ -365,7 +369,7 @@ const Index = () => {
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm"
+                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
                 onClick={() => {
                   setOpenSelect(null);
                   setShowSearch(true);
@@ -391,7 +395,7 @@ const Index = () => {
                 }}
               >
                 <SelectTrigger
-                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                   onClick={() => {
                     setShowSearch(false);
                     setOpenSelect(openSelect === 'sort-desktop' ? null : 'sort-desktop');
@@ -418,7 +422,7 @@ const Index = () => {
                 }}
               >
                 <SelectTrigger
-                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                   onClick={() => {
                     setShowSearch(false);
                     setOpenSelect(openSelect === 'filter-desktop' ? null : 'filter-desktop');
@@ -437,7 +441,7 @@ const Index = () => {
             {/* Right side: Logo */}
             <button
               onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm"
+              className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer"
             >
               <Heart className="h-5 w-5 text-accent" fill="currentColor" />
             </button>
