@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heading1, Type, Bold, Italic } from 'lucide-react';
+import { Heading1, Type } from 'lucide-react';
 
 export type FormatType = 'p' | 'h1' | 'bold' | 'italic';
 
@@ -49,11 +49,41 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
 
       if (!editorRect) return;
 
+      // Calculate bar dimensions (approx 100px wide, 40px tall)
+      const barWidth = 100;
+      const barHeight = 48;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
       // On mobile, position below selection to avoid native menu
       // On desktop, position above selection
-      const offset = isMobile ? 40 : -50;
-      const top = rect.top - editorRect.top + (isMobile ? rect.height : 0) + offset;
-      const left = rect.left - editorRect.left + (rect.width / 2);
+      const offset = isMobile ? 50 : -55;
+      let top = rect.top - editorRect.top + (isMobile ? rect.height : 0) + offset;
+      let left = rect.left - editorRect.left + (rect.width / 2);
+
+      // Ensure toolbar stays within horizontal viewport bounds
+      const absoluteLeft = editorRect.left + left;
+      const minLeft = barWidth / 2 + 16; // 16px padding from edge
+      const maxLeft = viewportWidth - barWidth / 2 - 16;
+
+      if (absoluteLeft < minLeft) {
+        left = minLeft - editorRect.left;
+      } else if (absoluteLeft > maxLeft) {
+        left = maxLeft - editorRect.left;
+      }
+
+      // Ensure toolbar stays within vertical viewport bounds
+      const absoluteTop = editorRect.top + top;
+
+      // If toolbar would be above viewport, position below selection instead
+      if (absoluteTop < barHeight + 16) {
+        top = rect.top - editorRect.top + rect.height + 12;
+      }
+
+      // If toolbar would be below viewport, position above selection
+      if (absoluteTop + barHeight > viewportHeight - 16) {
+        top = rect.top - editorRect.top - barHeight - 12;
+      }
 
       setPosition({ top, left });
 
@@ -71,23 +101,6 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
         formats.add('h1');
       } else {
         formats.add('p');
-      }
-
-      // Use queryCommandState for reliable formatting detection
-      try {
-        if (document.queryCommandState('bold')) {
-          formats.add('bold');
-        }
-        if (document.queryCommandState('italic')) {
-          formats.add('italic');
-        }
-      } catch (e) {
-        // Fallback to DOM traversal if queryCommandState fails
-        const bold = (element as Element).closest('strong, b');
-        if (bold) formats.add('bold');
-
-        const italic = (element as Element).closest('em, i');
-        if (italic) formats.add('italic');
       }
 
       setCurrentFormats(formats);
@@ -111,7 +124,7 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
   return (
     <div
       ref={barRef}
-      className="absolute z-50 bg-background border rounded-lg shadow-lg p-1 flex gap-1 animate-in fade-in slide-in-from-bottom-2 duration-200"
+      className="absolute z-50 bg-card/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-elevated p-1.5 flex gap-1 animate-in fade-in slide-in-from-bottom-2 duration-200"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
@@ -121,7 +134,7 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
       <Button
         variant={currentFormats.has('p') ? 'default' : 'ghost'}
         size="sm"
-        className="h-8 w-8 p-0"
+        className="h-9 w-9 p-0 rounded-lg"
         onMouseDown={(e) => {
           e.preventDefault(); // Prevent focus loss
           onFormat('p');
@@ -134,7 +147,7 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
       <Button
         variant={currentFormats.has('h1') ? 'default' : 'ghost'}
         size="sm"
-        className="h-8 w-8 p-0"
+        className="h-9 w-9 p-0 rounded-lg"
         onMouseDown={(e) => {
           e.preventDefault(); // Prevent focus loss
           onFormat('h1');
@@ -142,34 +155,6 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
         title="Title"
       >
         <Heading1 className="h-4 w-4" />
-      </Button>
-
-      <div className="w-px bg-border mx-1" />
-
-      <Button
-        variant={currentFormats.has('bold') ? 'default' : 'ghost'}
-        size="sm"
-        className="h-8 w-8 p-0 font-bold"
-        onMouseDown={(e) => {
-          e.preventDefault(); // Prevent focus loss
-          onFormat('bold');
-        }}
-        title="Bold"
-      >
-        <Bold className="h-4 w-4" />
-      </Button>
-
-      <Button
-        variant={currentFormats.has('italic') ? 'default' : 'ghost'}
-        size="sm"
-        className="h-8 w-8 p-0 italic"
-        onMouseDown={(e) => {
-          e.preventDefault(); // Prevent focus loss
-          onFormat('italic');
-        }}
-        title="Italic"
-      >
-        <Italic className="h-4 w-4" />
       </Button>
     </div>
   );
