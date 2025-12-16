@@ -167,7 +167,7 @@ const Index = () => {
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center gap-2 mt-4">
+          <div className="flex items-center justify-center gap-2 mt-4">
             <Button
               onClick={handleCreateNote}
               className="flex items-center gap-2 h-11 px-5
@@ -271,7 +271,7 @@ const Index = () => {
               </div>
             )}
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center gap-2">
               <Button
                 onClick={handleCreateNote}
                 className="flex items-center gap-2 h-11 px-5
