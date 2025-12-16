@@ -26,14 +26,14 @@ interface NoteCardProps {
 export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen, isPinned = false, onTogglePin, onDelete }: NoteCardProps) {
   const titleFont = useTitleFont();
   const { isTouchDevice, isIOS } = useIsTouchDevice();
-  
+
   // Check if this note is shared with the user (they don't own it)
   const isSharedWithUser = 'isSharedWithUser' in note && note.isSharedWithUser && !note.isOwnedByUser;
-  
+
   // Check if this note is shared by the user (they own it and have shared it with others)
   const isSharedByUser = 'shares' in note && note.shares && note.shares.length > 0;
-  
-  const contentPreview = note.content 
+
+  const contentPreview = note.content
     ? note.content
         .replace(/<\/p>/gi, ' ')
         .replace(/<\/div>/gi, ' ')
@@ -50,18 +50,24 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         .replace(/\s{2,}/g, ' ')
         .trim()
     : 'No content';
-  
-  const truncatedContent = contentPreview.length > 120 
+
+  const truncatedContent = contentPreview.length > 120
     ? contentPreview.substring(0, 120) + '...'
     : contentPreview;
 
-  // Remove selection styling completely to fix iOS tap issues
-
   return (
-    <Card 
-      className={`h-full cursor-pointer group interactive-card ${!isTouchDevice ? 'hover:border-accent/50' : ''} animate-float-in relative backdrop-blur-sm bg-card/95`}
-      onClick={(e) => { 
-        e.stopPropagation(); 
+    <Card
+      className={`
+        h-full cursor-pointer group relative overflow-hidden
+        bg-card/80 backdrop-blur-sm
+        border border-border/50
+        transition-all duration-350 ease-bounce-out
+        ${!isTouchDevice ? 'hover:border-accent/30 hover:shadow-elevated hover:-translate-y-1' : ''}
+        ${isSelected ? 'ring-2 ring-accent/30 border-accent/40' : ''}
+        ${isPinned ? 'border-accent/25' : ''}
+      `}
+      onClick={(e) => {
+        e.stopPropagation();
         if (isIOS) {
           // iOS: Always open immediately to avoid triple tap issues
           onOpen?.(note);
@@ -78,11 +84,21 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         }
       }}
     >
+      {/* Subtle gradient overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-br from-accent/[0.02] via-transparent to-transparent pointer-events-none" />
+
       {/* Pin button in top right corner */}
       <Button
         variant="secondary"
         size="sm"
-        className={`absolute top-2 right-2 h-8 w-8 rounded-full p-0 shadow-sm z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'} ${isPinned ? 'text-primary border-primary/30 bg-primary/10' : ''}`}
+        className={`
+          absolute top-3 right-3 h-8 w-8 rounded-full p-0 z-10
+          bg-secondary/80 backdrop-blur-sm border border-border/50
+          transition-all duration-250 ease-bounce-out
+          ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}
+          ${isPinned ? 'text-accent border-accent/30 bg-accent/10' : ''}
+          hover:scale-105 hover:shadow-sm
+        `}
         aria-label={isPinned ? 'Unpin note' : 'Pin note'}
         onClick={(e) => {
           e.stopPropagation();
@@ -91,15 +107,22 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       >
         <Pin className="h-4 w-4" fill={isPinned ? "currentColor" : "none"} />
       </Button>
-      
-      {/* Delete button - exact same behavior as share button */}
+
+      {/* Delete button */}
       {onDelete && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
               variant="ghost"
               size="sm"
-              className={`absolute top-2 right-11 h-8 w-8 rounded-full p-0 shadow-sm z-10 hover:bg-destructive/10 transition-opacity duration-200 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
+              className={`
+                absolute top-3 right-12 h-8 w-8 rounded-full p-0 z-10
+                bg-secondary/60 backdrop-blur-sm border border-border/50
+                hover:bg-destructive/10 hover:border-destructive/30
+                transition-all duration-250 ease-bounce-out
+                ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}
+                hover:scale-105
+              `}
               aria-label="Delete note"
               onClick={(e) => {
                 e.stopPropagation();
@@ -108,21 +131,21 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
               <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
           </AlertDialogTrigger>
-          <AlertDialogContent>
+          <AlertDialogContent className="bg-card/95 backdrop-blur-xl border-border/50">
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete Note</AlertDialogTitle>
+              <AlertDialogTitle className="font-display">Delete Note</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you would like to delete this note? It will be moved to recently deleted for 7 days before being permanently removed.
             </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
               <AlertDialogAction
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete(note);
                 }}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full"
               >
                 Delete
               </AlertDialogAction>
@@ -136,7 +159,14 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         <Button
           variant="ghost"
           size="sm"
-          className={`absolute bottom-2 right-11 h-7 w-7 rounded-full p-0 transition-opacity duration-200 hover:bg-accent z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
+          className={`
+            absolute bottom-3 right-12 h-7 w-7 rounded-full p-0 z-10
+            bg-secondary/60 backdrop-blur-sm border border-border/50
+            hover:bg-accent/10 hover:border-accent/30
+            transition-all duration-250 ease-bounce-out
+            ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}
+            hover:scale-105
+          `}
           onClick={(e) => {
             e.stopPropagation();
             onShareClick(note);
@@ -150,7 +180,14 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       <Button
         variant="secondary"
         size="sm"
-        className={`absolute bottom-2 right-2 h-7 w-7 rounded-full p-0 shadow-sm z-10 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}
+        className={`
+          absolute bottom-3 right-3 h-7 w-7 rounded-full p-0 z-10
+          bg-accent/10 backdrop-blur-sm border border-accent/20
+          text-accent hover:bg-accent hover:text-accent-foreground
+          transition-all duration-250 ease-bounce-out
+          ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}
+          hover:scale-105 hover:shadow-glow-sm
+        `}
         aria-label="Open note"
         onClick={(e) => {
           e.stopPropagation();
@@ -159,12 +196,13 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       >
         <ArrowUpRight className="h-3.5 w-3.5" />
       </Button>
-      <CardContent className={`p-4 transition-all duration-300 ${!isTouchDevice ? 'group-hover:translate-y-[-1px]' : ''} select-none`}>
+
+      <CardContent className={`p-5 transition-all duration-300 ${!isTouchDevice ? 'group-hover:translate-y-[-1px]' : ''} select-none relative`}>
         {/* Shared note tags at top of content */}
         {isSharedWithUser && (
-          <Badge 
-            variant="secondary" 
-            className="h-6 px-2 text-xs flex items-center gap-1 mb-3 w-fit"
+          <Badge
+            variant="secondary"
+            className="h-6 px-2.5 text-xs flex items-center gap-1.5 mb-3 w-fit rounded-full bg-accent/10 text-accent border-accent/20"
           >
             {('userPermission' in note && note.userPermission === 'read') ? (
               <Eye className="h-3 w-3" />
@@ -174,21 +212,45 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
             Shared With Me
           </Badge>
         )}
-        
+
         {isSharedByUser && (
-          <Badge 
-            variant="secondary" 
-            className="h-6 px-2 text-xs flex items-center gap-1 mb-3 w-fit"
+          <Badge
+            variant="secondary"
+            className="h-6 px-2.5 text-xs flex items-center gap-1.5 mb-3 w-fit rounded-full bg-accent/10 text-accent border-accent/20"
           >
             <Users className="h-3 w-3" />
             I Shared
           </Badge>
         )}
-        <h3 className={`font-bold text-lg font-${titleFont} break-words overflow-wrap-anywhere leading-tight text-foreground transition-colors duration-300 mb-3 pr-5 dynamic-title-font`}>{note.title || "Untitled Note"}</h3>
-        <p className={`text-sm text-muted-foreground line-clamp-4 ${!isTouchDevice ? 'group-hover:text-foreground/90' : ''} transition-colors duration-300 leading-relaxed`}>{truncatedContent}</p>
+
+        <h3 className={`
+          font-display font-medium text-lg
+          break-words overflow-wrap-anywhere leading-tight
+          text-foreground transition-colors duration-300
+          mb-3 pr-8 dynamic-title-font
+          ${!isTouchDevice ? 'group-hover:text-accent' : ''}
+        `}>
+          {note.title || "Untitled Note"}
+        </h3>
+
+        <p className={`
+          text-sm text-muted-foreground line-clamp-4
+          ${!isTouchDevice ? 'group-hover:text-foreground/80' : ''}
+          transition-colors duration-300 leading-relaxed
+        `}>
+          {truncatedContent}
+        </p>
       </CardContent>
-      <CardFooter className={`p-4 pt-0 text-xs text-muted-foreground transition-all duration-300 ${!isTouchDevice ? 'group-hover:text-muted-foreground/80' : ''}`}>
-        Last modified {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
+
+      <CardFooter className={`
+        px-5 pb-5 pt-0 text-xs text-muted-foreground/80
+        transition-all duration-300
+        ${!isTouchDevice ? 'group-hover:text-muted-foreground' : ''}
+      `}>
+        <span className="flex items-center gap-1.5">
+          <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+          {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
+        </span>
       </CardFooter>
     </Card>
   );

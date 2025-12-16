@@ -7,7 +7,7 @@ import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, ArrowUpDown, Filter } from 'lucide-react';
+import { Plus, Search, ArrowUpDown, Filter, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -38,9 +38,9 @@ const Index = () => {
       // First apply search filter
       const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (note.content && note.content.toLowerCase().includes(searchTerm.toLowerCase()));
-      
+
       if (!matchesSearch) return false;
-      
+
       // Then apply share filter
       switch (shareFilter) {
         case 'shared-with-me':
@@ -77,7 +77,7 @@ const Index = () => {
     const unpinned = sorted.filter(n => !n.pinned);
     return [...pinned, ...unpinned];
   }, [notes, searchTerm, sortOrder, shareFilter]);
-  
+
   const handleCreateNote = async () => {
     try {
       const newNote = await addNote();
@@ -144,33 +144,40 @@ const Index = () => {
 
   const content = (
     <div className="min-h-full apple-pwa-content">
-      <div className="p-3 md:p-6 animate-fade-in apple-pwa-content"
-           style={{ animationDelay: '0.1s', animationFillMode: 'both' }}
+      <div className="p-4 md:p-8 animate-fade-in apple-pwa-content"
+           style={{ animationDelay: '0.05s', animationFillMode: 'both' }}
            onClick={() => setSelectedNoteId(null)}>
-        {/* Mobile layout: My Notes text on far right, buttons underneath */}
-        <div className="md:hidden mb-6">
+        {/* Mobile layout */}
+        <div className="md:hidden mb-8">
           {/* Top row: Menu button left, My Notes text far right */}
-          <div className="flex items-center justify-between mb-4 apple-pwa-header-spacing">
+          <div className="flex items-center justify-between mb-6 apple-pwa-header-spacing">
             <div className="flex items-center">
               {(isMobile || state === "collapsed") && (
                 <div className="relative">
-                  <SidebarTrigger />
+                  <SidebarTrigger className="h-10 w-10 rounded-xl bg-secondary/50 hover:bg-secondary transition-all duration-250" />
                   {user && unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                    <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </div>
                   )}
                 </div>
               )}
             </div>
-            <h1 className="text-2xl font-light dynamic-title-font">My Notes</h1>
+            <h1 className="text-2xl font-display font-medium tracking-tight dynamic-title-font">My Notes</h1>
           </div>
 
-          {/* Bottom row: All buttons */}
-          <div className="flex items-center gap-2 mt-6 px-2 py-2">
-            <Button 
-              onClick={handleCreateNote} 
-              className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full whitespace-nowrap apple-pwa-button-spacing"
+          {/* Action buttons */}
+          <div className="flex items-center gap-2 mt-4">
+            <Button
+              onClick={handleCreateNote}
+              className="flex items-center gap-2 h-11 px-5
+                bg-gradient-to-r from-accent to-accent/90
+                hover:from-accent/90 hover:to-accent
+                text-accent-foreground font-medium
+                rounded-xl shadow-glow-sm hover:shadow-glow
+                transition-all duration-250 ease-bounce-out
+                hover:scale-[1.02] active:scale-[0.98]
+                apple-pwa-button-spacing"
             >
               <Plus className="h-4 w-4" />
               New Note
@@ -178,7 +185,8 @@ const Index = () => {
 
             <Button
               size="sm"
-              className="h-10 px-3 rounded-full hover:scale-105 active:scale-95 transition-all duration-150"
+              variant="secondary"
+              className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250"
               onClick={() => {
                 setOpenSelect(null);
                 setShowSearch(true);
@@ -192,8 +200,8 @@ const Index = () => {
               <Search className="h-4 w-4" />
             </Button>
 
-            <Select 
-              value={sortOrder} 
+            <Select
+              value={sortOrder}
               onValueChange={(value) => {
                 setSortOrder(value);
                 setOpenSelect(null);
@@ -203,8 +211,8 @@ const Index = () => {
                 if (!open) setOpenSelect(null);
               }}
             >
-              <SelectTrigger 
-                className="h-10 px-3 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
+              <SelectTrigger
+                className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'sort-mobile' ? null : 'sort-mobile');
@@ -212,15 +220,15 @@ const Index = () => {
               >
                 <ArrowUpDown className="h-4 w-4" />
               </SelectTrigger>
-              <SelectContent className="z-50 bg-popover border shadow-lg" side="bottom" align="center" sideOffset={5}>
-                <SelectItem value="latest">Latest</SelectItem>
-                <SelectItem value="oldest">Oldest</SelectItem>
-                <SelectItem value="alphabetical">A-Z</SelectItem>
+              <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="center" sideOffset={8}>
+                <SelectItem value="latest" className="rounded-lg">Latest</SelectItem>
+                <SelectItem value="oldest" className="rounded-lg">Oldest</SelectItem>
+                <SelectItem value="alphabetical" className="rounded-lg">A-Z</SelectItem>
               </SelectContent>
             </Select>
 
-            <Select 
-              value={shareFilter} 
+            <Select
+              value={shareFilter}
               onValueChange={(value) => {
                 setShareFilter(value);
                 setOpenSelect(null);
@@ -230,8 +238,8 @@ const Index = () => {
                 if (!open) setOpenSelect(null);
               }}
             >
-              <SelectTrigger 
-                className="h-10 px-3 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
+              <SelectTrigger
+                className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'filter-mobile' ? null : 'filter-mobile');
@@ -239,42 +247,50 @@ const Index = () => {
               >
                 <Filter className="h-4 w-4" />
               </SelectTrigger>
-              <SelectContent className="z-50 bg-popover border shadow-lg" side="bottom" align="center" sideOffset={5}>
-                <SelectItem value="all">All Notes</SelectItem>
-                <SelectItem value="shared-with-me">Shared with Me</SelectItem>
-                <SelectItem value="shared-with-others">My Shared Notes</SelectItem>
+              <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="center" sideOffset={8}>
+                <SelectItem value="all" className="rounded-lg">All Notes</SelectItem>
+                <SelectItem value="shared-with-me" className="rounded-lg">Shared with Me</SelectItem>
+                <SelectItem value="shared-with-others" className="rounded-lg">My Shared Notes</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
 
-        {/* Desktop layout: Menu button, buttons with space, My Notes text far right */}
-        <div className="hidden md:flex items-center justify-between mb-6 apple-pwa-header-spacing">
+        {/* Desktop layout */}
+        <div className="hidden md:flex items-center justify-between mb-8 apple-pwa-header-spacing">
           {/* Left side: Menu button + buttons */}
           <div className="flex items-center gap-4">
             {(isMobile || state === "collapsed") && (
               <div className="relative">
-                <SidebarTrigger />
+                <SidebarTrigger className="h-10 w-10 rounded-xl bg-secondary/50 hover:bg-secondary transition-all duration-250" />
                 {user && unreadCount > 0 && (
-                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </div>
                 )}
               </div>
             )}
 
-            <div className="flex items-center gap-2 px-2 py-2">
-              <Button 
-                onClick={handleCreateNote} 
-                className="flex items-center gap-2 hover:scale-105 transition-all duration-200 hover:shadow-md rounded-full apple-pwa-button-spacing"
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleCreateNote}
+                className="flex items-center gap-2 h-11 px-5
+                  bg-gradient-to-r from-accent to-accent/90
+                  hover:from-accent/90 hover:to-accent
+                  text-accent-foreground font-medium
+                  rounded-xl shadow-glow-sm hover:shadow-glow
+                  transition-all duration-250 ease-bounce-out
+                  hover:scale-[1.02] active:scale-[0.98]
+                  apple-pwa-button-spacing"
               >
-                <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                <Plus className="h-4 w-4" />
                 New Note
               </Button>
 
               <Button
                 size="sm"
-                className="h-10 px-3 rounded-full hover:scale-105 active:scale-95 transition-all duration-150"
+                variant="secondary"
+                className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250"
                 onClick={() => {
                   setOpenSelect(null);
                   setShowSearch(true);
@@ -288,8 +304,8 @@ const Index = () => {
                 <Search className="h-4 w-4" />
               </Button>
 
-              <Select 
-                value={sortOrder} 
+              <Select
+                value={sortOrder}
                 onValueChange={(value) => {
                   setSortOrder(value);
                   setOpenSelect(null);
@@ -299,8 +315,8 @@ const Index = () => {
                   if (!open) setOpenSelect(null);
                 }}
               >
-                <SelectTrigger 
-                  className="h-10 px-3 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
+                <SelectTrigger
+                  className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                   onClick={() => {
                     setShowSearch(false);
                     setOpenSelect(openSelect === 'sort-desktop' ? null : 'sort-desktop');
@@ -308,15 +324,15 @@ const Index = () => {
                 >
                   <ArrowUpDown className="h-4 w-4" />
                 </SelectTrigger>
-                <SelectContent className="z-50 bg-popover border shadow-lg" side="bottom" align="center" sideOffset={5}>
-                  <SelectItem value="latest">Latest</SelectItem>
-                  <SelectItem value="oldest">Oldest</SelectItem>
-                  <SelectItem value="alphabetical">A-Z</SelectItem>
+                <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="center" sideOffset={8}>
+                  <SelectItem value="latest" className="rounded-lg">Latest</SelectItem>
+                  <SelectItem value="oldest" className="rounded-lg">Oldest</SelectItem>
+                  <SelectItem value="alphabetical" className="rounded-lg">A-Z</SelectItem>
                 </SelectContent>
               </Select>
 
-              <Select 
-                value={shareFilter} 
+              <Select
+                value={shareFilter}
                 onValueChange={(value) => {
                   setShareFilter(value);
                   setOpenSelect(null);
@@ -326,8 +342,8 @@ const Index = () => {
                   if (!open) setOpenSelect(null);
                 }}
               >
-                <SelectTrigger 
-                  className="h-10 px-3 rounded-full bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-150 data-[state=open]:bg-primary/90 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden [&>[data-radix-select-icon]]:hidden"
+                <SelectTrigger
+                  className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                   onClick={() => {
                     setShowSearch(false);
                     setOpenSelect(openSelect === 'filter-desktop' ? null : 'filter-desktop');
@@ -335,51 +351,62 @@ const Index = () => {
                 >
                   <Filter className="h-4 w-4" />
                 </SelectTrigger>
-                <SelectContent className="z-50 bg-popover border shadow-lg" side="bottom" align="center" sideOffset={5}>
-                  <SelectItem value="all">All Notes</SelectItem>
-                  <SelectItem value="shared-with-me">Shared with Me</SelectItem>
-                  <SelectItem value="shared-with-others">My Shared Notes</SelectItem>
+                <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="center" sideOffset={8}>
+                  <SelectItem value="all" className="rounded-lg">All Notes</SelectItem>
+                  <SelectItem value="shared-with-me" className="rounded-lg">Shared with Me</SelectItem>
+                  <SelectItem value="shared-with-others" className="rounded-lg">My Shared Notes</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           {/* Right side: My Notes text */}
-          <h1 className="text-2xl font-light dynamic-title-font">My Notes</h1>
+          <h1 className="text-3xl font-display font-medium tracking-tight dynamic-title-font">My Notes</h1>
         </div>
 
         {/* Search Input - appears when search bubble is clicked */}
         {showSearch && (
-          <div className="relative mb-4 animate-in slide-in-from-top-2 duration-200">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <div className="relative mb-6 animate-in slide-in-from-top-2 duration-200">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               id="search-input"
               placeholder="Search notes by title or content..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onBlur={() => {
-                if (!searchTerm) {
-                  setShowSearch(false);
-                }
-              }}
-              className="pl-10"
+              className="pl-11 pr-10 h-12 rounded-xl bg-card/80 backdrop-blur-sm border-border/50 focus:border-accent/50 focus:ring-accent/20 transition-all duration-250"
             />
+            {searchTerm && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-secondary"
+                onClick={() => {
+                  setSearchTerm('');
+                  setShowSearch(false);
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         )}
-        
+
         {searchTerm && (
-          <div className="text-sm text-muted-foreground mb-4">
-            {filteredAndSortedNotes.length} of {notes.length} notes shown
+          <div className="text-sm text-muted-foreground mb-6 flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
+              {filteredAndSortedNotes.length}
+            </span>
+            <span>of {notes.length} notes</span>
           </div>
         )}
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-24">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-24">
           {filteredAndSortedNotes.map((note, index) => (
-            <div 
+            <div
               key={note.id}
               className="animate-float-in"
-              style={{ 
-                animationDelay: `${index * 0.1}s`,
+              style={{
+                animationDelay: `${index * 0.05}s`,
                 animationFillMode: 'both'
               }}
             >
@@ -387,7 +414,7 @@ const Index = () => {
             </div>
           ))}
         </div>
-        
+
         {/* Share Manager */}
         {shareManagerNote && (
           <ShareManager
