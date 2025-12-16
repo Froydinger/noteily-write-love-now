@@ -2,18 +2,15 @@
 import { useState } from "react";
 import { useTitleFont } from '@/hooks/useTitleFont';
 import { useNavigate, useLocation } from "react-router-dom";
-import { 
-  BookOpen, 
-  Plus, 
-  Heart, 
-  Settings, 
+import {
+  BookOpen,
+  Plus,
+  Sparkles,
+  Settings,
   Pencil,
-  PanelLeftClose,
-  PanelLeft,
   RefreshCw,
   Trash2,
   Bell,
-  
 } from "lucide-react";
 import {
   Sidebar,
@@ -21,12 +18,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarTrigger,
   useSidebar
 } from "@/components/ui/sidebar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -52,7 +44,7 @@ export function AppSidebar() {
   const { user } = useAuth();
   const { unreadCount } = useNotifications();
   const { state, toggleSidebar } = useSidebar();
-  
+
   // Get initial accordion state from localStorage, default to closed
   const [recentNotesOpen, setRecentNotesOpen] = useState(() => {
     const saved = localStorage.getItem('sidebar-recent-notes-open');
@@ -65,9 +57,9 @@ export function AppSidebar() {
     localStorage.setItem('sidebar-recent-notes-open', JSON.stringify(isOpen));
   };
 
-  const filteredNotes = searchTerm 
-    ? notes.filter(note => 
-        note.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const filteredNotes = searchTerm
+    ? notes.filter(note =>
+        note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         note.content.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : notes;
@@ -77,7 +69,7 @@ export function AppSidebar() {
       const newNote = await addNote();
       setCurrentNote(newNote);
       navigate(`/note/${newNote.id}`);
-      
+
       toast({
         title: "Note created",
         description: "Your new note has been created.",
@@ -92,15 +84,15 @@ export function AppSidebar() {
     if (isMobile && state === "expanded") {
       toggleSidebar();
     }
-    
+
     // Then sync notes
     await syncNotes();
   };
-  
+
   const handleSelectNote = (note: Note) => {
     setCurrentNote(note);
     navigate(`/note/${note.id}`);
-    
+
     // Auto-hide sidebar on mobile after selecting a note
     if (isMobile && state === "expanded") {
       toggleSidebar();
@@ -112,14 +104,19 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className={`transition-all duration-300 ease-in-out bg-black/20 dark:bg-white/10 backdrop-blur-2xl border-r border-white/20 dark:border-white/10 supports-[backdrop-filter]:bg-black/20 supports-[backdrop-filter]:dark:bg-white/10`} collapsible="offcanvas">
-      <SidebarHeader className="flex flex-row items-center justify-between px-4 py-4 gap-0 apple-pwa-sidebar-header">{/* Apple PWA Liquid Glass UI spacing */}
+    <Sidebar
+      className="transition-all duration-350 ease-bounce-out bg-sidebar/70 backdrop-blur-2xl border-r border-border/30"
+      collapsible="offcanvas"
+    >
+      <SidebarHeader className="flex flex-row items-center justify-between px-5 py-5 gap-0 apple-pwa-sidebar-header">
         <div className={`flex items-center space-x-3 flex-1 ${state === "collapsed" ? "justify-center" : ""}`}>
-          <Heart className="h-5 w-5 text-neon-blue" />
+          <div className="p-1.5 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+            <Sparkles className="h-5 w-5 text-accent" />
+          </div>
           {state !== "collapsed" && (
             <div className="flex items-center">
-              <h1 className="text-xl font-light dynamic-title-font">Noteily</h1>
-              <span className="text-xs text-muted-foreground ml-0.5 -mt-2">™</span>
+              <h1 className="text-xl font-display font-medium tracking-tight dynamic-title-font">Noteily</h1>
+              <span className="text-[10px] text-muted-foreground ml-0.5 -mt-2 font-medium">TM</span>
             </div>
           )}
         </div>
@@ -128,12 +125,12 @@ export function AppSidebar() {
             <Button
               variant="ghost"
               size="sm"
-              className="btn-accessible h-8 w-8 rounded-full flex-shrink-0 relative"
+              className="btn-accessible h-9 w-9 rounded-full flex-shrink-0 relative hover:bg-accent/10"
               title="Notifications"
             >
               <Bell className="h-4 w-4" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                <span className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-semibold">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
@@ -141,45 +138,56 @@ export function AppSidebar() {
           </NotificationsPanel>
         )}
       </SidebarHeader>
-      
+
       {state !== "collapsed" && (
-        <SidebarContent className="pt-2">
-          <div className="px-4 mb-4">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start gap-3 h-10 btn-accessible group hover:scale-[1.02] transition-all duration-200 hover:shadow-md rounded-full bg-gradient-to-r from-accent/5 to-accent/10 hover:from-accent/10 hover:to-accent/20 border-accent/20 hover:border-accent/40 apple-pwa-button-spacing"
+        <SidebarContent className="pt-2 px-3">
+          <div className="mb-5">
+            <Button
+              variant="default"
+              className="w-full justify-center gap-2.5 h-11 group
+                bg-gradient-to-r from-accent to-accent/90
+                hover:from-accent/90 hover:to-accent
+                text-accent-foreground font-medium
+                rounded-xl shadow-glow-sm hover:shadow-glow
+                transition-all duration-250 ease-bounce-out
+                hover:scale-[1.02] active:scale-[0.98]
+                apple-pwa-button-spacing"
               onClick={handleCreateNote}
             >
-              <Plus className="h-4 w-4 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-90" />
-              <span className="font-medium">New Note</span>
+              <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
+              <span>New Note</span>
             </Button>
           </div>
 
           <SidebarGroup>
             <SidebarGroupContent>
               {/* Horizontal navigation buttons */}
-              <div className="flex justify-center px-4 mb-4">
-                <div className="flex gap-1 w-full max-w-[220px]">
+              <div className="flex justify-center mb-5">
+                <div className="flex gap-2 w-full p-1 bg-secondary/50 rounded-xl">
                   <Button
-                    variant={isActive('/') ? 'default' : 'outline'}
+                    variant={isActive('/') ? 'default' : 'ghost'}
                     size="sm"
                     asChild
-                    className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm min-w-0 apple-pwa-button-spacing"
+                    className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250
+                      ${isActive('/') ? 'bg-card shadow-sm' : 'hover:bg-card/50'}
+                    `}
                   >
-                    <a href="/" className="flex items-center justify-center gap-1.5 px-2">
-                      <BookOpen className="h-4 w-4 flex-shrink-0" />
-                      <span className="truncate">All</span>
+                    <a href="/" className="flex items-center justify-center gap-2">
+                      <BookOpen className="h-4 w-4" />
+                      <span>All</span>
                     </a>
                   </Button>
                   <Button
-                    variant={isActive('/prompts') ? 'default' : 'outline'}
+                    variant={isActive('/prompts') ? 'default' : 'ghost'}
                     size="sm"
                     asChild
-                    className="flex-1 h-9 rounded-full font-medium text-xs sm:text-sm min-w-0 apple-pwa-button-spacing"
+                    className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250
+                      ${isActive('/prompts') ? 'bg-card shadow-sm' : 'hover:bg-card/50'}
+                    `}
                   >
-                    <a href="/prompts" className="flex items-center justify-center gap-1.5 px-2">
-                      <Pencil className="h-4 w-4 flex-shrink-0" />
-                      <span className="truncate">Ideas</span>
+                    <a href="/prompts" className="flex items-center justify-center gap-2">
+                      <Pencil className="h-4 w-4" />
+                      <span>Ideas</span>
                     </a>
                   </Button>
                 </div>
@@ -188,69 +196,76 @@ export function AppSidebar() {
           </SidebarGroup>
 
           <SidebarGroup className="py-2">
-            <div className="px-4">
-              <Accordion 
-                type="single" 
-                collapsible 
-                value={recentNotesOpen ? "recent-notes" : undefined}
-                onValueChange={(value) => handleRecentNotesToggle(value === "recent-notes")}
-              >
-                <AccordionItem value="recent-notes" className="border-none">
-                  <AccordionTrigger className="w-full px-4 py-2.5 rounded-full hover:no-underline hover:bg-accent/50 transition-colors duration-200 font-medium text-foreground data-[state=closed]:mb-0 h-9">
-                    <div className="flex items-center justify-center gap-3 w-full">
-                      <BookOpen className="h-4 w-4" />
-                      <span className="text-sm">Recent Notes</span>
-                    </div>
-                  </AccordionTrigger>
-                <AccordionContent className="pb-0">
+            <Accordion
+              type="single"
+              collapsible
+              value={recentNotesOpen ? "recent-notes" : undefined}
+              onValueChange={(value) => handleRecentNotesToggle(value === "recent-notes")}
+            >
+              <AccordionItem value="recent-notes" className="border-none">
+                <AccordionTrigger className="w-full px-4 py-2.5 rounded-xl hover:no-underline hover:bg-secondary/50 transition-all duration-250 font-medium text-foreground data-[state=closed]:mb-0 h-10">
+                  <div className="flex items-center justify-center gap-2.5 w-full">
+                    <BookOpen className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">Recent Notes</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pb-0 pt-2">
                   <SidebarGroupContent>
-                    <div className="h-[calc(100vh-320px)] overflow-y-auto scrollbar-hide"
+                    <div className="h-[calc(100vh-380px)] overflow-y-auto scrollbar-hide pr-1"
                          style={{
-                           scrollbarWidth: 'none', /* Firefox */
-                           msOverflowStyle: 'none' /* IE and Edge */
+                           scrollbarWidth: 'none',
+                           msOverflowStyle: 'none'
                          }}>
                       <style>{`
                         .scrollbar-hide::-webkit-scrollbar {
-                          display: none; /* Safari and Chrome */
+                          display: none;
                         }
                       `}</style>
-                      <div className="px-3 py-1">
+                      <div className="space-y-1">
                         {filteredNotes.length > 0 ? (
-                          filteredNotes.map((note) => (
-                            <div 
+                          filteredNotes.map((note, index) => (
+                            <div
                               key={note.id}
-                              className={`px-3 py-2.5 my-1 rounded-md btn-accessible cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-sm animate-slide-up-smooth ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}`}
+                              className={`
+                                px-3 py-2.5 rounded-lg cursor-pointer
+                                transition-all duration-250 ease-bounce-out
+                                hover:bg-secondary/60
+                                ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}
+                              `}
                               onClick={() => handleSelectNote(note)}
-                              style={{ 
-                                animationDelay: `${notes.indexOf(note) * 0.05}s`,
+                              style={{
+                                animationDelay: `${index * 0.03}s`,
                                 animationFillMode: 'both'
                               }}
                             >
-                              <h3 className="text-sm font-light truncate dynamic-title-font">{note.title || "Untitled Note"}</h3>
-                              <p className="text-xs text-muted-foreground truncate">
-                                {note.content ? 
+                              <h3 className="text-sm font-medium truncate dynamic-title-font text-foreground/90">
+                                {note.title || "Untitled Note"}
+                              </h3>
+                              <p className="text-xs text-muted-foreground truncate mt-0.5 leading-relaxed">
+                                {note.content ?
                                   note.content
-                                    .replace(/<[^>]*>?/gm, '') // Remove HTML tags
-                                    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with spaces
-                                    .replace(/&[a-z]+;/gi, ' ') // Replace other HTML entities with spaces
+                                    .replace(/<[^>]*>?/gm, '')
+                                    .replace(/&nbsp;/g, ' ')
+                                    .replace(/&[a-z]+;/gi, ' ')
                                     .trim()
-                                    .substring(0, 60) 
+                                    .substring(0, 50)
                                   : "No content"
                                 }
                               </p>
-                              <p className="text-xs text-muted-foreground mt-1">
+                              <p className="text-[10px] text-muted-foreground/70 mt-1.5 flex items-center gap-1">
+                                <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
                                 {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
                               </p>
                             </div>
                           ))
                         ) : (
-                          <div className="px-2 py-4 text-center text-muted-foreground">
-                            <p>No notes found</p>
+                          <div className="px-3 py-6 text-center text-muted-foreground">
+                            <p className="text-sm">No notes found</p>
                             {searchTerm && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="mt-2 btn-accessible rounded-full"
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="mt-3 btn-accessible rounded-full text-xs"
                                 onClick={() => setSearchTerm("")}
                               >
                                 Clear search
@@ -264,58 +279,49 @@ export function AppSidebar() {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-            </div>
           </SidebarGroup>
 
         </SidebarContent>
       )}
 
 
-      <SidebarFooter className="px-4 py-4 border-t border-white/10 apple-pwa-bottom-safe">
-        <div className="flex justify-between w-full px-4 md:px-6">
-          <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSync}
-              className="btn-accessible h-8 w-8 rounded-full flex-shrink-0"
-              title="Sync notes"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
-            <ThemeToggle variant="settings" />
-          </div>
-          
-          <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/recently-deleted') ? 'sidebar-menu-active' : ''}`}
-              asChild
-              title="Recently Deleted"
-            >
-              <a href="/recently-deleted">
-                <Trash2 className="h-4 w-4" />
-              </a>
-            </Button>
-          </div>
-          
-          <div className="h-8 w-8 flex items-center justify-center flex-shrink-0">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className={`btn-accessible h-8 w-8 rounded-full flex-shrink-0 ${isActive('/settings') ? 'sidebar-menu-active' : ''}`}
-              asChild
-              title="Settings"
-            >
-              <a href="/settings">
-                <Settings className="h-4 w-4" />
-              </a>
-            </Button>
-          </div>
+      <SidebarFooter className="px-4 py-4 border-t border-border/20 apple-pwa-bottom-safe">
+        <div className="flex justify-between items-center w-full gap-1 px-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSync}
+            className="btn-accessible h-9 w-9 rounded-full hover:bg-accent/10"
+            title="Sync notes"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+
+          <ThemeToggle variant="settings" />
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`btn-accessible h-9 w-9 rounded-full hover:bg-accent/10 ${isActive('/recently-deleted') ? 'bg-accent/10 text-accent' : ''}`}
+            asChild
+            title="Recently Deleted"
+          >
+            <a href="/recently-deleted">
+              <Trash2 className="h-4 w-4" />
+            </a>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`btn-accessible h-9 w-9 rounded-full hover:bg-accent/10 ${isActive('/settings') ? 'bg-accent/10 text-accent' : ''}`}
+            asChild
+            title="Settings"
+          >
+            <a href="/settings">
+              <Settings className="h-4 w-4" />
+            </a>
+          </Button>
         </div>
       </SidebarFooter>
     </Sidebar>
