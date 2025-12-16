@@ -258,9 +258,9 @@ const Index = () => {
         </div>
 
         {/* Desktop layout */}
-        <div className="hidden md:flex items-center justify-between mb-8 apple-pwa-header-spacing">
-          {/* Left side: Menu button + buttons */}
-          <div className="flex items-center gap-4">
+        <div className="hidden md:block mb-8 apple-pwa-header-spacing">
+          {/* Top row: Menu button left, My Notes right */}
+          <div className="flex items-center justify-between mb-6">
             {(isMobile || state === "collapsed") && (
               <div className="relative">
                 <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
@@ -271,22 +271,26 @@ const Index = () => {
                 )}
               </div>
             )}
+            <h1 className="text-3xl font-display font-medium tracking-tight dynamic-title-font">My Notes</h1>
+          </div>
 
-            <div className="flex items-center justify-center gap-2">
-              <Button
-                onClick={handleCreateNote}
-                className="flex items-center gap-2 h-11 px-5
-                  bg-gradient-to-r from-accent to-accent/90
-                  hover:from-accent/90 hover:to-accent
-                  text-accent-foreground font-medium
-                  rounded-full shadow-glow-sm hover:shadow-glow
-                  transition-all duration-250 ease-bounce-out
-                  hover:scale-[1.02] active:scale-[0.98]
-                  apple-pwa-button-spacing"
-              >
-                <Plus className="h-4 w-4" />
-                New Note
-              </Button>
+          {/* Centered action buttons */}
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              onClick={handleCreateNote}
+              variant="outline"
+              className="flex items-center justify-center gap-2.5 h-11 px-5 group
+                bg-accent/10 hover:bg-accent/20
+                border-2 border-accent
+                text-accent font-medium
+                rounded-full shadow-glow-sm hover:shadow-glow
+                transition-all duration-250 ease-bounce-out
+                hover:scale-[1.02] active:scale-[0.98]
+                apple-pwa-button-spacing"
+            >
+              <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
+              New Note
+            </Button>
 
               <Button
                 size="sm"
@@ -358,11 +362,7 @@ const Index = () => {
                   <SelectItem value="shared-with-others" className="rounded-lg">My Shared Notes</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
           </div>
-
-          {/* Right side: My Notes text */}
-          <h1 className="text-3xl font-display font-medium tracking-tight dynamic-title-font">My Notes</h1>
         </div>
 
         {/* Search Input - appears when search bubble is clicked */}

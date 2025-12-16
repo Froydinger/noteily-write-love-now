@@ -271,74 +271,77 @@ const NotePage = () => {
         className="sticky top-0 z-[100] p-3"
         style={{ position: 'sticky', top: 0, zIndex: 100 }}
       >
-        <div className="flex items-center justify-center gap-1.5">
-          <div className="relative">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleSidebar}
+                className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
+                title="Toggle sidebar"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              {user && unreadCount > 0 && state === "collapsed" && (
+                <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </div>
+              )}
+            </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={toggleSidebar}
+              onClick={() => navigate('/')}
               className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
-              title="Toggle sidebar"
+              title="Back to notes"
             >
-              <Menu className="h-5 w-5" />
+              <ChevronLeft className="h-5 w-5" />
             </Button>
-            {user && unreadCount > 0 && state === "collapsed" && (
-              <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </div>
+
+            {note.isSharedWithUser && (
+              <Badge variant="secondary" className="flex items-center gap-1 px-2">
+                <Users className="h-3 w-3" />
+                {note.userPermission === 'read' ? (
+                  <Eye className="h-3 w-3" />
+                ) : (
+                  <Edit className="h-3 w-3" />
+                )}
+              </Badge>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/')}
-            className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
-            title="Back to notes"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
 
-          {note.isSharedWithUser && (
-            <Badge variant="secondary" className="flex items-center gap-1 px-2">
-              <Users className="h-3 w-3" />
-              {note.userPermission === 'read' ? (
-                <Eye className="h-3 w-3" />
-              ) : (
-                <Edit className="h-3 w-3" />
-              )}
-            </Badge>
-          )}
-
-          {/* Show people icon for owned notes (to share) or shared notes (to manage) */}
-          {(note.isOwnedByUser || (note.isSharedWithUser && !note.isOwnedByUser)) && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowShareManager(true)}
-              className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
-              title={note.isOwnedByUser ? "Share note" : "Manage sharing"}
-            >
-              <Users className="h-5 w-5" />
-            </Button>
-          )}
-
-          <FeaturedImageUpload
-            noteId={note.id}
-            onImageSet={handleFeaturedImageSet}
-            hasImage={!!note.featured_image}
-          />
-
-          <ExportMenu
-            note={note}
-            onShare={handleShare}
-          />
-
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full text-destructive hover:bg-destructive/15 hover:border-destructive/40 transition-all duration-200 shadow-sm">
-                <Trash className="h-5 w-5" />
+          <div className="flex items-center gap-1.5">
+            {/* Show people icon for owned notes (to share) or shared notes (to manage) */}
+            {(note.isOwnedByUser || (note.isSharedWithUser && !note.isOwnedByUser)) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowShareManager(true)}
+                className="btn-accessible p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
+                title={note.isOwnedByUser ? "Share note" : "Manage sharing"}
+              >
+                <Users className="h-5 w-5" />
               </Button>
-            </AlertDialogTrigger>
+            )}
+
+            <FeaturedImageUpload
+              noteId={note.id}
+              onImageSet={handleFeaturedImageSet}
+              hasImage={!!note.featured_image}
+            />
+
+            <ExportMenu
+              note={note}
+              onShare={handleShare}
+            />
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="p-2.5 bg-background/60 backdrop-blur-md border border-border/30 rounded-full text-destructive hover:bg-destructive/15 hover:border-destructive/40 transition-all duration-200 shadow-sm">
+                  <Trash className="h-5 w-5" />
+                </Button>
+              </AlertDialogTrigger>
                <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
@@ -358,7 +361,8 @@ const NotePage = () => {
                    </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
-          </AlertDialog>
+            </AlertDialog>
+          </div>
         </div>
       </header>
       
