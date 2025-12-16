@@ -7,7 +7,7 @@ import EmptyNotesPlaceholder from '@/components/notes/EmptyNotesPlaceholder';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, ArrowUpDown, Filter, X, Heart } from 'lucide-react';
+import { Plus, Search, ArrowUpDown, Filter, X, Heart, FileText, CheckSquare, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -16,6 +16,13 @@ import PullToRefresh from 'react-simple-pull-to-refresh';
 import { ShareManager } from '@/components/notes/ShareManager';
 import { toast } from '@/components/ui/sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { NoteType } from "@/types/sharing";
 
 const Index = () => {
   const { user } = useAuth();
@@ -79,9 +86,9 @@ const Index = () => {
     return [...pinned, ...unpinned];
   }, [notes, searchTerm, sortOrder, shareFilter]);
 
-  const handleCreateNote = async () => {
+  const handleCreateNote = async (noteType: NoteType = 'note') => {
     try {
-      const newNote = await addNote();
+      const newNote = await addNote(noteType);
       setCurrentNote(newNote);
       navigate(`/note/${newNote.id}`);
     } catch (error) {
@@ -149,12 +156,12 @@ const Index = () => {
            style={{ animationDelay: '0.05s', animationFillMode: 'both' }}
            onClick={() => setSelectedNoteId(null)}>
         {/* Mobile layout */}
-        <div className="md:hidden mb-8">
-          {/* Top row: Menu button + Logo */}
-          <div className="flex items-center justify-between mb-6 apple-pwa-header-spacing">
+        <div className="md:hidden mb-6">
+          {/* Top row: Menu button + Heart on opposite sides, action buttons in middle */}
+          <div className="flex items-center justify-between mb-4">
             {(isMobile || state === "collapsed") && (
               <div className="relative">
-                <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
+                <SidebarTrigger className="h-10 w-10 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm" />
                 {user && unreadCount > 0 && (
                   <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
                     {unreadCount > 99 ? '99+' : unreadCount}
@@ -164,34 +171,63 @@ const Index = () => {
             )}
             <button
               onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+              className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm"
             >
-              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+              <Heart className="h-5 w-5 text-accent" fill="currentColor" />
             </button>
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center justify-center gap-2">
-            <Button
-              onClick={handleCreateNote}
-              variant="outline"
-              className="flex items-center justify-center gap-2.5 h-11 px-5 group
-                bg-accent/10 hover:bg-accent/20
-                border-2 border-accent
-                text-accent font-medium
-                rounded-full shadow-glow-sm hover:shadow-glow
-                transition-all duration-250 ease-bounce-out
-                hover:scale-[1.02] active:scale-[0.98]
-                apple-pwa-button-spacing"
-            >
-              <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
-              New Note
-            </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex items-center justify-center gap-2.5 h-11 px-5 group
+                    bg-accent/10 hover:bg-accent/20
+                    border-2 border-accent
+                    text-accent font-medium
+                    rounded-full shadow-glow-sm hover:shadow-glow
+                    transition-all duration-250 ease-bounce-out
+                    hover:scale-[1.02] active:scale-[0.98]
+                    apple-pwa-button-spacing"
+                >
+                  <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
+                  <span>New</span>
+                  <ChevronDown className="h-3 w-3 ml-1 opacity-70" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="center"
+                className="w-[200px] bg-popover border border-border shadow-lg z-50"
+              >
+                <DropdownMenuItem
+                  onClick={() => handleCreateNote('note')}
+                  className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                >
+                  <FileText className="h-4 w-4" />
+                  <div className="flex flex-col">
+                    <span className="font-medium">Note</span>
+                    <span className="text-xs opacity-80">Free-form writing</span>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleCreateNote('checklist')}
+                  className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                >
+                  <CheckSquare className="h-4 w-4" />
+                  <div className="flex flex-col">
+                    <span className="font-medium">Checklist</span>
+                    <span className="text-xs opacity-80">Task list with checkboxes</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <Button
               size="sm"
-              variant="secondary"
-              className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250"
+              variant="ghost"
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm"
               onClick={() => {
                 setOpenSelect(null);
                 setShowSearch(true);
@@ -217,7 +253,7 @@ const Index = () => {
               }}
             >
               <SelectTrigger
-                className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'sort-mobile' ? null : 'sort-mobile');
@@ -244,7 +280,7 @@ const Index = () => {
               }}
             >
               <SelectTrigger
-                className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'filter-mobile' ? null : 'filter-mobile');
@@ -262,14 +298,14 @@ const Index = () => {
         </div>
 
         {/* Desktop layout */}
-        <div className="hidden md:block mb-8 apple-pwa-header-spacing">
+        <div className="hidden md:block mb-6">
           {/* Top row: Left buttons + Logo on right */}
           <div className="flex items-center justify-between">
             {/* Left side: Menu + Action buttons */}
             <div className="flex items-center gap-2">
               {state === "collapsed" && (
-                <div className="relative mr-2">
-                  <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
+                <div className="relative mr-1">
+                  <SidebarTrigger className="h-10 w-10 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm" />
                   {user && unreadCount > 0 && (
                     <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
                       {unreadCount > 99 ? '99+' : unreadCount}
@@ -280,27 +316,56 @@ const Index = () => {
 
               {/* Hide New Note button when sidebar is open (desktop only) to avoid duplicate */}
               {state === "collapsed" && (
-                <Button
-                  onClick={handleCreateNote}
-                  variant="outline"
-                  className="flex items-center justify-center gap-2.5 h-11 px-5 group
-                    bg-accent/10 hover:bg-accent/20
-                    border-2 border-accent
-                    text-accent font-medium
-                    rounded-full shadow-glow-sm hover:shadow-glow
-                    transition-all duration-250 ease-bounce-out
-                    hover:scale-[1.02] active:scale-[0.98]
-                    apple-pwa-button-spacing"
-                >
-                  <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
-                  New Note
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="flex items-center justify-center gap-2.5 h-11 px-5 group
+                        bg-accent/10 hover:bg-accent/20
+                        border-2 border-accent
+                        text-accent font-medium
+                        rounded-full shadow-glow-sm hover:shadow-glow
+                        transition-all duration-250 ease-bounce-out
+                        hover:scale-[1.02] active:scale-[0.98]
+                        apple-pwa-button-spacing"
+                    >
+                      <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
+                      <span>New</span>
+                      <ChevronDown className="h-3 w-3 ml-1 opacity-70" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="w-[200px] bg-popover border border-border shadow-lg z-50"
+                  >
+                    <DropdownMenuItem
+                      onClick={() => handleCreateNote('note')}
+                      className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                    >
+                      <FileText className="h-4 w-4" />
+                      <div className="flex flex-col">
+                        <span className="font-medium">Note</span>
+                        <span className="text-xs opacity-80">Free-form writing</span>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleCreateNote('checklist')}
+                      className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                    >
+                      <CheckSquare className="h-4 w-4" />
+                      <div className="flex flex-col">
+                        <span className="font-medium">Checklist</span>
+                        <span className="text-xs opacity-80">Task list with checkboxes</span>
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
 
               <Button
                 size="sm"
-                variant="secondary"
-                className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250"
+                variant="ghost"
+                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm"
                 onClick={() => {
                   setOpenSelect(null);
                   setShowSearch(true);
@@ -326,7 +391,7 @@ const Index = () => {
                 }}
               >
                 <SelectTrigger
-                  className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                   onClick={() => {
                     setShowSearch(false);
                     setOpenSelect(openSelect === 'sort-desktop' ? null : 'sort-desktop');
@@ -353,7 +418,7 @@ const Index = () => {
                 }}
               >
                 <SelectTrigger
-                  className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                   onClick={() => {
                     setShowSearch(false);
                     setOpenSelect(openSelect === 'filter-desktop' ? null : 'filter-desktop');
@@ -372,9 +437,9 @@ const Index = () => {
             {/* Right side: Logo */}
             <button
               onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+              className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm"
             >
-              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+              <Heart className="h-5 w-5 text-accent" fill="currentColor" />
             </button>
           </div>
         </div>
