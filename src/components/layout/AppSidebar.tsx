@@ -5,12 +5,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   BookOpen,
   Plus,
-  Sparkles,
+  Heart,
   Settings,
   Pencil,
   RefreshCw,
   Trash2,
   Bell,
+  PanelLeftClose,
 } from "lucide-react";
 import {
   Sidebar,
@@ -111,7 +112,7 @@ export function AppSidebar() {
       <SidebarHeader className="flex flex-row items-center justify-between px-5 py-5 gap-0 apple-pwa-sidebar-header">
         <div className={`flex items-center space-x-3 flex-1 ${state === "collapsed" ? "justify-center" : ""}`}>
           <div className="p-1.5 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
-            <Sparkles className="h-5 w-5 text-accent" />
+            <Heart className="h-5 w-5 text-accent" fill="currentColor" />
           </div>
           {state !== "collapsed" && (
             <div className="flex items-center">
@@ -120,22 +121,35 @@ export function AppSidebar() {
             </div>
           )}
         </div>
-        {state !== "collapsed" && user && (
-          <NotificationsPanel>
+        {state !== "collapsed" && (
+          <div className="flex items-center gap-1">
+            {user && (
+              <NotificationsPanel>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="btn-accessible h-9 w-9 rounded-full flex-shrink-0 relative hover:bg-accent/10"
+                  title="Notifications"
+                >
+                  <Bell className="h-4 w-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-semibold">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </Button>
+              </NotificationsPanel>
+            )}
             <Button
               variant="ghost"
               size="sm"
-              className="btn-accessible h-9 w-9 rounded-full flex-shrink-0 relative hover:bg-accent/10"
-              title="Notifications"
+              className="btn-accessible h-9 w-9 rounded-full flex-shrink-0 hover:bg-accent/10 hidden md:flex"
+              title="Hide sidebar"
+              onClick={toggleSidebar}
             >
-              <Bell className="h-4 w-4" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-semibold">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
+              <PanelLeftClose className="h-4 w-4" />
             </Button>
-          </NotificationsPanel>
+          </div>
         )}
       </SidebarHeader>
 
