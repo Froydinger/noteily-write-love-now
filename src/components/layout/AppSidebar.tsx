@@ -175,24 +175,24 @@ export function AppSidebar() {
                 align="center" 
                 className="w-[200px] bg-popover border border-border shadow-lg z-50"
               >
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handleCreateNote('note')}
-                  className="flex items-center gap-3 py-3 cursor-pointer"
+                  className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                 >
-                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  <FileText className="h-4 w-4" />
                   <div className="flex flex-col">
                     <span className="font-medium">Note</span>
-                    <span className="text-xs text-muted-foreground">Free-form writing</span>
+                    <span className="text-xs opacity-80">Free-form writing</span>
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handleCreateNote('checklist')}
-                  className="flex items-center gap-3 py-3 cursor-pointer"
+                  className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                 >
-                  <CheckSquare className="h-4 w-4 text-muted-foreground" />
+                  <CheckSquare className="h-4 w-4" />
                   <div className="flex flex-col">
                     <span className="font-medium">Checklist</span>
-                    <span className="text-xs text-muted-foreground">Task list with checkboxes</span>
+                    <span className="text-xs opacity-80">Task list with checkboxes</span>
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
