@@ -15,6 +15,7 @@ import {
   FileText,
   CheckSquare,
   ChevronDown,
+  Clock,
 } from "lucide-react";
 import {
   Sidebar,
@@ -291,7 +292,7 @@ export function AppSidebar() {
                                 }
                               </p>
                               <p className="text-[10px] text-muted-foreground/70 mt-1.5 flex items-center gap-1">
-                                <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+                                <Clock className="h-2.5 w-2.5" />
                                 {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
                               </p>
                             </div>
