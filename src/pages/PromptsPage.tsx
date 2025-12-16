@@ -74,18 +74,20 @@ const PromptsPage = () => {
 
         {/* Desktop layout */}
         <div className="hidden md:block mb-8">
-          {/* Top row: Menu button + Logo */}
+          {/* Top row: Menu button + Logo (logo always on right) */}
           <div className="flex items-center justify-between mb-6">
-            {state === "collapsed" && (
-              <div className="relative">
-                <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
-                {user && unreadCount > 0 && (
-                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </div>
-                )}
-              </div>
-            )}
+            <div>
+              {state === "collapsed" && (
+                <div className="relative">
+                  <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
+                  {user && unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
               <Heart className="h-6 w-6 text-accent" fill="currentColor" />
             </div>
