@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { offlineStorage } from '@/lib/offlineStorage';
 import { useOfflineStatus } from '@/hooks/useOfflineStatus';
 
-import type { NoteWithSharing } from '@/types/sharing';
+import type { NoteWithSharing, NoteType } from '@/types/sharing';
 
 export type Note = NoteWithSharing;
 
@@ -23,7 +23,7 @@ type NoteContextType = {
   dailyPrompts: WritingPrompt[];
   loading: boolean;
   hasInitialLoad: boolean;
-  addNote: () => Promise<Note>;
+  addNote: (noteType?: NoteType) => Promise<Note>;
   updateNote: (id: string, updates: Partial<Note>, silent?: boolean) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
   restoreNote: (id: string) => Promise<void>;
@@ -492,9 +492,10 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         featured_image: note.featured_image || undefined,
         user_id: note.user_id,
         pinned: note.pinned || false,
+        note_type: (note.note_type as NoteType) || 'note',
         isOwnedByUser: true,
         isSharedWithUser: false,
-        shares: sharesMap.get(note.id) || [], // Add shares data
+        shares: sharesMap.get(note.id) || [],
       }));
 
       const formattedSharedNotes: Note[] = sharedNotesData.map(share => ({
@@ -504,8 +505,9 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: share.notes.created_at,
         updatedAt: share.notes.updated_at,
         featured_image: share.notes.featured_image || undefined,
-        user_id: share.notes.user_id, // Keep original user_id
-        pinned: false, // Shared notes can't be pinned
+        user_id: share.notes.user_id,
+        pinned: false,
+        note_type: ((share.notes as any).note_type as NoteType) || 'note',
         isOwnedByUser: false,
         isSharedWithUser: true,
         userPermission: share.permission as 'read' | 'write',
@@ -601,19 +603,21 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('lastPromptsRefreshDate', new Date().toISOString());
   };
 
-  const addNote = async (): Promise<Note> => {
+  const addNote = async (noteType: NoteType = 'note'): Promise<Note> => {
     if (!user) {
       throw new Error('User must be authenticated to add notes');
     }
 
+    const isChecklist = noteType === 'checklist';
     const tempNote: Note = {
       id: crypto.randomUUID(),
-      title: 'Untitled Note',
+      title: isChecklist ? 'Untitled Checklist' : 'Untitled Note',
       content: '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       user_id: user.id,
       pinned: false,
+      note_type: noteType,
       isOwnedByUser: true,
       isSharedWithUser: false,
     };
@@ -628,6 +632,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
           user_id: user.id,
           title: tempNote.title,
           content: tempNote.content,
+          note_type: noteType,
         })
         .select()
         .single();
@@ -641,12 +646,13 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Update with actual database data (keeping ownership info)
       const dbNote: Note = {
         id: data.id,
-        title: tempNote.title, // Keep original plain text for UI
-        content: tempNote.content, // Keep original plain text for UI
+        title: tempNote.title,
+        content: tempNote.content,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
         user_id: data.user_id,
         pinned: data.pinned || false,
+        note_type: (data.note_type as NoteType) || 'note',
         isOwnedByUser: true,
         isSharedWithUser: false,
       };
@@ -940,6 +946,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         featured_image: note.featured_image || undefined,
         user_id: note.user_id,
         pinned: note.pinned || false,
+        note_type: (note.note_type as NoteType) || 'note',
         isOwnedByUser: true,
         isSharedWithUser: false,
         deleted_at: note.deleted_at,

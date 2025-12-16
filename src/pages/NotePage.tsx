@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '@/contexts/NoteContext';
 import NoteEditor from '@/components/notes/NoteEditor';
+import ChecklistEditor from '@/components/notes/ChecklistEditor';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Trash, Menu, Users, Eye, Edit } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -367,12 +368,16 @@ const NotePage = () => {
       </header>
       
       <div className="relative">
-        <NoteEditor
-          note={note}
-          onContentBeforeChange={storeUndoState}
-          onSpellCheckApplied={storeUndoState}
-          onAIContentReplace={(replacementFn) => setAiReplacementFunction(() => replacementFn)}
-        />
+        {note.note_type === 'checklist' ? (
+          <ChecklistEditor note={note} />
+        ) : (
+          <NoteEditor
+            note={note}
+            onContentBeforeChange={storeUndoState}
+            onSpellCheckApplied={storeUndoState}
+            onAIContentReplace={(replacementFn) => setAiReplacementFunction(() => replacementFn)}
+          />
+        )}
       </div>
       
       {/* Share Manager - now accessible from persistent people icon */}

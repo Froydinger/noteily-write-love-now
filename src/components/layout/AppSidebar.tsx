@@ -12,6 +12,9 @@ import {
   Trash2,
   Bell,
   X,
+  FileText,
+  CheckSquare,
+  ChevronDown,
 } from "lucide-react";
 import {
   Sidebar,
@@ -22,6 +25,12 @@ import {
   SidebarHeader,
   useSidebar
 } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { Button } from "@/components/ui/button";
 import { useNotes, Note } from "@/contexts/NoteContext";
@@ -32,6 +41,7 @@ import ThemeToggle from "@/components/theme/ThemeToggle";
 import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useAuth } from "@/contexts/AuthContext";
+import { NoteType } from "@/types/sharing";
 
 export function AppSidebar() {
   const titleFont = useTitleFont();
@@ -52,15 +62,15 @@ export function AppSidebar() {
       )
     : notes;
 
-  const handleCreateNote = async () => {
+  const handleCreateNote = async (noteType: NoteType = 'note') => {
     try {
-      const newNote = await addNote();
+      const newNote = await addNote(noteType);
       setCurrentNote(newNote);
       navigate(`/note/${newNote.id}`);
 
       toast({
-        title: "Note created",
-        description: "Your new note has been created.",
+        title: noteType === 'checklist' ? "Checklist created" : "Note created",
+        description: noteType === 'checklist' ? "Your new checklist has been created." : "Your new note has been created.",
       });
     } catch (error) {
       console.error('Failed to create note:', error);
@@ -143,21 +153,50 @@ export function AppSidebar() {
       {state !== "collapsed" && (
         <SidebarContent className="pt-2 px-3">
           <div className="mb-5">
-            <Button
-              variant="outline"
-              className="w-full justify-center gap-2.5 h-11 group
-                bg-accent/10 hover:bg-accent/20
-                border-2 border-accent
-                text-accent font-medium
-                rounded-full shadow-glow-sm hover:shadow-glow
-                transition-all duration-250 ease-bounce-out
-                hover:scale-[1.02] active:scale-[0.98]
-                apple-pwa-button-spacing"
-              onClick={handleCreateNote}
-            >
-              <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
-              <span>New Note</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-center gap-2.5 h-11 group
+                    bg-accent/10 hover:bg-accent/20
+                    border-2 border-accent
+                    text-accent font-medium
+                    rounded-full shadow-glow-sm hover:shadow-glow
+                    transition-all duration-250 ease-bounce-out
+                    hover:scale-[1.02] active:scale-[0.98]
+                    apple-pwa-button-spacing"
+                >
+                  <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
+                  <span>New</span>
+                  <ChevronDown className="h-3 w-3 ml-1 opacity-70" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="center" 
+                className="w-[200px] bg-popover border border-border shadow-lg z-50"
+              >
+                <DropdownMenuItem 
+                  onClick={() => handleCreateNote('note')}
+                  className="flex items-center gap-3 py-3 cursor-pointer"
+                >
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex flex-col">
+                    <span className="font-medium">Note</span>
+                    <span className="text-xs text-muted-foreground">Free-form writing</span>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleCreateNote('checklist')}
+                  className="flex items-center gap-3 py-3 cursor-pointer"
+                >
+                  <CheckSquare className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex flex-col">
+                    <span className="font-medium">Checklist</span>
+                    <span className="text-xs text-muted-foreground">Task list with checkboxes</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <SidebarGroup>
@@ -232,9 +271,14 @@ export function AppSidebar() {
                                 animationFillMode: 'both'
                               }}
                             >
-                              <h3 className="text-sm font-medium truncate dynamic-title-font text-foreground/90">
-                                {note.title || "Untitled Note"}
-                              </h3>
+                              <div className="flex items-center gap-2">
+                                {note.note_type === 'checklist' && (
+                                  <CheckSquare className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                                )}
+                                <h3 className="text-sm font-medium truncate dynamic-title-font text-foreground/90">
+                                  {note.title || (note.note_type === 'checklist' ? "Untitled Checklist" : "Untitled Note")}
+                                </h3>
+                              </div>
                               <p className="text-xs text-muted-foreground truncate mt-0.5 leading-relaxed">
                                 {note.content ?
                                   note.content

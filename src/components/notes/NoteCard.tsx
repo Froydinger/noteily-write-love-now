@@ -6,7 +6,7 @@ import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2 } from 'lucide-react';
+import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2, CheckSquare } from 'lucide-react';
 import type { NoteWithSharing } from '@/types/sharing';
 import { useIsTouchDevice } from '@/hooks/use-touch-device';
 import { useTitleFont } from '@/hooks/useTitleFont';
@@ -222,15 +222,20 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
           </Badge>
         )}
 
-        <h3 className={`
-          font-display font-medium text-lg
-          break-words overflow-wrap-anywhere leading-tight
-          text-foreground transition-colors duration-300
-          mb-3 pr-8 dynamic-title-font
-          ${!isTouchDevice ? 'group-hover:text-accent' : ''}
-        `}>
-          {note.title || "Untitled Note"}
-        </h3>
+        <div className="flex items-center gap-2 mb-3 pr-8">
+          {('note_type' in note && note.note_type === 'checklist') && (
+            <CheckSquare className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          )}
+          <h3 className={`
+            font-display font-medium text-lg
+            break-words overflow-wrap-anywhere leading-tight
+            text-foreground transition-colors duration-300
+            dynamic-title-font
+            ${!isTouchDevice ? 'group-hover:text-accent' : ''}
+          `}>
+            {note.title || (('note_type' in note && note.note_type === 'checklist') ? "Untitled Checklist" : "Untitled Note")}
+          </h3>
+        </div>
 
         <p className={`
           text-sm text-muted-foreground line-clamp-4
