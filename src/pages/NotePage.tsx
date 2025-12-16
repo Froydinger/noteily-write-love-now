@@ -265,10 +265,10 @@ const NotePage = () => {
   
   return (
     <div key={id} className={`min-h-screen transform transition-all duration-200 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-1 opacity-90'}`}>
-      <header 
+      <header
         ref={headerRef}
         data-note-header
-        className="sticky top-0 z-[100] bg-background border-b p-3"
+        className="sticky top-0 z-[100] bg-background/70 backdrop-blur-xl border-b border-border/30 p-3"
         style={{ position: 'sticky', top: 0, zIndex: 100 }}
       >
         <div className="flex items-center justify-between">
@@ -284,11 +284,11 @@ const NotePage = () => {
               </div>
             ) : (
               <div className="relative">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={toggleSidebar}
-                  className="btn-accessible p-2"
+                  className="btn-accessible p-2 bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg hover:bg-card/80 hover:border-border/40 transition-all duration-200"
                   title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
                 >
                   {state === "expanded" ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
@@ -300,11 +300,11 @@ const NotePage = () => {
                 )}
               </div>
             )}
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => navigate('/')}
-              className="btn-accessible p-2"
+              className="btn-accessible p-2 bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg hover:bg-card/80 hover:border-border/40 transition-all duration-200"
               title="Back to notes"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -325,11 +325,11 @@ const NotePage = () => {
           <div className="flex items-center gap-1">
             {/* Show people icon for owned notes (to share) or shared notes (to manage) */}
             {(note.isOwnedByUser || (note.isSharedWithUser && !note.isOwnedByUser)) && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setShowShareManager(true)}
-                className="btn-accessible p-2"
+                className="btn-accessible p-2 bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg hover:bg-card/80 hover:border-border/40 transition-all duration-200"
                 title={note.isOwnedByUser ? "Share note" : "Manage sharing"}
               >
                 <Users className="h-4 w-4" />
@@ -349,7 +349,7 @@ const NotePage = () => {
             
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive-foreground hover:bg-destructive/10">
+                <Button variant="ghost" size="sm" className="p-2 bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg text-destructive hover:bg-destructive/20 hover:border-destructive/30 transition-all duration-200">
                   <Trash className="h-4 w-4" />
                 </Button>
               </AlertDialogTrigger>

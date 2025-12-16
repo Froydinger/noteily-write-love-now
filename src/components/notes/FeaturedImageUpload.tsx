@@ -211,7 +211,7 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
         variant="ghost"
         size="sm"
         onClick={() => fileInputRef.current?.click()}
-        className="btn-accessible"
+        className="btn-accessible p-2 bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg hover:bg-card/80 hover:border-border/40 transition-all duration-200"
         title={hasImage ? "Change featured image" : "Add featured image"}
       >
         <ImagePlus className="h-4 w-4" />
