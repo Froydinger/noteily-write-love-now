@@ -162,7 +162,7 @@ export function AppSidebar() {
                 bg-gradient-to-r from-accent to-accent/90
                 hover:from-accent/90 hover:to-accent
                 text-accent-foreground font-medium
-                rounded-xl shadow-glow-sm hover:shadow-glow
+                rounded-full shadow-glow-sm hover:shadow-glow
                 transition-all duration-250 ease-bounce-out
                 hover:scale-[1.02] active:scale-[0.98]
                 apple-pwa-button-spacing"

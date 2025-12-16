@@ -154,7 +154,7 @@ const Index = () => {
             <div className="flex items-center">
               {(isMobile || state === "collapsed") && (
                 <div className="relative">
-                  <SidebarTrigger className="h-10 w-10 rounded-xl bg-secondary/50 hover:bg-secondary transition-all duration-250" />
+                  <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
                   {user && unreadCount > 0 && (
                     <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
                       {unreadCount > 99 ? '99+' : unreadCount}
@@ -174,7 +174,7 @@ const Index = () => {
                 bg-gradient-to-r from-accent to-accent/90
                 hover:from-accent/90 hover:to-accent
                 text-accent-foreground font-medium
-                rounded-xl shadow-glow-sm hover:shadow-glow
+                rounded-full shadow-glow-sm hover:shadow-glow
                 transition-all duration-250 ease-bounce-out
                 hover:scale-[1.02] active:scale-[0.98]
                 apple-pwa-button-spacing"
@@ -186,7 +186,7 @@ const Index = () => {
             <Button
               size="sm"
               variant="secondary"
-              className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250"
+              className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250"
               onClick={() => {
                 setOpenSelect(null);
                 setShowSearch(true);
@@ -212,7 +212,7 @@ const Index = () => {
               }}
             >
               <SelectTrigger
-                className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'sort-mobile' ? null : 'sort-mobile');
@@ -239,7 +239,7 @@ const Index = () => {
               }}
             >
               <SelectTrigger
-                className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                 onClick={() => {
                   setShowSearch(false);
                   setOpenSelect(openSelect === 'filter-mobile' ? null : 'filter-mobile');
@@ -262,7 +262,7 @@ const Index = () => {
           <div className="flex items-center gap-4">
             {(isMobile || state === "collapsed") && (
               <div className="relative">
-                <SidebarTrigger className="h-10 w-10 rounded-xl bg-secondary/50 hover:bg-secondary transition-all duration-250" />
+                <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
                 {user && unreadCount > 0 && (
                   <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
                     {unreadCount > 99 ? '99+' : unreadCount}
@@ -278,7 +278,7 @@ const Index = () => {
                   bg-gradient-to-r from-accent to-accent/90
                   hover:from-accent/90 hover:to-accent
                   text-accent-foreground font-medium
-                  rounded-xl shadow-glow-sm hover:shadow-glow
+                  rounded-full shadow-glow-sm hover:shadow-glow
                   transition-all duration-250 ease-bounce-out
                   hover:scale-[1.02] active:scale-[0.98]
                   apple-pwa-button-spacing"
@@ -290,7 +290,7 @@ const Index = () => {
               <Button
                 size="sm"
                 variant="secondary"
-                className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250"
+                className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250"
                 onClick={() => {
                   setOpenSelect(null);
                   setShowSearch(true);
@@ -316,7 +316,7 @@ const Index = () => {
                 }}
               >
                 <SelectTrigger
-                  className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                  className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                   onClick={() => {
                     setShowSearch(false);
                     setOpenSelect(openSelect === 'sort-desktop' ? null : 'sort-desktop');
@@ -343,7 +343,7 @@ const Index = () => {
                 }}
               >
                 <SelectTrigger
-                  className="h-11 w-11 rounded-xl bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                  className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250 border-0 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
                   onClick={() => {
                     setShowSearch(false);
                     setOpenSelect(openSelect === 'filter-desktop' ? null : 'filter-desktop');
