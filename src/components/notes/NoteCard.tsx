@@ -60,11 +60,10 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
       className={`
         h-full cursor-pointer group relative overflow-hidden
         bg-card/80 backdrop-blur-sm
-        border border-border/50
-        transition-all duration-350 ease-bounce-out
+        border transition-all duration-350 ease-bounce-out
+        ${isPinned ? 'border-accent' : 'border-border/50'}
         ${!isTouchDevice ? 'hover:border-accent/30 hover:shadow-elevated hover:-translate-y-1' : ''}
         ${isSelected ? 'ring-2 ring-accent/30 border-accent/40' : ''}
-        ${isPinned ? 'border-accent/25' : ''}
       `}
       onClick={(e) => {
         e.stopPropagation();

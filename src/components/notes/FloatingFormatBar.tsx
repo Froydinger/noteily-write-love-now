@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heading1, Type } from 'lucide-react';
+import { Heading1, Type, Bold, Italic } from 'lucide-react';
 
 export type FormatType = 'p' | 'h1' | 'bold' | 'italic';
 
@@ -49,8 +49,8 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
 
       if (!editorRect) return;
 
-      // Calculate bar dimensions (approx 100px wide, 40px tall)
-      const barWidth = 100;
+      // Calculate bar dimensions (approx 200px wide with 4 buttons + divider, 40px tall)
+      const barWidth = 200;
       const barHeight = 48;
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
@@ -101,6 +101,14 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
         formats.add('h1');
       } else {
         formats.add('p');
+      }
+
+      // Check bold and italic using queryCommandState
+      if (document.queryCommandState('bold')) {
+        formats.add('bold');
+      }
+      if (document.queryCommandState('italic')) {
+        formats.add('italic');
       }
 
       setCurrentFormats(formats);
@@ -155,6 +163,34 @@ export const FloatingFormatBar: React.FC<FloatingFormatBarProps> = ({
         title="Title"
       >
         <Heading1 className="h-4 w-4" />
+      </Button>
+
+      <div className="w-px h-6 bg-border/50 mx-0.5" />
+
+      <Button
+        variant={currentFormats.has('bold') ? 'default' : 'ghost'}
+        size="sm"
+        className="h-9 w-9 p-0 rounded-full"
+        onMouseDown={(e) => {
+          e.preventDefault(); // Prevent focus loss
+          onFormat('bold');
+        }}
+        title="Bold (⌘B)"
+      >
+        <Bold className="h-4 w-4" />
+      </Button>
+
+      <Button
+        variant={currentFormats.has('italic') ? 'default' : 'ghost'}
+        size="sm"
+        className="h-9 w-9 p-0 rounded-full"
+        onMouseDown={(e) => {
+          e.preventDefault(); // Prevent focus loss
+          onFormat('italic');
+        }}
+        title="Italic (⌘I)"
+      >
+        <Italic className="h-4 w-4" />
       </Button>
     </div>
   );
