@@ -1,16 +1,17 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 
 import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2, CheckSquare } from 'lucide-react';
-import type { NoteWithSharing } from '@/types/sharing';
+import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2, CheckSquare, Circle, CheckCircle2 } from 'lucide-react';
+import type { NoteWithSharing, ChecklistItem } from '@/types/sharing';
 import { useIsTouchDevice } from '@/hooks/use-touch-device';
 import { useTitleFont } from '@/hooks/useTitleFont';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NoteCardProps {
   note: Note | NoteWithSharing;
@@ -26,6 +27,24 @@ interface NoteCardProps {
 export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen, isPinned = false, onTogglePin, onDelete }: NoteCardProps) {
   const titleFont = useTitleFont();
   const { isTouchDevice, isIOS } = useIsTouchDevice();
+  const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
+
+  const isChecklist = 'note_type' in note && note.note_type === 'checklist';
+
+  // Load checklist items for checklist notes
+  useEffect(() => {
+    if (isChecklist) {
+      supabase
+        .from('checklist_items')
+        .select('*')
+        .eq('note_id', note.id)
+        .order('position', { ascending: true })
+        .limit(5)
+        .then(({ data }) => {
+          if (data) setChecklistItems(data as ChecklistItem[]);
+        });
+    }
+  }, [note.id, isChecklist]);
 
   // Check if this note is shared with the user (they don't own it)
   const isSharedWithUser = 'isSharedWithUser' in note && note.isSharedWithUser && !note.isOwnedByUser;
@@ -42,11 +61,10 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         .replace(/&lt;[^&]*&gt;/g, '')
         .replace(/&nbsp;/g, ' ')
         .replace(/&amp;/g, '&')
-        // Intentionally do not decode &lt; or &gt; to avoid showing fake tags
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'")
-        .replace(/\n+/g, ' ')  // Convert newlines to spaces
-        .replace(/\r+/g, ' ')  // Convert carriage returns to spaces
+        .replace(/\n+/g, ' ')
+        .replace(/\r+/g, ' ')
         .replace(/\s{2,}/g, ' ')
         .trim()
     : 'No content';
@@ -237,13 +255,37 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
           </h3>
         </div>
 
-        <p className={`
-          text-sm text-muted-foreground line-clamp-4
-          ${!isTouchDevice ? 'group-hover:text-foreground/80' : ''}
-          transition-colors duration-300 leading-relaxed
-        `}>
-          {truncatedContent}
-        </p>
+        {isChecklist ? (
+          <div className="space-y-1.5">
+            {checklistItems.length > 0 ? (
+              checklistItems.slice(0, 4).map((item) => (
+                <div key={item.id} className="flex items-center gap-2 text-sm">
+                  {item.completed ? (
+                    <CheckCircle2 className="h-3.5 w-3.5 text-accent flex-shrink-0" />
+                  ) : (
+                    <Circle className="h-3.5 w-3.5 text-muted-foreground/50 flex-shrink-0" />
+                  )}
+                  <span className={`truncate ${item.completed ? 'line-through text-muted-foreground/60' : 'text-muted-foreground'}`}>
+                    {item.content || 'Empty item'}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground/60 italic">No items yet</p>
+            )}
+            {checklistItems.length > 4 && (
+              <p className="text-xs text-muted-foreground/50">+{checklistItems.length - 4} more items</p>
+            )}
+          </div>
+        ) : (
+          <p className={`
+            text-sm text-muted-foreground line-clamp-4
+            ${!isTouchDevice ? 'group-hover:text-foreground/80' : ''}
+            transition-colors duration-300 leading-relaxed
+          `}>
+            {truncatedContent}
+          </p>
+        )}
       </CardContent>
 
       <CardFooter className={`
