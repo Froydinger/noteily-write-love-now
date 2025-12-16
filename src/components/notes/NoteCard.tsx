@@ -6,7 +6,7 @@ import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2, CheckSquare, Circle, CheckCircle2 } from 'lucide-react';
+import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2, CheckSquare, Circle, CheckCircle2, Clock } from 'lucide-react';
 import type { NoteWithSharing, ChecklistItem } from '@/types/sharing';
 import { useIsTouchDevice } from '@/hooks/use-touch-device';
 import { useTitleFont } from '@/hooks/useTitleFont';
@@ -294,7 +294,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         ${!isTouchDevice ? 'group-hover:text-muted-foreground' : ''}
       `}>
         <span className="flex items-center gap-1.5">
-          <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+          <Clock className="h-3 w-3" />
           {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
         </span>
       </CardFooter>
