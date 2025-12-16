@@ -22,7 +22,6 @@ import {
   SidebarHeader,
   useSidebar
 } from "@/components/ui/sidebar";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 import { Button } from "@/components/ui/button";
 import { useNotes, Note } from "@/contexts/NoteContext";
@@ -45,18 +44,6 @@ export function AppSidebar() {
   const { user } = useAuth();
   const { unreadCount } = useNotifications();
   const { state, toggleSidebar } = useSidebar();
-
-  // Get initial accordion state from localStorage, default to closed
-  const [recentNotesOpen, setRecentNotesOpen] = useState(() => {
-    const saved = localStorage.getItem('sidebar-recent-notes-open');
-    return saved !== null ? JSON.parse(saved) : false;
-  });
-
-  // Save accordion state to localStorage
-  const handleRecentNotesToggle = (isOpen: boolean) => {
-    setRecentNotesOpen(isOpen);
-    localStorage.setItem('sidebar-recent-notes-open', JSON.stringify(isOpen));
-  };
 
   const filteredNotes = searchTerm
     ? notes.filter(note =>
@@ -210,21 +197,14 @@ export function AppSidebar() {
           </SidebarGroup>
 
           <SidebarGroup className="py-2">
-            <Accordion
-              type="single"
-              collapsible
-              value={recentNotesOpen ? "recent-notes" : undefined}
-              onValueChange={(value) => handleRecentNotesToggle(value === "recent-notes")}
-            >
-              <AccordionItem value="recent-notes" className="border-none">
-                <AccordionTrigger className="w-full px-4 py-2.5 rounded-xl hover:no-underline hover:bg-secondary/50 transition-all duration-250 font-medium text-foreground data-[state=closed]:mb-0 h-10">
-                  <div className="flex items-center justify-center gap-2.5 w-full">
-                    <BookOpen className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">Recent Notes</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pb-0 pt-2">
-                  <SidebarGroupContent>
+            {/* Recent Notes Header */}
+            <div className="w-full px-4 py-2.5 font-medium text-foreground h-10">
+              <div className="flex items-center justify-center gap-2.5 w-full">
+                <BookOpen className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm">Recent Notes</span>
+              </div>
+            </div>
+            <SidebarGroupContent>
                     <div className="h-[calc(100vh-380px)] overflow-y-auto scrollbar-hide pr-1"
                          style={{
                            scrollbarWidth: 'none',
@@ -289,10 +269,7 @@ export function AppSidebar() {
                         )}
                       </div>
                     </div>
-                  </SidebarGroupContent>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+            </SidebarGroupContent>
           </SidebarGroup>
 
         </SidebarContent>
