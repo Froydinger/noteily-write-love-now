@@ -11,6 +11,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { RefreshCw, Heart } from 'lucide-react';
 import { useTitleFont } from '@/hooks/useTitleFont';
 import { useBodyFont } from '@/hooks/useTitleFont';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 const PromptsPage = () => {
   const { dailyPrompts, addNote, updateNote, setCurrentNote, refreshDailyPrompts } = useNotes();
@@ -21,7 +22,8 @@ const PromptsPage = () => {
   const { state } = useSidebar();
   const titleFont = useTitleFont();
   const bodyFont = useBodyFont();
-  
+  const [showSupportDialog, setShowSupportDialog] = useState(false);
+
   const handleUsePrompt = async (prompt: typeof dailyPrompts[0]) => {
     try {
       const newNote = await addNote();
@@ -53,9 +55,12 @@ const PromptsPage = () => {
                 )}
               </div>
             )}
-            <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+            >
               <Heart className="h-6 w-6 text-accent" fill="currentColor" />
-            </div>
+            </button>
           </div>
 
           {/* Centered refresh button */}
@@ -74,21 +79,26 @@ const PromptsPage = () => {
 
         {/* Desktop layout */}
         <div className="hidden md:block mb-8">
-          {/* Top row: Menu button + Logo */}
+          {/* Top row: Menu button + Logo (logo always on right) */}
           <div className="flex items-center justify-between mb-6">
-            {state === "collapsed" && (
-              <div className="relative">
-                <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
-                {user && unreadCount > 0 && (
-                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </div>
-                )}
-              </div>
-            )}
-            <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
-              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+            <div>
+              {state === "collapsed" && (
+                <div className="relative">
+                  <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
+                  {user && unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+            >
+              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+            </button>
           </div>
 
           {/* Centered refresh button */}
@@ -117,6 +127,30 @@ const PromptsPage = () => {
             ))}
           </div>
         </div>
+
+        {/* Support Dialog */}
+        <AlertDialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
+          <AlertDialogContent className="max-w-sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2 justify-center">
+                <Heart className="h-5 w-5 text-accent" fill="currentColor" />
+                Support Noteily!
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center">
+                Noteily is made with love by Win The Night. If you enjoy using Noteily, consider supporting our work!
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-col sm:flex-col gap-2">
+              <AlertDialogAction
+                onClick={() => window.open('https://winthenight.org/support', '_blank')}
+                className="w-full bg-accent hover:bg-accent/90"
+              >
+                Support Us
+              </AlertDialogAction>
+              <AlertDialogCancel className="w-full">Maybe Later</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

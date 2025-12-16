@@ -32,6 +32,7 @@ const Index = () => {
   const [shareChanged, setShareChanged] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [openSelect, setOpenSelect] = useState<string | null>(null);
+  const [showSupportDialog, setShowSupportDialog] = useState(false);
 
   const filteredAndSortedNotes = useMemo(() => {
     const filtered = notes.filter(note => {
@@ -161,9 +162,12 @@ const Index = () => {
                 )}
               </div>
             )}
-            <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+            >
               <Heart className="h-6 w-6 text-accent" fill="currentColor" />
-            </div>
+            </button>
           </div>
 
           {/* Action buttons */}
@@ -259,21 +263,26 @@ const Index = () => {
 
         {/* Desktop layout */}
         <div className="hidden md:block mb-8 apple-pwa-header-spacing">
-          {/* Top row: Menu button + Logo */}
+          {/* Top row: Menu button + Logo (logo always on right) */}
           <div className="flex items-center justify-between mb-6">
-            {state === "collapsed" && (
-              <div className="relative">
-                <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
-                {user && unreadCount > 0 && (
-                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </div>
-                )}
-              </div>
-            )}
-            <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
-              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+            <div>
+              {state === "collapsed" && (
+                <div className="relative">
+                  <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
+                  {user && unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+            >
+              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+            </button>
           </div>
 
           {/* Centered action buttons */}
@@ -430,6 +439,30 @@ const Index = () => {
             onShareUpdate={handleShareUpdated}
           />
         )}
+
+        {/* Support Dialog */}
+        <AlertDialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
+          <AlertDialogContent className="max-w-sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2 justify-center">
+                <Heart className="h-5 w-5 text-accent" fill="currentColor" />
+                Support Noteily!
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center">
+                Noteily is made with love by Win The Night. If you enjoy using Noteily, consider supporting our work!
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-col sm:flex-col gap-2">
+              <AlertDialogAction
+                onClick={() => window.open('https://winthenight.org/support', '_blank')}
+                className="w-full bg-accent hover:bg-accent/90"
+              >
+                Support Us
+              </AlertDialogAction>
+              <AlertDialogCancel className="w-full">Maybe Later</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
