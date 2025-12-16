@@ -998,6 +998,9 @@ html[data-title-font="mono"] .note-editor h6 {
 [data-sonner-toast] {
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-radius: 9999px !important;
+  padding-left: 1.25rem !important;
+  padding-right: 2.5rem !important;
 }
 
 [data-sonner-toast] [data-close-button] {

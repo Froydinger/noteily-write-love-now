@@ -30,7 +30,7 @@ const Index = () => {
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('latest');
   const [shareFilter, setShareFilter] = useState('all');
@@ -88,6 +88,10 @@ const Index = () => {
 
   const handleCreateNote = async (noteType: NoteType = 'note') => {
     try {
+      // Hide sidebar on mobile before navigating
+      if (isMobile && state === "expanded") {
+        toggleSidebar();
+      }
       const newNote = await addNote(noteType);
       setCurrentNote(newNote);
       navigate(`/note/${newNote.id}`);
