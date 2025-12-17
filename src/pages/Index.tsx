@@ -159,11 +159,10 @@ const Index = () => {
 
   const content = (
     <div className="min-h-full apple-pwa-content">
-      <div className="p-4 md:p-8 animate-fade-in apple-pwa-content"
-           style={{ animationDelay: '0.05s', animationFillMode: 'both' }}
-           onClick={() => setSelectedNoteId(null)}>
+      {/* Sticky header - stays at top while scrolling */}
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/20 p-4 md:p-6 md:px-8">
         {/* Mobile layout */}
-        <div className="md:hidden mb-6">
+        <div className="md:hidden">
           {/* Top row: Menu button + Heart on opposite sides, action buttons in middle */}
           <div className="flex items-center justify-between mb-4">
             {(isMobile || state === "collapsed") && (
@@ -304,7 +303,7 @@ const Index = () => {
         </div>
 
         {/* Desktop layout */}
-        <div className="hidden md:block mb-6">
+        <div className="hidden md:block">
           {/* Top row: Left buttons + Logo on right */}
           <div className="flex items-center justify-between">
             {/* Left side: Menu + Action buttons */}
@@ -448,7 +447,12 @@ const Index = () => {
             </button>
           </div>
         </div>
+      </div>
 
+      {/* Scrollable content area */}
+      <div className="p-4 md:p-8 animate-fade-in"
+           style={{ animationDelay: '0.05s', animationFillMode: 'both' }}
+           onClick={() => setSelectedNoteId(null)}>
         {/* Search Input - appears when search bubble is clicked */}
         {showSearch && (
           <div className="relative mb-6 animate-in slide-in-from-top-2 duration-200">
