@@ -232,6 +232,23 @@
       padding-top: max(env(safe-area-inset-top), 20px) !important;
     }
 
+    /* Fixed top elements need safe area offset (toasts, modals, etc.) */
+    [data-sonner-toaster] {
+      top: env(safe-area-inset-top) !important;
+    }
+
+    /* Radix toast viewport */
+    [data-radix-toast-viewport] {
+      top: env(safe-area-inset-top) !important;
+    }
+
+    /* Any fixed top-0 elements inside root */
+    .fixed.top-0 {
+      top: env(safe-area-inset-top) !important;
+    }
+
+    /* Sticky elements already work because body has padding-top */
+
     /* Floating controls - small bottom margin for home indicator, no safe-area-inset */
     .apple-pwa-floating {
       bottom: 16px;
