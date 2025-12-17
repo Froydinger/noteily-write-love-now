@@ -36,7 +36,7 @@ const App = () => {
         <BrowserRouter>
           <AuthProvider>
             <Toaster />
-            <Sonner position="top-right" duration={3000} />
+            <Sonner position="top-center" duration={3000} />
             <AppContent />
           </AuthProvider>
         </BrowserRouter>
