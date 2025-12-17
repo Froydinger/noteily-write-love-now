@@ -69,10 +69,13 @@ export function AppSidebar() {
       setCurrentNote(newNote);
       navigate(`/note/${newNote.id}`);
 
-      toast({
-        title: noteType === 'checklist' ? "Checklist created" : "Note created",
-        description: noteType === 'checklist' ? "Your new checklist has been created." : "Your new note has been created.",
-      });
+      // Delay toast to prevent render blocking during navigation
+      setTimeout(() => {
+        toast({
+          title: noteType === 'checklist' ? "Checklist created" : "Note created",
+          description: noteType === 'checklist' ? "Your new checklist has been created." : "Your new note has been created.",
+        });
+      }, 100);
     } catch (error) {
       console.error('Failed to create note:', error);
     }
