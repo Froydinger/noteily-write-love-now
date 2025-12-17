@@ -227,6 +227,11 @@
       min-height: 100dvh;
     }
 
+    /* Sidebar header - respect top safe area */
+    .apple-pwa-sidebar-header {
+      padding-top: max(env(safe-area-inset-top), 20px) !important;
+    }
+
     /* Floating controls - small bottom margin for home indicator, no safe-area-inset */
     .apple-pwa-floating {
       bottom: 16px;
