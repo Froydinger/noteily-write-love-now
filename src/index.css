@@ -218,13 +218,23 @@
     }
 
     /* Add TOP safe area padding to body - pushes content below status bar */
+    /* EXPLICITLY NO BOTTOM PADDING - ever */
     body {
       padding-top: env(safe-area-inset-top) !important;
+      padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
     }
 
     #root {
       min-height: 100vh;
       min-height: 100dvh;
+      padding-bottom: 0 !important;
+    }
+
+    /* Kill any bottom safe area anywhere */
+    html, body, #root, .min-h-screen, .min-h-full {
+      padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
     }
 
     /* Sidebar header - respect top safe area */
