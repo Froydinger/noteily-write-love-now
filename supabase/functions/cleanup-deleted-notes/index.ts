@@ -21,6 +21,21 @@ Deno.serve(async (req) => {
     })
   }
 
+  // Authenticate using service role key in Authorization header
+  const authHeader = req.headers.get('Authorization')
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  
+  if (!authHeader || !authHeader.includes(serviceRoleKey ?? '')) {
+    console.error('Unauthorized cleanup attempt')
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      {
+        status: 401,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      }
+    )
+  }
+
   try {
     // Create Supabase client with service role key for admin operations
     const supabase = createClient(
