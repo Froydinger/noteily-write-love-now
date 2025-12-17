@@ -1,4 +1,4 @@
-import { Sun, Moon, Waves, FileText, Monitor } from 'lucide-react';
+import { Sun, Moon, Waves, FileText, Sparkles } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { usePreferences, ThemeType } from '@/contexts/PreferencesContext';
@@ -29,9 +29,9 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
       case 'light':
         return <Sun className="h-4 w-4" />;
       case 'dark':
-        return <Monitor className="h-4 w-4" />;
-      case 'navy':
         return <Moon className="h-4 w-4" />;
+      case 'navy':
+        return <Sparkles className="h-4 w-4" />;
       default:
         return <Moon className="h-4 w-4" />;
     }
