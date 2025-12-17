@@ -15,11 +15,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <NoteProvider>
       <SidebarProvider>
-        <div className="flex min-h-[100dvh] w-full apple-pwa-content">
+        <div className="flex min-h-[100dvh] w-full">
           <AppSidebar />
-          <main className="flex-1 min-w-0">
-            {children}
-          </main>
+          <main className="flex-1 min-w-0">{children}</main>
         </div>
         <OfflineIndicator />
       </SidebarProvider>
