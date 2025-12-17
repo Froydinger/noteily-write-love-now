@@ -177,7 +177,7 @@ const NotePage = () => {
       <header
         ref={headerRef}
         data-note-header
-        className="sticky top-0 z-[100] p-4 bg-background/95 backdrop-blur-md"
+        className="sticky top-0 z-[100] p-4"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

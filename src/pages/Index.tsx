@@ -159,8 +159,8 @@ const Index = () => {
 
   const content = (
     <div className="min-h-full apple-pwa-content">
-      {/* Sticky header - stays at top while scrolling */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/20 p-4 md:p-6 md:px-8">
+      {/* Sticky header - floating buttons, no background bar */}
+      <div className="sticky top-0 z-40 p-4 md:p-6 md:px-8">
         {/* Mobile layout */}
         <div className="md:hidden">
           {/* Top row: Menu button + Heart on opposite sides, action buttons in middle */}
