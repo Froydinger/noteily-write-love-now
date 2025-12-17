@@ -22,6 +22,7 @@ import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import NotFound from "./pages/NotFound";
 import RecentlyDeletedPage from "./pages/RecentlyDeletedPage";
+import LanderPage from "./pages/LanderPage";
 import { PreferencesProvider } from "./contexts/PreferencesContext";
 import { NotificationToastListener } from "./components/notifications/NotificationToastListener";
 import { useAuth } from "./contexts/AuthContext";
@@ -57,31 +58,72 @@ const AppContent = () => {
     );
   }
 
-  // Show marketing splash for unregistered users
-  if (!user) {
-    return <MarketingSplashScreen />;
-  }
-
   return (
     <>
-      <NotificationToastListener />
-      <PreferencesProvider>
-        <Routes>
-          
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/" element={<AppLayout><Index /></AppLayout>} />
-          <Route path="/note/:id" element={<AppLayout><NotePage /></AppLayout>} />
-          <Route path="/prompts" element={<AppLayout><PromptsPage /></AppLayout>} />
-          <Route path="/recently-deleted" element={<AppLayout><RecentlyDeletedPage /></AppLayout>} />
-          <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <PWAInstall />
-        <PWAUpdateNotification />
-      </PreferencesProvider>
+      <Routes>
+        {/* Public routes - accessible to everyone */}
+        <Route path="/lander" element={<LanderPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+
+        {/* Protected routes - require authentication */}
+        {user ? (
+          <>
+            <Route
+              path="/"
+              element={
+                <PreferencesProvider>
+                  <NotificationToastListener />
+                  <AppLayout><Index /></AppLayout>
+                </PreferencesProvider>
+              }
+            />
+            <Route
+              path="/note/:id"
+              element={
+                <PreferencesProvider>
+                  <AppLayout><NotePage /></AppLayout>
+                </PreferencesProvider>
+              }
+            />
+            <Route
+              path="/prompts"
+              element={
+                <PreferencesProvider>
+                  <AppLayout><PromptsPage /></AppLayout>
+                </PreferencesProvider>
+              }
+            />
+            <Route
+              path="/recently-deleted"
+              element={
+                <PreferencesProvider>
+                  <AppLayout><RecentlyDeletedPage /></AppLayout>
+                </PreferencesProvider>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <PreferencesProvider>
+                  <AppLayout><SettingsPage /></AppLayout>
+                </PreferencesProvider>
+              }
+            />
+            <Route path="*" element={<PreferencesProvider><NotFound /></PreferencesProvider>} />
+          </>
+        ) : (
+          <>
+            {/* Unauthenticated users see marketing splash on root */}
+            <Route path="/" element={<MarketingSplashScreen />} />
+            <Route path="*" element={<NotFound />} />
+          </>
+        )}
+      </Routes>
+      <PWAInstall />
+      <PWAUpdateNotification />
     </>
   );
 };
