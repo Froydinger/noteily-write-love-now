@@ -341,7 +341,7 @@ export function AppSidebar() {
       )}
 
 
-      <SidebarFooter className="px-4 py-4 border-t border-border/20 apple-pwa-bottom-safe">
+      <SidebarFooter className="px-4 py-4 border-t border-border/20">
         <div className="flex justify-between items-center w-full gap-1 px-2">
           <Button
             variant="ghost"

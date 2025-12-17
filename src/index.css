@@ -1069,11 +1069,6 @@ html[data-title-font="mono"] .note-editor h6 {
     margin-top: 4px !important;
   }
 
-  .apple-pwa-bottom-safe {
-    padding-bottom: 8px !important;
-    margin-bottom: 4px !important;
-  }
-
   /* Note editor header compact */
   [data-note-header] {
     padding: 0.5rem !important;
