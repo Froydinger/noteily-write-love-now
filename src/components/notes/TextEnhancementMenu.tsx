@@ -285,14 +285,22 @@ export function TextEnhancementMenu({
         <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               disabled={disabled || isProcessing}
               onClick={!isDropdownOpen ? (() => {
                 setIsChatHidden(false);
                 handleOpenChatDialog();
               }) : undefined}
-              className="!fixed !z-[9999] h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-200 hover:scale-105 flex items-center justify-center p-0"
+              className="!fixed !z-[9999] h-12 w-12 rounded-full
+                bg-accent/10 hover:bg-accent/20
+                border-2 border-accent
+                text-accent
+                shadow-glow-sm hover:shadow-glow
+                transition-all duration-250 ease-bounce-out
+                hover:scale-[1.05] active:scale-[0.95]
+                flex items-center justify-center p-0
+                backdrop-blur-sm"
               style={{
                 bottom: 'max(env(safe-area-inset-bottom), 16px)',
                 right: 'max(env(safe-area-inset-right), 16px)',
