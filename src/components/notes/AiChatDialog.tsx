@@ -519,7 +519,7 @@ export function AiChatDialog({
                   size="sm"
                   onClick={() => setIsMinimized(!isMinimized)}
                   title={isMinimized ? "Expand chat" : "Minimize chat"}
-                  className={`transition-all duration-300 mr-2 ${
+                  className={`transition-all duration-300 mr-2 h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 shadow-sm flex items-center justify-center ${
                     hasTextSelected ? 'ring-2 ring-blue-400 ring-offset-1 shadow-blue-400/50' : ''
                   }`}
                   style={{
@@ -536,6 +536,7 @@ export function AiChatDialog({
                   console.log('Close button clicked - closing dialog');
                   onOpenChange(false);
                 }}
+                className="h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -713,7 +714,7 @@ export function AiChatDialog({
                     size="sm"
                     onClick={() => setIsMinimized(!isMinimized)}
                     title={isMinimized ? "Expand chat" : "Minimize chat"}
-                    className="transition-all duration-300"
+                    className="transition-all duration-300 h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 shadow-sm"
                   >
                     {isMinimized ? "↑" : "↓"}
                   </Button>
@@ -725,7 +726,7 @@ export function AiChatDialog({
                       onOpenChange(false);
                     }}
                     title="Close chat"
-                    className="transition-all duration-300"
+                    className="transition-all duration-300 h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 shadow-sm"
                   >
                     <X className="h-4 w-4" />
                   </Button>

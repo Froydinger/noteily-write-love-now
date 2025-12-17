@@ -126,7 +126,7 @@ export function AppSidebar() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="btn-accessible h-9 w-9 rounded-full flex-shrink-0 relative hover:bg-accent/10"
+                  className="btn-accessible h-9 w-9 rounded-full flex-shrink-0 relative bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
                   title="Notifications"
                 >
                   <Bell className="h-4 w-4" />
@@ -141,7 +141,7 @@ export function AppSidebar() {
             <Button
               variant="ghost"
               size="sm"
-              className="btn-accessible h-9 w-9 rounded-full flex-shrink-0 hover:bg-accent/10 hidden md:flex"
+              className="btn-accessible h-9 w-9 rounded-full flex-shrink-0 bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm hidden md:flex"
               title="Hide sidebar"
               onClick={toggleSidebar}
             >
@@ -304,7 +304,7 @@ export function AppSidebar() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="mt-3 btn-accessible rounded-full text-xs"
+                                className="mt-3 btn-accessible rounded-full text-xs bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
                                 onClick={() => setSearchTerm("")}
                               >
                                 Clear search
@@ -327,7 +327,7 @@ export function AppSidebar() {
             variant="ghost"
             size="sm"
             onClick={handleSync}
-            className="btn-accessible h-9 w-9 rounded-full hover:bg-accent/10"
+            className="btn-accessible h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
             title="Sync notes"
           >
             <RefreshCw className="h-4 w-4" />
@@ -338,7 +338,7 @@ export function AppSidebar() {
           <Button
             variant="ghost"
             size="sm"
-            className={`btn-accessible h-9 w-9 rounded-full hover:bg-accent/10 ${isActive('/recently-deleted') ? 'bg-accent/10 text-accent' : ''}`}
+            className={`btn-accessible h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm ${isActive('/recently-deleted') ? 'bg-secondary/80 text-accent' : ''}`}
             asChild
             title="Recently Deleted"
           >
@@ -350,7 +350,7 @@ export function AppSidebar() {
           <Button
             variant="ghost"
             size="sm"
-            className={`btn-accessible h-9 w-9 rounded-full hover:bg-accent/10 ${isActive('/settings') ? 'bg-accent/10 text-accent' : ''}`}
+            className={`btn-accessible h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm ${isActive('/settings') ? 'bg-secondary/80 text-accent' : ''}`}
             asChild
             title="Settings"
           >
