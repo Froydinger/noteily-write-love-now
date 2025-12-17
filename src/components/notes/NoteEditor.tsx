@@ -387,22 +387,36 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
       // Create a temporary div to parse HTML
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = htmlData;
-      
-      // Clean up the content and process it properly
+
+      // Clean up the content and process it properly - preserving whitespace and blank lines
       const processElement = (element: Element): DocumentFragment => {
         const fragment = document.createDocumentFragment();
-        
+
         // Process all child nodes
         for (const child of Array.from(element.childNodes)) {
           if (child.nodeType === Node.TEXT_NODE) {
-            const text = child.textContent?.trim();
+            // Preserve text content including whitespace, only collapse multiple spaces
+            const text = child.textContent || '';
+            // Don't skip empty text nodes if they contain newlines - preserve structure
             if (text) {
-              fragment.appendChild(document.createTextNode(text));
+              // Preserve newlines and convert them to proper line breaks
+              const lines = text.split('\n');
+              lines.forEach((line, lineIndex) => {
+                // Only trim leading/trailing spaces, not the entire content
+                const trimmedLine = line.replace(/^[ \t]+|[ \t]+$/g, '');
+                if (trimmedLine) {
+                  fragment.appendChild(document.createTextNode(trimmedLine));
+                }
+                // Add BR for each newline except the last
+                if (lineIndex < lines.length - 1) {
+                  fragment.appendChild(document.createElement('br'));
+                }
+              });
             }
           } else if (child.nodeType === Node.ELEMENT_NODE) {
             const childElement = child as Element;
             const tagName = childElement.tagName.toLowerCase();
-            
+
             // Handle different element types
             if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tagName)) {
               const heading = document.createElement(tagName);
@@ -415,23 +429,29 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
               }
             } else if (tagName === 'p') {
               const para = document.createElement('p');
-              para.textContent = childElement.textContent || '';
+              // Preserve content with internal formatting
+              const content = childElement.textContent || '';
+              para.textContent = content;
               fragment.appendChild(para);
             } else if (tagName === 'div') {
-              // Process div content recursively but don't add extra breaks
-              const text = childElement.textContent?.trim();
-              if (text) {
-                // Check if this div contains block-level content or just text
-                const hasBlockElements = childElement.querySelector('h1, h2, h3, h4, h5, h6, p');
-                if (hasBlockElements) {
-                  const divContent = processElement(childElement);
-                  fragment.appendChild(divContent);
-                } else {
-                  // Just text content, treat as paragraph
-                  const para = document.createElement('p');
-                  para.textContent = text;
-                  fragment.appendChild(para);
-                }
+              // Process div content - divs typically represent line breaks/paragraphs
+              const text = childElement.textContent || '';
+              const trimmedText = text.trim();
+
+              // Check if this div contains block-level content or just text
+              const hasBlockElements = childElement.querySelector('h1, h2, h3, h4, h5, h6, p, div');
+              if (hasBlockElements) {
+                const divContent = processElement(childElement);
+                fragment.appendChild(divContent);
+              } else if (trimmedText) {
+                // Just text content, treat as paragraph
+                const para = document.createElement('p');
+                para.textContent = trimmedText;
+                fragment.appendChild(para);
+              } else {
+                // Empty div represents a blank line
+                fragment.appendChild(document.createElement('br'));
+                fragment.appendChild(document.createElement('br'));
               }
             } else if (['strong', 'b'].includes(tagName)) {
               const strong = document.createElement('strong');
@@ -447,16 +467,28 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
               fragment.appendChild(u);
             } else if (tagName === 'br') {
               fragment.appendChild(document.createElement('br'));
+            } else if (['ul', 'ol'].includes(tagName)) {
+              // Handle lists - preserve list structure as line breaks
+              const listItems = childElement.querySelectorAll('li');
+              listItems.forEach((li, liIndex) => {
+                const bullet = tagName === 'ul' ? '• ' : `${liIndex + 1}. `;
+                fragment.appendChild(document.createTextNode(bullet + (li.textContent || '')));
+                fragment.appendChild(document.createElement('br'));
+              });
+            } else if (tagName === 'li') {
+              // Individual list item (shouldn't happen normally but handle it)
+              fragment.appendChild(document.createTextNode('• ' + (childElement.textContent || '')));
+              fragment.appendChild(document.createElement('br'));
             } else {
-              // For other elements, just extract text content
-              const text = childElement.textContent?.trim();
-              if (text) {
+              // For other elements, preserve text content
+              const text = childElement.textContent || '';
+              if (text.trim()) {
                 fragment.appendChild(document.createTextNode(text));
               }
             }
           }
         }
-        
+
         return fragment;
       };
       
@@ -483,7 +515,7 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
     }
   };
   
-  // Helper function for plain text insertion - preserves ALL blank lines
+  // Helper function for plain text insertion - preserves ALL blank lines and spacing
   const insertPlainText = (text: string, range: Range, selection: Selection) => {
     // Normalize line breaks: only standardize Windows line endings, preserve all blank lines
     const normalizedText = text
@@ -494,18 +526,31 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
     const lines = normalizedText.split('\n');
 
     lines.forEach((line, index) => {
-      // Insert text node for each line (including empty ones for blank lines)
+      // Insert text node for each line - always create node even if empty
+      // to preserve spacing and blank lines
       if (line.length > 0) {
         const textNode = document.createTextNode(line);
         range.insertNode(textNode);
         range.setStartAfter(textNode);
       }
 
-      // Add line break except for the last line
+      // Add line break for all lines except the last one
+      // For blank lines, this creates the visual blank line
       if (index < lines.length - 1) {
         const br = document.createElement('br');
         range.insertNode(br);
         range.setStartAfter(br);
+
+        // For consecutive blank lines, we need an additional BR
+        // because a single BR after nothing doesn't create a visible blank line
+        if (line.length === 0 && index < lines.length - 2 && lines[index + 1].length === 0) {
+          // Don't add extra BR here - the next iteration will handle it
+        } else if (line.length === 0) {
+          // Add a second BR to make the blank line visible
+          const extraBr = document.createElement('br');
+          range.insertNode(extraBr);
+          range.setStartAfter(extraBr);
+        }
       }
     });
 
