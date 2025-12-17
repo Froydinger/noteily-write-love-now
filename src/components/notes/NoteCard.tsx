@@ -31,9 +31,13 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
 
   const isChecklist = 'note_type' in note && note.note_type === 'checklist';
 
-  // Load checklist items for checklist notes
+  // Load checklist items for checklist notes - with delay to prevent thundering herd
   useEffect(() => {
-    if (isChecklist) {
+    if (!isChecklist) return;
+    
+    // Small staggered delay based on note id to prevent all cards querying at once
+    const delay = Math.random() * 200;
+    const timeoutId = setTimeout(() => {
       supabase
         .from('checklist_items')
         .select('*')
@@ -43,7 +47,9 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         .then(({ data }) => {
           if (data) setChecklistItems(data as ChecklistItem[]);
         });
-    }
+    }, delay);
+    
+    return () => clearTimeout(timeoutId);
   }, [note.id, isChecklist]);
 
   // Check if this note is shared with the user (they don't own it)
