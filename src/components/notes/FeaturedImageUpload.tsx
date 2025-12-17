@@ -157,17 +157,25 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
         throw uploadError;
       }
 
-      const { data: { publicUrl } } = supabase.storage
+      // Create signed URL (valid for 1 year) since bucket is private
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from('note-images')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 year expiry
+
+      if (signedUrlError || !signedUrlData?.signedUrl) {
+        toast.error("URL generation failed", { description: "Could not generate image URL." });
+        return;
+      }
+
+      const imageUrl = signedUrlData.signedUrl;
 
       // Validate the generated URL before using it
-      if (!isValidImageUrl(publicUrl)) {
+      if (!isValidImageUrl(imageUrl)) {
         toast.error("Invalid URL", { description: "Generated image URL is not valid." });
         return;
       }
 
-      onImageSet(publicUrl);
+      onImageSet(imageUrl);
       setShowCrop(false);
       setImageSrc('');
 

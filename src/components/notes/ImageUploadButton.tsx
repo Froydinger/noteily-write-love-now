@@ -138,21 +138,29 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
         throw uploadError;
       }
 
-      console.log('Upload successful, getting public URL...');
+      console.log('Upload successful, getting signed URL...');
 
-      const { data: { publicUrl } } = supabase.storage
+      // Create signed URL (valid for 1 year) since bucket is private
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from('note-images')
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 60 * 60 * 24 * 365); // 1 year expiry
 
-      console.log('Public URL:', publicUrl);
+      if (signedUrlError || !signedUrlData?.signedUrl) {
+        console.error('Signed URL error:', signedUrlError);
+        toast.error("Could not generate image URL");
+        return;
+      }
+
+      const imageUrl = signedUrlData.signedUrl;
+      console.log('Signed URL:', imageUrl);
       
       // Validate the generated URL before using it
-      if (!isValidImageUrl(publicUrl)) {
+      if (!isValidImageUrl(imageUrl)) {
         toast.error("Generated image URL is not valid");
         return;
       }
 
-      onImageInsert(publicUrl);
+      onImageInsert(imageUrl);
       toast.success('Image uploaded successfully');
     } catch (error) {
       console.error('Error uploading image:', error);
