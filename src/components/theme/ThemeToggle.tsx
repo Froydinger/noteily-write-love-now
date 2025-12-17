@@ -29,9 +29,9 @@ export default function ThemeToggle({ variant = 'sidebar' }: ThemeToggleProps) {
       case 'light':
         return <Sun className="h-4 w-4" />;
       case 'dark':
-        return <Moon className="h-4 w-4" />;
-      case 'navy':
         return <Sparkles className="h-4 w-4" />;
+      case 'navy':
+        return <Moon className="h-4 w-4" />;
       default:
         return <Moon className="h-4 w-4" />;
     }
