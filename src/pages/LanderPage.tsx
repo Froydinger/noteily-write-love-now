@@ -71,18 +71,28 @@ export default function LanderPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative px-4 sm:px-6 lg:px-8 py-20 sm:py-32 max-w-6xl mx-auto">
-        {/* Parallax background elements */}
+      <section className="relative px-4 sm:px-6 lg:px-8 py-20 sm:py-32 max-w-6xl mx-auto overflow-hidden">
+        {/* Parallax background elements with enhanced glow */}
         <div
-          className="absolute top-20 right-10 w-72 h-72 bg-accent/10 rounded-full blur-3xl"
-          style={{ transform: `translateY(${scrollY * 0.5}px)` }}
+          className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none shadow-2xl"
+          style={{
+            background: 'radial-gradient(circle, rgba(0, 217, 255, 0.15), rgba(0, 217, 255, 0) 70%)',
+            transform: `translateY(${scrollY * 0.5}px)`,
+            zIndex: -10,
+            filter: 'drop-shadow(0 0 60px rgba(0, 217, 255, 0.3))'
+          }}
         />
         <div
-          className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"
-          style={{ transform: `translateY(${scrollY * 0.3}px)` }}
+          className="absolute -bottom-20 -left-20 w-96 h-96 rounded-full blur-3xl pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0) 70%)',
+            transform: `translateY(${scrollY * 0.3}px)`,
+            zIndex: -10,
+            filter: 'drop-shadow(0 0 40px rgba(168, 85, 247, 0.2))'
+          }}
         />
 
-        <div className="relative text-center space-y-8 animate-fade-in">
+        <div className="relative text-center space-y-8 animate-fade-in z-10">
           {/* Logo with animation */}
           <div className="flex justify-center">
             <div
@@ -149,7 +159,7 @@ export default function LanderPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8">
+      <section className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 relative z-20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-serif font-bold mb-4">
@@ -174,7 +184,7 @@ export default function LanderPage() {
                   {/* Background gradient on hover */}
                   <div className="absolute inset-0 bg-gradient-to-br from-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                  <div className="relative space-y-4">
+                  <div className="relative z-10 space-y-4">
                     <div className="inline-flex p-3 rounded-xl bg-background/40 group-hover:bg-accent/20 transition-colors">
                       <Icon className="h-6 w-6 text-accent" />
                     </div>
@@ -189,7 +199,7 @@ export default function LanderPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 border-y border-border/50">
+      <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 border-y border-border/50 relative z-20">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
@@ -208,7 +218,7 @@ export default function LanderPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8">
+      <section className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 relative z-20">
         <div className="max-w-2xl mx-auto text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-4xl sm:text-5xl font-serif font-bold">
@@ -240,7 +250,7 @@ export default function LanderPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/30 py-12 px-4 sm:px-6 lg:px-8">
+      <footer className="border-t border-border/30 py-12 px-4 sm:px-6 lg:px-8 relative z-20">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
