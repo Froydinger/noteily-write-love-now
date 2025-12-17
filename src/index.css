@@ -200,76 +200,149 @@
     background: inherit;
     margin: 0;
     padding: 0;
-    /* IMPORTANT: Do NOT add safe-area padding here - it creates white gaps */
-    /* Safe area is handled by setting background-color on html element */
+    /* PWA safe area handling - Enhanced for Apple's latest updates */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 
-  /* PWA Layout - SIMPLIFIED */
-  /* Safe area is TOP ONLY (status bar), NO bottom gap */
-  /* Background color is set inline on html element to match theme */
+  /* Enhanced Apple platform detection for latest macOS/iPadOS updates */
+  @supports (-webkit-touch-callout: none) {
+    /* iOS/iPadOS/macOS Safari only */
+    @media (display-mode: standalone) {
+      /* PWA mode on Apple platforms */
 
-  @media (display-mode: standalone) {
-    html, body {
-      /* Fill entire viewport - background color set via JS */
-      min-height: 100vh;
-      min-height: 100dvh;
-      margin: 0;
-      padding: 0;
-      padding-bottom: 0 !important;
-      margin-bottom: 0 !important;
-    }
+      /* Root level safe area handling */
+      #root {
+        /* Only respect safe areas, no extra padding */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+      }
 
-    /* Add TOP safe area padding to body - pushes content below status bar */
-    /* EXPLICITLY NO BOTTOM PADDING - ever */
-    body {
-      padding-top: env(safe-area-inset-top) !important;
-      padding-bottom: 0 !important;
-      margin-bottom: 0 !important;
-    }
+      /* Header spacing for rounded corners and liquid toolbars */
+      .apple-pwa-header-spacing {
+        padding-top: max(env(safe-area-inset-top), 12px);
+        padding-left: max(env(safe-area-inset-left), 16px);
+        padding-right: max(env(safe-area-inset-right), 16px);
+        /* Avoid overlap with macOS title area */
+        margin-top: 4px;
+      }
 
-    #root {
-      min-height: 100vh;
-      min-height: 100dvh;
-      padding-bottom: 0 !important;
-      margin-bottom: 0 !important;
-    }
+      /* Button spacing to avoid rounded corners */
+      .apple-pwa-button-spacing {
+        padding: max(10px, env(safe-area-inset-top, 0px) + 2px) max(16px, env(safe-area-inset-left, 0px) + 8px);
+        margin: 4px max(env(safe-area-inset-left, 0px) + 2px);
+        /* Ensure buttons don't touch window edges */
+        border-radius: min(12px, calc(100vw / 40));
+      }
 
-    /* Kill bottom padding on common layout containers */
-    main, .flex, [class*="min-h-"], [class*="h-full"], [class*="h-screen"] {
-      padding-bottom: 0 !important;
-    }
+      /* Sidebar header with proper safe area respect */
+      .apple-pwa-sidebar-header {
+        padding-top: max(env(safe-area-inset-top), 16px);
+        padding-left: max(env(safe-area-inset-left), 12px);
+        padding-right: max(env(safe-area-inset-right), 12px);
+        /* Extra margin for macOS title bar */
+        margin-top: 8px;
+      }
 
-    /* Prevent iOS from adding safe area to anything */
-    * {
-      -webkit-margin-after: 0;
-    }
+      /* Floating controls and FABs */
+      .apple-pwa-floating {
+        bottom: max(env(safe-area-inset-bottom), 16px);
+        right: max(env(safe-area-inset-right), 16px);
+        /* Remove left positioning for right-aligned FABs */
+        /* Ensure floating elements stay within rounded corners */
+        margin: 0 8px;
+      }
 
-    /* Sidebar header - respect top safe area */
-    .apple-pwa-sidebar-header {
-      padding-top: max(env(safe-area-inset-top), 20px) !important;
-    }
+      /* Content container safe spacing - minimal for full window fill */
+      .apple-pwa-content {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+        margin: 0;
+      }
 
-    /* Fixed top elements need safe area offset (toasts, modals, etc.) */
-    [data-sonner-toaster] {
-      top: env(safe-area-inset-top) !important;
-    }
+      @media (min-width: 768px) {
+        /* iPad and larger screens - more generous spacing */
+        .apple-pwa-header-spacing {
+          padding-top: max(env(safe-area-inset-top), 16px);
+          padding-left: max(env(safe-area-inset-left), 20px);
+          padding-right: max(env(safe-area-inset-right), 20px);
+          margin-top: 8px;
+        }
 
-    /* Radix toast viewport */
-    [data-radix-toast-viewport] {
-      top: env(safe-area-inset-top) !important;
-    }
+        .apple-pwa-button-spacing {
+          padding: max(12px, env(safe-area-inset-top, 0px) + 4px) max(20px, env(safe-area-inset-left, 0px) + 10px);
+          margin: 6px max(env(safe-area-inset-left, 0px) + 4px);
+          border-radius: 14px;
+        }
 
-    /* Any fixed top-0 elements inside root */
-    .fixed.top-0 {
-      top: env(safe-area-inset-top) !important;
-    }
+        .apple-pwa-sidebar-header {
+          padding-top: max(env(safe-area-inset-top), 20px);
+          padding-left: max(env(safe-area-inset-left), 16px);
+          padding-right: max(env(safe-area-inset-right), 16px);
+          margin-top: 12px;
+        }
 
-    /* Sticky elements already work because body has padding-top */
+        .apple-pwa-floating {
+          bottom: max(env(safe-area-inset-bottom), 20px);
+          right: max(env(safe-area-inset-right), 20px);
+          /* Remove left positioning for right-aligned FABs */
+          margin: 0 12px;
+        }
 
-    /* Floating controls - small bottom margin for home indicator, no safe-area-inset */
-    .apple-pwa-floating {
-      bottom: 16px;
-      right: 16px;
+        .apple-pwa-content {
+          padding-left: env(safe-area-inset-left);
+          padding-right: env(safe-area-inset-right);
+          margin: 0;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        /* macOS and large screens - accommodate liquid toolbars */
+        .apple-pwa-header-spacing {
+          padding-top: max(env(safe-area-inset-top), 20px);
+          padding-left: max(env(safe-area-inset-left), 24px);
+          padding-right: max(env(safe-area-inset-right), 24px);
+          margin-top: 12px;
+        }
+
+        .apple-pwa-button-spacing {
+          padding: max(14px, env(safe-area-inset-top, 0px) + 6px) max(24px, env(safe-area-inset-left, 0px) + 12px);
+          margin: 8px max(env(safe-area-inset-left, 0px) + 6px);
+          border-radius: 16px;
+        }
+
+        .apple-pwa-sidebar-header {
+          padding-top: max(env(safe-area-inset-top), 24px);
+          padding-left: max(env(safe-area-inset-left), 20px);
+          padding-right: max(env(safe-area-inset-right), 20px);
+          margin-top: 16px;
+        }
+
+        .apple-pwa-floating {
+          bottom: max(env(safe-area-inset-bottom), 24px);
+          right: max(env(safe-area-inset-right), 24px);
+          /* Remove left positioning for right-aligned FABs */
+          margin: 0 16px;
+        }
+
+        .apple-pwa-content {
+          padding-left: env(safe-area-inset-left);
+          padding-right: env(safe-area-inset-right);
+          margin: 0;
+        }
+      }
+
+      /* Special handling for iPad home indicator area */
+      @media (pointer: coarse) and (max-width: 1366px) {
+        .apple-pwa-bottom-safe {
+          padding-bottom: max(env(safe-area-inset-bottom), 34px);
+          margin-bottom: 8px;
+        }
+      }
     }
   }
   * {
@@ -900,11 +973,16 @@ html[data-title-font="mono"] .note-editor h6 {
     0 0 0 1px hsl(var(--accent) / 0.3) !important;
 }
 
-/* Spell check FAB positioning */
-@media (display-mode: standalone) {
-  .spell-check-fab {
-    bottom: 24px !important;
-    right: 24px !important;
+/* Enhanced safe area support for Apple devices */
+@supports (-webkit-touch-callout: none) {
+  @media (display-mode: standalone) {
+    .spell-check-fab {
+      bottom: max(env(safe-area-inset-bottom), 24px) !important;
+      right: max(env(safe-area-inset-right), 24px) !important;
+      /* Ensure it stays within rounded corners */
+      margin-right: 8px !important;
+      margin-bottom: 8px !important;
+    }
   }
 }
 
@@ -1101,6 +1179,11 @@ html[data-title-font="mono"] .note-editor h6 {
   .apple-pwa-sidebar-header {
     padding-top: max(env(safe-area-inset-top), 8px) !important;
     margin-top: 4px !important;
+  }
+
+  .apple-pwa-bottom-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 8px) !important;
+    margin-bottom: 4px !important;
   }
 
   /* Note editor header compact */

@@ -69,25 +69,11 @@ const NotePage = () => {
     if (document.activeElement && document.activeElement !== document.body) {
       (document.activeElement as HTMLElement).blur();
     }
-
-    // Force scroll to top immediately and after render
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-
-    // Also scroll after a brief delay to catch any layout shifts
-    const scrollTimer = setTimeout(() => {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    }, 100);
-
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    
     // Simple timeout instead of nested RAF to reduce main thread blocking
     const timer = setTimeout(() => setEntered(true), 50);
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(scrollTimer);
-    };
+    return () => clearTimeout(timer);
   }, [id]);
 
 
@@ -192,6 +178,7 @@ const NotePage = () => {
         ref={headerRef}
         data-note-header
         className="sticky top-0 z-[100] p-4"
+        style={{ position: 'sticky', top: 0, zIndex: 100 }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
