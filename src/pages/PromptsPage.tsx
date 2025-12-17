@@ -94,42 +94,40 @@ const PromptsPage = () => {
       </header>
 
       <div className="px-4 md:px-8 animate-fade-in">
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
-            {dailyPrompts.map((prompt) => (
-              <PromptCard 
-                key={prompt.id} 
-                prompt={prompt} 
-                onUsePrompt={handleUsePrompt} 
-              />
-            ))}
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
+          {dailyPrompts.map((prompt) => (
+            <PromptCard 
+              key={prompt.id} 
+              prompt={prompt} 
+              onUsePrompt={handleUsePrompt} 
+            />
+          ))}
         </div>
-
-        {/* Support Dialog */}
-        <AlertDialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
-          <AlertDialogContent className="max-w-sm">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2 justify-center">
-                <Heart className="h-5 w-5 text-accent" fill="currentColor" />
-                Support Noteily!
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-center">
-                Noteily is made with love by Win The Night. If you enjoy using Noteily, consider supporting our work!
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="flex-col sm:flex-col gap-2">
-              <AlertDialogAction
-                onClick={() => window.open('https://winthenight.org/support', '_blank')}
-                className="w-full bg-accent hover:bg-accent/90"
-              >
-                Support Us
-              </AlertDialogAction>
-              <AlertDialogCancel className="w-full">Maybe Later</AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
+
+      {/* Support Dialog */}
+      <AlertDialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 justify-center">
+              <Heart className="h-5 w-5 text-accent" fill="currentColor" />
+              Support Noteily!
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              Noteily is made with love by Win The Night. If you enjoy using Noteily, consider supporting our work!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-col gap-2">
+            <AlertDialogAction
+              onClick={() => window.open('https://winthenight.org/support', '_blank')}
+              className="w-full bg-accent hover:bg-accent/90"
+            >
+              Support Us
+            </AlertDialogAction>
+            <AlertDialogCancel className="w-full">Maybe Later</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
