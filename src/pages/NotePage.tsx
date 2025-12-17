@@ -172,8 +172,8 @@ const NotePage = () => {
     return <div className="p-8">Note not found</div>;
   }
   
-  return (
-    <div key={id} className={`min-h-screen transform transition-all duration-200 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-1 opacity-90'}`}>
+   return (
+     <div key={id} className={`min-h-[100dvh] transform transition-all duration-200 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-1 opacity-90'}`}>
       <header
         ref={headerRef}
         data-note-header

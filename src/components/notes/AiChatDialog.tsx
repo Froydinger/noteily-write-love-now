@@ -498,7 +498,7 @@ export function AiChatDialog({
               bottom: '16px',
               right: '16px',
               maxWidth: 'calc(100vw - 32px)',
-              maxHeight: 'calc(100vh - 32px)'
+              maxHeight: 'calc(100dvh - 32px)'
             }}
           >
         <DialogHeader className="px-6 py-4 border-b">
@@ -691,12 +691,12 @@ export function AiChatDialog({
       ) : (
         /* Desktop: Use fixed positioned div instead of modal */
         open && (
-          <div 
-            className={`fixed bottom-4 right-4 z-[9998] w-96 bg-background border border-border rounded-lg shadow-xl flex flex-col transition-all duration-300 ${isMinimized ? 'h-16' : 'h-[70vh]'}`}
-            style={{
-              maxWidth: 'calc(100vw - 32px)',
-              maxHeight: 'calc(100vh - 32px)'
-            }}
+            <div 
+              className={`fixed bottom-4 right-4 z-[9998] w-96 bg-background border border-border rounded-lg shadow-xl flex flex-col transition-all duration-300 ${isMinimized ? 'h-16' : 'h-[70vh]'}`}
+              style={{
+                maxWidth: 'calc(100vw - 32px)',
+                maxHeight: 'calc(100dvh - 32px)'
+              }}
           >
             {/* Header */}
             <div className="px-6 py-4 border-b">

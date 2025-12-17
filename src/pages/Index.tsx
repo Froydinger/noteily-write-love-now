@@ -157,10 +157,10 @@ const Index = () => {
     return <EmptyNotesPlaceholder />;
   }
 
-  const content = (
-    <div className="min-h-full apple-pwa-content">
-      <div className="p-4 md:p-8 animate-fade-in apple-pwa-content"
-           style={{ animationDelay: '0.05s', animationFillMode: 'both' }}
+   const content = (
+     <div className="min-h-full apple-pwa-content">
+       <div className="p-4 md:p-8 animate-fade-in"
+            style={{ animationDelay: '0.05s', animationFillMode: 'both' }}
            onClick={() => setSelectedNoteId(null)}>
         {/* Mobile layout */}
         <div className="md:hidden mb-6">

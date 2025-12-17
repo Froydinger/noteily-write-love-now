@@ -251,7 +251,7 @@ export function AppSidebar() {
               </div>
             </div>
             <SidebarGroupContent>
-                    <div className="h-[calc(100vh-380px)] overflow-y-auto scrollbar-hide pr-1"
+                    <div className="h-[calc(100dvh-380px)] overflow-y-auto scrollbar-hide pr-1"
                          style={{
                            scrollbarWidth: 'none',
                            msOverflowStyle: 'none'
