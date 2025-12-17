@@ -1,113 +1,162 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, Shield, Sparkles, Mail, Database } from 'lucide-react';
 
 const PrivacyPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div 
-      className="min-h-screen p-4" 
-      style={{
-        background: 'linear-gradient(180deg, hsl(215, 55%, 18%) 0%, hsl(218, 50%, 14%) 30%, hsl(220, 55%, 10%) 70%, hsl(222, 60%, 7%) 100%) !important',
-        backgroundAttachment: 'fixed',
-        backgroundColor: 'hsl(215, 45%, 12%) !important'
-      }}
-    >
-      <div className="max-w-4xl mx-auto">
-        <Button 
+    <div className="min-h-screen bg-background p-4 sm:p-8">
+      <div className="max-w-3xl mx-auto">
+        <Button
           onClick={() => navigate(-1)}
           variant="ghost"
-          className="mb-6"
-          style={{ color: 'hsl(210, 40%, 95%) !important' }}
+          className="mb-6 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
 
-        <Card 
-          style={{
-            backgroundColor: 'hsl(215, 45%, 14%) !important',
-            borderColor: 'hsl(215, 45%, 20%) !important',
-            color: 'hsl(210, 40%, 95%) !important',
-            border: '1px solid hsl(215, 45%, 20%) !important'
-          }}
-        >
-          <CardHeader>
-            <CardTitle className="text-3xl font-serif" style={{ color: 'hsl(210, 40%, 95%) !important' }}>
-              Privacy Policy
-            </CardTitle>
-            <CardDescription style={{ color: 'hsl(210, 20%, 70%) !important' }}>
-              Last updated: {new Date().toLocaleDateString()}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="prose prose-invert max-w-none space-y-6">
-            <div style={{ color: 'hsl(210, 40%, 95%) !important' }}>
-              <h2 className="text-xl font-semibold mb-3">Our Commitment to Your Privacy</h2>
-              <p className="mb-4">
-                At Noteily, we believe your personal information should remain personal. We are committed to protecting your privacy and being transparent about how we handle your data.
-              </p>
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
+              Privacy & Terms
+            </h1>
+            <p className="text-muted-foreground">
+              Simple, honest, and transparent
+            </p>
+          </div>
 
-              <h2 className="text-xl font-semibold mb-3 mt-6">Data Collection</h2>
-              <p className="mb-4">
-                We collect only the minimum information necessary to provide our service:
+          {/* The Short Version */}
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Shield className="h-5 w-5 text-accent" />
+                The Short Version
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-foreground space-y-3">
+              <p>
+                Noteily is a free note-taking tool. We keep it simple:
               </p>
-              <ul className="list-disc pl-6 mb-4">
-                <li>Email address for account creation and authentication</li>
-                <li>Notes and content you create within the app</li>
-                <li>Basic usage analytics to improve our service</li>
+              <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                <li><strong className="text-foreground">We don't collect your data</strong> - Your notes stay on your device and sync to your account. That's it.</li>
+                <li><strong className="text-foreground">We don't spam you</strong> - No marketing emails, no newsletters, no nonsense.</li>
+                <li><strong className="text-foreground">We don't sell anything</strong> - No ads, no premium tiers, no hidden monetization.</li>
+                <li><strong className="text-foreground">We don't read your notes</strong> - Your content is yours. We don't look at it.</li>
               </ul>
+            </CardContent>
+          </Card>
 
-              <h2 className="text-xl font-semibold mb-3 mt-6">Data Use</h2>
-              <p className="mb-4">
-                We use your data solely to:
+          {/* AI Features */}
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Sparkles className="h-5 w-5 text-accent" />
+                AI Features (Gemini)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-foreground space-y-3">
+              <p>
+                Our AI rewrite and spell/grammar check features are powered by Google's Gemini API.
               </p>
-              <ul className="list-disc pl-6 mb-4">
-                <li>Provide and maintain the Noteily service</li>
-                <li>Sync your notes across devices</li>
-                <li>Communicate important service updates</li>
-                <li>Improve our app's functionality and user experience</li>
+              <p className="text-muted-foreground">
+                When you use these features, your selected text is sent to Google for processing. Here's what you should know:
+              </p>
+              <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                <li>We've configured our API to <strong className="text-foreground">not share or store your data</strong> for Google's training purposes</li>
+                <li>Data is processed in real-time and not retained by our systems</li>
+                <li>However, Google's data handling is subject to their own privacy policies</li>
+                <li>If you're concerned, simply don't use the AI features - everything else works without them</li>
               </ul>
-
-              <h2 className="text-xl font-semibold mb-3 mt-6">What We Don't Do</h2>
-              <p className="mb-4">
-                We promise we will never:
+              <p className="text-sm text-muted-foreground mt-4">
+                For more information about how Google handles API data, see{' '}
+                <a
+                  href="https://ai.google.dev/gemini-api/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  Google's Gemini API Terms
+                </a>
               </p>
-              <ul className="list-disc pl-6 mb-4">
-                <li><strong>Sell your data</strong> - Your information is not for sale, ever</li>
-                <li><strong>Share your data</strong> - We don't share your personal information with third parties</li>
-                <li><strong>Run ads</strong> - We will never display advertisements in our app</li>
-                <li><strong>Read your notes</strong> - Your content is private and encrypted</li>
+            </CardContent>
+          </Card>
+
+          {/* Data Storage */}
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Database className="h-5 w-5 text-accent" />
+                Data Storage
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-foreground space-y-3">
+              <p>
+                Your notes are stored securely using Supabase (hosted on AWS). We store:
+              </p>
+              <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                <li>Your email address (for login)</li>
+                <li>Your notes and checklists</li>
+                <li>Your app preferences (theme, fonts, etc.)</li>
               </ul>
-
-              <h2 className="text-xl font-semibold mb-3 mt-6">Data Security</h2>
-              <p className="mb-4">
-                We implement industry-standard security measures to protect your data, including encryption in transit and at rest.
+              <p className="text-muted-foreground mt-3">
+                You can delete your account and all associated data at any time from the Settings page.
               </p>
+            </CardContent>
+          </Card>
 
-              <h2 className="text-xl font-semibold mb-3 mt-6">Your Rights</h2>
-              <p className="mb-4">
-                You have the right to:
+          {/* Terms of Use */}
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-xl">
+                Terms of Use
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-foreground space-y-3">
+              <p className="text-muted-foreground">
+                By using Noteily, you agree to:
               </p>
-              <ul className="list-disc pl-6 mb-4">
-                <li>Access your personal data</li>
-                <li>Correct inaccurate data</li>
-                <li>Delete your account and data</li>
-                <li>Export your notes</li>
+              <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                <li>Not use the service for anything illegal</li>
+                <li>Keep your login credentials secure</li>
+                <li>Accept that the service is provided "as is" without warranties</li>
               </ul>
+              <p className="text-muted-foreground mt-3">
+                That's really it. We're not trying to trap you in legal jargon. Just use the app responsibly and we're good.
+              </p>
+            </CardContent>
+          </Card>
 
-              <h2 className="text-xl font-semibold mb-3 mt-6">Contact Us</h2>
-              <p className="mb-4">
-                If you have any questions about this privacy policy or your data, please contact us at:
+          {/* Contact */}
+          <Card className="bg-card border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Mail className="h-5 w-5 text-accent" />
+                Questions?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-foreground">
+              <p className="text-muted-foreground">
+                If you have any questions or concerns, reach out:{' '}
+                <a
+                  href="mailto:help@noteily.app"
+                  className="text-accent hover:underline"
+                >
+                  help@noteily.app
+                </a>
               </p>
-              <p className="mb-4">
-                <strong>Email:</strong> <a href="mailto:help@noteily.app" className="text-blue-400 hover:text-blue-300">help@noteily.app</a>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          {/* Footer */}
+          <p className="text-center text-sm text-muted-foreground pt-4">
+            Last updated: December 2024
+          </p>
+        </div>
       </div>
     </div>
   );
