@@ -302,8 +302,8 @@ export function TextEnhancementMenu({
                 flex items-center justify-center p-0
                 backdrop-blur-sm"
               style={{
-                bottom: 'max(env(safe-area-inset-bottom), 16px)',
-                right: 'max(env(safe-area-inset-right), 16px)',
+                bottom: '16px',
+                right: '16px',
                 left: 'auto',
                 top: 'auto'
               }}
