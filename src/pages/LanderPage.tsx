@@ -1,10 +1,37 @@
 import { useState } from 'react';
-import { Heart, ArrowRight } from 'lucide-react';
+import { Heart, ArrowRight, Zap, Lock, Share2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/auth/LoginDialog';
 
 export default function LanderPage() {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+
+  const features = [
+    {
+      icon: Sparkles,
+      title: 'Beautiful Writing',
+      description: 'A distraction-free experience designed for writers who love their craft',
+      color: 'from-cyan-500/20 to-cyan-500/5'
+    },
+    {
+      icon: Zap,
+      title: 'Lightning Fast',
+      description: 'Instant syncing across all your devices with zero lag',
+      color: 'from-purple-500/20 to-purple-500/5'
+    },
+    {
+      icon: Lock,
+      title: 'Private & Secure',
+      description: 'Your notes are encrypted and only you can access them',
+      color: 'from-emerald-500/20 to-emerald-500/5'
+    },
+    {
+      icon: Share2,
+      title: 'Collaborate Easily',
+      description: 'Share notes with friends and collaborate in real-time',
+      color: 'from-pink-500/20 to-pink-500/5'
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-card/30 overflow-hidden">
@@ -104,6 +131,45 @@ export default function LanderPage() {
         </div>
       </section>
 
+      {/* Features Section */}
+      <section className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 relative z-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-serif font-bold mb-4">
+              Everything You Need
+            </h2>
+            <p className="text-lg text-foreground/60 max-w-2xl mx-auto">
+              Noteily is packed with features to enhance your writing journey
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={index}
+                  className={`group relative overflow-hidden rounded-2xl p-8 backdrop-blur-xl border border-border/50 bg-gradient-to-br ${feature.color} hover:border-accent/50 transition-all duration-300 hover:shadow-lg`}
+                  style={{
+                    animation: `float-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.1}s both`
+                  }}
+                >
+                  {/* Background gradient on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                  <div className="relative z-10 space-y-4">
+                    <div className="inline-flex p-3 rounded-xl bg-background/40 group-hover:bg-accent/20 transition-colors">
+                      <Icon className="h-6 w-6 text-accent" />
+                    </div>
+                    <h3 className="text-xl font-serif font-semibold">{feature.title}</h3>
+                    <p className="text-foreground/70">{feature.description}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 relative z-20">
