@@ -8,7 +8,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppLayout } from "./components/layout/AppLayout";
 
-import { MarketingSplashScreen } from "./components/layout/MarketingSplashScreen";
 import { PWAInstall } from "./components/pwa/PWAInstall";
 import { PWAUpdateNotification } from "./components/pwa/PWAUpdateNotification";
 import Index from "./pages/Index";
@@ -62,7 +61,6 @@ const AppContent = () => {
     <>
       <Routes>
         {/* Public routes - accessible to everyone */}
-        <Route path="/lander" element={<LanderPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
@@ -116,8 +114,8 @@ const AppContent = () => {
           </>
         ) : (
           <>
-            {/* Unauthenticated users see marketing splash on root */}
-            <Route path="/" element={<MarketingSplashScreen />} />
+            {/* Unauthenticated users see landing page on root */}
+            <Route path="/" element={<LanderPage />} />
             <Route path="*" element={<NotFound />} />
           </>
         )}
