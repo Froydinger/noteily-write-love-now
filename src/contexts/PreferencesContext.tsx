@@ -35,13 +35,13 @@ export const usePreferences = () => {
 
 export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const [preferences, setPreferences] = useState<UserPreferences>({ theme: 'navy', titleFont: 'sans', bodyFont: 'sans', aiEnabled: true });
+  const [preferences, setPreferences] = useState<UserPreferences>({ theme: 'dark', titleFont: 'sans', bodyFont: 'sans', aiEnabled: true });
   const [loading, setLoading] = useState(false);
 
   // Load user preferences - prioritize localStorage, sync with Supabase
   const loadPreferences = async () => {
     // Always start with localStorage as primary source
-    const localTheme = (localStorage.getItem('theme') as ThemeType) || 'navy';
+    const localTheme = (localStorage.getItem('theme') as ThemeType) || 'dark';
     const localTitleFont = (localStorage.getItem('titleFont') as TitleFontType) || 'sans';
     const localBodyFont = (localStorage.getItem('bodyFont') as BodyFontType) || 'sans';
     const localAiEnabled = localStorage.getItem('aiEnabled') !== 'false'; // Default to true
@@ -111,7 +111,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
   }, [user]);
 
-  const createDefaultPreferences = async (theme: ThemeType = 'navy', titleFont: TitleFontType = 'sans', bodyFont: BodyFontType = 'sans', aiEnabled: boolean = true) => {
+  const createDefaultPreferences = async (theme: ThemeType = 'dark', titleFont: TitleFontType = 'sans', bodyFont: BodyFontType = 'sans', aiEnabled: boolean = true) => {
     if (!user) return;
 
     try {
