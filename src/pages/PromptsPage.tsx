@@ -40,7 +40,7 @@ const PromptsPage = () => {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="p-4 md:p-8 animate-fade-in">
+      <div className="p-4 md:p-8 animate-fade-in pwa-safe-top">
         {/* Mobile layout */}
         <div className="md:hidden mb-8">
           {/* Top row: Menu button + Logo */}

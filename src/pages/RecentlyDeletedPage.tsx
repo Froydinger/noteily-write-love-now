@@ -74,7 +74,7 @@ export default function RecentlyDeletedPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-4 sm:py-8 max-w-4xl min-h-screen">
+    <div className="container mx-auto px-4 py-4 sm:py-8 max-w-4xl min-h-screen pwa-safe-top">
       {/* Mobile layout: Recently Deleted text on far right, back button underneath */}
       <div className="md:hidden mb-6">
         {/* Top row: Back button left, title far right */}
