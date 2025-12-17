@@ -81,7 +81,7 @@ export default function RecentlyDeletedPage() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <Link to="/">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
@@ -104,7 +104,7 @@ export default function RecentlyDeletedPage() {
         {/* Left side: Back button */}
         <div className="flex items-center gap-4 px-2 py-2">
           <Link to="/">
-            <Button variant="ghost" size="icon" className="h-10 w-10">
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm">
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
