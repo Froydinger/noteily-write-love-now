@@ -40,11 +40,11 @@ const PromptsPage = () => {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="p-4 md:p-8 animate-fade-in pwa-safe-top">
+      {/* Sticky floating header */}
+      <header className="sticky top-0 z-50 p-4 md:p-8 pb-4 pwa-safe-top">
         {/* Mobile layout */}
-        <div className="md:hidden mb-8">
-          {/* Top row: Menu button + Logo */}
-          <div className="flex items-center justify-between mb-6">
+        <div className="md:hidden">
+          <div className="flex items-center justify-between mb-4">
             {(isMobile || state === "collapsed") && (
               <div className="relative">
                 <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
@@ -55,32 +55,20 @@ const PromptsPage = () => {
                 )}
               </div>
             )}
-            <button
-              onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
-            >
+            <button onClick={() => setShowSupportDialog(true)} className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200">
               <Heart className="h-6 w-6 text-accent" fill="currentColor" />
             </button>
           </div>
-
-          {/* Centered refresh button */}
           <div className="flex items-center justify-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250"
-              onClick={refreshDailyPrompts}
-              title="Refresh prompts"
-            >
+            <Button variant="secondary" size="sm" className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250" onClick={refreshDailyPrompts} title="Refresh prompts">
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
         </div>
 
         {/* Desktop layout */}
-        <div className="hidden md:block mb-8">
-          {/* Top row: Menu button + Logo (logo always on right) */}
-          <div className="flex items-center justify-between mb-6">
+        <div className="hidden md:block">
+          <div className="flex items-center justify-between mb-4">
             <div>
               {state === "collapsed" && (
                 <div className="relative">
@@ -93,29 +81,19 @@ const PromptsPage = () => {
                 </div>
               )}
             </div>
-            <button
-              onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
-            >
+            <button onClick={() => setShowSupportDialog(true)} className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200">
               <Heart className="h-6 w-6 text-accent" fill="currentColor" />
             </button>
           </div>
-
-          {/* Centered refresh button */}
           <div className="flex items-center justify-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250"
-              onClick={refreshDailyPrompts}
-              title="Refresh prompts"
-            >
+            <Button variant="secondary" size="sm" className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250" onClick={refreshDailyPrompts} title="Refresh prompts">
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
         </div>
+      </header>
 
-        <div className="mb-6">
+      <div className="px-4 md:px-8 animate-fade-in">
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
             {dailyPrompts.map((prompt) => (

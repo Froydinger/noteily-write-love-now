@@ -74,50 +74,35 @@ export default function RecentlyDeletedPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-4 sm:py-8 max-w-4xl min-h-screen pwa-safe-top">
-      {/* Mobile layout: Recently Deleted text on far right, back button underneath */}
-      <div className="md:hidden mb-6">
-        {/* Top row: Back button left, title far right */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
+    <div className="container mx-auto px-4 py-4 sm:py-8 max-w-4xl min-h-screen">
+      {/* Sticky floating header */}
+      <header className="sticky top-0 z-50 pb-4 pwa-safe-top bg-background/80 backdrop-blur-md">
+        {/* Mobile layout */}
+        <div className="md:hidden">
+          <div className="flex items-center justify-between mb-4">
             <Link to="/">
               <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-          </div>
-          <div className="text-right">
             <h1 className="text-xl font-bold">Recently Deleted</h1>
           </div>
+          <p className="text-muted-foreground text-sm">Notes are automatically deleted after 7 days</p>
         </div>
-        
-        {/* Bottom row: Description */}
-        <div className="px-2 py-2">
-          <p className="text-muted-foreground text-sm">
-            Notes are automatically deleted after 7 days
-          </p>
-        </div>
-      </div>
 
-      {/* Desktop layout: Back button, title far right */}
-      <div className="hidden md:flex items-center justify-between mb-6">
-        {/* Left side: Back button */}
-        <div className="flex items-center gap-4 px-2 py-2">
+        {/* Desktop layout */}
+        <div className="hidden md:flex items-center justify-between">
           <Link to="/">
             <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm">
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
+          <div className="text-right">
+            <h1 className="text-3xl font-bold">Recently Deleted</h1>
+            <p className="text-muted-foreground mt-1">Notes are automatically deleted after 7 days</p>
+          </div>
         </div>
-
-        {/* Right side: Title and description */}
-        <div className="text-right">
-          <h1 className="text-3xl font-bold">Recently Deleted</h1>
-          <p className="text-muted-foreground mt-1">
-            Notes are automatically deleted after 7 days
-          </p>
-        </div>
-      </div>
+      </header>
 
       {deletedNotes.length === 0 ? (
         <div className="text-center py-8 sm:py-12">
