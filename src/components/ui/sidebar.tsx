@@ -45,6 +45,19 @@ function useSidebar() {
   return context
 }
 
+// Helper function to read sidebar state from cookie
+function getSidebarStateFromCookie(): boolean | null {
+  if (typeof document === 'undefined') return null
+  const cookies = document.cookie.split(';')
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=')
+    if (name === SIDEBAR_COOKIE_NAME) {
+      return value === 'true'
+    }
+  }
+  return null
+}
+
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
@@ -70,7 +83,11 @@ const SidebarProvider = React.forwardRef<
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
-    const [_open, _setOpen] = React.useState(defaultOpen)
+    // Read initial state from cookie to persist user preference
+    const [_open, _setOpen] = React.useState(() => {
+      const cookieState = getSidebarStateFromCookie()
+      return cookieState !== null ? cookieState : defaultOpen
+    })
     const open = openProp ?? _open
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {

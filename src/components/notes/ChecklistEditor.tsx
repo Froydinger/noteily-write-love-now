@@ -8,6 +8,7 @@ import { Plus, GripVertical, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTitleFont, useBodyFont } from '@/hooks/useTitleFont';
 import { useNotes } from '@/contexts/NoteContext';
+import { FeaturedImage } from './FeaturedImage';
 
 interface ChecklistEditorProps {
   note: Note;
@@ -189,6 +190,15 @@ export default function ChecklistEditor({ note }: ChecklistEditorProps) {
         )}
         rows={1}
       />
+
+      {/* Featured Image */}
+      {note.featured_image && (
+        <FeaturedImage
+          imageUrl={note.featured_image}
+          alt={note.title}
+          onDelete={() => updateNote(note.id, { featured_image: null }, true)}
+        />
+      )}
 
       {/* Progress indicator */}
       {items.length > 0 && (
