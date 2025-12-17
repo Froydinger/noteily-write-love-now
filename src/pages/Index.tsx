@@ -15,7 +15,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import PullToRefresh from 'react-simple-pull-to-refresh';
 import { ShareManager } from '@/components/notes/ShareManager';
 import { toast } from '@/components/ui/sonner';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,18 +43,13 @@ const Index = () => {
 
   const filteredAndSortedNotes = useMemo(() => {
     const filtered = notes.filter(note => {
-      // First apply search filter
       const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (note.content && note.content.toLowerCase().includes(searchTerm.toLowerCase()));
-
       if (!matchesSearch) return false;
-
-      // Then apply share filter
       switch (shareFilter) {
         case 'shared-with-me':
           return note.isSharedWithUser === true;
         case 'shared-with-others':
-          // Only include notes you own that have been explicitly shared with someone
           return note.isOwnedByUser === true && (note.shares?.length ?? 0) > 0;
         case 'all':
         default:
@@ -76,7 +71,6 @@ const Index = () => {
         break;
     }
 
-    // Place pinned notes first unless using a shared-only view
     if (shareFilter === 'shared-with-me' || shareFilter === 'shared-with-others') {
       return sorted;
     }
@@ -90,13 +84,10 @@ const Index = () => {
     try {
       const newNote = await addNote(noteType);
       setCurrentNote(newNote);
-      
-      // On mobile, wait for sidebar animation to complete before navigating
       if (isMobile && state === "expanded") {
         toggleSidebar();
         await new Promise(resolve => setTimeout(resolve, 350));
       }
-      
       navigate(`/note/${newNote.id}`);
     } catch (error) {
       console.error('Failed to create note:', error);
@@ -125,14 +116,11 @@ const Index = () => {
   };
 
   const handleCardPress = (note: Note) => {
-    // Simply select the note - opening will be handled by NoteCard's onOpen
     setSelectedNoteId(note.id);
   };
 
   const handleDeleteNote = async (note: Note, e?: React.MouseEvent) => {
-    // Prevent event bubbling to avoid navigating to the note
     e?.stopPropagation();
-
     try {
       await deleteNote(note.id);
       setSelectedNoteId(null);
@@ -143,30 +131,23 @@ const Index = () => {
     }
   };
 
-  // Debug logging to track the race condition
   console.log('Index render state:', { loading, notesLength: notes.length, hasUser: !!user, hasInitialLoad });
 
-  // Simplified rendering logic - always show content when user exists
   if (!user) {
-    return null; // This shouldn't happen since we're inside authenticated route
+    return null;
   }
 
-  // Show empty state when we've completed the initial load AND notes are actually empty
   if (hasInitialLoad && !loading && notes.length === 0) {
     console.log('Showing EmptyNotesPlaceholder - hasInitialLoad:', hasInitialLoad);
     return <EmptyNotesPlaceholder />;
   }
 
-   const content = (
-     <div className="min-h-full">
-       <div
-         className="px-4 pb-4 md:p-8 animate-fade-in pwa-safe-top"
-         style={{ animationDelay: '0.05s', animationFillMode: 'both' }}
-         onClick={() => setSelectedNoteId(null)}
-       >
+  const content = (
+    <div className="min-h-full">
+      {/* Sticky floating header */}
+      <header className="sticky top-0 z-50 px-4 pt-4 md:px-8 md:pt-8 pb-4 pwa-safe-top">
         {/* Mobile layout */}
-        <div className="md:hidden mb-6">
-          {/* Top row: Menu button + Heart on opposite sides, action buttons in middle */}
+        <div className="md:hidden">
           <div className="flex items-center justify-between mb-4">
             {(isMobile || state === "collapsed") && (
               <div className="relative">
@@ -185,44 +166,23 @@ const Index = () => {
               <Heart className="h-5 w-5 text-accent" fill="currentColor" />
             </button>
           </div>
-
-          {/* Action buttons */}
           <div className="flex items-center gap-2 flex-wrap">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex items-center justify-center gap-2.5 h-11 px-5 group
-                    bg-accent/10 hover:bg-accent/20
-                    border-2 border-accent
-                    text-accent font-medium
-                    rounded-full shadow-glow-sm hover:shadow-glow
-                    transition-all duration-250 ease-bounce-out
-                    hover:scale-[1.02] active:scale-[0.98]
-                    apple-pwa-button-spacing"
-                >
+                <Button variant="outline" className="flex items-center justify-center gap-2.5 h-11 px-5 group bg-accent/10 hover:bg-accent/20 border-2 border-accent text-accent font-medium rounded-full shadow-glow-sm hover:shadow-glow transition-all duration-250 ease-bounce-out hover:scale-[1.02] active:scale-[0.98] apple-pwa-button-spacing">
                   <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
                   <span>New</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="center"
-                className="w-[200px] bg-popover border border-border shadow-lg z-50"
-              >
-                <DropdownMenuItem
-                  onClick={() => handleCreateNote('note')}
-                  className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                >
+              <DropdownMenuContent align="center" className="w-[200px] bg-popover border border-border shadow-lg z-50">
+                <DropdownMenuItem onClick={() => handleCreateNote('note')} className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground">
                   <FileText className="h-4 w-4" />
                   <div className="flex flex-col">
                     <span className="font-medium">Note</span>
                     <span className="text-xs opacity-80">Free-form writing</span>
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleCreateNote('checklist')}
-                  className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                >
+                <DropdownMenuItem onClick={() => handleCreateNote('checklist')} className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground">
                   <CheckSquare className="h-4 w-4" />
                   <div className="flex flex-col">
                     <span className="font-medium">Checklist</span>
@@ -231,42 +191,11 @@ const Index = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
-              onClick={() => {
-                setOpenSelect(null);
-                setShowSearch(true);
-                setTimeout(() => {
-                  const input = document.getElementById('search-input') as HTMLInputElement;
-                  input?.focus();
-                  input?.click();
-                }, 150);
-              }}
-            >
+            <Button size="sm" variant="ghost" className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer" onClick={() => { setOpenSelect(null); setShowSearch(true); setTimeout(() => { const input = document.getElementById('search-input') as HTMLInputElement; input?.focus(); input?.click(); }, 150); }}>
               <Search className="h-4 w-4" />
             </Button>
-
-            <Select
-              value={sortOrder}
-              onValueChange={(value) => {
-                setSortOrder(value);
-                setOpenSelect(null);
-              }}
-              open={openSelect === 'sort-mobile'}
-              onOpenChange={(open) => {
-                if (!open) setOpenSelect(null);
-              }}
-            >
-              <SelectTrigger
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
-                onClick={() => {
-                  setShowSearch(false);
-                  setOpenSelect(openSelect === 'sort-mobile' ? null : 'sort-mobile');
-                }}
-              >
+            <Select value={sortOrder} onValueChange={(value) => { setSortOrder(value); setOpenSelect(null); }} open={openSelect === 'sort-mobile'} onOpenChange={(open) => { if (!open) setOpenSelect(null); }}>
+              <SelectTrigger className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden" onClick={() => { setShowSearch(false); setOpenSelect(openSelect === 'sort-mobile' ? null : 'sort-mobile'); }}>
                 <ArrowUpDown className="h-4 w-4" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="center" sideOffset={8}>
@@ -275,25 +204,8 @@ const Index = () => {
                 <SelectItem value="alphabetical" className="rounded-lg">A-Z</SelectItem>
               </SelectContent>
             </Select>
-
-            <Select
-              value={shareFilter}
-              onValueChange={(value) => {
-                setShareFilter(value);
-                setOpenSelect(null);
-              }}
-              open={openSelect === 'filter-mobile'}
-              onOpenChange={(open) => {
-                if (!open) setOpenSelect(null);
-              }}
-            >
-              <SelectTrigger
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
-                onClick={() => {
-                  setShowSearch(false);
-                  setOpenSelect(openSelect === 'filter-mobile' ? null : 'filter-mobile');
-                }}
-              >
+            <Select value={shareFilter} onValueChange={(value) => { setShareFilter(value); setOpenSelect(null); }} open={openSelect === 'filter-mobile'} onOpenChange={(open) => { if (!open) setOpenSelect(null); }}>
+              <SelectTrigger className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden" onClick={() => { setShowSearch(false); setOpenSelect(openSelect === 'filter-mobile' ? null : 'filter-mobile'); }}>
                 <Filter className="h-4 w-4" />
               </SelectTrigger>
               <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="center" sideOffset={8}>
@@ -306,10 +218,8 @@ const Index = () => {
         </div>
 
         {/* Desktop layout */}
-        <div className="hidden md:block mb-6">
-          {/* Top row: Left buttons + Logo on right */}
+        <div className="hidden md:block">
           <div className="flex items-center justify-between">
-            {/* Left side: Menu + Action buttons */}
             <div className="flex items-center gap-2">
               {state === "collapsed" && (
                 <div className="relative mr-1">
@@ -321,44 +231,23 @@ const Index = () => {
                   )}
                 </div>
               )}
-
-              {/* Hide New Note button when sidebar is open (desktop only) to avoid duplicate */}
               {state === "collapsed" && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="flex items-center justify-center gap-2.5 h-11 px-5 group
-                        bg-accent/10 hover:bg-accent/20
-                        border-2 border-accent
-                        text-accent font-medium
-                        rounded-full shadow-glow-sm hover:shadow-glow
-                        transition-all duration-250 ease-bounce-out
-                        hover:scale-[1.02] active:scale-[0.98]
-                        apple-pwa-button-spacing"
-                    >
+                    <Button variant="outline" className="flex items-center justify-center gap-2.5 h-11 px-5 group bg-accent/10 hover:bg-accent/20 border-2 border-accent text-accent font-medium rounded-full shadow-glow-sm hover:shadow-glow transition-all duration-250 ease-bounce-out hover:scale-[1.02] active:scale-[0.98] apple-pwa-button-spacing">
                       <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
                       <span>New</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="start"
-                    className="w-[200px] bg-popover border border-border shadow-lg z-50"
-                  >
-                    <DropdownMenuItem
-                      onClick={() => handleCreateNote('note')}
-                      className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                    >
+                  <DropdownMenuContent align="start" className="w-[200px] bg-popover border border-border shadow-lg z-50">
+                    <DropdownMenuItem onClick={() => handleCreateNote('note')} className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground">
                       <FileText className="h-4 w-4" />
                       <div className="flex flex-col">
                         <span className="font-medium">Note</span>
                         <span className="text-xs opacity-80">Free-form writing</span>
                       </div>
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleCreateNote('checklist')}
-                      className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                    >
+                    <DropdownMenuItem onClick={() => handleCreateNote('checklist')} className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground">
                       <CheckSquare className="h-4 w-4" />
                       <div className="flex flex-col">
                         <span className="font-medium">Checklist</span>
@@ -368,42 +257,11 @@ const Index = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
-
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
-                onClick={() => {
-                  setOpenSelect(null);
-                  setShowSearch(true);
-                  setTimeout(() => {
-                    const input = document.getElementById('search-input') as HTMLInputElement;
-                    input?.focus();
-                    input?.click();
-                  }, 150);
-                }}
-              >
+              <Button size="sm" variant="ghost" className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer" onClick={() => { setOpenSelect(null); setShowSearch(true); setTimeout(() => { const input = document.getElementById('search-input') as HTMLInputElement; input?.focus(); input?.click(); }, 150); }}>
                 <Search className="h-4 w-4" />
               </Button>
-
-              <Select
-                value={sortOrder}
-                onValueChange={(value) => {
-                  setSortOrder(value);
-                  setOpenSelect(null);
-                }}
-                open={openSelect === 'sort-desktop'}
-                onOpenChange={(open) => {
-                  if (!open) setOpenSelect(null);
-                }}
-              >
-                <SelectTrigger
-                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
-                  onClick={() => {
-                    setShowSearch(false);
-                    setOpenSelect(openSelect === 'sort-desktop' ? null : 'sort-desktop');
-                  }}
-                >
+              <Select value={sortOrder} onValueChange={(value) => { setSortOrder(value); setOpenSelect(null); }} open={openSelect === 'sort-desktop'} onOpenChange={(open) => { if (!open) setOpenSelect(null); }}>
+                <SelectTrigger className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden" onClick={() => { setShowSearch(false); setOpenSelect(openSelect === 'sort-desktop' ? null : 'sort-desktop'); }}>
                   <ArrowUpDown className="h-4 w-4" />
                 </SelectTrigger>
                 <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="start" sideOffset={8}>
@@ -412,25 +270,8 @@ const Index = () => {
                   <SelectItem value="alphabetical" className="rounded-lg">A-Z</SelectItem>
                 </SelectContent>
               </Select>
-
-              <Select
-                value={shareFilter}
-                onValueChange={(value) => {
-                  setShareFilter(value);
-                  setOpenSelect(null);
-                }}
-                open={openSelect === 'filter-desktop'}
-                onOpenChange={(open) => {
-                  if (!open) setOpenSelect(null);
-                }}
-              >
-                <SelectTrigger
-                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
-                  onClick={() => {
-                    setShowSearch(false);
-                    setOpenSelect(openSelect === 'filter-desktop' ? null : 'filter-desktop');
-                  }}
-                >
+              <Select value={shareFilter} onValueChange={(value) => { setShareFilter(value); setOpenSelect(null); }} open={openSelect === 'filter-desktop'} onOpenChange={(open) => { if (!open) setOpenSelect(null); }}>
+                <SelectTrigger className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden" onClick={() => { setShowSearch(false); setOpenSelect(openSelect === 'filter-desktop' ? null : 'filter-desktop'); }}>
                   <Filter className="h-4 w-4" />
                 </SelectTrigger>
                 <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated" side="bottom" align="start" sideOffset={8}>
@@ -440,38 +281,21 @@ const Index = () => {
                 </SelectContent>
               </Select>
             </div>
-
-            {/* Right side: Logo */}
-            <button
-              onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer"
-            >
+            <button onClick={() => setShowSupportDialog(true)} className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer">
               <Heart className="h-5 w-5 text-accent" fill="currentColor" />
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Search Input - appears when search bubble is clicked */}
+      {/* Scrollable content */}
+      <div className="px-4 pb-4 md:px-8 animate-fade-in" style={{ animationDelay: '0.05s', animationFillMode: 'both' }} onClick={() => setSelectedNoteId(null)}>
         {showSearch && (
           <div className="relative mb-6 animate-in slide-in-from-top-2 duration-200">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              id="search-input"
-              placeholder="Search notes by title or content..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-11 pr-10 h-12 rounded-xl bg-card/80 backdrop-blur-sm border-border/50 focus:border-accent/50 focus:ring-accent/20 transition-all duration-250"
-            />
+            <Input id="search-input" placeholder="Search notes by title or content..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-11 pr-10 h-12 rounded-xl bg-card/80 backdrop-blur-sm border-border/50 focus:border-accent/50 focus:ring-accent/20 transition-all duration-250" />
             {searchTerm && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-secondary"
-                onClick={() => {
-                  setSearchTerm('');
-                  setShowSearch(false);
-                }}
-              >
+              <Button variant="ghost" size="sm" className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-secondary" onClick={() => { setSearchTerm(''); setShowSearch(false); }}>
                 <X className="h-4 w-4" />
               </Button>
             )}
@@ -480,39 +304,23 @@ const Index = () => {
 
         {searchTerm && (
           <div className="text-sm text-muted-foreground mb-6 flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
-              {filteredAndSortedNotes.length}
-            </span>
+            <span className="px-2.5 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">{filteredAndSortedNotes.length}</span>
             <span>of {notes.length} notes</span>
           </div>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-24">
           {filteredAndSortedNotes.map((note, index) => (
-            <div
-              key={note.id}
-              className="animate-float-in"
-              style={{
-                animationDelay: `${index * 0.05}s`,
-                animationFillMode: 'both'
-              }}
-            >
+            <div key={note.id} className="animate-float-in" style={{ animationDelay: `${index * 0.05}s`, animationFillMode: 'both' }}>
               <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} isPinned={note.pinned} onTogglePin={(n) => togglePinNote(n.id)} onDelete={handleDeleteNote} />
             </div>
           ))}
         </div>
 
-        {/* Share Manager */}
         {shareManagerNote && (
-          <ShareManager
-            isOpen={!!shareManagerNote}
-            onClose={handleShareClose}
-            note={shareManagerNote}
-            onShareUpdate={handleShareUpdated}
-          />
+          <ShareManager isOpen={!!shareManagerNote} onClose={handleShareClose} note={shareManagerNote} onShareUpdate={handleShareUpdated} />
         )}
 
-        {/* Support Dialog */}
         <AlertDialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
           <AlertDialogContent className="max-w-sm">
             <AlertDialogHeader>
@@ -525,10 +333,7 @@ const Index = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="flex-col sm:flex-col gap-2">
-              <AlertDialogAction
-                onClick={() => window.open('https://winthenight.org/support', '_blank')}
-                className="w-full bg-accent hover:bg-accent/90"
-              >
+              <AlertDialogAction onClick={() => window.open('https://winthenight.org/support', '_blank')} className="w-full bg-accent hover:bg-accent/90">
                 Support Us
               </AlertDialogAction>
               <AlertDialogCancel className="w-full">Maybe Later</AlertDialogCancel>
