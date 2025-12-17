@@ -69,11 +69,25 @@ const NotePage = () => {
     if (document.activeElement && document.activeElement !== document.body) {
       (document.activeElement as HTMLElement).blur();
     }
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    
+
+    // Force scroll to top immediately and after render
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    // Also scroll after a brief delay to catch any layout shifts
+    const scrollTimer = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 100);
+
     // Simple timeout instead of nested RAF to reduce main thread blocking
     const timer = setTimeout(() => setEntered(true), 50);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(scrollTimer);
+    };
   }, [id]);
 
 
