@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { useAiHistory } from '@/hooks/useAiHistory';
 import { AiChatDialog } from './AiChatDialog';
@@ -51,37 +51,26 @@ export function TextEnhancementMenu({
   const [selectedText, setSelectedText] = useState('');
   const [hasTextSelected, setHasTextSelected] = useState(false);
   const [isChatHidden, setIsChatHidden] = useState(false);
-  const { toast } = useToast();
   const { preferences } = usePreferences();
   const { history, addHistoryEntry, revertToVersion, clearHistory } = useAiHistory(noteId);
 
-  // Function to get selected text and range
   const getSelectedText = () => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-      return {
-        text: selection.toString().trim(),
-        range: selection.getRangeAt(0).cloneRange()
-      };
+      return { text: selection.toString().trim(), range: selection.getRangeAt(0).cloneRange() };
     }
     return { text: '', range: null };
   };
 
-  // Check for text selection periodically
   React.useEffect(() => {
     const checkSelection = () => {
       const selection = getSelectedText();
       setHasTextSelected(selection.text.length > 0);
     };
-
-    // Check immediately
     checkSelection();
-
-    // Add event listeners for selection changes
     document.addEventListener('selectionchange', checkSelection);
     document.addEventListener('mouseup', checkSelection);
     document.addEventListener('keyup', checkSelection);
-
     return () => {
       document.removeEventListener('selectionchange', checkSelection);
       document.removeEventListener('mouseup', checkSelection);
@@ -89,11 +78,7 @@ export function TextEnhancementMenu({
     };
   }, []);
 
-  // Handle opening chat dialog with enhanced text selection
-  const getEnhancedSelectedContent = () => {
-    // Always return full content - selected text editing disabled for now
-    return content;
-  };
+  const getEnhancedSelectedContent = () => content;
 
   const handleOpenChatDialog = () => {
     const selection = getSelectedText();
@@ -103,52 +88,25 @@ export function TextEnhancementMenu({
 
   const handleSpellCheck = async () => {
     if (!content.trim()) {
-      toast({
-        title: "No text to check",
-        description: "Please write some text first.",
-        variant: "destructive",
-      });
+      toast.error("No text to check");
       return;
     }
-
     setIsProcessing(true);
     try {
       const { data, error } = await supabase.functions.invoke('spell-check', {
-        body: { 
-          content: originalHTML,
-          originalHTML: originalHTML,
-          action: 'spell'
-        }
+        body: { content: originalHTML, originalHTML, action: 'spell' }
       });
-
       if (error) throw error;
-
       if (data.correctedContent && data.correctedContent !== originalHTML) {
-        // Use AI's HTML output directly - it preserves structure better
-        const correctedHTML = data.correctedContent;
-        
-        // Add to history before changing content
         await addHistoryEntry('spell', originalHTML, data.correctedContent, noteTitle, noteTitle);
-        
-        onContentChange(correctedHTML, false);
-        
-        toast({
-          title: "Spelling corrected",
-          description: "Fixed spelling errors in your note.",
-        });
+        onContentChange(data.correctedContent, false);
+        toast.success("Spelling corrected");
       } else {
-        toast({
-          title: "No spelling errors found",
-          description: "Your text looks good!",
-        });
+        toast.success("No spelling errors found");
       }
     } catch (error) {
       console.error('Spell check failed:', error);
-      toast({
-        title: "Spell check failed",
-        description: "There was an error checking your spelling.",
-        variant: "destructive",
-      });
+      toast.error("Spell check failed");
     } finally {
       setIsProcessing(false);
     }
@@ -156,80 +114,49 @@ export function TextEnhancementMenu({
 
   const handleGrammarCheck = async () => {
     if (!content.trim()) {
-      toast({
-        title: "No text to check",
-        description: "Please write some text first.",
-        variant: "destructive",
-      });
+      toast.error("No text to check");
       return;
     }
-
     setIsProcessing(true);
     try {
       const { data, error } = await supabase.functions.invoke('spell-check', {
-        body: { 
-          content: originalHTML,
-          originalHTML: originalHTML,
-          action: 'grammar'
-        }
+        body: { content: originalHTML, originalHTML, action: 'grammar' }
       });
-
       if (error) throw error;
-
       if (data.correctedContent && data.correctedContent !== originalHTML) {
-        // Use AI's HTML output directly - it preserves structure better
-        const correctedHTML = data.correctedContent;
-        
-        // Add to history before changing content
         await addHistoryEntry('grammar', originalHTML, data.correctedContent, noteTitle, noteTitle);
-        
-        onContentChange(correctedHTML, false);
-        
-        toast({
-          title: "Grammar corrected",
-          description: "Fixed grammar issues in your note.",
-        });
+        onContentChange(data.correctedContent, false);
+        toast.success("Grammar corrected");
       } else {
-        toast({
-          title: "No grammar errors found",
-          description: "Your text looks good!",
-        });
+        toast.success("No grammar errors found");
       }
     } catch (error) {
       console.error('Grammar check failed:', error);
-      toast({
-        title: "Grammar check failed",
-        description: "There was an error checking your grammar.",
-        variant: "destructive",
-      });
+      toast.error("Grammar check failed");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handleAIUndo = async () => {
-    // Revert to the original content before any AI changes
+  const [originalContentBackup, setOriginalContentBackup] = React.useState<{content: string, title: string} | null>(null);
+  
+  React.useEffect(() => {
     if (!originalContentBackup) {
-      toast({
-        title: "Nothing to revert",
-        description: "No original content available to restore.",
-        variant: "destructive",
-      });
+      setOriginalContentBackup({ content: originalHTML, title: noteTitle });
+    }
+  }, []);
+
+  const handleAIUndo = async () => {
+    if (!originalContentBackup) {
+      toast.error("Nothing to revert");
       return;
     }
-
     onContentChange(originalContentBackup.content);
     if (originalContentBackup.title && originalContentBackup.title !== noteTitle) {
       onTitleChange(originalContentBackup.title);
     }
-    
-    // Clear the backup since we've reverted
     setOriginalContentBackup(null);
-    
-    toast({
-      title: "Reverted to original",
-      description: "Content has been restored to original state before AI changes.",
-    });
+    toast.success("Reverted to original");
   };
 
   // Store original content backup when AI operations start

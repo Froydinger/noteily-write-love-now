@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Heart } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 
 interface LoginDialogProps {
   open: boolean;
@@ -21,7 +21,6 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [shake, setShake] = useState(false);
   const { signIn, signUp, signInWithGoogle } = useAuth();
-  const { toast } = useToast();
 
   const handleChoiceSelection = (mode: 'signin' | 'signup') => {
     setAuthMode(mode);
@@ -41,20 +40,12 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     if (authMode === 'signup') {
       setIsCreatingAccount(true);
       
-      toast({
-        title: "Welcome to Noteily! 🎉",
-        description: "Creating your account...",
-        className: "bg-green-600 text-white border-green-600",
-      });
+      toast.success("Welcome to Noteily! 🎉", { description: "Creating your account..." });
       
       const { error: signUpError } = await signUp(emailOrUsername, password);
       if (!signUpError) {
         setPassword('');
-        toast({
-          title: "Account created successfully! ✨",
-          description: "You're all set to start taking notes.",
-          className: "bg-green-600 text-white border-green-600",
-        });
+        toast.success("Account created successfully! ✨", { description: "You're all set to start taking notes." });
         onOpenChange(false);
       }
       setIsCreatingAccount(false);

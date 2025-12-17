@@ -1,13 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { Bell, Share2, Edit3 } from 'lucide-react';
+import { toast } from '@/components/ui/sonner';
 import { useNavigate } from 'react-router-dom';
 
 export const NotificationToastListener = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
   const lastNotificationId = useRef<string | null>(null);
 
@@ -50,18 +48,13 @@ export const NotificationToastListener = () => {
           lastNotificationId.current = notification.id;
 
           // Show toast notification
-          toast({
-            title: `${getNotificationIcon(notification.type)} ${notification.title}`,
+          toast(`${getNotificationIcon(notification.type)} ${notification.title}`, {
             description: notification.message,
-            duration: 4000, // 4 seconds for notification toasts
-            action: notification.note_id ? (
-              <button
-                onClick={() => handleToastClick(notification.note_id)}
-                className="text-primary hover:text-primary/80 text-sm font-medium"
-              >
-                View →
-              </button>
-            ) : undefined,
+            duration: 4000,
+            action: notification.note_id ? {
+              label: 'View →',
+              onClick: () => handleToastClick(notification.note_id)
+            } : undefined,
           });
         }
       )
@@ -70,7 +63,7 @@ export const NotificationToastListener = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, toast, navigate]);
+  }, [user, navigate]);
 
   return null; // This is an invisible component that just listens
 };

@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { ImagePlus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
@@ -16,7 +16,6 @@ interface FeaturedImageUploadProps {
 }
 
 export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedImageUploadProps) {
-  const { toast } = useToast();
   const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [showCrop, setShowCrop] = useState(false);
@@ -31,22 +30,14 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Invalid file",
-        description: "Please select an image file.",
-        variant: "destructive",
-      });
+      toast.error("Invalid file", { description: "Please select an image file." });
       return;
     }
 
     // File size validation (10MB limit)
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      toast({
-        title: "File too large",
-        description: "Image size must be less than 10MB.",
-        variant: "destructive",
-      });
+      toast.error("File too large", { description: "Image size must be less than 10MB." });
       return;
     }
 
@@ -148,11 +139,7 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
       const croppedBlob = await getCroppedImg(imgRef.current, completedCrop);
       
       if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to upload images.",
-          variant: "destructive",
-        });
+        toast.error("Authentication required", { description: "Please sign in to upload images." });
         return;
       }
 
@@ -176,11 +163,7 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
 
       // Validate the generated URL before using it
       if (!isValidImageUrl(publicUrl)) {
-        toast({
-          title: "Invalid URL",
-          description: "Generated image URL is not valid.",
-          variant: "destructive",
-        });
+        toast.error("Invalid URL", { description: "Generated image URL is not valid." });
         return;
       }
 
@@ -188,22 +171,15 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
       setShowCrop(false);
       setImageSrc('');
 
-      toast({
-        title: "Featured image set",
-        description: "Your featured image has been uploaded successfully.",
-      });
+      toast.success("Featured image set");
 
     } catch (error) {
       console.error('Upload error:', error);
-      toast({
-        title: "Upload failed",
-        description: "Failed to upload image. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Upload failed", { description: "Failed to upload image. Please try again." });
     } finally {
       setIsUploading(false);
     }
-  }, [completedCrop, user, noteId, onImageSet, toast, getCroppedImg]);
+  }, [completedCrop, user, noteId, onImageSet, getCroppedImg]);
 
   return (
     <>

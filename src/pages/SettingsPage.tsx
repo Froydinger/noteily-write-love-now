@@ -5,7 +5,7 @@ import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotes } from '@/contexts/NoteContext';
 import { usePreferences } from '@/contexts/PreferencesContext';
@@ -25,7 +25,6 @@ const SettingsPage = () => {
   const [isDisconnectingGoogle, setIsDisconnectingGoogle] = useState(false);
   const isMobile = useIsMobile();
   const { state } = useSidebar();
-  const { toast } = useToast();
   const { user, signOut } = useAuth();
   const { notes } = useNotes();
   const { preferences, updateTitleFont, updateBodyFont, updateAiEnabled } = usePreferences();
@@ -51,15 +50,10 @@ const SettingsPage = () => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      toast({
-        title: "Signed out",
-        description: "You have been signed out successfully.",
-      });
-      // Force navigation to ensure user sees they're logged out
+      toast.success("Signed out");
       navigate('/');
     } catch (error) {
       console.error('Settings page sign out error:', error);
-      // Even if signOut fails, navigate to home
       navigate('/');
     }
   };
@@ -69,56 +63,25 @@ const SettingsPage = () => {
   };
 
   const faqItems = [
-    {
-      question: "How do I create a new note?",
-      answer: "Click the '+' button or use the 'New Note' option to create a new note. Start typing immediately."
-    },
-    {
-      question: "Are my notes saved automatically?",
-      answer: "Yes, all notes are automatically saved as you type. No need to manually save."
-    },
-    {
-      question: "Can I access my notes offline?",
-      answer: "Yes, Noteily works offline. Your notes are stored locally and will sync when you're back online."
-    },
-    {
-      question: "How do I format text in my notes?",
-      answer: "Select text to see your device's formatting options like bold, italic, and more. Most devices support native text formatting when you select text."
-    },
-    {
-      question: "Is my data secure and private?",
-      answer: "Yes, your notes are encrypted with your unique key and stored securely. Only you can access your notes - we cannot read them, and neither can anyone else. When signed in, your encrypted notes sync across your devices."
-    }
+    { question: "How do I create a new note?", answer: "Click the '+' button or use the 'New Note' option to create a new note. Start typing immediately." },
+    { question: "Are my notes saved automatically?", answer: "Yes, all notes are automatically saved as you type. No need to manually save." },
+    { question: "Can I access my notes offline?", answer: "Yes, Noteily works offline. Your notes are stored locally and will sync when you're back online." },
+    { question: "How do I format text in my notes?", answer: "Select text to see your device's formatting options like bold, italic, and more. Most devices support native text formatting when you select text." },
+    { question: "Is my data secure and private?", answer: "Yes, your notes are encrypted with your unique key and stored securely. Only you can access your notes - we cannot read them, and neither can anyone else. When signed in, your encrypted notes sync across your devices." }
   ];
 
   const handleExportNotes = () => {
     if (!notes.length) {
-      toast({
-        title: "No notes to export",
-        description: "You don't have any notes to export yet.",
-        variant: "destructive",
-      });
+      toast.error("No notes to export");
       return;
     }
 
-    // Create a formatted text content with all notes
     const exportContent = notes.map(note => {
       const createdDate = new Date(note.createdAt).toLocaleDateString();
       const updatedDate = new Date(note.updatedAt).toLocaleDateString();
-      
-      return `
-=====================================
-Title: ${note.title}
-Created: ${createdDate}
-Updated: ${updatedDate}
-=====================================
-
-${note.content}
-
-`;
+      return `\n=====================================\nTitle: ${note.title}\nCreated: ${createdDate}\nUpdated: ${updatedDate}\n=====================================\n\n${note.content}\n\n`;
     }).join('\n');
 
-    // Create blob and download
     const blob = new Blob([exportContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -129,107 +92,57 @@ ${note.content}
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    toast({
-      title: "Notes exported",
-      description: `Successfully exported ${notes.length} notes to a text file.`,
-    });
+    toast.success(`Exported ${notes.length} notes`);
   };
 
   const handleChangePassword = async () => {
     if (!newPassword.trim()) {
-      toast({
-        title: "Password required",
-        description: "Please enter a new password.",
-        variant: "destructive",
-      });
+      toast.error("Password required");
       return;
     }
-
     if (newPassword.length < 6) {
-      toast({
-        title: "Password too short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
-      });
+      toast.error("Password must be at least 6 characters");
       return;
     }
 
     setIsChangingPassword(true);
-
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-
-      if (error) {
-        throw error;
-      }
-
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
       setNewPassword('');
-      toast({
-        title: "Password updated",
-        description: "Your password has been successfully changed.",
-      });
+      toast.success("Password updated");
     } catch (error: any) {
       console.error('Error changing password:', error);
-      toast({
-        title: "Error changing password",
-        description: error.message || "Failed to change password. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Error changing password", { description: error.message });
     } finally {
       setIsChangingPassword(false);
     }
   };
 
   const isGoogleUser = () => {
-    return user?.app_metadata?.providers?.includes('google') || 
-           user?.identities?.some(identity => identity.provider === 'google');
+    return user?.app_metadata?.providers?.includes('google') || user?.identities?.some(identity => identity.provider === 'google');
   };
 
   const hasPassword = () => {
-    // Check if user has a password set (users who signed up with Google initially don't have a password)
     return user?.app_metadata?.provider !== 'google' || newPassword.trim().length >= 6;
   };
 
   const handleDisconnectGoogle = async () => {
     if (!user || !isGoogleUser()) return;
-
-    // Require password to be set first
     if (newPassword.trim().length < 6) {
-      toast({
-        title: "Password required",
-        description: "Please set a password before disconnecting Google. This ensures you can still access your account.",
-        variant: "destructive",
-      });
+      toast.error("Please set a password first");
       return;
     }
 
     setIsDisconnectingGoogle(true);
-
     try {
-      // First set password
-      const { error: passwordError } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-      
-      if (passwordError) {
-        throw passwordError;
-      }
-      
+      const { error: passwordError } = await supabase.auth.updateUser({ password: newPassword });
+      if (passwordError) throw passwordError;
       setNewPassword('');
-
-      toast({
-        title: "Password set successfully",
-        description: "Your password has been set. You can now sign in with email/password. To fully disconnect Google, please contact support.",
-      });
+      toast.success("Password set successfully");
     } catch (error: any) {
       console.error('Error setting password:', error);
-      toast({
-        title: "Error setting password",
-        description: error.message || "Failed to set password. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Error setting password", { description: error.message });
     } finally {
       setIsDisconnectingGoogle(false);
     }
@@ -237,51 +150,22 @@ ${note.content}
 
   const handleDeleteAccount = async () => {
     if (!user) return;
-    
     setIsDeleting(true);
     
     try {
-      // First delete user preferences
-      const { error: preferencesError } = await supabase
-        .from('user_preferences')
-        .delete()
-        .eq('user_id', user.id);
+      const { error: preferencesError } = await supabase.from('user_preferences').delete().eq('user_id', user.id);
+      if (preferencesError) console.warn('Error deleting user preferences:', preferencesError);
 
-      if (preferencesError) {
-        console.warn('Error deleting user preferences:', preferencesError);
-      }
+      const { error: notesError } = await supabase.from('notes').delete().eq('user_id', user.id);
+      if (notesError) throw notesError;
 
-      // Then delete all user's notes
-      const { error: notesError } = await supabase
-        .from('notes')
-        .delete()
-        .eq('user_id', user.id);
-
-      if (notesError) {
-        throw notesError;
-      }
-
-      // Sign out the user which will clear their session
       await signOut();
-
-      // Clear local storage
       localStorage.clear();
-      
-      toast({
-        title: "Account deleted",
-        description: "Your account and all data have been permanently deleted.",
-      });
-      
-      // Navigate to auth page
+      toast.success("Account deleted");
       navigate('/');
-      
     } catch (error: any) {
       console.error('Error deleting account:', error);
-      toast({
-        title: "Error deleting account",
-        description: error.message || "Failed to delete account. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Error deleting account", { description: error.message });
     } finally {
       setIsDeleting(false);
     }

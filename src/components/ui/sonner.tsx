@@ -1,6 +1,5 @@
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, toast } from "sonner"
-import { X } from "lucide-react"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
@@ -26,6 +25,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
           closeButton:
             "group-[.toast]:bg-background/60 group-[.toast]:border-border/50 group-[.toast]:text-foreground group-[.toast]:hover:bg-secondary group-[.toast]:rounded-full group-[.toast]:opacity-100 group-[.toast]:right-2 group-[.toast]:top-1/2 group-[.toast]:-translate-y-1/2",
         },
+      }}
+      style={{
+        top: 'max(env(safe-area-inset-top, 0px), 12px)',
       }}
       {...props}
     />

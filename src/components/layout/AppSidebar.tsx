@@ -37,7 +37,7 @@ import { Button } from "@/components/ui/button";
 import { useNotes, Note } from "@/contexts/NoteContext";
 import { formatDistanceToNow } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/sonner";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -51,7 +51,6 @@ export function AppSidebar() {
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const isMobile = useIsMobile();
-  const { toast } = useToast();
   const { user } = useAuth();
   const { unreadCount } = useNotifications();
   const { state, toggleSidebar } = useSidebar();
@@ -78,10 +77,7 @@ export function AppSidebar() {
 
       // Delay toast to prevent render blocking during navigation
       setTimeout(() => {
-        toast({
-          title: noteType === 'checklist' ? "Checklist created" : "Note created",
-          description: noteType === 'checklist' ? "Your new checklist has been created." : "Your new note has been created.",
-        });
+        toast.success(noteType === 'checklist' ? "Checklist created" : "Note created");
       }, 150);
     } catch (error) {
       console.error('Failed to create note:', error);
@@ -331,7 +327,7 @@ export function AppSidebar() {
       )}
 
 
-      <SidebarFooter className="px-4 py-4 border-t border-border/20 apple-pwa-bottom-safe">
+      <SidebarFooter className="px-4 py-4 border-t border-border/20">
         <div className="flex justify-between items-center w-full gap-1 px-2">
           <Button
             variant="ghost"
