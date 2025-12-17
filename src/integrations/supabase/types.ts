@@ -216,9 +216,7 @@ export type Database = {
           action: string
           created_at: string | null
           id: string
-          ip_address: unknown
           shared_note_id: string
-          user_agent: string | null
           user_id: string
         }
         Insert: {
@@ -226,9 +224,7 @@ export type Database = {
           action: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown
           shared_note_id: string
-          user_agent?: string | null
           user_id: string
         }
         Update: {
@@ -236,9 +232,7 @@ export type Database = {
           action?: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown
           shared_note_id?: string
-          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
