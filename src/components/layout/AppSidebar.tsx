@@ -67,6 +67,13 @@ export function AppSidebar() {
     try {
       const newNote = await addNote(noteType);
       setCurrentNote(newNote);
+      
+      // On mobile, wait for sidebar animation to complete before navigating
+      if (isMobile && state === "expanded") {
+        toggleSidebar();
+        await new Promise(resolve => setTimeout(resolve, 350));
+      }
+      
       navigate(`/note/${newNote.id}`);
 
       // Delay toast to prevent render blocking during navigation
@@ -75,7 +82,7 @@ export function AppSidebar() {
           title: noteType === 'checklist' ? "Checklist created" : "Note created",
           description: noteType === 'checklist' ? "Your new checklist has been created." : "Your new note has been created.",
         });
-      }, 100);
+      }, 150);
     } catch (error) {
       console.error('Failed to create note:', error);
     }
