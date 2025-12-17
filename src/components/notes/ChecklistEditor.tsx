@@ -42,27 +42,38 @@ export default function ChecklistEditor({ note }: ChecklistEditorProps) {
 
   // Load checklist items
   useEffect(() => {
-    loadItems();
+    // Use requestIdleCallback for initial load to not block main thread
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(() => loadItems());
+    } else {
+      setTimeout(loadItems, 50);
+    }
     
-    // Subscribe to real-time changes
-    const channel = supabase
-      .channel(`checklist-${note.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'checklist_items',
-          filter: `note_id=eq.${note.id}`
-        },
-        () => {
-          loadItems();
-        }
-      )
-      .subscribe();
+    // Delay real-time subscription to allow page to render first
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    const subscriptionTimeout = setTimeout(() => {
+      channel = supabase
+        .channel(`checklist-${note.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'checklist_items',
+            filter: `note_id=eq.${note.id}`
+          },
+          () => {
+            loadItems();
+          }
+        )
+        .subscribe();
+    }, 200);
 
     return () => {
-      supabase.removeChannel(channel);
+      clearTimeout(subscriptionTimeout);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, [note.id]);
 

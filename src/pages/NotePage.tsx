@@ -70,9 +70,10 @@ const NotePage = () => {
       (document.activeElement as HTMLElement).blur();
     }
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => setEntered(true));
-    });
+    
+    // Simple timeout instead of nested RAF to reduce main thread blocking
+    const timer = setTimeout(() => setEntered(true), 50);
+    return () => clearTimeout(timer);
   }, [id]);
 
 

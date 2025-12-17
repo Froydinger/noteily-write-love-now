@@ -88,12 +88,15 @@ const Index = () => {
 
   const handleCreateNote = async (noteType: NoteType = 'note') => {
     try {
-      // Hide sidebar on mobile before navigating
-      if (isMobile && state === "expanded") {
-        toggleSidebar();
-      }
       const newNote = await addNote(noteType);
       setCurrentNote(newNote);
+      
+      // On mobile, wait for sidebar animation to complete before navigating
+      if (isMobile && state === "expanded") {
+        toggleSidebar();
+        await new Promise(resolve => setTimeout(resolve, 350));
+      }
+      
       navigate(`/note/${newNote.id}`);
     } catch (error) {
       console.error('Failed to create note:', error);
