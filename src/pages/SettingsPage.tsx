@@ -174,7 +174,7 @@ const SettingsPage = () => {
 
   return (
     <div className="h-full">
-      <div className="p-4 md:p-8 pb-32 animate-fade-in min-h-screen">
+      <div className="p-4 md:p-8 pb-32 animate-fade-in min-h-screen pwa-safe-top">
         {/* Mobile layout */}
         <div className="md:hidden mb-8">
           {/* Top row: Menu button + Logo */}
