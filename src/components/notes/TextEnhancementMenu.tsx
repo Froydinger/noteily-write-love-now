@@ -159,18 +159,6 @@ export function TextEnhancementMenu({
     toast.success("Reverted to original");
   };
 
-  // Store original content backup when AI operations start
-  const [originalContentBackup, setOriginalContentBackup] = React.useState<{content: string, title: string} | null>(null);
-  
-  React.useEffect(() => {
-    if (!originalContentBackup) {
-      setOriginalContentBackup({
-        content: originalHTML,
-        title: noteTitle
-      });
-    }
-  }, []);
-
   // Preserve HTML structure while replacing text content
   const preserveHTMLStructure = (originalHTML: string, newText: string): string => {
     try {
