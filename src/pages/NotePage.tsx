@@ -29,11 +29,6 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { handleNoteKeyboard } from '@/lib/viewport';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 
-interface UndoRedoState {
-  title: string;
-  content: string;
-}
-
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
   const { getNote, setCurrentNote, deleteNote, loading, updateNote } = useNotes();
@@ -45,39 +40,19 @@ const NotePage = () => {
   const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
   const [entered, setEntered] = useState(false);
-  const { saveState, undo, redo, canUndo, canRedo, clearHistory } = useUndoRedo();
+  const { saveState } = useUndoRedo();
   const [aiReplacementFunction, setAiReplacementFunction] = useState<((newContent: string, isSelectionReplacement: boolean) => void) | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   
   const note = getNote(id || '');
   
-  // Keyboard handling for undo/redo
+  // Keyboard handling - let native browser undo/redo work naturally
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Check for Ctrl+Z (undo) or Cmd+Z (undo) on Mac
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-        e.preventDefault();
-        handleUndo();
-        return;
-      }
-      
-      // Check for Ctrl+Y (redo) or Ctrl+Shift+Z (redo) or Cmd+Shift+Z (redo) on Mac
-      if (((e.ctrlKey || e.metaKey) && e.key === 'y') || 
-          ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z')) {
-        e.preventDefault();
-        handleRedo();
-        return;
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
     const cleanup = handleNoteKeyboard();
-    
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
       cleanup();
     };
-  }, [canUndo, canRedo]);
+  }, []);
   
   useEffect(() => {
     if (note) {
@@ -184,75 +159,7 @@ const NotePage = () => {
     }
   };
 
-  const handleUndo = () => {
-    if (!note) return;
-    
-    // DON'T save current state to undo stack - just get the previous state
-    const undoneState = undo();
-    if (undoneState) {
-      // Force update the note content directly
-      updateNote(note.id, { 
-        title: undoneState.title, 
-        content: undoneState.content 
-      }, false);
-      
-      // Force editor update by updating DOM directly
-      setTimeout(() => {
-        const titleInput = document.querySelector('[data-title-input]') as HTMLTextAreaElement;
-        const contentDiv = document.querySelector('[contenteditable="true"]') as HTMLDivElement;
-        
-        if (titleInput && titleInput.value !== undoneState.title) {
-          titleInput.value = undoneState.title;
-          titleInput.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-        
-        if (contentDiv && contentDiv.innerHTML !== undoneState.content) {
-          contentDiv.innerHTML = undoneState.content;
-          contentDiv.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-      }, 50);
-      
-      toast({
-        title: "Undone",
-        description: "Note reverted to previous state.",
-      });
-    }
-  };
-
-  const handleRedo = () => {
-    if (!note) return;
-    
-    const redoneState = redo();
-    if (redoneState) {
-      // Force update the note content directly
-      updateNote(note.id, { 
-        title: redoneState.title, 
-        content: redoneState.content 
-      }, false);
-      
-      // Force editor update by updating DOM directly
-      setTimeout(() => {
-        const titleInput = document.querySelector('[data-title-input]') as HTMLTextAreaElement;
-        const contentDiv = document.querySelector('[contenteditable="true"]') as HTMLDivElement;
-        
-        if (titleInput && titleInput.value !== redoneState.title) {
-          titleInput.value = redoneState.title;
-          titleInput.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-        
-        if (contentDiv && contentDiv.innerHTML !== redoneState.content) {
-          contentDiv.innerHTML = redoneState.content;
-          contentDiv.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-      }, 50);
-      
-      toast({
-        title: "Redone",
-        description: "Note restored to next state.",
-      });
-    }
-  };
-
+  // Store state for AI revert functionality only
   const storeUndoState = () => {
     if (note) {
       saveState(note.title, note.content);
