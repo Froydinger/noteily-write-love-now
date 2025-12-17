@@ -200,8 +200,11 @@
     background: inherit;
     margin: 0;
     padding: 0;
-    /* NOTE: Safe area padding is handled by #root in PWA mode, NOT body */
-    /* This prevents double-padding which causes layout issues */
+    /* PWA safe area handling - Enhanced for Apple's latest updates */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 
   /* Enhanced Apple platform detection for latest macOS/iPadOS updates */
@@ -210,10 +213,13 @@
     @media (display-mode: standalone) {
       /* PWA mode on Apple platforms */
 
-      /* Root level - NO extra safe area padding here, let components handle it */
+      /* Root level safe area handling */
       #root {
-        /* Remove safe area padding from root - causes double spacing */
-        padding: 0;
+        /* Only respect safe areas, no extra padding */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
       }
 
       /* Header spacing for rounded corners and liquid toolbars */
@@ -1060,72 +1066,6 @@ html[data-title-font="mono"] .note-editor h6 {
     display: none;
     width: 0;
     height: 0;
-  }
-}
-
-/* iOS PWA bottom safe area fix - CRITICAL for preventing white space */
-@supports (-webkit-touch-callout: none) {
-  @media (display-mode: standalone) {
-    /* Ensure html has solid background color that fills ENTIRE viewport including safe areas */
-    html {
-      background-color: #0a0a0a !important; /* Dark fallback */
-    }
-
-    html.light {
-      background-color: hsl(40, 30%, 98%) !important;
-    }
-
-    html.dark {
-      background-color: hsl(240, 15%, 6%) !important;
-    }
-
-    html.navy {
-      background-color: hsl(220, 45%, 10%) !important;
-    }
-
-    /* Body must also have solid background to prevent any gaps */
-    body {
-      background-color: inherit !important;
-      padding: 0 !important;
-      margin: 0 !important;
-    }
-
-    /* Root element - NO padding, just fill viewport */
-    #root {
-      min-height: 100vh;
-      min-height: 100dvh;
-      padding: 0 !important;
-      box-sizing: border-box;
-    }
-
-    /* Create a pseudo-element that covers the bottom safe area with correct color */
-    html::after {
-      content: '';
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: env(safe-area-inset-bottom);
-      z-index: 99999;
-      pointer-events: none;
-    }
-
-    html.light::after {
-      background: hsl(50, 15%, 93%);
-    }
-
-    html.dark::after {
-      background: hsl(270, 10%, 3%);
-    }
-
-    html.navy::after {
-      background: hsl(226, 45%, 5%);
-    }
-
-    /* Default fallback */
-    html:not(.light):not(.dark):not(.navy)::after {
-      background: hsl(226, 45%, 5%);
-    }
   }
 }
 

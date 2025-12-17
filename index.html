@@ -89,7 +89,7 @@
           // Apply theme class
           document.documentElement.className = theme;
           
-          // Force body background immediately - CRITICAL for iOS PWA
+          // Force body background immediately
           document.documentElement.style.setProperty('background-color', color, 'important');
           if (document.body) {
             document.body.style.setProperty('background-color', color, 'important');
@@ -147,19 +147,6 @@
         }
       })();
     </script>
-    <style>
-      /* Immediate iOS PWA safe area fix - prevents white flash at bottom */
-      @supports (-webkit-touch-callout: none) {
-        @media (display-mode: standalone) {
-          html, body {
-            background-color: #0a0a0a !important;
-          }
-          html.light, html.light body { background-color: hsl(40, 30%, 98%) !important; }
-          html.dark, html.dark body { background-color: hsl(240, 15%, 6%) !important; }
-          html.navy, html.navy body { background-color: hsl(220, 45%, 10%) !important; }
-        }
-      }
-    </style>
     <div id="root"></div>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
