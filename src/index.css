@@ -874,6 +874,15 @@
 
 }
 
+/* Glow shadow utilities for accent-colored elements */
+.shadow-glow-sm {
+  box-shadow: 0 0 10px hsl(var(--accent) / 0.3);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px hsl(var(--accent) / 0.4), 0 0 40px hsl(var(--accent) / 0.2);
+}
+
 /* Dynamic font classes based on preferences */
 html[data-title-font="serif"] .dynamic-title-font {
   font-family: 'Playfair Display', Georgia, serif;
