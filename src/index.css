@@ -206,21 +206,26 @@
     padding-right: env(safe-area-inset-right);
   }
 
-  /* iOS standalone (PWA): use full available height + apply ONLY top safe-area padding */
+  /* iOS standalone (PWA): use full available height + account for safe areas on fixed/sticky UI */
   @supports (-webkit-touch-callout: none) {
     @media (display-mode: standalone) {
       html, body, #root {
         height: -webkit-fill-available;
       }
 
-      body {
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: 0;
-      }
-
       /* Sidebar header with proper safe area respect */
       .apple-pwa-sidebar-header {
         padding-top: max(env(safe-area-inset-top), 16px);
+      }
+
+      /* Sticky note header: add ONLY top safe area (keep existing padding) */
+      [data-note-header] {
+        padding-top: calc(env(safe-area-inset-top) + 1rem) !important;
+      }
+
+      /* Generic utility: add top safe-area to any block (useful for pages without sticky header) */
+      .pwa-safe-top {
+        padding-top: calc(env(safe-area-inset-top) + 1rem) !important;
       }
     }
   }
@@ -1057,18 +1062,21 @@ html[data-title-font="mono"] .note-editor h6 {
 
   /* Sidebar adjustments */
   .apple-pwa-sidebar-header {
-    padding-top: max(env(safe-area-inset-top), 8px) !important;
+    padding-top: 8px !important;
     margin-top: 4px !important;
   }
 
   .apple-pwa-bottom-safe {
-    padding-bottom: max(env(safe-area-inset-bottom), 8px) !important;
+    padding-bottom: 8px !important;
     margin-bottom: 4px !important;
   }
 
-  /* Note editor header compact */
+  /* Note editor header compact (safe-area top handled above in iOS standalone block) */
   [data-note-header] {
-    padding: 0.5rem !important;
+    padding-top: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    padding-left: 0.5rem !important;
   }
 
   [data-note-header] .p-2\.5 {
