@@ -110,7 +110,7 @@ export function NotificationsPanel({ children }: NotificationsPanelProps) {
         </SheetHeader>
 
         <div className="p-4 bg-background/20">
-          <ScrollArea className="h-[calc(100vh-160px)]">
+          <ScrollArea className="h-[calc(100dvh-160px)]">
             {notifications.length === 0 ? (
               <div className="text-center py-12 px-4">
                 <div className="h-16 w-16 rounded-full bg-background/60 backdrop-blur-md border border-border/30 flex items-center justify-center mx-auto mb-4 shadow-sm">

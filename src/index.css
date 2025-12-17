@@ -206,11 +206,22 @@
     padding-right: env(safe-area-inset-right);
   }
 
-  /* iOS standalone: avoid 100vh overflow ("extra space" at bottom) */
+  /* iOS standalone: avoid 100vh overflow ("extra space" at bottom) + respect safe areas */
   @supports (-webkit-touch-callout: none) {
     @media (display-mode: standalone) {
       html, body, #root {
         height: -webkit-fill-available;
+      }
+
+      /* Main app pages: push content below status bar (no bottom padding added) */
+      .apple-pwa-content {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: 0px;
+      }
+
+      /* Sticky note header: include safe-top so it never sits under the status bar */
+      [data-note-header] {
+        padding-top: max(env(safe-area-inset-top), 16px);
       }
     }
   }
