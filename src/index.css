@@ -215,6 +215,8 @@
       min-height: 100dvh;
       margin: 0;
       padding: 0;
+      padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
     }
 
     /* Add TOP safe area padding to body - pushes content below status bar */
@@ -229,12 +231,17 @@
       min-height: 100vh;
       min-height: 100dvh;
       padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
     }
 
-    /* Kill any bottom safe area anywhere */
-    html, body, #root, .min-h-screen, .min-h-full {
+    /* Kill bottom padding on common layout containers */
+    main, .flex, [class*="min-h-"], [class*="h-full"], [class*="h-screen"] {
       padding-bottom: 0 !important;
-      margin-bottom: 0 !important;
+    }
+
+    /* Prevent iOS from adding safe area to anything */
+    * {
+      -webkit-margin-after: 0;
     }
 
     /* Sidebar header - respect top safe area */
