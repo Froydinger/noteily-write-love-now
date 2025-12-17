@@ -217,14 +217,14 @@
       padding: 0;
     }
 
+    /* Add TOP safe area padding to body - pushes content below status bar */
+    body {
+      padding-top: env(safe-area-inset-top) !important;
+    }
+
     #root {
       min-height: 100vh;
       min-height: 100dvh;
-    }
-
-    /* Header spacing - TOP safe area only (for status bar) */
-    .apple-pwa-header-spacing {
-      padding-top: max(env(safe-area-inset-top), 12px);
     }
 
     /* Floating controls - small bottom margin for home indicator, no safe-area-inset */
