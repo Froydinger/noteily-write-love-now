@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNotes, Note } from "@/contexts/NoteContext";
 import { formatDistanceToNow } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -46,7 +47,7 @@ import { NoteType } from "@/types/sharing";
 
 export function AppSidebar() {
   const titleFont = useTitleFont();
-  const { notes, addNote, setCurrentNote, syncNotes } = useNotes();
+  const { notes, addNote, setCurrentNote, syncNotes, loading, hasInitialLoad } = useNotes();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
@@ -266,7 +267,16 @@ export function AppSidebar() {
                         }
                       `}</style>
                       <div className="space-y-1">
-                        {filteredNotes.length > 0 ? (
+                        {(loading || !hasInitialLoad) ? (
+                          // Show skeleton loaders while loading
+                          Array.from({ length: 5 }).map((_, index) => (
+                            <div key={index} className="px-3 py-2.5 rounded-lg">
+                              <Skeleton className="h-4 w-3/4 mb-2" />
+                              <Skeleton className="h-3 w-full mb-1.5" />
+                              <Skeleton className="h-2.5 w-1/3" />
+                            </div>
+                          ))
+                        ) : filteredNotes.length > 0 ? (
                           filteredNotes.map((note, index) => (
                             <div
                               key={note.id}
