@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -13,7 +13,6 @@ export const PWAInstall = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [showAddToHomePrompt, setShowAddToHomePrompt] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -58,10 +57,7 @@ export const PWAInstall = () => {
     const choiceResult = await deferredPrompt.userChoice;
     
     if (choiceResult.outcome === 'accepted') {
-      toast({
-        title: "App installed!",
-        description: "Noteily has been installed successfully.",
-      });
+      toast.success("App installed!");
     }
     
     // Clear the deferredPrompt

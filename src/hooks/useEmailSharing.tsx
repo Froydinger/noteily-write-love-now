@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 
 export interface EmailShare {
   id: string;
@@ -16,7 +16,6 @@ export function useEmailSharing(noteId?: string) {
   const [shares, setShares] = useState<EmailShare[]>([]);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
-  const { toast } = useToast();
 
   const loadShares = useCallback(async (targetNoteId: string) => {
     if (!user) {
@@ -47,16 +46,12 @@ export function useEmailSharing(noteId?: string) {
       setShares(emailShares);
     } catch (error) {
       console.error('Error loading shares:', error);
-      toast({
-        title: "Failed to load shares",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
+      toast.error("Failed to load shares", { description: "Please try again later." });
       setShares([]);
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [user]);
 
   const addShare = useCallback(async (email: string, permission: 'read' | 'write') => {
     if (!user || !noteId) return { success: false, error: 'Missing requirements' };
@@ -80,23 +75,16 @@ export function useEmailSharing(noteId?: string) {
       // Reload shares
       await loadShares(noteId);
 
-      toast({
-        title: "Note shared successfully",
-        description: `Shared with ${trimmedEmail}`,
-      });
+      toast.success("Note shared successfully", { description: `Shared with ${trimmedEmail}` });
 
       return { success: true, data };
     } catch (error: any) {
       console.error('Error adding share:', error);
       const errorMessage = error.message || 'Failed to share note';
-      toast({
-        title: "Failed to share note",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      toast.error("Failed to share note", { description: errorMessage });
       return { success: false, error: errorMessage };
     }
-  }, [user, noteId, loadShares, toast]);
+  }, [user, noteId, loadShares]);
 
   const updatePermission = useCallback(async (shareId: string, permission: 'read' | 'write') => {
     if (!user || !noteId) return false;
@@ -115,22 +103,15 @@ export function useEmailSharing(noteId?: string) {
         share.id === shareId ? { ...share, permission } : share
       ));
 
-      toast({
-        title: "Permission updated",
-        description: `Updated to ${permission} access`,
-      });
+      toast.success("Permission updated", { description: `Updated to ${permission} access` });
 
       return true;
     } catch (error: any) {
       console.error('Error updating permission:', error);
-      toast({
-        title: "Failed to update permission",
-        description: error.message || 'Please try again',
-        variant: "destructive",
-      });
+      toast.error("Failed to update permission", { description: error.message || 'Please try again' });
       return false;
     }
-  }, [user, noteId, toast]);
+  }, [user, noteId]);
 
   const removeShare = useCallback(async (shareId: string) => {
     if (!user) return false;
@@ -147,22 +128,15 @@ export function useEmailSharing(noteId?: string) {
       // Update local state
       setShares(prev => prev.filter(share => share.id !== shareId));
 
-      toast({
-        title: "Share removed",
-        description: "User access has been removed",
-      });
+      toast.success("Share removed");
 
       return true;
     } catch (error: any) {
       console.error('Error removing share:', error);
-      toast({
-        title: "Failed to remove share",
-        description: error.message || 'Please try again',
-        variant: "destructive",
-      });
+      toast.error("Failed to remove share", { description: error.message || 'Please try again' });
       return false;
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Auto-load when noteId changes
   useEffect(() => {

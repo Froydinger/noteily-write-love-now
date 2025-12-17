@@ -1,14 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 import type { SharedNote, ShareRequest, ShareUpdateRequest, ShareDeleteRequest } from '@/types/sharing';
 
 export function useSharedNotes(noteId?: string) {
   const [sharedUsers, setSharedUsers] = useState<SharedNote[]>([]);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
-  const { toast } = useToast();
 
   // Load shares for a specific note (when user owns the note)
   const loadShares = useCallback(async (targetNoteId: string) => {
@@ -52,16 +51,12 @@ export function useSharedNotes(noteId?: string) {
       return sharesWithUsernames;
     } catch (error) {
       console.error('Error loading shares:', error);
-      toast({
-        title: "Failed to load shares",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
+      toast.error("Failed to load shares", { description: "Please try again later." });
       return [];
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Check if current user has access to a note (either owns it or it's shared with them)
   const checkNoteAccess = useCallback(async (targetNoteId: string) => {
@@ -179,23 +174,16 @@ export function useSharedNotes(noteId?: string) {
       // Refresh shares list
       await loadShares(noteId);
 
-      toast({
-        title: "Note shared successfully",
-        description: `Shared with ${trimmedInput}`,
-      });
+      toast.success("Note shared successfully", { description: `Shared with ${trimmedInput}` });
 
       return { success: true, data };
     } catch (error) {
       console.error('Error adding share:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to share note';
-      toast({
-        title: "Failed to share note",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      toast.error("Failed to share note", { description: errorMessage });
       return { success: false, error: errorMessage };
     }
-  }, [user, loadShares, toast]);
+  }, [user, loadShares]);
 
   // Update share permission
   const updateShare = useCallback(async ({ shareId, permission }: ShareUpdateRequest) => {
@@ -215,23 +203,16 @@ export function useSharedNotes(noteId?: string) {
         share.id === shareId ? { ...share, permission } : share
       ));
 
-      toast({
-        title: "Permission updated",
-        description: `Updated to ${permission} access`,
-      });
+      toast.success("Permission updated", { description: `Updated to ${permission} access` });
 
       return { success: true };
     } catch (error) {
       console.error('Error updating share:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to update permission';
-      toast({
-        title: "Failed to update permission",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      toast.error("Failed to update permission", { description: errorMessage });
       return { success: false, error: errorMessage };
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Remove a share
   const removeShare = useCallback(async ({ shareId }: ShareDeleteRequest) => {
@@ -249,23 +230,16 @@ export function useSharedNotes(noteId?: string) {
       // Update local state
       setSharedUsers(prev => prev.filter(share => share.id !== shareId));
 
-      toast({
-        title: "Share removed",
-        description: "User access has been removed",
-      });
+      toast.success("Share removed");
 
       return { success: true };
     } catch (error) {
       console.error('Error removing share:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to remove share';
-      toast({
-        title: "Failed to remove share",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      toast.error("Failed to remove share", { description: errorMessage });
       return { success: false, error: errorMessage };
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Load shares on mount if noteId provided
   useEffect(() => {

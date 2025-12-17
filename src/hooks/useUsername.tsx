@@ -1,14 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 
 export function useUsername() {
   const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
   const { user } = useAuth();
-  const { toast } = useToast();
 
   // Load current username
   const loadUsername = useCallback(async () => {
@@ -68,38 +67,22 @@ export function useUsername() {
     // Validate username format
     const trimmedUsername = newUsername.trim().toLowerCase();
     if (!trimmedUsername) {
-      toast({
-        title: "Invalid username",
-        description: "Username cannot be empty.",
-        variant: "destructive",
-      });
+      toast.error("Invalid username", { description: "Username cannot be empty." });
       return false;
     }
 
     if (trimmedUsername.length < 3) {
-      toast({
-        title: "Username too short",
-        description: "Username must be at least 3 characters long.",
-        variant: "destructive",
-      });
+      toast.error("Username too short", { description: "Username must be at least 3 characters long." });
       return false;
     }
 
     if (trimmedUsername.length > 20) {
-      toast({
-        title: "Username too long",
-        description: "Username must be 20 characters or less.",
-        variant: "destructive",
-      });
+      toast.error("Username too long", { description: "Username must be 20 characters or less." });
       return false;
     }
 
     if (!/^[a-z0-9_]+$/.test(trimmedUsername)) {
-      toast({
-        title: "Invalid username",
-        description: "Username can only contain lowercase letters, numbers, and underscores.",
-        variant: "destructive",
-      });
+      toast.error("Invalid username", { description: "Username can only contain lowercase letters, numbers, and underscores." });
       return false;
     }
 
@@ -126,23 +109,16 @@ export function useUsername() {
       }
 
       setUsername(trimmedUsername);
-      toast({
-        title: "Username set",
-        description: `Your username is now @${trimmedUsername}`,
-      });
+      toast.success("Username set", { description: `Your username is now @${trimmedUsername}` });
       return true;
     } catch (error: any) {
       console.error('Error setting username:', error);
-      toast({
-        title: "Failed to set username",
-        description: error.message || "Please try again later.",
-        variant: "destructive",
-      });
+      toast.error("Failed to set username", { description: error.message || "Please try again later." });
       return false;
     } finally {
       setLoading(false);
     }
-  }, [user, toast, checkUsernameAvailable]);
+  }, [user, checkUsernameAvailable, username]);
 
   // Remove username
   const removeUsername = useCallback(async (): Promise<boolean> => {
@@ -160,23 +136,16 @@ export function useUsername() {
       }
 
       setUsername(null);
-      toast({
-        title: "Username removed",
-        description: "Your username has been removed.",
-      });
+      toast.success("Username removed");
       return true;
     } catch (error: any) {
       console.error('Error removing username:', error);
-      toast({
-        title: "Failed to remove username",
-        description: error.message || "Please try again later.",
-        variant: "destructive",
-      });
+      toast.error("Failed to remove username", { description: error.message || "Please try again later." });
       return false;
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [user]);
 
   return {
     username,
