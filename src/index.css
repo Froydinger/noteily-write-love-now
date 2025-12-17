@@ -1033,6 +1033,33 @@ html[data-title-font="mono"] .note-editor h6 {
   background: hsl(var(--muted-foreground) / 0.4);
 }
 
+/* PWA mode - hide scrollbars completely to prevent white bar flashing */
+@media (display-mode: standalone) {
+  html, body, #root {
+    overflow-x: hidden;
+    overscroll-behavior: none;
+  }
+
+  /* Hide scrollbar in PWA mode but allow scrolling */
+  ::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    display: none;
+  }
+
+  /* Firefox scrollbar hiding */
+  * {
+    scrollbar-width: none;
+  }
+
+  /* Hide scrollbar for all scrollable elements */
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
 /* Sonner Toast Styles */
 [data-sonner-toaster] {
   --normal-bg: hsl(var(--background) / 0.85);
