@@ -53,7 +53,7 @@ export default function LanderPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/30">
+      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/30 pwa-safe-top">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3 group">
             <div className="p-2 rounded-xl bg-gradient-to-br from-accent/30 to-accent/10 group-hover:from-accent/40 group-hover:to-accent/20 transition-all duration-300 shadow-lg shadow-accent/10">
