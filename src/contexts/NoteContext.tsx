@@ -25,6 +25,7 @@ type NoteContextType = {
   addNote: (noteType?: NoteType) => Promise<Note>;
   updateNote: (id: string, updates: Partial<Note>, silent?: boolean) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
+  duplicateNote: (id: string) => Promise<Note | null>;
   togglePinNote: (id: string) => Promise<void>;
   getNote: (id: string) => Note | undefined;
   setCurrentNote: (note: Note | null) => void;
@@ -856,6 +857,80 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return notes.find(note => note.id === id);
   };
 
+  const duplicateNote = async (id: string): Promise<Note | null> => {
+    if (!user) {
+      console.error('User must be authenticated to duplicate notes');
+      return null;
+    }
+
+    const noteToDuplicate = notes.find(note => note.id === id);
+    if (!noteToDuplicate) {
+      console.error('Note not found');
+      return null;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .insert({
+          user_id: user.id,
+          title: `${noteToDuplicate.title} (Copy)`,
+          content: noteToDuplicate.content,
+          note_type: noteToDuplicate.note_type || 'note',
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const newNote: Note = {
+        id: data.id,
+        title: data.title,
+        content: data.content,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+        user_id: data.user_id,
+        pinned: false,
+        note_type: (data.note_type as NoteType) || 'note',
+        isOwnedByUser: true,
+        isSharedWithUser: false,
+      };
+
+      // If it's a checklist, duplicate the checklist items too
+      if (noteToDuplicate.note_type === 'checklist') {
+        const { data: checklistItems } = await supabase
+          .from('checklist_items')
+          .select('*')
+          .eq('note_id', id)
+          .order('position', { ascending: true });
+
+        if (checklistItems && checklistItems.length > 0) {
+          const newItems = checklistItems.map((item, index) => ({
+            note_id: newNote.id,
+            content: item.content,
+            completed: false,
+            position: index,
+          }));
+
+          await supabase.from('checklist_items').insert(newItems);
+        }
+      }
+
+      setNotes(prevNotes => [newNote, ...prevNotes]);
+      await offlineStorage.saveNote(newNote, user.id);
+
+      return newNote;
+    } catch (error) {
+      console.error('Error duplicating note:', error);
+      toast({
+        title: "Error duplicating note",
+        description: "Failed to duplicate note. Please try again.",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
   const syncNotes = async () => {
     await loadNotes();
     // Also sync preferences to ensure theme/color is up to date across devices
@@ -883,6 +958,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addNote, 
         updateNote, 
         deleteNote,
+        duplicateNote,
         togglePinNote,
         getNote,
         setCurrentNote,
