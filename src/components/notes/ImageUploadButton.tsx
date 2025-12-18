@@ -14,16 +14,39 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
 
-  // Check if we're on iOS
-  const isIOS = () => {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  };
 
-  // Check if file is an iCloud placeholder (common iOS issue)
-  const isICloudPlaceholder = (file: File) => {
-    // iCloud placeholders are often very small (< 1KB) or have specific characteristics
-    return file.size < 1024 && isIOS();
+  // Compress image before upload
+  const compressImage = async (file: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxWidth = 1600;
+        const maxHeight = 1600;
+        let { width, height } = img;
+        
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width *= ratio;
+          height *= ratio;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('No context')); return; }
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('Compression failed'));
+        }, 'image/jpeg', 0.85);
+      };
+      img.onerror = () => reject(new Error('Image load failed'));
+      img.src = URL.createObjectURL(file);
+    });
   };
 
   const handleUpload = async (file: File) => {
@@ -31,7 +54,6 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
       fileName: file.name, 
       fileSize: file.size, 
       fileType: file.type,
-      isIOS: isIOS(),
       userId: user?.id 
     });
     
@@ -54,84 +76,26 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
       return;
     }
 
-    // Check for iCloud placeholder on iOS
-    if (isICloudPlaceholder(file)) {
-      console.error('iCloud placeholder detected');
-      toast.error('This photo is stored in iCloud. Please download it to your device first by opening it in Photos app, then try again.');
-      return;
-    }
-
-    // Additional check for very small files that might be placeholders
+    // Check for empty files
     if (file.size === 0) {
       console.error('File is empty (0 bytes)');
       toast.error('The selected file appears to be empty. Please try a different image.');
       return;
     }
 
-    // iOS-specific: Enhanced file availability check
-    if (isIOS()) {
-      try {
-        console.log('Performing iOS-specific file checks...');
-        
-        // Check 1: Try to read file as blob URL
-        const blobUrl = URL.createObjectURL(file);
-        const img = new Image();
-        
-        const imageLoadPromise = new Promise((resolve, reject) => {
-          img.onload = () => {
-            URL.revokeObjectURL(blobUrl);
-            resolve(true);
-          };
-          img.onerror = () => {
-            URL.revokeObjectURL(blobUrl);
-            reject(new Error('Image failed to load - may be iCloud placeholder'));
-          };
-          
-          // Timeout after 10 seconds
-          setTimeout(() => {
-            URL.revokeObjectURL(blobUrl);
-            reject(new Error('Image load timeout'));
-          }, 10000);
-        });
-        
-        img.src = blobUrl;
-        await imageLoadPromise;
-        
-        // Check 2: Try to read the file data
-        const reader = new FileReader();
-        const fileCheckPromise = new Promise((resolve, reject) => {
-          reader.onload = (e) => {
-            if (e.target?.result && (e.target.result as ArrayBuffer).byteLength > 0) {
-              resolve(true);
-            } else {
-              reject(new Error('File has no data'));
-            }
-          };
-          reader.onerror = () => reject(new Error('File read error - not available'));
-          reader.onabort = () => reject(new Error('File read aborted'));
-        });
-        
-        reader.readAsArrayBuffer(file.slice(0, 2048)); // Read first 2KB
-        await fileCheckPromise;
-        console.log('iOS file availability checks passed');
-        
-      } catch (error) {
-        console.error('iOS file availability check failed:', error);
-        toast.error('This image is not fully available. If from iCloud, please open it in Photos app and wait for download, then try again.');
-        return;
-      }
-    }
-
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
     const filePath = `${user.id}/${fileName}`;
 
-    console.log('Uploading to path:', filePath);
+    console.log('Compressing and uploading to path:', filePath);
 
     try {
+      // Compress the image before upload
+      const compressedBlob = await compressImage(file);
+      console.log('Compressed from', file.size, 'to', compressedBlob.size, 'bytes');
+
       const { error: uploadError } = await supabase.storage
         .from('note-images')
-        .upload(filePath, file);
+        .upload(filePath, compressedBlob, { contentType: 'image/jpeg' });
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
@@ -152,7 +116,6 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
       }
 
       const imageUrl = signedUrlData.signedUrl;
-      console.log('Signed URL:', imageUrl);
       
       // Validate the generated URL before using it
       if (!isValidImageUrl(imageUrl)) {

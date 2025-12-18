@@ -19,7 +19,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import NotFound from "./pages/NotFound";
-import RecentlyDeletedPage from "./pages/RecentlyDeletedPage";
+
 import LanderPage from "./pages/LanderPage";
 import { PreferencesProvider } from "./contexts/PreferencesContext";
 import { NotificationToastListener } from "./components/notifications/NotificationToastListener";
@@ -89,14 +89,6 @@ const AppContent = () => {
               element={
                 <PreferencesProvider>
                   <AppLayout><PromptsPage /></AppLayout>
-                </PreferencesProvider>
-              }
-            />
-            <Route
-              path="/recently-deleted"
-              element={
-                <PreferencesProvider>
-                  <AppLayout><RecentlyDeletedPage /></AppLayout>
                 </PreferencesProvider>
               }
             />
