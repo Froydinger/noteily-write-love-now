@@ -26,7 +26,7 @@ import { NoteType } from "@/types/sharing";
 
 const Index = () => {
   const { user } = useAuth();
-  const { notes, addNote, setCurrentNote, loading, syncNotes, hasInitialLoad, deleteNote, togglePinNote } = useNotes();
+  const { notes, addNote, setCurrentNote, loading, syncNotes, hasInitialLoad, deleteNote, togglePinNote, duplicateNote } = useNotes();
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -128,6 +128,18 @@ const Index = () => {
     } catch (error) {
       console.error('Failed to delete note:', error);
       toast.error('Failed to delete note');
+    }
+  };
+
+  const handleDuplicateNote = async (note: Note) => {
+    try {
+      const newNote = await duplicateNote(note.id);
+      if (newNote) {
+        toast.success('Note duplicated');
+      }
+    } catch (error) {
+      console.error('Failed to duplicate note:', error);
+      toast.error('Failed to duplicate note');
     }
   };
 
@@ -312,7 +324,7 @@ const Index = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-24">
           {filteredAndSortedNotes.map((note, index) => (
             <div key={note.id} className="animate-float-in" style={{ animationDelay: `${index * 0.05}s`, animationFillMode: 'both' }}>
-              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} isPinned={note.pinned} onTogglePin={(n) => togglePinNote(n.id)} onDelete={handleDeleteNote} />
+              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} isPinned={note.pinned} onTogglePin={(n) => togglePinNote(n.id)} onDelete={handleDeleteNote} onDuplicate={handleDuplicateNote} />
             </div>
           ))}
         </div>

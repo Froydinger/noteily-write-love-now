@@ -6,7 +6,7 @@ import { Note } from '@/contexts/NoteContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2, CheckSquare, Circle, CheckCircle2, Clock } from 'lucide-react';
+import { Users, Eye, Edit, ArrowUpRight, Pin, Trash2, CheckSquare, Circle, CheckCircle2, Clock, Copy } from 'lucide-react';
 import type { NoteWithSharing, ChecklistItem } from '@/types/sharing';
 import { useIsTouchDevice } from '@/hooks/use-touch-device';
 import { useTitleFont } from '@/hooks/useTitleFont';
@@ -22,9 +22,10 @@ interface NoteCardProps {
   isPinned?: boolean;
   onTogglePin?: (note: Note | NoteWithSharing) => void;
   onDelete?: (note: Note | NoteWithSharing) => void;
+  onDuplicate?: (note: Note | NoteWithSharing) => void;
 }
 
-export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen, isPinned = false, onTogglePin, onDelete }: NoteCardProps) {
+export default function NoteCard({ note, onShareClick, isSelected = false, onPress, onOpen, isPinned = false, onTogglePin, onDelete, onDuplicate }: NoteCardProps) {
   const titleFont = useTitleFont();
   const { isTouchDevice, isIOS } = useIsTouchDevice();
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
@@ -131,6 +132,29 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         <Pin className="h-4 w-4" fill={isPinned ? "currentColor" : "none"} />
       </Button>
 
+      {/* Duplicate button */}
+      {onDuplicate && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`
+            absolute top-3 right-12 h-8 w-8 rounded-full p-0 z-10
+            bg-secondary/60 backdrop-blur-sm border border-border/50
+            hover:bg-accent/10 hover:border-accent/30
+            transition-all duration-250 ease-bounce-out
+            ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}
+            hover:scale-105
+          `}
+          aria-label="Duplicate note"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDuplicate(note);
+          }}
+        >
+          <Copy className="h-4 w-4" />
+        </Button>
+      )}
+
       {/* Delete button */}
       {onDelete && (
         <AlertDialog>
@@ -139,13 +163,14 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
               variant="ghost"
               size="sm"
               className={`
-                absolute top-3 right-12 h-8 w-8 rounded-full p-0 z-10
+                absolute top-3 h-8 w-8 rounded-full p-0 z-10
                 bg-secondary/60 backdrop-blur-sm border border-border/50
                 hover:bg-destructive/10 hover:border-destructive/30
                 transition-all duration-250 ease-bounce-out
                 ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}
                 hover:scale-105
               `}
+              style={{ right: onDuplicate ? '5.25rem' : '3rem' }}
               aria-label="Delete note"
               onClick={(e) => {
                 e.stopPropagation();
