@@ -156,9 +156,9 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
           </AlertDialogTrigger>
           <AlertDialogContent className="bg-card/95 backdrop-blur-xl border-border/50">
             <AlertDialogHeader>
-              <AlertDialogTitle className="font-display">Delete Note</AlertDialogTitle>
+              <AlertDialogTitle className="font-display">Delete Note Permanently</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you would like to delete this note? It will be moved to recently deleted for 7 days before being permanently removed.
+              Are you sure you want to delete this note? This action cannot be undone.
             </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

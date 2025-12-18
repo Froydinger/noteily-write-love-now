@@ -88,18 +88,12 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
     const sourceCropWidth = crop.width * scaleX;
     const sourceCropHeight = crop.height * scaleY;
 
-    // Set minimum output width for high quality (maintain aspect ratio)
-    const minOutputWidth = 1200;
+    // Cap output dimensions to save storage while maintaining quality
+    const maxOutputWidth = 1200;
     const aspectRatio = sourceCropWidth / sourceCropHeight;
     
-    let outputWidth = Math.max(minOutputWidth, sourceCropWidth);
+    let outputWidth = Math.min(maxOutputWidth, sourceCropWidth);
     let outputHeight = outputWidth / aspectRatio;
-
-    // If the source is smaller than our minimum, use source dimensions
-    if (sourceCropWidth < minOutputWidth) {
-      outputWidth = sourceCropWidth;
-      outputHeight = sourceCropHeight;
-    }
 
     canvas.width = outputWidth;
     canvas.height = outputHeight;
@@ -121,12 +115,13 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
     );
 
     return new Promise((resolve) => {
+      // Use JPEG with 85% quality for good balance of quality and size
       canvas.toBlob((blob) => {
         if (!blob) {
           throw new Error('Failed to crop image');
         }
         resolve(blob);
-      }, 'image/png'); // Use PNG for lossless quality
+      }, 'image/jpeg', 0.85);
     });
   }, []);
 
@@ -143,12 +138,12 @@ export function FeaturedImageUpload({ noteId, onImageSet, hasImage }: FeaturedIm
         return;
       }
 
-      const fileName = `${user.id}/${noteId}-featured-${Date.now()}.png`;
+      const fileName = `${user.id}/${noteId}-featured-${Date.now()}.jpg`;
       
       const { error: uploadError } = await supabase.storage
         .from('note-images')
         .upload(fileName, croppedBlob, {
-          contentType: 'image/png',
+          contentType: 'image/jpeg',
           upsert: true,
           cacheControl: '3600'
         });

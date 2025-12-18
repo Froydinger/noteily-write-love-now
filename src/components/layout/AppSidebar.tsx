@@ -9,7 +9,6 @@ import {
   Settings,
   Pencil,
   RefreshCw,
-  Trash2,
   Bell,
   X,
   FileText,
@@ -340,18 +339,6 @@ export function AppSidebar() {
           </Button>
 
           <ThemeToggle variant="settings" />
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`btn-accessible h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm ${isActive('/recently-deleted') ? 'bg-secondary/80 text-accent' : ''}`}
-            asChild
-            title="Recently Deleted"
-          >
-            <a href="/recently-deleted">
-              <Trash2 className="h-4 w-4" />
-            </a>
-          </Button>
 
           <Button
             variant="ghost"
