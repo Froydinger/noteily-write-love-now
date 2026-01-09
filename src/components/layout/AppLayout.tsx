@@ -1,23 +1,31 @@
-
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { NoteProvider } from "@/contexts/NoteContext";
 import { OfflineIndicator } from "@/components/notifications/OfflineIndicator";
-import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type AppLayoutProps = {
   children: React.ReactNode;
 };
 
 export function AppLayout({ children }: AppLayoutProps) {
+  const isMobile = useIsMobile();
+
   return (
     <NoteProvider>
       <SidebarProvider>
         <div className="flex min-h-[100dvh] w-full">
-          <AppSidebar />
-          <main className="flex-1 min-w-0">{children}</main>
+          {/* Desktop: Show sidebar */}
+          {!isMobile && <AppSidebar />}
+          
+          {/* Main content area */}
+          <main className={`flex-1 min-w-0 ${isMobile ? 'pb-20' : ''}`}>
+            {children}
+          </main>
+          
+          {/* Mobile: Show bottom navigation */}
+          {isMobile && <BottomNav />}
         </div>
         <OfflineIndicator />
       </SidebarProvider>

@@ -321,10 +321,25 @@ const Index = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-24">
+        {/* Masonry grid layout */}
+        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 pb-24 space-y-4">
           {filteredAndSortedNotes.map((note, index) => (
-            <div key={note.id} className="animate-float-in" style={{ animationDelay: `${index * 0.05}s`, animationFillMode: 'both' }}>
-              <NoteCard note={note} onShareClick={handleShareClick} isSelected={selectedNoteId === note.id} onPress={handleCardPress} onOpen={(n) => navigate(`/note/${n.id}`)} isPinned={note.pinned} onTogglePin={(n) => togglePinNote(n.id)} onDelete={handleDeleteNote} onDuplicate={handleDuplicateNote} />
+            <div 
+              key={note.id} 
+              className="break-inside-avoid animate-float-in" 
+              style={{ animationDelay: `${index * 0.03}s`, animationFillMode: 'both' }}
+            >
+              <NoteCard 
+                note={note} 
+                onShareClick={handleShareClick} 
+                isSelected={selectedNoteId === note.id} 
+                onPress={handleCardPress} 
+                onOpen={(n) => navigate(`/note/${n.id}`)} 
+                isPinned={note.pinned} 
+                onTogglePin={(n) => togglePinNote(n.id)} 
+                onDelete={handleDeleteNote} 
+                onDuplicate={handleDuplicateNote} 
+              />
             </div>
           ))}
         </div>
