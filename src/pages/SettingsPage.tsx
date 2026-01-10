@@ -1,27 +1,49 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { toast } from '@/components/ui/sonner';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNotes } from '@/contexts/NoteContext';
-import { usePreferences } from '@/contexts/PreferencesContext';
-import { useNotifications } from '@/hooks/useNotifications';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { LogOut, User, HelpCircle, Download, Trash2, Key, Heart, Check, X as XIcon, Loader2, Brain } from 'lucide-react';
-import { useTitleFont } from '@/hooks/useTitleFont';
-import { supabase } from '@/integrations/supabase/client';
-import ThemeToggle from '@/components/theme/ThemeToggle';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { toast } from "@/components/ui/sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNotes } from "@/contexts/NoteContext";
+import { usePreferences } from "@/contexts/PreferencesContext";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  LogOut,
+  User,
+  HelpCircle,
+  Download,
+  Trash2,
+  Key,
+  Heart,
+  Check,
+  X as XIcon,
+  Loader2,
+  Brain,
+} from "lucide-react";
+import { useTitleFont } from "@/hooks/useTitleFont";
+import { supabase } from "@/integrations/supabase/client";
+import ThemeToggle from "@/components/theme/ThemeToggle";
+import { Input } from "@/components/ui/input";
 
 const SettingsPage = () => {
   const titleFont = useTitleFont();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
+  const [newPassword, setNewPassword] = useState("");
   const [isDisconnectingGoogle, setIsDisconnectingGoogle] = useState(false);
   const isMobile = useIsMobile();
   const { state } = useSidebar();
@@ -35,11 +57,16 @@ const SettingsPage = () => {
 
   const getThemeLabel = (theme: string) => {
     switch (theme) {
-      case 'light': return 'Light Mode';
-      case 'dark': return 'Dark Mode';
-      case 'navy': return 'Night Mode';
-      case 'sepia': return 'Fresh Page';
-      default: return 'Night Mode';
+      case "light":
+        return "Light Mode";
+      case "dark":
+        return "Dark Mode";
+      case "navy":
+        return "Night Mode";
+      case "sepia":
+        return "Fresh Page";
+      default:
+        return "Night Mode";
     }
   };
 
@@ -51,23 +78,40 @@ const SettingsPage = () => {
     try {
       await signOut();
       toast.success("Signed out");
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Settings page sign out error:', error);
-      navigate('/');
+      console.error("Settings page sign out error:", error);
+      navigate("/");
     }
   };
 
   const handleSignIn = () => {
-    navigate('/');
+    navigate("/");
   };
 
   const faqItems = [
-    { question: "How do I create a new note?", answer: "Click the '+' button or use the 'New Note' option to create a new note. Start typing immediately." },
-    { question: "Are my notes saved automatically?", answer: "Yes, all notes are automatically saved as you type. No need to manually save." },
-    { question: "Can I access my notes offline?", answer: "Yes, Noteily works offline. Your notes are stored locally and will sync when you're back online." },
-    { question: "How do I format text in my notes?", answer: "Select text to see your device's formatting options like bold, italic, and more. Most devices support native text formatting when you select text." },
-    { question: "Is my data secure and private?", answer: "Yes, your notes are encrypted with your unique key and stored securely. Only you can access your notes - we cannot read them, and neither can anyone else. When signed in, your encrypted notes sync across your devices." }
+    {
+      question: "How do I create a new note?",
+      answer: "Click the '+' button or use the 'New Note' option to create a new note. Start typing immediately.",
+    },
+    {
+      question: "Are my notes saved automatically?",
+      answer: "Yes, all notes are automatically saved as you type. No need to manually save.",
+    },
+    {
+      question: "Can I access my notes offline?",
+      answer: "Yes, Noteily works offline. Your notes are stored locally and will sync when you're back online.",
+    },
+    {
+      question: "How do I format text in my notes?",
+      answer:
+        "Select text to see your device's formatting options like bold, italic, and more. Most devices support native text formatting when you select text.",
+    },
+    {
+      question: "Is my data secure and private?",
+      answer:
+        "Yes, your notes are encrypted with your unique key and stored securely. Only you can access your notes - we cannot read them, and neither can anyone else. When signed in, your encrypted notes sync across your devices.",
+    },
   ];
 
   const handleExportNotes = () => {
@@ -76,17 +120,19 @@ const SettingsPage = () => {
       return;
     }
 
-    const exportContent = notes.map(note => {
-      const createdDate = new Date(note.createdAt).toLocaleDateString();
-      const updatedDate = new Date(note.updatedAt).toLocaleDateString();
-      return `\n=====================================\nTitle: ${note.title}\nCreated: ${createdDate}\nUpdated: ${updatedDate}\n=====================================\n\n${note.content}\n\n`;
-    }).join('\n');
+    const exportContent = notes
+      .map((note) => {
+        const createdDate = new Date(note.createdAt).toLocaleDateString();
+        const updatedDate = new Date(note.updatedAt).toLocaleDateString();
+        return `\n=====================================\nTitle: ${note.title}\nCreated: ${createdDate}\nUpdated: ${updatedDate}\n=====================================\n\n${note.content}\n\n`;
+      })
+      .join("\n");
 
-    const blob = new Blob([exportContent], { type: 'text/plain' });
+    const blob = new Blob([exportContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `noteily-export-${new Date().toISOString().split('T')[0]}.txt`;
+    link.download = `noteily-export-${new Date().toISOString().split("T")[0]}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -109,10 +155,10 @@ const SettingsPage = () => {
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
-      setNewPassword('');
+      setNewPassword("");
       toast.success("Password updated");
     } catch (error: any) {
-      console.error('Error changing password:', error);
+      console.error("Error changing password:", error);
       toast.error("Error changing password", { description: error.message });
     } finally {
       setIsChangingPassword(false);
@@ -120,11 +166,14 @@ const SettingsPage = () => {
   };
 
   const isGoogleUser = () => {
-    return user?.app_metadata?.providers?.includes('google') || user?.identities?.some(identity => identity.provider === 'google');
+    return (
+      user?.app_metadata?.providers?.includes("google") ||
+      user?.identities?.some((identity) => identity.provider === "google")
+    );
   };
 
   const hasPassword = () => {
-    return user?.app_metadata?.provider !== 'google' || newPassword.trim().length >= 6;
+    return user?.app_metadata?.provider !== "google" || newPassword.trim().length >= 6;
   };
 
   const handleDisconnectGoogle = async () => {
@@ -138,10 +187,10 @@ const SettingsPage = () => {
     try {
       const { error: passwordError } = await supabase.auth.updateUser({ password: newPassword });
       if (passwordError) throw passwordError;
-      setNewPassword('');
+      setNewPassword("");
       toast.success("Password set successfully");
     } catch (error: any) {
-      console.error('Error setting password:', error);
+      console.error("Error setting password:", error);
       toast.error("Error setting password", { description: error.message });
     } finally {
       setIsDisconnectingGoogle(false);
@@ -151,26 +200,25 @@ const SettingsPage = () => {
   const handleDeleteAccount = async () => {
     if (!user) return;
     setIsDeleting(true);
-    
-    try {
-      const { error: preferencesError } = await supabase.from('user_preferences').delete().eq('user_id', user.id);
-      if (preferencesError) console.warn('Error deleting user preferences:', preferencesError);
 
-      const { error: notesError } = await supabase.from('notes').delete().eq('user_id', user.id);
+    try {
+      const { error: preferencesError } = await supabase.from("user_preferences").delete().eq("user_id", user.id);
+      if (preferencesError) console.warn("Error deleting user preferences:", preferencesError);
+
+      const { error: notesError } = await supabase.from("notes").delete().eq("user_id", user.id);
       if (notesError) throw notesError;
 
       await signOut();
       localStorage.clear();
       toast.success("Account deleted");
-      navigate('/');
+      navigate("/");
     } catch (error: any) {
-      console.error('Error deleting account:', error);
+      console.error("Error deleting account:", error);
       toast.error("Error deleting account", { description: error.message });
     } finally {
       setIsDeleting(false);
     }
   };
-
 
   return (
     <div className="h-full">
@@ -180,16 +228,19 @@ const SettingsPage = () => {
         <div className="md:hidden">
           <div className="flex items-center justify-between">
             {(isMobile || state === "collapsed") && (
-              <div className="relative">
+              <div className="relative hidden">
                 <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
                 {user && unreadCount > 0 && (
                   <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
-                    {unreadCount > 99 ? '99+' : unreadCount}
+                    {unreadCount > 99 ? "99+" : unreadCount}
                   </div>
                 )}
               </div>
             )}
-            <button onClick={() => setShowSupportDialog(true)} className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200">
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+            >
               <Heart className="h-6 w-6 text-accent" fill="currentColor" />
             </button>
           </div>
@@ -204,13 +255,16 @@ const SettingsPage = () => {
                   <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
                   {user && unreadCount > 0 && (
                     <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
-                      {unreadCount > 99 ? '99+' : unreadCount}
+                      {unreadCount > 99 ? "99+" : unreadCount}
                     </div>
                   )}
                 </div>
               )}
             </div>
-            <button onClick={() => setShowSupportDialog(true)} className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200">
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+            >
               <Heart className="h-6 w-6 text-accent" fill="currentColor" />
             </button>
           </div>
@@ -218,240 +272,230 @@ const SettingsPage = () => {
       </header>
 
       <div className="px-4 md:px-8 pb-32 animate-fade-in">
-
         <div className="max-w-2xl mx-auto">
           <div className="space-y-4 md:space-y-6">
-          <div className="bg-card rounded-lg p-4 border">
-            <h2 className="text-lg font-light mb-3 dynamic-title-font flex items-center gap-2">
-              <span>Preferences</span>
-            </h2>
-            <div className="space-y-4">
-              {/* Theme setting */}
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <Label htmlFor="theme" className="text-sm font-medium">Theme</Label>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Choose your preferred theme
-                  </p>
+            <div className="bg-card rounded-lg p-4 border">
+              <h2 className="text-lg font-light mb-3 dynamic-title-font flex items-center gap-2">
+                <span>Preferences</span>
+              </h2>
+              <div className="space-y-4">
+                {/* Theme setting */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <Label htmlFor="theme" className="text-sm font-medium">
+                      Theme
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">Choose your preferred theme</p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="text-sm text-muted-foreground hidden sm:inline">
+                      {getThemeLabel(preferences.theme)}
+                    </span>
+                    <ThemeToggle variant="settings" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-sm text-muted-foreground hidden sm:inline">
-                    {getThemeLabel(preferences.theme)}
-                  </span>
-                  <ThemeToggle variant="settings" />
-                </div>
-              </div>
-              
-              {/* AI Features setting */}
-              <div className="flex items-start justify-between gap-3 border-t pt-4">
-                <div className="flex-1 min-w-0">
-                  <Label htmlFor="aiEnabled" className="text-sm font-medium">AI Features</Label>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Enable or disable AI-powered writing assistance features like spell check, grammar correction, and text rewriting
-                  </p>
-                  <p className="text-xs text-primary mt-1 font-medium">
-                    Current: {preferences.aiEnabled ? 'Enabled' : 'Disabled'}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAiEnabledToggle}
-                    className="p-2 h-8 w-8"
-                    title={`${preferences.aiEnabled ? 'Disable' : 'Enable'} AI features`}
-                  >
-                    <Brain className="h-3 w-3" />
-                  </Button>
+
+                {/* AI Features setting */}
+                <div className="flex items-start justify-between gap-3 border-t pt-4">
+                  <div className="flex-1 min-w-0">
+                    <Label htmlFor="aiEnabled" className="text-sm font-medium">
+                      AI Features
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Enable or disable AI-powered writing assistance features like spell check, grammar correction, and
+                      text rewriting
+                    </p>
+                    <p className="text-xs text-primary mt-1 font-medium">
+                      Current: {preferences.aiEnabled ? "Enabled" : "Disabled"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAiEnabledToggle}
+                      className="p-2 h-8 w-8"
+                      title={`${preferences.aiEnabled ? "Disable" : "Enable"} AI features`}
+                    >
+                      <Brain className="h-3 w-3" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          
-          
-          <div className="bg-card rounded-lg p-4 border">
-            <h2 className="text-lg font-medium mb-3 font-serif">Account</h2>
-            {user ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium truncate">{user.email}</p>
-                    <p className="text-xs text-muted-foreground">Signed in</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-3 border-t pt-3">
-                  <div className="flex items-center gap-2">
-                    <Key className="h-4 w-4 text-muted-foreground" />
-                    <Label htmlFor="new-password" className="text-sm font-medium">Change Password</Label>
-                  </div>
-                  <div className="flex gap-2">
-                    <Input
-                      id="new-password"
-                      type="password"
-                      placeholder="Enter new password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button 
-                      onClick={handleChangePassword} 
-                      size="sm" 
-                      disabled={isChangingPassword || !newPassword.trim()}
-                    >
-                      {isChangingPassword ? "Updating..." : "Update"}
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Password must be at least 6 characters long
-                  </p>
-                </div>
-                
-                {isGoogleUser() && (
-                  <div className="space-y-3 border-t pt-3">
-                    <div className="text-sm">
-                      <p className="font-medium text-muted-foreground mb-1">Google Account Connected</p>
-                      <p className="text-xs text-muted-foreground">
-                        Set a password to enable email/password login as backup
-                      </p>
+
+            <div className="bg-card rounded-lg p-4 border">
+              <h2 className="text-lg font-medium mb-3 font-serif">Account</h2>
+              {user ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium truncate">{user.email}</p>
+                      <p className="text-xs text-muted-foreground">Signed in</p>
                     </div>
-                    <Button 
-                      onClick={handleDisconnectGoogle} 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full"
-                      disabled={isDisconnectingGoogle || newPassword.trim().length < 6}
-                    >
-                      {isDisconnectingGoogle ? "Setting Password..." : "Set Password for Account Security"}
-                    </Button>
                   </div>
-                )}
-                
-                <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sign Out
-                </Button>
+
+                  <div className="space-y-3 border-t pt-3">
+                    <div className="flex items-center gap-2">
+                      <Key className="h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="new-password" className="text-sm font-medium">
+                        Change Password
+                      </Label>
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        id="new-password"
+                        type="password"
+                        placeholder="Enter new password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button
+                        onClick={handleChangePassword}
+                        size="sm"
+                        disabled={isChangingPassword || !newPassword.trim()}
+                      >
+                        {isChangingPassword ? "Updating..." : "Update"}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Password must be at least 6 characters long</p>
+                  </div>
+
+                  {isGoogleUser() && (
+                    <div className="space-y-3 border-t pt-3">
+                      <div className="text-sm">
+                        <p className="font-medium text-muted-foreground mb-1">Google Account Connected</p>
+                        <p className="text-xs text-muted-foreground">
+                          Set a password to enable email/password login as backup
+                        </p>
+                      </div>
+                      <Button
+                        onClick={handleDisconnectGoogle}
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        disabled={isDisconnectingGoogle || newPassword.trim().length < 6}
+                      >
+                        {isDisconnectingGoogle ? "Setting Password..." : "Set Password for Account Security"}
+                      </Button>
+                    </div>
+                  )}
+
+                  <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">Sign in to sync your notes across all devices</p>
+                  <Button onClick={handleSignIn} size="sm" className="w-full">
+                    Sign In
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-card rounded-lg p-4 border">
+              <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
+                <HelpCircle className="h-5 w-5" />
+                FAQ
+              </h2>
+              <Accordion type="single" collapsible className="w-full">
+                {faqItems.map((item, index) => (
+                  <AccordionItem key={index} value={`item-${index}`} className="border-b last:border-b-0">
+                    <AccordionTrigger className="text-sm font-medium text-left py-3 hover:no-underline">
+                      {item.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-muted-foreground pb-3">{item.answer}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+
+            <div className="bg-card rounded-lg p-4 border">
+              <h2 className="text-lg font-medium mb-3 font-serif">About Noteily</h2>
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Noteily - "Write What You Love" is a minimalist notes app focused on creative expression and
+                  passionate writing.
+                </p>
+                <p className="text-xs text-muted-foreground">Version 2.0.5</p>
               </div>
-            ) : (
+            </div>
+
+            <div className="bg-card rounded-lg p-4 border">
+              <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
+                <Heart className="h-5 w-5 text-pink-500" fill="#e91e63" />
+                Support Noteily
+              </h2>
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  Sign in to sync your notes across all devices
+                  Enjoying Noteily? Consider supporting development to help keep the app running and add new features.
                 </p>
-                <Button onClick={handleSignIn} size="sm" className="w-full">
-                  Sign In
-                </Button>
+                <a
+                  href="https://buymeacoffee.com/froydinger"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm btn-accessible py-2 px-3 rounded-md border border-border hover:bg-accent transition-colors"
+                >
+                  <Heart className="h-4 w-4 text-pink-500" fill="#e91e63" />
+                  <span>Buy me a coffee</span>
+                </a>
+              </div>
+            </div>
+
+            {user && (
+              <div className="bg-card rounded-lg p-4 border">
+                <h2 className="text-lg font-medium mb-3 font-serif">Data Management</h2>
+                <div className="space-y-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button onClick={handleExportNotes} variant="outline" size="sm" className="flex-1">
+                      <Download className="mr-2 h-4 w-4" />
+                      Export Notes
+                    </Button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="sm" className="flex-1" disabled={isDeleting}>
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          {isDeleting ? "Deleting..." : "Delete Account"}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete your account and remove all your
+                            notes from our servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleDeleteAccount}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Yes, delete my account
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground">
+                    <p>
+                      <strong>Export Notes:</strong> Download all your notes as a single text file.
+                    </p>
+                    <p>
+                      <strong>Delete Account:</strong> Permanently remove your account and all associated data.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
-          </div>
-
-
-          <div className="bg-card rounded-lg p-4 border">
-            <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
-              <HelpCircle className="h-5 w-5" />
-              FAQ
-            </h2>
-            <Accordion type="single" collapsible className="w-full">
-              {faqItems.map((item, index) => (
-                <AccordionItem key={index} value={`item-${index}`} className="border-b last:border-b-0">
-                  <AccordionTrigger className="text-sm font-medium text-left py-3 hover:no-underline">
-                    {item.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground pb-3">
-                    {item.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-          
-          <div className="bg-card rounded-lg p-4 border">
-            <h2 className="text-lg font-medium mb-3 font-serif">About Noteily</h2>
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Noteily - "Write What You Love" is a minimalist notes app focused on creative expression and passionate writing.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Version 2.0.5
-              </p>
-            </div>
-          </div>
-          
-          <div className="bg-card rounded-lg p-4 border">
-            <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
-              <Heart className="h-5 w-5 text-pink-500" fill="#e91e63" />
-              Support Noteily
-            </h2>
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Enjoying Noteily? Consider supporting development to help keep the app running and add new features.
-              </p>
-              <a 
-                href="https://buymeacoffee.com/froydinger" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm btn-accessible py-2 px-3 rounded-md border border-border hover:bg-accent transition-colors"
-              >
-                <Heart className="h-4 w-4 text-pink-500" fill="#e91e63" />
-                <span>Buy me a coffee</span>
-              </a>
-            </div>
-          </div>
-
-          {user && (
-            <div className="bg-card rounded-lg p-4 border">
-              <h2 className="text-lg font-medium mb-3 font-serif">Data Management</h2>
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button 
-                    onClick={handleExportNotes} 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex-1"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Export Notes
-                  </Button>
-                  
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
-                        className="flex-1"
-                        disabled={isDeleting}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        {isDeleting ? "Deleting..." : "Delete Account"}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Account</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete your account and remove all your notes from our servers.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction 
-                          onClick={handleDeleteAccount}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          Yes, delete my account
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-                
-                <div className="text-xs text-muted-foreground">
-                  <p><strong>Export Notes:</strong> Download all your notes as a single text file.</p>
-                  <p><strong>Delete Account:</strong> Permanently remove your account and all associated data.</p>
-                </div>
-              </div>
-            </div>
-          )}
           </div>
         </div>
 
@@ -469,7 +513,7 @@ const SettingsPage = () => {
             </AlertDialogHeader>
             <AlertDialogFooter className="flex-col sm:flex-col gap-2">
               <AlertDialogAction
-                onClick={() => window.open('https://winthenight.org/support', '_blank')}
+                onClick={() => window.open("https://winthenight.org/support", "_blank")}
                 className="w-full bg-accent hover:bg-accent/90"
               >
                 Support Us
