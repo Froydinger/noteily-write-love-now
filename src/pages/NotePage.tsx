@@ -1,14 +1,13 @@
-
-import { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useNotes } from '@/contexts/NoteContext';
-import NoteEditor from '@/components/notes/NoteEditor';
-import ChecklistEditor from '@/components/notes/ChecklistEditor';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, Trash, Menu, Users, Eye, Edit } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
-import { useToast } from '@/hooks/use-toast';
+import { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useNotes } from "@/contexts/NoteContext";
+import NoteEditor from "@/components/notes/NoteEditor";
+import ChecklistEditor from "@/components/notes/ChecklistEditor";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, Trash, Menu, Users, Eye, Edit } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,14 +19,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useIsMobile } from '@/hooks/use-mobile';
-import { FeaturedImageUpload } from '@/components/notes/FeaturedImageUpload';
-import { ExportMenu } from '@/components/notes/ExportMenu';
-import { ShareManager } from '@/components/notes/ShareManager';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNotifications } from '@/hooks/useNotifications';
-import { handleNoteKeyboard } from '@/lib/viewport';
-import { useUndoRedo } from '@/hooks/useUndoRedo';
+import { useIsMobile } from "@/hooks/use-mobile";
+import { FeaturedImageUpload } from "@/components/notes/FeaturedImageUpload";
+import { ExportMenu } from "@/components/notes/ExportMenu";
+import { ShareManager } from "@/components/notes/ShareManager";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/hooks/useNotifications";
+import { handleNoteKeyboard } from "@/lib/viewport";
+import { useUndoRedo } from "@/hooks/useUndoRedo";
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,11 +40,13 @@ const NotePage = () => {
   const [showShareManager, setShowShareManager] = useState(false);
   const [entered, setEntered] = useState(false);
   const { saveState } = useUndoRedo();
-  const [aiReplacementFunction, setAiReplacementFunction] = useState<((newContent: string, isSelectionReplacement: boolean) => void) | null>(null);
+  const [aiReplacementFunction, setAiReplacementFunction] = useState<
+    ((newContent: string, isSelectionReplacement: boolean) => void) | null
+  >(null);
   const headerRef = useRef<HTMLElement>(null);
-  
-  const note = getNote(id || '');
-  
+
+  const note = getNote(id || "");
+
   // Keyboard handling - let native browser undo/redo work naturally
   useEffect(() => {
     const cleanup = handleNoteKeyboard();
@@ -53,12 +54,12 @@ const NotePage = () => {
       cleanup();
     };
   }, []);
-  
+
   useEffect(() => {
     if (note) {
       setCurrentNote(note);
     }
-    
+
     return () => setCurrentNote(null);
   }, [id, note, setCurrentNote]);
 
@@ -69,18 +70,17 @@ const NotePage = () => {
     if (document.activeElement && document.activeElement !== document.body) {
       (document.activeElement as HTMLElement).blur();
     }
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
     // Simple timeout instead of nested RAF to reduce main thread blocking
     const timer = setTimeout(() => setEntered(true), 50);
     return () => clearTimeout(timer);
   }, [id]);
 
-
   const handleDelete = () => {
     if (id) {
       deleteNote(id);
-      
+
       if (note?.isSharedWithUser && !note?.isOwnedByUser) {
         // It's a shared note - user is removing their access
         toast({
@@ -94,51 +94,54 @@ const NotePage = () => {
           description: "You can restore this note within 7 days.",
         });
       }
-      navigate('/');
+      navigate("/");
     }
   };
-  
+
   const handleCopy = () => {
     if (!note) return;
-    
+
     // Create a clean plain text version without artificial line breaks
-    const contentElement = document.createElement('div');
+    const contentElement = document.createElement("div");
     contentElement.innerHTML = note.content;
-    
+
     // Extract text content and normalize whitespace to remove artificial line breaks
-    const textContent = contentElement.textContent || contentElement.innerText || '';
-    const cleanText = textContent.replace(/\s+/g, ' ').trim();
+    const textContent = contentElement.textContent || contentElement.innerText || "";
+    const cleanText = textContent.replace(/\s+/g, " ").trim();
     const plainText = `${note.title}\n\n${cleanText}`;
-    
-    navigator.clipboard.writeText(plainText).then(() => {
-      toast({
-        title: "Copied to clipboard",
-        description: "Note content copied to clipboard.",
+
+    navigator.clipboard
+      .writeText(plainText)
+      .then(() => {
+        toast({
+          title: "Copied to clipboard",
+          description: "Note content copied to clipboard.",
+        });
+      })
+      .catch((err) => {
+        toast({
+          title: "Copy failed",
+          description: "Could not copy to clipboard.",
+          variant: "destructive",
+        });
+        console.error("Copy failed:", err);
       });
-    }).catch(err => {
-      toast({
-        title: "Copy failed",
-        description: "Could not copy to clipboard.",
-        variant: "destructive",
-      });
-      console.error('Copy failed:', err);
-    });
   };
-  
+
   const handleShare = async () => {
     if (!note) return;
-    
+
     // Create a clean plain text version
-    const contentElement = document.createElement('div');
+    const contentElement = document.createElement("div");
     contentElement.innerHTML = note.content;
-    const textContent = contentElement.textContent || contentElement.innerText || '';
-    const cleanText = textContent.replace(/\s+/g, ' ').trim();
+    const textContent = contentElement.textContent || contentElement.innerText || "";
+    const cleanText = textContent.replace(/\s+/g, " ").trim();
     const plainText = `${note.title}\n\n${cleanText}`;
-    
+
     try {
       if (navigator.share) {
         await navigator.share({
-          title: note.title || 'Untitled Note',
+          title: note.title || "Untitled Note",
           text: plainText,
         });
       } else {
@@ -150,7 +153,7 @@ const NotePage = () => {
         });
       }
     } catch (error) {
-      console.error('Share failed:', error);
+      console.error("Share failed:", error);
     }
   };
 
@@ -167,22 +170,24 @@ const NotePage = () => {
     }
   };
 
-  
   if (!note) {
     return <div className="p-8">Note not found</div>;
   }
-  
-   return (
-     <div key={id} className={`min-h-[100dvh] transform transition-all duration-200 ease-out ${entered ? 'translate-x-0 opacity-100' : 'translate-x-1 opacity-90'}`}>
+
+  return (
+    <div
+      key={id}
+      className={`min-h-[100dvh] transform transition-all duration-200 ease-out ${entered ? "translate-x-0 opacity-100" : "translate-x-1 opacity-90"}`}
+    >
       <header
         ref={headerRef}
         data-note-header
         className="sticky top-0 z-[100] p-4"
-        style={{ position: 'sticky', top: 0, zIndex: 100 }}
+        style={{ position: "sticky", top: 0, zIndex: 100 }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="relative">
+            <div className="relative hidden md:block">
               <Button
                 variant="ghost"
                 size="sm"
@@ -194,14 +199,14 @@ const NotePage = () => {
               </Button>
               {user && unreadCount > 0 && state === "collapsed" && (
                 <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
-                  {unreadCount > 99 ? '99+' : unreadCount}
+                  {unreadCount > 99 ? "99+" : unreadCount}
                 </div>
               )}
             </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate('/')}
+              onClick={() => navigate("/")}
               className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
               title="Back to notes"
             >
@@ -211,11 +216,7 @@ const NotePage = () => {
             {note.isSharedWithUser && (
               <Badge variant="secondary" className="flex items-center gap-1 px-2">
                 <Users className="h-3 w-3" />
-                {note.userPermission === 'read' ? (
-                  <Eye className="h-3 w-3" />
-                ) : (
-                  <Edit className="h-3 w-3" />
-                )}
+                {note.userPermission === "read" ? <Eye className="h-3 w-3" /> : <Edit className="h-3 w-3" />}
               </Badge>
             )}
           </div>
@@ -240,43 +241,43 @@ const NotePage = () => {
               hasImage={!!note.featured_image}
             />
 
-            <ExportMenu
-              note={note}
-              onShare={handleShare}
-            />
+            <ExportMenu note={note} onShare={handleShare} />
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full text-destructive hover:bg-destructive/15 hover:border-destructive/40 transition-all duration-200 shadow-sm glass-shimmer">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full text-destructive hover:bg-destructive/15 hover:border-destructive/40 transition-all duration-200 shadow-sm glass-shimmer"
+                >
                   <Trash className="h-5 w-5" />
                 </Button>
               </AlertDialogTrigger>
-               <AlertDialogContent>
+              <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    {note.isSharedWithUser && !note.isOwnedByUser ? 'Remove Access' : 'Delete Note'}
+                    {note.isSharedWithUser && !note.isOwnedByUser ? "Remove Access" : "Delete Note"}
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    {note.isSharedWithUser && !note.isOwnedByUser 
-                      ? 'Are you sure you want to remove your access to this shared note? You will no longer be able to view or edit it.'
-                      : 'Are you sure you want to delete this note? It will be moved to Recently Deleted where you can restore it within 7 days.'
-                    }
+                    {note.isSharedWithUser && !note.isOwnedByUser
+                      ? "Are you sure you want to remove your access to this shared note? You will no longer be able to view or edit it."
+                      : "Are you sure you want to delete this note? It will be moved to Recently Deleted where you can restore it within 7 days."}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                 <AlertDialogFooter>
-                   <AlertDialogCancel className="btn-accessible">Cancel</AlertDialogCancel>
-                   <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-                     {note.isSharedWithUser && !note.isOwnedByUser ? 'Remove Access' : 'Delete'}
-                   </AlertDialogAction>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="btn-accessible">Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                    {note.isSharedWithUser && !note.isOwnedByUser ? "Remove Access" : "Delete"}
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
           </div>
         </div>
       </header>
-      
+
       <div className="relative">
-        {note.note_type === 'checklist' ? (
+        {note.note_type === "checklist" ? (
           <ChecklistEditor note={note} />
         ) : (
           <NoteEditor
@@ -287,7 +288,7 @@ const NotePage = () => {
           />
         )}
       </div>
-      
+
       {/* Share Manager - now accessible from persistent people icon */}
       {showShareManager && (
         <ShareManager
