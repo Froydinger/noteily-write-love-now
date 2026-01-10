@@ -179,9 +179,14 @@ const Index = () => {
       {/* Sticky floating header */}
       <header className="sticky top-0 z-50 px-4 pt-4 md:px-8 md:pt-8 pb-4 pwa-safe-top">
         {/* Mobile layout */}
-        <div className="md:hidden space-y-4">
-          {/* Top row: Filters and Heart */}
+        <div className="md:hidden">
           <div className="flex items-center justify-between">
+            {/* Left: Logo */}
+            <div className="p-1.5 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+              <Heart className="h-5 w-5 text-accent" fill="currentColor" />
+            </div>
+
+            {/* Right: All control buttons */}
             <div className="flex items-center gap-2">
               <Select
                 value={sortOrder}
@@ -257,9 +262,6 @@ const Index = () => {
                   </SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="flex items-center gap-2">
               <Button
                 size="sm"
                 variant="ghost"
@@ -283,43 +285,6 @@ const Index = () => {
                 <Heart className="h-5 w-5 text-accent" fill="currentColor" />
               </button>
             </div>
-          </div>
-
-          {/* Bottom row: Centered New button */}
-          <div className="flex items-center justify-center">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex items-center justify-center gap-2.5 h-11 px-5 group bg-accent/10 hover:bg-accent/20 border-2 border-accent text-accent font-medium rounded-full shadow-glow-sm hover:shadow-glow transition-all duration-250 ease-bounce-out hover:scale-[1.02] active:scale-[0.98] apple-pwa-button-spacing"
-                >
-                  <Plus className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
-                  <span>New</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-[200px] bg-popover border border-border shadow-lg z-50">
-                <DropdownMenuItem
-                  onClick={() => handleCreateNote("note")}
-                  className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                >
-                  <FileText className="h-4 w-4" />
-                  <div className="flex flex-col">
-                    <span className="font-medium">Note</span>
-                    <span className="text-xs opacity-80">Free-form writing</span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleCreateNote("checklist")}
-                  className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                >
-                  <CheckSquare className="h-4 w-4" />
-                  <div className="flex flex-col">
-                    <span className="font-medium">Checklist</span>
-                    <span className="text-xs opacity-80">Task list with checkboxes</span>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
 
