@@ -1,9 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Plus, Lightbulb, Settings, FileText, CheckSquare, Brain } from 'lucide-react';
+import { Home, Plus, Lightbulb, Settings, FileText, CheckSquare } from 'lucide-react';
 import { useNotes } from '@/contexts/NoteContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSidebar } from '@/components/ui/sidebar';
-import { useAiButton } from '@/contexts/AiButtonContext';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -19,7 +18,6 @@ export function BottomNav() {
   const { addNote, setCurrentNote } = useNotes();
   const isMobile = useIsMobile();
   const { state, toggleSidebar } = useSidebar();
-  const { isAiButtonVisible, openAiChat } = useAiButton();
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -42,12 +40,8 @@ export function BottomNav() {
     }
   };
 
-  // Dynamic nav items based on AI button visibility
-  const leftNavItems = [
+  const navItems = [
     { path: '/', icon: Home, label: 'Notes' },
-  ];
-
-  const rightNavItems = [
     { path: '/prompts', icon: Lightbulb, label: 'Ideas' },
     { path: '/settings', icon: Settings, label: 'Settings' },
   ];
@@ -58,14 +52,14 @@ export function BottomNav() {
       <div className="absolute inset-0 glass-nav" />
       
       {/* Safe area spacer for iOS */}
-      <div className="relative flex items-center justify-around px-4 h-16 pb-safe">
-        {/* Left nav item - Home */}
-        {leftNavItems.map((item) => (
+      <div className="relative flex items-center justify-around px-6 h-16 pb-safe">
+        {/* Left nav items */}
+        {navItems.slice(0, 1).map((item) => (
           <button
             key={item.path}
             onClick={() => navigate(item.path)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-250",
+              "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-2xl transition-all duration-250",
               isActive(item.path)
                 ? "text-accent"
                 : "text-muted-foreground hover:text-foreground"
@@ -78,24 +72,6 @@ export function BottomNav() {
             <span className="text-[10px] font-medium">{item.label}</span>
           </button>
         ))}
-
-        {/* AI Button - only shown when viewing/editing a note */}
-        {isAiButtonVisible && (
-          <button
-            onClick={openAiChat}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-250",
-              "text-accent hover:text-accent"
-            )}
-          >
-            <div className="relative">
-              <Brain className="h-6 w-6 transition-transform duration-250" />
-              {/* Subtle glow indicator */}
-              <div className="absolute inset-0 rounded-full bg-accent/20 animate-pulse-soft -z-10 scale-150" />
-            </div>
-            <span className="text-[10px] font-medium">AI</span>
-          </button>
-        )}
 
         {/* Center FAB - Create Note */}
         <DropdownMenu>
@@ -114,7 +90,7 @@ export function BottomNav() {
           >
             <DropdownMenuItem 
               onClick={() => handleCreateNote('note')} 
-              className="flex items-center gap-3 py-3 px-4 cursor-pointer rounded-xl hover:bg-accent/20 hover:text-foreground focus:bg-accent/20 focus:text-foreground"
+              className="flex items-center gap-3 py-3 px-4 cursor-pointer rounded-xl hover:bg-accent/10"
             >
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent/10">
                 <FileText className="h-4 w-4 text-accent" />
@@ -126,7 +102,7 @@ export function BottomNav() {
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={() => handleCreateNote('checklist')} 
-              className="flex items-center gap-3 py-3 px-4 cursor-pointer rounded-xl hover:bg-accent/20 hover:text-foreground focus:bg-accent/20 focus:text-foreground"
+              className="flex items-center gap-3 py-3 px-4 cursor-pointer rounded-xl hover:bg-accent/10"
             >
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent/10">
                 <CheckSquare className="h-4 w-4 text-accent" />
@@ -140,12 +116,12 @@ export function BottomNav() {
         </DropdownMenu>
 
         {/* Right nav items */}
-        {rightNavItems.map((item) => (
+        {navItems.slice(1).map((item) => (
           <button
             key={item.path}
             onClick={() => navigate(item.path)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-250",
+              "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-2xl transition-all duration-250",
               isActive(item.path)
                 ? "text-accent"
                 : "text-muted-foreground hover:text-foreground"

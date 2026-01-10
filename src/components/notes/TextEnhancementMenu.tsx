@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { 
@@ -19,8 +19,6 @@ import {
 import { toast } from '@/components/ui/sonner';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { useAiHistory } from '@/hooks/useAiHistory';
-import { useAiButton } from '@/contexts/AiButtonContext';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { AiChatDialog } from './AiChatDialog';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -55,43 +53,6 @@ export function TextEnhancementMenu({
   const [isChatHidden, setIsChatHidden] = useState(false);
   const { preferences } = usePreferences();
   const { history, addHistoryEntry, revertToVersion, clearHistory } = useAiHistory(noteId);
-  const { registerAiButton, unregisterAiButton, isAiChatOpen, setIsAiChatOpen } = useAiButton();
-  const isMobile = useIsMobile();
-
-  // Register AI button with context for mobile bottom nav
-  useEffect(() => {
-    if (isMobile && preferences.aiEnabled) {
-      registerAiButton({
-        content,
-        originalHTML,
-        noteTitle,
-        noteId,
-        onContentChange,
-        onTitleChange,
-        disabled,
-      });
-    }
-    return () => {
-      if (isMobile) {
-        unregisterAiButton();
-      }
-    };
-  }, [isMobile, preferences.aiEnabled, content, originalHTML, noteTitle, noteId, disabled]);
-
-  // Listen for AI chat open from bottom nav
-  useEffect(() => {
-    if (isAiChatOpen && isMobile) {
-      setShowChatDialog(true);
-      setIsChatHidden(false);
-    }
-  }, [isAiChatOpen, isMobile]);
-
-  // Sync dialog state back to context
-  useEffect(() => {
-    if (!showChatDialog && isMobile) {
-      setIsAiChatOpen(false);
-    }
-  }, [showChatDialog, isMobile, setIsAiChatOpen]);
 
   const getSelectedText = () => {
     const selection = window.getSelection();
@@ -101,7 +62,7 @@ export function TextEnhancementMenu({
     return { text: '', range: null };
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const checkSelection = () => {
       const selection = getSelectedText();
       setHasTextSelected(selection.text.length > 0);
@@ -177,9 +138,9 @@ export function TextEnhancementMenu({
     }
   };
 
-  const [originalContentBackup, setOriginalContentBackup] = useState<{content: string, title: string} | null>(null);
+  const [originalContentBackup, setOriginalContentBackup] = React.useState<{content: string, title: string} | null>(null);
   
-  useEffect(() => {
+  React.useEffect(() => {
     if (!originalContentBackup) {
       setOriginalContentBackup({ content: originalHTML, title: noteTitle });
     }
@@ -234,8 +195,8 @@ export function TextEnhancementMenu({
 
   return createPortal(
      <>
-      {/* Floating AI button - only show on desktop, or on mobile when chat is hidden and NOT using bottom nav */}
-      {(!showChatDialog || isChatHidden) && !isMobile && (
+      {/* Floating AI button - always visible when chat is hidden */}
+      {(!showChatDialog || isChatHidden) && (
         <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <Button
@@ -300,12 +261,7 @@ export function TextEnhancementMenu({
         open={showChatDialog && !isChatHidden}
         onOpenChange={(open) => {
           setShowChatDialog(open);
-          if (!open) {
-            setIsChatHidden(false);
-            if (isMobile) {
-              setIsAiChatOpen(false);
-            }
-          }
+          if (!open) setIsChatHidden(false);
         }}
         onHide={() => setIsChatHidden(true)}
         content={content}
