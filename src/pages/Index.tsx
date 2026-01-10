@@ -179,26 +179,114 @@ const Index = () => {
       {/* Sticky floating header */}
       <header className="sticky top-0 z-50 px-4 pt-4 md:px-8 md:pt-8 pb-4 pwa-safe-top">
         {/* Mobile layout */}
-        <div className="md:hidden">
-          <div className="flex items-center justify-between mb-4">
-            {(isMobile || state === "collapsed") && (
-              <div className="relative hidden">
-                <SidebarTrigger className="h-10 w-10 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer" />
-                {user && unreadCount > 0 && (
-                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </div>
-                )}
-              </div>
-            )}
-            <button
-              onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer"
-            >
-              <Heart className="h-5 w-5 text-accent" fill="currentColor" />
-            </button>
+        <div className="md:hidden space-y-4">
+          {/* Top row: Filters and Heart */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Select
+                value={sortOrder}
+                onValueChange={(value) => {
+                  setSortOrder(value);
+                  setOpenSelect(null);
+                }}
+                open={openSelect === "sort-mobile"}
+                onOpenChange={(open) => {
+                  if (!open) setOpenSelect(null);
+                }}
+              >
+                <SelectTrigger
+                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                  onClick={() => {
+                    setShowSearch(false);
+                    setOpenSelect(openSelect === "sort-mobile" ? null : "sort-mobile");
+                  }}
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </SelectTrigger>
+                <SelectContent
+                  className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated"
+                  side="bottom"
+                  align="center"
+                  sideOffset={8}
+                >
+                  <SelectItem value="latest" className="rounded-lg">
+                    Latest
+                  </SelectItem>
+                  <SelectItem value="oldest" className="rounded-lg">
+                    Oldest
+                  </SelectItem>
+                  <SelectItem value="alphabetical" className="rounded-lg">
+                    A-Z
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <Select
+                value={shareFilter}
+                onValueChange={(value) => {
+                  setShareFilter(value);
+                  setOpenSelect(null);
+                }}
+                open={openSelect === "filter-mobile"}
+                onOpenChange={(open) => {
+                  if (!open) setOpenSelect(null);
+                }}
+              >
+                <SelectTrigger
+                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
+                  onClick={() => {
+                    setShowSearch(false);
+                    setOpenSelect(openSelect === "filter-mobile" ? null : "filter-mobile");
+                  }}
+                >
+                  <Filter className="h-4 w-4" />
+                </SelectTrigger>
+                <SelectContent
+                  className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated"
+                  side="bottom"
+                  align="center"
+                  sideOffset={8}
+                >
+                  <SelectItem value="all" className="rounded-lg">
+                    All Notes
+                  </SelectItem>
+                  <SelectItem value="shared-with-me" className="rounded-lg">
+                    Shared with Me
+                  </SelectItem>
+                  <SelectItem value="shared-with-others" className="rounded-lg">
+                    My Shared Notes
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
+                onClick={() => {
+                  setOpenSelect(null);
+                  setShowSearch(true);
+                  setTimeout(() => {
+                    const input = document.getElementById("search-input") as HTMLInputElement;
+                    input?.focus();
+                    input?.click();
+                  }, 150);
+                }}
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+              <button
+                onClick={() => setShowSupportDialog(true)}
+                className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer h-11 w-11 flex items-center justify-center"
+              >
+                <Heart className="h-5 w-5 text-accent" fill="currentColor" />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
+
+          {/* Bottom row: Centered New button */}
+          <div className="flex items-center justify-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -232,96 +320,6 @@ const Index = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
-              onClick={() => {
-                setOpenSelect(null);
-                setShowSearch(true);
-                setTimeout(() => {
-                  const input = document.getElementById("search-input") as HTMLInputElement;
-                  input?.focus();
-                  input?.click();
-                }, 150);
-              }}
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-            <Select
-              value={sortOrder}
-              onValueChange={(value) => {
-                setSortOrder(value);
-                setOpenSelect(null);
-              }}
-              open={openSelect === "sort-mobile"}
-              onOpenChange={(open) => {
-                if (!open) setOpenSelect(null);
-              }}
-            >
-              <SelectTrigger
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
-                onClick={() => {
-                  setShowSearch(false);
-                  setOpenSelect(openSelect === "sort-mobile" ? null : "sort-mobile");
-                }}
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </SelectTrigger>
-              <SelectContent
-                className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated"
-                side="bottom"
-                align="center"
-                sideOffset={8}
-              >
-                <SelectItem value="latest" className="rounded-lg">
-                  Latest
-                </SelectItem>
-                <SelectItem value="oldest" className="rounded-lg">
-                  Oldest
-                </SelectItem>
-                <SelectItem value="alphabetical" className="rounded-lg">
-                  A-Z
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={shareFilter}
-              onValueChange={(value) => {
-                setShareFilter(value);
-                setOpenSelect(null);
-              }}
-              open={openSelect === "filter-mobile"}
-              onOpenChange={(open) => {
-                if (!open) setOpenSelect(null);
-              }}
-            >
-              <SelectTrigger
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
-                onClick={() => {
-                  setShowSearch(false);
-                  setOpenSelect(openSelect === "filter-mobile" ? null : "filter-mobile");
-                }}
-              >
-                <Filter className="h-4 w-4" />
-              </SelectTrigger>
-              <SelectContent
-                className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated"
-                side="bottom"
-                align="center"
-                sideOffset={8}
-              >
-                <SelectItem value="all" className="rounded-lg">
-                  All Notes
-                </SelectItem>
-                <SelectItem value="shared-with-me" className="rounded-lg">
-                  Shared with Me
-                </SelectItem>
-                <SelectItem value="shared-with-others" className="rounded-lg">
-                  My Shared Notes
-                </SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
