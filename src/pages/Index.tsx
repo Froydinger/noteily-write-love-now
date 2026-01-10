@@ -235,7 +235,7 @@ const Index = () => {
             <div className="flex items-center gap-2">
               {state === "collapsed" && (
                 <div className="relative mr-1">
-                  <SidebarTrigger className="h-10 w-10 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer" />
+                  <SidebarTrigger className="hidden md:block" "h-10 w-10 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer" />
                   {user && unreadCount > 0 && (
                     <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
                       {unreadCount > 99 ? '99+' : unreadCount}
