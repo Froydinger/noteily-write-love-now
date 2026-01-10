@@ -2,17 +2,34 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
+import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Brain, Send, History, X, Minus } from 'lucide-react';
+import {
+  Sparkles,
+  Send,
+  X,
+  ChevronDown,
+  ChevronUp,
+  Briefcase,
+  Coffee,
+  Maximize2,
+  Minimize2,
+  Smile,
+  GraduationCap,
+  SpellCheck,
+  Type,
+  RotateCcw,
+  Wand2
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { AiHistoryEntry } from '@/hooks/useAiHistory';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface ChatMessage {
   id: string;
@@ -63,81 +80,34 @@ export function AiChatDialog({
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [originalContentBackup, setOriginalContentBackup] = useState<{content: string, title: string} | null>(null);
-  
   const [isMinimized, setIsMinimized] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
-  const [selectedTextRange, setSelectedTextRange] = useState<{start: number, end: number} | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  
-  // Disable selected text editing - only allow full page rewrites
-  const isSelectedText = false;
-
-  // Function to inject changed text back into the original content
-  const injectChangedText = (originalContent: string, selectedText: string, newText: string): string => {
-    if (!isSelectedText || !selectedText.trim()) {
-      return newText; // If no selection, replace all content
-    }
-
-    // Simple text replacement for selected content
-    const cleanSelectedText = selectedText.trim();
-    const selectedTextIndex = originalContent.indexOf(cleanSelectedText);
-    
-    if (selectedTextIndex !== -1) {
-      const beforeSelection = originalContent.substring(0, selectedTextIndex);
-      const afterSelection = originalContent.substring(selectedTextIndex + cleanSelectedText.length);
-      return beforeSelection + newText + afterSelection;
-    }
-    
-    // Fallback to full replacement if we can't find the selection
-    console.warn('Could not locate selected text for replacement, using full content');
-    return newText;
-  };
 
   // Initialize chat with welcome message and reset states when opening
   useEffect(() => {
     if (open) {
-      console.log('Dialog opening - current state:', { isMinimized, hasTextSelected });
-      // Only reset minimized state if dialog was completely closed before
-      setHasUserInteracted(false); // Reset interaction flag
-      
-      // Store original content backup when opening dialog
+      setHasUserInteracted(false);
+
       if (!originalContentBackup) {
         setOriginalContentBackup({
           content: content,
           title: noteTitle
         });
       }
-      
-      // Calculate text selection range if working with selected text
-      if (isSelectedText) {
-        const fullText = originalHTML.replace(/<[^>]*>/g, ''); // Strip HTML for text comparison
-        const selectedIndex = fullText.indexOf(content);
-        if (selectedIndex !== -1) {
-          setSelectedTextRange({
-            start: selectedIndex,
-            end: selectedIndex + content.length
-          });
-        }
-      } else {
-        setSelectedTextRange(null);
-      }
-      
+
       if (chatMessages.length === 0) {
-        const welcomeMessage = 'Hi! I can help you improve your writing. Use the quick actions below or tell me what you\'d like me to do with your text.';
         setChatMessages([{
           id: 'welcome',
           type: 'system',
-          content: welcomeMessage,
+          content: 'How would you like me to enhance your writing?',
           timestamp: new Date()
         }]);
       }
     }
-  }, [open, isSelectedText, content, originalHTML]);
-
-  // Removed auto-hide functionality completely
-
+  }, [open, content, originalHTML]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -150,22 +120,17 @@ export function AiChatDialog({
   }, [chatMessages]);
 
   const quickActions = [
-    { label: 'Professional', instruction: 'Make this more professional and formal' },
-    { label: 'Casual', instruction: 'Make this more casual and friendly' },
-    { label: 'Expand', instruction: 'Expand this text with more details and examples' },
-    { label: 'Shorten', instruction: 'Make this shorter and more concise' },
-    { label: 'Happier', instruction: 'Make this more upbeat, positive and happier' },
-    { label: 'Formal', instruction: 'Make this more formal and business-appropriate' },
+    { label: 'Professional', instruction: 'Make this more professional and formal', icon: Briefcase, color: 'from-blue-500/20 to-blue-600/10 hover:from-blue-500/30 hover:to-blue-600/20 border-blue-500/20' },
+    { label: 'Casual', instruction: 'Make this more casual and friendly', icon: Coffee, color: 'from-amber-500/20 to-amber-600/10 hover:from-amber-500/30 hover:to-amber-600/20 border-amber-500/20' },
+    { label: 'Expand', instruction: 'Expand this text with more details and examples', icon: Maximize2, color: 'from-green-500/20 to-green-600/10 hover:from-green-500/30 hover:to-green-600/20 border-green-500/20' },
+    { label: 'Shorten', instruction: 'Make this shorter and more concise', icon: Minimize2, color: 'from-purple-500/20 to-purple-600/10 hover:from-purple-500/30 hover:to-purple-600/20 border-purple-500/20' },
+    { label: 'Happier', instruction: 'Make this more upbeat, positive and happier', icon: Smile, color: 'from-pink-500/20 to-pink-600/10 hover:from-pink-500/30 hover:to-pink-600/20 border-pink-500/20' },
+    { label: 'Formal', instruction: 'Make this more formal and business-appropriate', icon: GraduationCap, color: 'from-slate-500/20 to-slate-600/10 hover:from-slate-500/30 hover:to-slate-600/20 border-slate-500/20' },
   ];
 
   const handleQuickAction = async (instruction: string, actionLabel: string) => {
-    console.log('Quick action triggered:', actionLabel);
     setHasUserInteracted(true);
     await handleRewrite(instruction, actionLabel);
-  };
-
-  const addInitialRestorePoint = () => {
-    // Removed restore point functionality - using main undo/redo system instead
   };
 
   const handleSpellCheck = async () => {
@@ -178,11 +143,9 @@ export function AiChatDialog({
       return;
     }
 
-    console.log('Spell check triggered');
     setHasUserInteracted(true);
     setIsProcessing(true);
-    
-    // Add user message
+
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'user',
@@ -194,7 +157,7 @@ export function AiChatDialog({
 
     try {
       const { data, error } = await supabase.functions.invoke('spell-check', {
-        body: { 
+        body: {
           content: originalHTML,
           action: 'spell',
           originalHTML: originalHTML,
@@ -206,20 +169,17 @@ export function AiChatDialog({
 
       if (data.correctedContent && data.correctedContent !== originalHTML) {
         await onAddHistoryEntry('spell', originalHTML, data.correctedContent, noteTitle, noteTitle);
-        
-        console.log('Spell check - sending to editor - full page replacement');
-        
-        // Always replace full content, never use selection replacement
         onContentChange(data.correctedContent, false);
+
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
-          content: 'I found and corrected some spelling errors in your text.',
+          content: 'Fixed spelling errors in your text.',
           actionType: 'spell',
           timestamp: new Date()
         };
         setChatMessages(prev => [...prev, aiMessage]);
-        
+
         toast({
           title: "Spelling corrected",
           description: "Fixed spelling errors in your note.",
@@ -228,7 +188,7 @@ export function AiChatDialog({
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
-          content: 'No spelling errors found. Your text looks good!',
+          content: 'No spelling errors found!',
           actionType: 'spell',
           timestamp: new Date()
         };
@@ -239,11 +199,11 @@ export function AiChatDialog({
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: 'Sorry, there was an error checking your spelling. Please try again.',
+        content: 'Sorry, there was an error. Please try again.',
         timestamp: new Date()
       };
       setChatMessages(prev => [...prev, errorMessage]);
-      
+
       toast({
         title: "Spell check failed",
         description: "There was an error checking your spelling.",
@@ -264,10 +224,9 @@ export function AiChatDialog({
       return;
     }
 
-    console.log('Grammar check triggered');
     setHasUserInteracted(true);
     setIsProcessing(true);
-    
+
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'user',
@@ -279,7 +238,7 @@ export function AiChatDialog({
 
     try {
       const { data, error } = await supabase.functions.invoke('spell-check', {
-        body: { 
+        body: {
           content: originalHTML,
           action: 'grammar',
           originalHTML: originalHTML,
@@ -291,19 +250,17 @@ export function AiChatDialog({
 
       if (data.correctedContent && data.correctedContent !== originalHTML) {
         await onAddHistoryEntry('grammar', originalHTML, data.correctedContent, noteTitle, noteTitle);
-        
-        // Always replace full content, never use selection replacement
         onContentChange(data.correctedContent, false);
-        
+
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
-          content: 'I found and corrected some grammar issues in your text.',
+          content: 'Fixed grammar issues in your text.',
           actionType: 'grammar',
           timestamp: new Date()
         };
         setChatMessages(prev => [...prev, aiMessage]);
-        // Removed restore point call
+
         toast({
           title: "Grammar corrected",
           description: "Fixed grammar issues in your note.",
@@ -312,7 +269,7 @@ export function AiChatDialog({
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
-          content: 'No grammar errors found. Your text looks good!',
+          content: 'No grammar issues found!',
           actionType: 'grammar',
           timestamp: new Date()
         };
@@ -323,11 +280,11 @@ export function AiChatDialog({
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: 'Sorry, there was an error checking your grammar. Please try again.',
+        content: 'Sorry, there was an error. Please try again.',
         timestamp: new Date()
       };
       setChatMessages(prev => [...prev, errorMessage]);
-      
+
       toast({
         title: "Grammar check failed",
         description: "There was an error checking your grammar.",
@@ -358,7 +315,7 @@ export function AiChatDialog({
     }
 
     setIsProcessing(true);
-    
+
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'user',
@@ -371,7 +328,7 @@ export function AiChatDialog({
 
     try {
       const response = await supabase.functions.invoke('spell-check', {
-        body: { 
+        body: {
           content: originalHTML,
           title: noteTitle,
           action: 'rewrite',
@@ -394,28 +351,25 @@ export function AiChatDialog({
           response.data.newTitle || noteTitle,
           instruction
         );
-        
-        console.log('Rewrite - sending to editor - full page replacement');
-        
-        // Always replace the full page content, never use selection replacement
+
         onContentChange(response.data.correctedContent, false);
-        
+
         if (response.data.newTitle && response.data.newTitle !== noteTitle) {
           onTitleChange(response.data.newTitle);
         }
-        
+
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
-          content: 'I\'ve rewritten your text according to your instructions.',
+          content: 'Done! Your text has been rewritten.',
           actionType: 'rewrite',
           timestamp: new Date()
         };
         setChatMessages(prev => [...prev, aiMessage]);
-        
+
         toast({
           title: "Text rewritten",
-          description: "Your content has been rewritten according to your instructions.",
+          description: "Your content has been updated.",
         });
       } else {
         throw new Error('No rewritten content received');
@@ -425,13 +379,13 @@ export function AiChatDialog({
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: 'Sorry, there was an error rewriting your text. Please try again.',
+        content: 'Sorry, there was an error. Please try again.',
         timestamp: new Date()
       };
       setChatMessages(prev => [...prev, errorMessage]);
-        // Removed restore point call
+
       toast({
-        title: "Rewrite failed", 
+        title: "Rewrite failed",
         description: error.message || "There was an error rewriting your text.",
         variant: "destructive",
       });
@@ -442,14 +396,12 @@ export function AiChatDialog({
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isProcessing) return;
-    
-    console.log('Send message triggered');
+
     setHasUserInteracted(true);
     const instruction = inputValue.trim();
     setInputValue('');
     await handleRewrite(instruction);
   };
-
 
   const handleRevertToHistoryVersion = async (entry: AiHistoryEntry) => {
     const revertData = await onRevertToVersion(entry);
@@ -457,213 +409,174 @@ export function AiChatDialog({
     if (revertData.title && revertData.title !== noteTitle) {
       onTitleChange(revertData.title);
     }
-    
+
     const revertMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'system',
-      content: `Reverted to version from ${new Date(entry.created_at).toLocaleString()}.`,
+      content: 'Reverted to previous version.',
       timestamp: new Date()
     };
     setChatMessages(prev => [...prev, revertMessage]);
-    
+
     toast({
       title: "Reverted",
-      description: "Content has been reverted to selected version.",
+      description: "Content has been reverted.",
     });
   };
 
-  return (
-    <>
-      {/* Mobile: Use Dialog for full screen */}
-      {isMobile ? (
-        <Dialog 
-          open={open} 
-          onOpenChange={() => {
-            // Completely prevent automatic closing - only allow manual close via X button
-            console.log('Dialog onOpenChange triggered but prevented automatic closing');
-          }}
-          modal={false}
-        >
-          <DialogContent
-            className={`
-              fixed bottom-4 right-4 z-[9999] w-[90vw] max-w-sm m-0 rounded-lg border shadow-lg
-              ${isMinimized ? 'h-16' : 'h-[70vh]'}
-              flex flex-col p-0 transition-all duration-300 bg-background
-              [&>button]:hidden
-            `}
-            style={{
-              transform: 'none',
-              left: 'auto',
-              top: 'auto',
-              bottom: '16px',
-              right: '16px',
-              maxWidth: 'calc(100vw - 32px)',
-              maxHeight: 'calc(100dvh - 32px)'
-            }}
-          >
-        <DialogHeader className="px-6 py-4 border-b">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center gap-2">
-              <Brain className="h-5 w-5" />
-              {!isMinimized && (
-                <span>NoteBot</span>
-              )}
-              {isProcessing && (
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
-              )}
-            </DialogTitle>
-            <div className="flex items-center gap-2">
-              {isMobile && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsMinimized(!isMinimized)}
-                  title={isMinimized ? "Expand chat" : "Minimize chat"}
-                  className={`transition-all duration-300 mr-2 h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 shadow-sm flex items-center justify-center ${
-                    hasTextSelected ? 'ring-2 ring-blue-400 ring-offset-1 shadow-blue-400/50' : ''
-                  }`}
-                  style={{
-                    animation: hasTextSelected ? 'glowBlue 2s ease-in-out infinite alternate' : 'none'
-                  }}
-                >
-                  {isMinimized ? "↑" : "↓"}
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  console.log('Close button clicked - closing dialog');
-                  onOpenChange(false);
-                }}
-                className="h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+  const renderContent = () => (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border/50 bg-gradient-to-r from-accent/5 to-transparent">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center shadow-lg shadow-accent/20">
+              <Wand2 className="h-5 w-5 text-accent-foreground" />
             </div>
+            {isProcessing && (
+              <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-accent animate-pulse" />
+            )}
           </div>
-        </DialogHeader>
+          <div>
+            <h3 className="font-semibold text-foreground">AI Writer</h3>
+            <p className="text-xs text-muted-foreground">Enhance your writing</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMinimized(!isMinimized)}
+            className="h-9 w-9 rounded-xl hover:bg-secondary/80"
+          >
+            {isMinimized ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onOpenChange(false)}
+            className="h-9 w-9 rounded-xl hover:bg-secondary/80"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
 
-        {!isMinimized && (
-          <div className="flex-1 flex min-h-0">
-            {/* Chat Area */}
-            <div className="flex-1 flex flex-col">
-              {/* Messages */}
-              <ScrollArea ref={scrollAreaRef} className="flex-1 px-6 py-4">
-                <div className="space-y-4">
-                  {chatMessages.map((message, index) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-lg p-3 ${
-                          message.type === 'user'
-                            ? 'bg-primary text-primary-foreground'
-                            : message.type === 'ai'
-                            ? 'bg-muted'
-                            : 'bg-accent text-accent-foreground'
-                        }`}
-                      >
-                        <p className="text-sm">{message.content}</p>
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-xs opacity-70">
-                            {message.timestamp.toLocaleTimeString()}
-                          </span>
-                          
-                          {/* Add rollback button for AI messages that correspond to history entries */}
-                          {message.type === 'ai' && message.actionType && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                // Find the corresponding history entry and revert
-                                const correspondingEntry = history.find(entry => 
-                                  entry.action_type === message.actionType &&
-                                  Math.abs(new Date(entry.created_at).getTime() - message.timestamp.getTime()) < 10000 // within 10 seconds
-                                );
-                                if (correspondingEntry) {
-                                  handleRevertToHistoryVersion(correspondingEntry);
-                                }
-                              }}
-                              className="text-xs h-6 px-2 ml-2 opacity-60 hover:opacity-100"
-                              title="Undo this change"
-                            >
-                              Undo
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {isProcessing && (
-                    <div className="flex justify-start">
-                      <div className="bg-muted rounded-lg p-3">
-                        <div className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-3 w-3 border-2 border-primary border-t-transparent"></div>
-                          <span className="text-sm text-muted-foreground">AI is thinking...</span>
-                        </div>
-                      </div>
-                    </div>
+      {!isMinimized && (
+        <>
+          {/* Messages Area */}
+          <ScrollArea ref={scrollAreaRef} className="flex-1 px-5 py-4">
+            <div className="space-y-4">
+              {chatMessages.map((message) => (
+                <div
+                  key={message.id}
+                  className={cn(
+                    "flex",
+                    message.type === 'user' ? 'justify-end' : 'justify-start'
                   )}
-                </div>
-              </ScrollArea>
-
-              {/* Status text instead of auto-hide toggle */}
-              <div className="px-6 py-3 border-t bg-muted/30">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-xs font-medium text-muted-foreground">Quick Actions:</div>
-                  <div 
-                    className={`text-xs text-muted-foreground px-2 py-1 bg-background/50 rounded transition-all duration-300 ${
-                      hasTextSelected ? 'ring-1 ring-blue-400 shadow-blue-400/30' : ''
-                    }`}
-                    style={{
-                      animation: hasTextSelected ? 'glowBlue 2s ease-in-out infinite alternate' : 'none'
-                    }}
+                >
+                  <div
+                    className={cn(
+                      "max-w-[85%] rounded-2xl px-4 py-3 shadow-sm",
+                      message.type === 'user'
+                        ? 'bg-accent text-accent-foreground rounded-br-md'
+                        : message.type === 'system'
+                        ? 'bg-secondary/50 text-foreground border border-border/50'
+                        : 'bg-card text-foreground border border-border/50 rounded-bl-md'
+                    )}
                   >
-                    {hasTextSelected ? "Text is selected" : "Editing whole page"}
+                    <p className="text-sm leading-relaxed">{message.content}</p>
+                    {message.type === 'ai' && message.actionType && history.length > 0 && (
+                      <button
+                        onClick={() => {
+                          const correspondingEntry = history.find(entry =>
+                            entry.action_type === message.actionType &&
+                            Math.abs(new Date(entry.created_at).getTime() - message.timestamp.getTime()) < 10000
+                          );
+                          if (correspondingEntry) {
+                            handleRevertToHistoryVersion(correspondingEntry);
+                          }
+                        }}
+                        className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                        Undo
+                      </button>
+                    )}
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSpellCheck}
-                    disabled={isProcessing}
-                    className="text-xs"
-                  >
-                    Spelling
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleGrammarCheck}
-                    disabled={isProcessing}
-                    className="text-xs"
-                  >
-                    Grammar
-                  </Button>
-                  {quickActions.map((action) => (
-                    <Button
-                      key={action.label}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleQuickAction(action.instruction, action.label)}
-                      disabled={isProcessing}
-                      className="text-xs"
-                    >
-                      {action.label}
-                    </Button>
-                  ))}
-                </div>
+              ))}
 
-                {/* Message Input */}
-                <div className="flex gap-2 mt-3">
+              {isProcessing && (
+                <div className="flex justify-start">
+                  <div className="bg-card border border-border/50 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1">
+                        <div className="h-2 w-2 rounded-full bg-accent animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="h-2 w-2 rounded-full bg-accent animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <div className="h-2 w-2 rounded-full bg-accent animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                      <span className="text-sm text-muted-foreground">Writing...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+
+          {/* Quick Actions & Input */}
+          <div className="border-t border-border/50 bg-card/50 backdrop-blur-sm">
+            {/* Correction Actions */}
+            <div className="px-5 pt-4 pb-2">
+              <div className="flex gap-2 mb-3">
+                <button
+                  onClick={handleSpellCheck}
+                  disabled={isProcessing}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-500/20 to-cyan-600/10 hover:from-cyan-500/30 hover:to-cyan-600/20 border border-cyan-500/20 text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <SpellCheck className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+                  <span>Spelling</span>
+                </button>
+                <button
+                  onClick={handleGrammarCheck}
+                  disabled={isProcessing}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-indigo-500/20 to-indigo-600/10 hover:from-indigo-500/30 hover:to-indigo-600/20 border border-indigo-500/20 text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Type className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                  <span>Grammar</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Rewrite Actions Grid */}
+            <div className="px-5 pb-3">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Rewrite as...</p>
+              <div className="grid grid-cols-3 gap-2">
+                {quickActions.map((action) => (
+                  <button
+                    key={action.label}
+                    onClick={() => handleQuickAction(action.instruction, action.label)}
+                    disabled={isProcessing}
+                    className={cn(
+                      "flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gradient-to-br border text-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]",
+                      action.color
+                    )}
+                  >
+                    <action.icon className="h-4 w-4 opacity-80" />
+                    <span className="text-xs font-medium">{action.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Custom Input */}
+            <div className="px-5 pb-5 pt-2">
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
                   <Input
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Tell me how to improve your text..."
+                    placeholder="Or describe how to rewrite..."
                     disabled={isProcessing}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
@@ -671,212 +584,63 @@ export function AiChatDialog({
                         handleSendMessage();
                       }
                     }}
-                    className="flex-1 bg-background text-foreground border-border placeholder:text-muted-foreground focus:ring-ring focus:border-ring"
+                    className="pr-12 h-12 rounded-xl bg-background border-border/50 focus:border-accent/50 focus:ring-accent/20 text-sm"
                   />
                   <Button
                     onClick={handleSendMessage}
                     disabled={!inputValue.trim() || isProcessing}
-                    size="sm"
+                    size="icon"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-lg bg-accent hover:bg-accent/90 disabled:opacity-50"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
 
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-      ) : (
-        /* Desktop: Use fixed positioned div instead of modal */
-        open && (
-            <div 
-              className={`fixed bottom-4 right-4 z-[9998] w-96 bg-background border border-border rounded-lg shadow-xl flex flex-col transition-all duration-300 ${isMinimized ? 'h-16' : 'h-[70vh]'}`}
-              style={{
-                maxWidth: 'calc(100vw - 32px)',
-                maxHeight: 'calc(100dvh - 32px)'
-              }}
-          >
-            {/* Header */}
-            <div className="px-6 py-4 border-b">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Brain className="h-5 w-5" />
-                  {!isMinimized && <span className="font-semibold">NoteBot</span>}
-                  {isProcessing && (
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsMinimized(!isMinimized)}
-                    title={isMinimized ? "Expand chat" : "Minimize chat"}
-                    className="transition-all duration-300 h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 shadow-sm"
-                  >
-                    {isMinimized ? "↑" : "↓"}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      console.log('Close button clicked');
-                      onOpenChange(false);
-                    }}
-                    title="Close chat"
-                    className="transition-all duration-300 h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 shadow-sm"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Chat Messages - Only show when not minimized */}
-            {!isMinimized && (
-              <>
-                <ScrollArea ref={scrollAreaRef} className="flex-1 p-6 min-h-0 overflow-y-auto">
-                  <div className="space-y-4">
-                    {chatMessages.map((message) => (
-                      <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] rounded-lg p-3 ${
-                          message.type === 'user' 
-                            ? 'bg-primary text-primary-foreground' 
-                            : message.type === 'system'
-                            ? 'bg-muted text-muted-foreground border border-border'
-                            : 'bg-muted'
-                        }`}>
-                           <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                           {message.type === 'ai' && message.actionType && (
-                             <div className="mt-2 pt-2 border-t border-border/50">
-                               <Button
-                                 variant="ghost"
-                                 size="sm"
-                                 onClick={async () => {
-                                   if (history.length > 0) {
-                                     const lastEntry = history[0];
-                                     await handleRevertToHistoryVersion(lastEntry);
-                                   }
-                                 }}
-                                 disabled={history.length === 0}
-                                 className="text-xs text-muted-foreground hover:text-foreground"
-                               >
-                                 Undo
-                               </Button>
-                             </div>
-                           )}
-                           {message.type === 'system' && message.actionType === 'restore' && originalContentBackup && (
-                             <div className="mt-2 pt-2 border-t border-border/50">
-                               <Button
-                                 variant="ghost"
-                                 size="sm"
-                                 onClick={async () => {
-                                   onContentChange(originalContentBackup.content);
-                                   onTitleChange(originalContentBackup.title);
-                                   toast({
-                                     title: "Restored to original",
-                                     description: "Your content has been restored to its original state.",
-                                   });
-                                 }}
-                                 className="text-xs text-muted-foreground hover:text-foreground"
-                               >
-                                 Restore Original
-                               </Button>
-                             </div>
-                           )}
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {isProcessing && (
-                      <div className="flex justify-start">
-                        <div className="bg-muted rounded-lg p-3">
-                          <div className="flex items-center gap-2">
-                            <div className="animate-spin rounded-full h-3 w-3 border-2 border-primary border-t-transparent"></div>
-                            <span className="text-sm text-muted-foreground">AI is thinking...</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
-
-                {/* Status and Input */}
-                <div className="px-6 py-3 border-t bg-muted/30">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="text-xs font-medium text-muted-foreground">Quick Actions:</div>
-                    <div 
-                      className={`text-xs text-muted-foreground px-2 py-1 bg-background/50 rounded transition-all duration-300 ${
-                        hasTextSelected ? 'ring-1 ring-blue-400 shadow-blue-400/30' : ''
-                      }`}
-                      style={{
-                        animation: hasTextSelected ? 'glowBlue 2s ease-in-out infinite alternate' : 'none'
-                      }}
-                    >
-                      {hasTextSelected ? "Text is selected" : "Editing whole page"}
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleSpellCheck}
-                      disabled={isProcessing}
-                      className="text-xs"
-                    >
-                      Spelling
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleGrammarCheck}
-                      disabled={isProcessing}
-                      className="text-xs"
-                    >
-                      Grammar
-                    </Button>
-                    {quickActions.map((action) => (
-                      <Button
-                        key={action.label}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleQuickAction(action.instruction, action.label)}
-                        disabled={isProcessing}
-                        className="text-xs"
-                      >
-                        {action.label}
-                      </Button>
-                    ))}
-                  </div>
-
-                  {/* Message Input */}
-                  <div className="flex gap-2 mt-3">
-                    <Input
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      placeholder="Tell me how to improve your text..."
-                      disabled={isProcessing}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                      className="flex-1 bg-background text-foreground border-border placeholder:text-muted-foreground focus:ring-ring focus:border-ring"
-                    />
-                    <Button
-                      onClick={handleSendMessage}
-                      disabled={!inputValue.trim() || isProcessing}
-                      size="sm"
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </>
+  return (
+    <>
+      {isMobile ? (
+        <Dialog
+          open={open}
+          onOpenChange={() => {}}
+          modal={false}
+        >
+          <DialogContent
+            className={cn(
+              "fixed bottom-4 left-4 right-4 z-[9999] m-0 rounded-2xl border border-border/50 shadow-2xl",
+              "flex flex-col p-0 transition-all duration-300 bg-background/95 backdrop-blur-xl",
+              "[&>button]:hidden",
+              isMinimized ? 'h-[72px]' : 'h-[75vh]'
             )}
+            style={{
+              transform: 'none',
+              top: 'auto',
+              maxWidth: 'calc(100vw - 32px)',
+              maxHeight: 'calc(100dvh - 32px)'
+            }}
+          >
+            {renderContent()}
+          </DialogContent>
+        </Dialog>
+      ) : (
+        open && (
+          <div
+            className={cn(
+              "fixed bottom-4 right-4 z-[9998] w-[400px] bg-background/95 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl flex flex-col transition-all duration-300",
+              isMinimized ? 'h-[72px]' : 'h-[600px]'
+            )}
+            style={{
+              maxWidth: 'calc(100vw - 32px)',
+              maxHeight: 'calc(100dvh - 32px)'
+            }}
+          >
+            {renderContent()}
           </div>
         )
       )}

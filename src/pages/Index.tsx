@@ -181,13 +181,32 @@ const Index = () => {
         {/* Mobile layout */}
         <div className="md:hidden">
           <div className="flex items-center justify-between">
-            {/* Left: Logo */}
-            <div className="p-1.5 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+            {/* Left: Support heart icon */}
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
+            >
               <Heart className="h-5 w-5 text-accent" fill="currentColor" />
-            </div>
+            </button>
 
-            {/* Right: All control buttons */}
+            {/* Right: Search and filter controls */}
             <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
+                onClick={() => {
+                  setOpenSelect(null);
+                  setShowSearch(true);
+                  setTimeout(() => {
+                    const input = document.getElementById("search-input") as HTMLInputElement;
+                    input?.focus();
+                    input?.click();
+                  }, 150);
+                }}
+              >
+                <Search className="h-4 w-4" />
+              </Button>
               <Select
                 value={sortOrder}
                 onValueChange={(value) => {
@@ -262,28 +281,6 @@ const Index = () => {
                   </SelectItem>
                 </SelectContent>
               </Select>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
-                onClick={() => {
-                  setOpenSelect(null);
-                  setShowSearch(true);
-                  setTimeout(() => {
-                    const input = document.getElementById("search-input") as HTMLInputElement;
-                    input?.focus();
-                    input?.click();
-                  }, 150);
-                }}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-              <button
-                onClick={() => setShowSupportDialog(true)}
-                className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer h-11 w-11 flex items-center justify-center"
-              >
-                <Heart className="h-5 w-5 text-accent" fill="currentColor" />
-              </button>
             </div>
           </div>
         </div>
