@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Plus, Lightbulb, Settings, FileText, CheckSquare, Brain } from 'lucide-react';
+import { NotebookTabs, Plus, Lightbulb, Settings, FileText, CheckSquare, Brain } from 'lucide-react';
 import { useNotes } from '@/contexts/NoteContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSidebar } from '@/components/ui/sidebar';
@@ -44,7 +44,7 @@ export function BottomNav() {
 
   // Dynamic nav items based on AI button visibility
   const leftNavItems = [
-    { path: '/', icon: Home, label: 'Notes' },
+    { path: '/', icon: NotebookTabs, label: 'Notes' },
   ];
 
   const rightNavItems = [
