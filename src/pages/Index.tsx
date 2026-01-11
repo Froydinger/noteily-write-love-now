@@ -430,7 +430,7 @@ const Index = () => {
             </div>
             <button
               onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer"
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
             >
               <Heart className="h-5 w-5 text-accent" fill="currentColor" />
             </button>
