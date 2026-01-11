@@ -65,7 +65,7 @@ export function BottomNav() {
             key={item.path}
             onClick={() => navigate(item.path)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-250",
+              "flex flex-col items-center justify-center gap-1 px-3 py-2 pb-3 rounded-2xl transition-all duration-250",
               isActive(item.path)
                 ? "text-accent"
                 : "text-muted-foreground hover:text-foreground"
@@ -84,7 +84,7 @@ export function BottomNav() {
           <button
             onClick={openAiChat}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-250",
+              "flex flex-col items-center justify-center gap-1 px-3 py-2 pb-3 rounded-2xl transition-all duration-250",
               "text-accent hover:text-accent"
             )}
           >
@@ -145,7 +145,7 @@ export function BottomNav() {
             key={item.path}
             onClick={() => navigate(item.path)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-250",
+              "flex flex-col items-center justify-center gap-1 px-3 py-2 pb-3 rounded-2xl transition-all duration-250",
               isActive(item.path)
                 ? "text-accent"
                 : "text-muted-foreground hover:text-foreground"
