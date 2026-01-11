@@ -58,7 +58,7 @@ export function BottomNav() {
       <div className="absolute inset-0 glass-nav" />
       
       {/* Safe area spacer for iOS */}
-      <div className="relative flex items-center justify-around px-4 h-16 pb-safe">
+      <div className="relative flex items-end justify-around px-4 h-16 pb-2 pb-safe">
         {/* Left nav item - Home */}
         {leftNavItems.map((item) => (
           <button
