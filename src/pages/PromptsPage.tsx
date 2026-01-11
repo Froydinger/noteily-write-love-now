@@ -65,9 +65,9 @@ const PromptsPage = () => {
             )}
             <button
               onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
             >
-              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+              <Heart className="h-5 w-5 text-accent" fill="currentColor" />
             </button>
           </div>
           <div className="flex items-center justify-center gap-2">
@@ -100,9 +100,9 @@ const PromptsPage = () => {
             </div>
             <button
               onClick={() => setShowSupportDialog(true)}
-              className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 hover:from-accent/30 hover:to-accent/10 transition-all duration-200"
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
             >
-              <Heart className="h-6 w-6 text-accent" fill="currentColor" />
+              <Heart className="h-5 w-5 text-accent" fill="currentColor" />
             </button>
           </div>
           <div className="flex items-center justify-center gap-2">
