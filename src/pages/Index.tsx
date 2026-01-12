@@ -197,12 +197,17 @@ const Index = () => {
                 className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
                 onClick={() => {
                   setOpenSelect(null);
-                  setShowSearch(true);
-                  setTimeout(() => {
-                    const input = document.getElementById("search-input") as HTMLInputElement;
-                    input?.focus();
-                    input?.click();
-                  }, 150);
+                  if (showSearch) {
+                    setShowSearch(false);
+                    setSearchTerm("");
+                  } else {
+                    setShowSearch(true);
+                    setTimeout(() => {
+                      const input = document.getElementById("search-input") as HTMLInputElement;
+                      input?.focus();
+                      input?.click();
+                    }, 150);
+                  }
                 }}
               >
                 <Search className="h-4 w-4" />
@@ -295,12 +300,17 @@ const Index = () => {
                 className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
                 onClick={() => {
                   setOpenSelect(null);
-                  setShowSearch(true);
-                  setTimeout(() => {
-                    const input = document.getElementById("search-input") as HTMLInputElement;
-                    input?.focus();
-                    input?.click();
-                  }, 150);
+                  if (showSearch) {
+                    setShowSearch(false);
+                    setSearchTerm("");
+                  } else {
+                    setShowSearch(true);
+                    setTimeout(() => {
+                      const input = document.getElementById("search-input") as HTMLInputElement;
+                      input?.focus();
+                      input?.click();
+                    }, 150);
+                  }
                 }}
               >
                 <Search className="h-4 w-4" />
