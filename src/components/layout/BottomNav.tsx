@@ -77,16 +77,11 @@ export function BottomNav() {
       "fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300",
       isKeyboardOpen && "translate-y-full"
     )}>
-      {/* Glass background */}
-      <div className="absolute inset-0 glass-nav" />
-
       {/* FAB - Create Note (Bottom Left) */}
       <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="absolute left-[26px] bottom-5 flex items-center justify-center w-14 h-14 rounded-full bg-accent text-accent-foreground shadow-glow hover:shadow-glow-lg transition-all duration-250 hover:scale-105 active:scale-95 z-10">
-              <Plus className="h-7 w-7" />
-              {/* Glow ring */}
-              <div className="absolute inset-0 rounded-full bg-accent/20 animate-pulse-soft -z-10 scale-125" />
+            <button className="absolute left-[26px] bottom-5 flex items-center justify-center w-12 h-12 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer">
+              <Plus className="h-6 w-6 text-accent" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
@@ -122,25 +117,22 @@ export function BottomNav() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-      {/* Safe area spacer for iOS */}
-      <div className="relative flex items-end justify-around px-4 pl-24 h-20 pb-2 pb-safe">
-        {/* Nav items - Notes, Ideas, Settings */}
+      {/* Navigation Items */}
+      <div className="relative flex items-end justify-around px-4 pl-24 h-20 pb-5 pb-safe gap-2">
         {[...leftNavItems, ...rightNavItems].map((item) => (
           <button
             key={item.path}
             onClick={() => navigate(item.path)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-250",
-              isActive(item.path)
-                ? "text-accent"
-                : "text-muted-foreground hover:text-foreground"
+              "flex items-center justify-center w-12 h-12 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer",
+              isActive(item.path) && "border-accent/50 bg-accent/10"
             )}
+            title={item.label}
           >
             <item.icon className={cn(
-              "h-6 w-6 transition-transform duration-250",
-              isActive(item.path) && "scale-110"
+              "h-5 w-5 transition-transform duration-200",
+              isActive(item.path) ? "text-accent scale-110" : "text-foreground"
             )} />
-            <span className="text-[10px] font-medium">{item.label}</span>
           </button>
         ))}
       </div>
