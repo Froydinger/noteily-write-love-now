@@ -54,33 +54,11 @@ export function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
       {/* Glass background */}
       <div className="absolute inset-0 glass-nav" />
-      
-      {/* Safe area spacer for iOS */}
-      <div className="relative flex items-end justify-around px-4 h-20 pb-2 pb-safe">
-        {/* Left nav item - Home */}
-        {leftNavItems.map((item) => (
-          <button
-            key={item.path}
-            onClick={() => navigate(item.path)}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-250",
-              isActive(item.path)
-                ? "text-accent"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <item.icon className={cn(
-              "h-6 w-6 transition-transform duration-250",
-              isActive(item.path) && "scale-110"
-            )} />
-            <span className="text-[10px] font-medium">{item.label}</span>
-          </button>
-        ))}
 
-        {/* Center FAB - Create Note */}
-        <DropdownMenu>
+      {/* FAB - Create Note (Bottom Left) */}
+      <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="relative flex items-center justify-center w-14 h-14 -mt-6 rounded-full bg-accent text-accent-foreground shadow-glow hover:shadow-glow-lg transition-all duration-250 hover:scale-105 active:scale-95">
+            <button className="absolute left-4 bottom-5 flex items-center justify-center w-14 h-14 rounded-full bg-accent text-accent-foreground shadow-glow hover:shadow-glow-lg transition-all duration-250 hover:scale-105 active:scale-95 z-10">
               <Plus className="h-7 w-7" />
               {/* Glow ring */}
               <div className="absolute inset-0 rounded-full bg-accent/20 animate-pulse-soft -z-10 scale-125" />
@@ -119,8 +97,10 @@ export function BottomNav() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Right nav items */}
-        {rightNavItems.map((item) => (
+      {/* Safe area spacer for iOS */}
+      <div className="relative flex items-end justify-end px-4 h-20 pb-2 pb-safe gap-4">
+        {/* Nav items - Notes, Ideas, Settings */}
+        {[...leftNavItems, ...rightNavItems].map((item) => (
           <button
             key={item.path}
             onClick={() => navigate(item.path)}
