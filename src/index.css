@@ -960,10 +960,11 @@ html[data-title-font="mono"] .note-editor h6 {
   }
 }
 
-/* Scrollbar styling for modern look */
+/* Scrollbar styling - hidden to prevent layout shift */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 0px;
+  height: 0px;
+  display: none;
 }
 
 ::-webkit-scrollbar-track {
@@ -971,22 +972,26 @@ html[data-title-font="mono"] .note-editor h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.3);
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
+  background: transparent;
+}
+
+/* Firefox scrollbar hiding */
+* {
+  scrollbar-width: none;
 }
 
 .dark ::-webkit-scrollbar-thumb,
 .navy ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.25);
+  background: transparent;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover,
 .navy ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.4);
+  background: transparent;
 }
 
 /* PWA mode - hide scrollbars completely to prevent white bar flashing */

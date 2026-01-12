@@ -74,9 +74,9 @@ export function BottomNav() {
 
   return (
     <nav className={cn(
-      "fixed bottom-0 z-50 md:hidden transition-transform duration-300",
+      "fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300",
       isKeyboardOpen && "translate-y-full"
-    )} style={{ left: 0, right: 0, width: '100vw' }}>
+    )}>
       {/* Navigation Items - All aligned */}
       <div className="relative flex items-center justify-center px-4 h-20 pb-safe gap-3" style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}>
         {/* Plus button - slightly larger */}
