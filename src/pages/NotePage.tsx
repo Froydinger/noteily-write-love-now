@@ -179,7 +179,7 @@ const NotePage = () => {
   return (
     <div
       key={id}
-      className={`min-h-[100dvh] transform transition-all duration-200 ease-out ${entered ? "translate-x-0 opacity-100" : "translate-x-1 opacity-90"}`}
+      className={`min-h-[100dvh] md:pl-20 transform transition-all duration-200 ease-out ${entered ? "translate-x-0 opacity-100" : "translate-x-1 opacity-90"}`}
     >
       <header
         ref={headerRef}
@@ -189,22 +189,6 @@ const NotePage = () => {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="relative hidden md:block">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleSidebar}
-                className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
-                title="Toggle sidebar"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              {user && unreadCount > 0 && state === "collapsed" && (
-                <div className="absolute -top-1 -right-1 h-5 w-5 bg-destructive rounded-full flex items-center justify-center text-xs text-white font-medium">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </div>
-              )}
-            </div>
             <Button
               variant="ghost"
               size="sm"
