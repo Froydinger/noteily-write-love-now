@@ -4,6 +4,7 @@ import { useNotes } from '@/contexts/NoteContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +19,27 @@ export function BottomNav() {
   const { addNote, setCurrentNote } = useNotes();
   const isMobile = useIsMobile();
   const { state, toggleSidebar } = useSidebar();
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+  // Detect keyboard open/close on mobile
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.visualViewport) return;
+
+    const handleResize = () => {
+      // When keyboard opens, visual viewport height is smaller than window height
+      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      const windowHeight = window.innerHeight;
+
+      // If viewport is significantly smaller (more than 150px), keyboard is likely open
+      setIsKeyboardOpen(windowHeight - viewportHeight > 150);
+    };
+
+    window.visualViewport.addEventListener('resize', handleResize);
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -51,14 +73,17 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+    <nav className={cn(
+      "fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300",
+      isKeyboardOpen && "translate-y-full"
+    )}>
       {/* Glass background */}
       <div className="absolute inset-0 glass-nav" />
 
       {/* FAB - Create Note (Bottom Left) */}
       <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="absolute left-4 bottom-5 flex items-center justify-center w-14 h-14 rounded-full bg-accent text-accent-foreground shadow-glow hover:shadow-glow-lg transition-all duration-250 hover:scale-105 active:scale-95 z-10">
+            <button className="absolute left-[26px] bottom-5 flex items-center justify-center w-14 h-14 rounded-full bg-accent text-accent-foreground shadow-glow hover:shadow-glow-lg transition-all duration-250 hover:scale-105 active:scale-95 z-10">
               <Plus className="h-7 w-7" />
               {/* Glow ring */}
               <div className="absolute inset-0 rounded-full bg-accent/20 animate-pulse-soft -z-10 scale-125" />
