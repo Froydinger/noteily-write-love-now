@@ -221,22 +221,12 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full md:pl-20">
       {/* Sticky floating header */}
       <header className="sticky top-0 z-50 p-4 md:p-8 pb-4 pwa-safe-top">
         {/* Mobile layout */}
         <div className="md:hidden">
           <div className="flex items-center justify-between">
-            {(isMobile || state === "collapsed") && (
-              <div className="relative hidden">
-                <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
-                {user && unreadCount > 0 && (
-                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </div>
-                )}
-              </div>
-            )}
             <button
               onClick={() => setShowSupportDialog(true)}
               className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
@@ -248,19 +238,7 @@ const SettingsPage = () => {
 
         {/* Desktop layout */}
         <div className="hidden md:block">
-          <div className="flex items-center justify-between">
-            <div>
-              {state === "collapsed" && (
-                <div className="relative">
-                  <SidebarTrigger className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-secondary transition-all duration-250" />
-                  {user && unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 h-5 w-5 bg-accent rounded-full flex items-center justify-center text-[10px] text-accent-foreground font-semibold shadow-glow-sm">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+          <div className="flex items-center justify-end">
             <button
               onClick={() => setShowSupportDialog(true)}
               className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
