@@ -83,7 +83,7 @@ export function BottomNav() {
       {/* FAB - Create Note (Bottom Left) */}
       <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="absolute left-4 bottom-5 flex items-center justify-center w-14 h-14 rounded-full bg-accent text-accent-foreground shadow-glow hover:shadow-glow-lg transition-all duration-250 hover:scale-105 active:scale-95 z-10">
+            <button className="absolute left-[26px] bottom-5 flex items-center justify-center w-14 h-14 rounded-full bg-accent text-accent-foreground shadow-glow hover:shadow-glow-lg transition-all duration-250 hover:scale-105 active:scale-95 z-10">
               <Plus className="h-7 w-7" />
               {/* Glow ring */}
               <div className="absolute inset-0 rounded-full bg-accent/20 animate-pulse-soft -z-10 scale-125" />
