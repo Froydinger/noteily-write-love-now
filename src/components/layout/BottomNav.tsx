@@ -77,10 +77,12 @@ export function BottomNav() {
       "fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300",
       isKeyboardOpen && "translate-y-full"
     )}>
-      {/* FAB - Create Note (Bottom Left) */}
-      <DropdownMenu>
+      {/* Navigation Items - All aligned */}
+      <div className="relative flex items-center justify-center px-4 h-20 pb-safe gap-3" style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}>
+        {/* Plus button - slightly larger */}
+        <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="absolute left-[26px] bottom-5 flex items-center justify-center w-12 h-12 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer">
+            <button className="flex items-center justify-center w-14 h-14 flex-shrink-0 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer">
               <Plus className="h-6 w-6 text-accent" />
             </button>
           </DropdownMenuTrigger>
@@ -117,14 +119,13 @@ export function BottomNav() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-      {/* Navigation Items */}
-      <div className="relative flex items-end justify-around px-4 pl-24 h-20 pb-5 pb-safe gap-2">
+        {/* Other nav items */}
         {[...leftNavItems, ...rightNavItems].map((item) => (
           <button
             key={item.path}
             onClick={() => navigate(item.path)}
             className={cn(
-              "flex items-center justify-center w-12 h-12 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer",
+              "flex items-center justify-center w-12 h-12 flex-shrink-0 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer",
               isActive(item.path) && "border-accent/50 bg-accent/10"
             )}
             title={item.label}
