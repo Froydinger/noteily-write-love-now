@@ -98,7 +98,7 @@ export function BottomNav() {
         </DropdownMenu>
 
       {/* Safe area spacer for iOS */}
-      <div className="relative flex items-end justify-end px-4 h-20 pb-2 pb-safe gap-4">
+      <div className="relative flex items-end justify-around px-4 pl-24 h-20 pb-2 pb-safe">
         {/* Nav items - Notes, Ideas, Settings */}
         {[...leftNavItems, ...rightNavItems].map((item) => (
           <button
