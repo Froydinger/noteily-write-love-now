@@ -73,12 +73,14 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className={cn(
-      "fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300",
-      isKeyboardOpen && "translate-y-full"
-    )}>
-      {/* Navigation Items - All aligned */}
-      <div className="relative flex items-center justify-center px-4 h-20 pb-safe gap-3" style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}>
+    <>
+      {/* Mobile Bottom Navigation */}
+      <nav className={cn(
+        "fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300",
+        isKeyboardOpen && "translate-y-full"
+      )}>
+        {/* Navigation Items - All aligned */}
+        <div className="relative flex items-center justify-center px-4 h-20 pb-safe gap-3" style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}>
         {/* Plus button - slightly larger */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -136,7 +138,71 @@ export function BottomNav() {
             )} />
           </button>
         ))}
-      </div>
-    </nav>
+        </div>
+      </nav>
+
+      {/* Desktop Left Sidebar */}
+      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 z-50 flex-col items-center gap-4 py-6 px-3 bg-background/60 backdrop-blur-md border-r border-border/30">
+        {/* Plus button */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center justify-center w-12 h-12 flex-shrink-0 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer">
+              <Plus className="h-6 w-6 text-accent" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="start"
+            side="right"
+            sideOffset={12}
+            className="w-[200px] glass-card border-border/30 rounded-2xl shadow-elevated-lg"
+          >
+            <DropdownMenuItem
+              onClick={() => handleCreateNote('note')}
+              className="flex items-center gap-3 py-3 px-4 cursor-pointer rounded-xl hover:bg-accent/20 hover:text-foreground focus:bg-accent/20 focus:text-foreground"
+            >
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent/10">
+                <FileText className="h-4 w-4 text-accent" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-medium">Note</span>
+                <span className="text-xs text-muted-foreground">Free-form writing</span>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleCreateNote('checklist')}
+              className="flex items-center gap-3 py-3 px-4 cursor-pointer rounded-xl hover:bg-accent/20 hover:text-foreground focus:bg-accent/20 focus:text-foreground"
+            >
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent/10">
+                <CheckSquare className="h-4 w-4 text-accent" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-medium">Checklist</span>
+                <span className="text-xs text-muted-foreground">Task list with checkboxes</span>
+              </div>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <div className="w-full h-px bg-border/30 my-2" />
+
+        {/* Navigation icons */}
+        {[...leftNavItems, ...rightNavItems].map((item) => (
+          <button
+            key={item.path}
+            onClick={() => navigate(item.path)}
+            className={cn(
+              "flex items-center justify-center w-12 h-12 flex-shrink-0 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer",
+              isActive(item.path) && "border-accent/50 bg-accent/10"
+            )}
+            title={item.label}
+          >
+            <item.icon className={cn(
+              "h-5 w-5 transition-transform duration-200",
+              isActive(item.path) ? "text-accent scale-110" : "text-foreground"
+            )} />
+          </button>
+        ))}
+      </nav>
+    </>
   );
 }
