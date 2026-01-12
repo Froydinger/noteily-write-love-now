@@ -56,14 +56,14 @@ export function BottomNav() {
       <div className="absolute inset-0 glass-nav" />
       
       {/* Safe area spacer for iOS */}
-      <div className="relative flex items-end justify-around px-4 h-16 pb-2 pb-safe">
+      <div className="relative flex items-center justify-around px-4 h-16 pb-safe">
         {/* Left nav item - Home */}
         {leftNavItems.map((item) => (
           <button
             key={item.path}
             onClick={() => navigate(item.path)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 px-3 py-2 pb-3 rounded-2xl transition-all duration-250",
+              "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-250",
               isActive(item.path)
                 ? "text-accent"
                 : "text-muted-foreground hover:text-foreground"
@@ -125,7 +125,7 @@ export function BottomNav() {
             key={item.path}
             onClick={() => navigate(item.path)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 px-3 py-2 pb-3 rounded-2xl transition-all duration-250",
+              "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-250",
               isActive(item.path)
                 ? "text-accent"
                 : "text-muted-foreground hover:text-foreground"
