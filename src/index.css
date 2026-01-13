@@ -465,6 +465,13 @@
     /* Ensure items in columns don't have stacking context issues */
     .break-inside-avoid {
       transform: none !important;
+      opacity: 1 !important;
+    }
+
+    /* Force cards to be visible - override animation fill mode issues */
+    .animate-float-in {
+      opacity: 1 !important;
+      animation: none !important;
     }
   }
 
