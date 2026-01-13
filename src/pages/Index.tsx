@@ -174,250 +174,255 @@ const Index = () => {
     return <EmptyNotesPlaceholder />;
   }
 
-  const content = (
-    <div className="min-h-full md:pl-20">
-      {/* Sticky floating header */}
-      <header className="sticky top-0 z-[100] px-4 pt-4 md:px-8 md:pt-8 pb-4 pwa-safe-top bg-background/80 backdrop-blur-md">
-        {/* Mobile layout - matches desktop */}
-        <div className="md:hidden">
-          <div className="flex items-center justify-between">
-            {/* Left: Search button */}
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
-                onClick={() => {
-                  setOpenSelect(null);
-                  if (showSearch) {
-                    setShowSearch(false);
-                    setSearchTerm("");
-                  } else {
-                    setShowSearch(true);
-                    setTimeout(() => {
-                      const input = document.getElementById("search-input") as HTMLInputElement;
-                      input?.focus();
-                      input?.click();
-                    }, 150);
-                  }
-                }}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Right: Sync and Support */}
-            <div className="flex items-center gap-2">
-              {/* Sync button */}
-              <button
-                onClick={handleRefresh}
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
-                title="Sync notes"
-              >
-                <RefreshCw className="h-5 w-5" />
-              </button>
-
-              {/* Support heart icon */}
-              <button
-                onClick={() => setShowSupportDialog(true)}
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
-              >
-                <Heart className="h-5 w-5 text-accent" fill="currentColor" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop layout */}
-        <div className="hidden md:block">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
-                onClick={() => {
-                  setOpenSelect(null);
-                  if (showSearch) {
-                    setShowSearch(false);
-                    setSearchTerm("");
-                  } else {
-                    setShowSearch(true);
-                    setTimeout(() => {
-                      const input = document.getElementById("search-input") as HTMLInputElement;
-                      input?.focus();
-                      input?.click();
-                    }, 150);
-                  }
-                }}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* Notifications */}
-              {user && unreadCount > 0 && (
-                <div className="relative">
-                  <button className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center">
-                    <span className="text-sm font-medium">{unreadCount > 99 ? "99+" : unreadCount}</span>
-                  </button>
-                </div>
-              )}
-
-              {/* Sync button */}
-              <button
-                onClick={handleRefresh}
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
-                title="Sync notes"
-              >
-                <RefreshCw className="h-5 w-5" />
-              </button>
-
-              {/* Support */}
-              <button
-                onClick={() => setShowSupportDialog(true)}
-                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
-              >
-                <Heart className="h-5 w-5 text-accent" fill="currentColor" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Scrollable content */}
-      <div
-        className="px-4 pb-4 md:px-8 animate-fade-in"
-        style={{ animationDelay: "0.05s", animationFillMode: "both" }}
-        onClick={() => setSelectedNoteId(null)}
-      >
-        {showSearch && (
-          <div className="relative mb-6 animate-in slide-in-from-top-2 duration-200">
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  id="search-input"
-                  placeholder="Search notes by title or content..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-11 pr-10 h-12 rounded-xl bg-card/80 backdrop-blur-sm border-border/50 focus:border-accent/50 focus:ring-accent/20 transition-all duration-250"
-                />
-                {searchTerm && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-secondary"
-                    onClick={() => {
-                      setSearchTerm("");
-                      setShowSearch(false);
-                }}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-              </div>
-
-              {/* Sort dropdown */}
-              <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger className="h-12 w-12 rounded-xl bg-card/80 backdrop-blur-sm border-border/50 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden">
-                  <ArrowUpDown className="h-4 w-4" />
-                </SelectTrigger>
-                <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl">
-                  <SelectItem value="latest">Latest</SelectItem>
-                  <SelectItem value="oldest">Oldest</SelectItem>
-                  <SelectItem value="alphabetical">A-Z</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Filter dropdown */}
-              <Select value={shareFilter} onValueChange={setShareFilter}>
-                <SelectTrigger className="h-12 w-12 rounded-xl bg-card/80 backdrop-blur-sm border-border/50 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden">
-                  <Filter className="h-4 w-4" />
-                </SelectTrigger>
-                <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl">
-                  <SelectItem value="all">All Notes</SelectItem>
-                  <SelectItem value="shared-with-me">Shared with Me</SelectItem>
-                  <SelectItem value="shared-with-others">My Shared Notes</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        )}
-
-        {searchTerm && (
-          <div className="text-sm text-muted-foreground mb-6 flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
-              {filteredAndSortedNotes.length}
-            </span>
-            <span>of {notes.length} notes</span>
-          </div>
-        )}
-
-        {/* Masonry grid layout */}
-        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 pb-24 space-y-4">
-          {filteredAndSortedNotes.map((note, index) => (
-            <div
-              key={note.id}
-              className="break-inside-avoid animate-float-in"
-              style={{ animationDelay: `${index * 0.03}s`, animationFillMode: "both" }}
+  // Header component - stays outside PullToRefresh for sticky to work on mobile
+  const header = (
+    <header className="sticky top-0 z-[100] px-4 pt-4 md:px-8 md:pt-8 pb-4 pwa-safe-top">
+      {/* Mobile layout - matches desktop */}
+      <div className="md:hidden">
+        <div className="flex items-center justify-between">
+          {/* Left: Search button */}
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
+              onClick={() => {
+                setOpenSelect(null);
+                if (showSearch) {
+                  setShowSearch(false);
+                  setSearchTerm("");
+                } else {
+                  setShowSearch(true);
+                  setTimeout(() => {
+                    const input = document.getElementById("search-input") as HTMLInputElement;
+                    input?.focus();
+                    input?.click();
+                  }, 150);
+                }
+              }}
             >
-              <NoteCard
-                note={note}
-                onShareClick={handleShareClick}
-                isSelected={selectedNoteId === note.id}
-                onPress={handleCardPress}
-                onOpen={(n) => navigate(`/note/${n.id}`)}
-                isPinned={note.pinned}
-                onTogglePin={(n) => togglePinNote(n.id)}
-                onDelete={handleDeleteNote}
-                onDuplicate={handleDuplicateNote}
-              />
-            </div>
-          ))}
+              <Search className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Right: Sync and Support */}
+          <div className="flex items-center gap-2">
+            {/* Sync button */}
+            <button
+              onClick={handleRefresh}
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
+              title="Sync notes"
+            >
+              <RefreshCw className="h-5 w-5" />
+            </button>
+
+            {/* Support heart icon */}
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
+            >
+              <Heart className="h-5 w-5 text-accent" fill="currentColor" />
+            </button>
+          </div>
         </div>
-
-        {shareManagerNote && (
-          <ShareManager
-            isOpen={!!shareManagerNote}
-            onClose={handleShareClose}
-            note={shareManagerNote}
-            onShareUpdate={handleShareUpdated}
-          />
-        )}
-
-        <AlertDialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
-          <AlertDialogContent className="max-w-sm">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2 justify-center">
-                <Heart className="h-5 w-5 text-accent" fill="currentColor" />
-                Support Noteily!
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-center">
-                Noteily is made with love by Win The Night. If you enjoy using Noteily, consider supporting our work!
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="flex-col sm:flex-col gap-2">
-              <AlertDialogAction
-                onClick={() => window.open("https://winthenight.org/support", "_blank")}
-                className="w-full bg-accent hover:bg-accent/90"
-              >
-                Support Us
-              </AlertDialogAction>
-              <AlertDialogCancel className="w-full">Maybe Later</AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
+
+      {/* Desktop layout */}
+      <div className="hidden md:block">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer"
+              onClick={() => {
+                setOpenSelect(null);
+                if (showSearch) {
+                  setShowSearch(false);
+                  setSearchTerm("");
+                } else {
+                  setShowSearch(true);
+                  setTimeout(() => {
+                    const input = document.getElementById("search-input") as HTMLInputElement;
+                    input?.focus();
+                    input?.click();
+                  }, 150);
+                }
+              }}
+            >
+              <Search className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Notifications */}
+            {user && unreadCount > 0 && (
+              <div className="relative">
+                <button className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center">
+                  <span className="text-sm font-medium">{unreadCount > 99 ? "99+" : unreadCount}</span>
+                </button>
+              </div>
+            )}
+
+            {/* Sync button */}
+            <button
+              onClick={handleRefresh}
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
+              title="Sync notes"
+            >
+              <RefreshCw className="h-5 w-5" />
+            </button>
+
+            {/* Support */}
+            <button
+              onClick={() => setShowSupportDialog(true)}
+              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
+            >
+              <Heart className="h-5 w-5 text-accent" fill="currentColor" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+
+  // Scrollable content - wrapped in PullToRefresh on mobile
+  const scrollableContent = (
+    <div
+      className="px-4 pb-4 md:px-8 animate-fade-in"
+      style={{ animationDelay: "0.05s", animationFillMode: "both" }}
+      onClick={() => setSelectedNoteId(null)}
+    >
+      {showSearch && (
+        <div className="relative mb-6 animate-in slide-in-from-top-2 duration-200">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                id="search-input"
+                placeholder="Search notes by title or content..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-11 pr-10 h-12 rounded-xl bg-card/80 backdrop-blur-sm border-border/50 focus:border-accent/50 focus:ring-accent/20 transition-all duration-250"
+              />
+              {searchTerm && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-secondary"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setShowSearch(false);
+              }}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+            </div>
+
+            {/* Sort dropdown */}
+            <Select value={sortOrder} onValueChange={setSortOrder}>
+              <SelectTrigger className="h-12 w-12 rounded-xl bg-card/80 backdrop-blur-sm border-border/50 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden">
+                <ArrowUpDown className="h-4 w-4" />
+              </SelectTrigger>
+              <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl">
+                <SelectItem value="latest">Latest</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
+                <SelectItem value="alphabetical">A-Z</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Filter dropdown */}
+            <Select value={shareFilter} onValueChange={setShareFilter}>
+              <SelectTrigger className="h-12 w-12 rounded-xl bg-card/80 backdrop-blur-sm border-border/50 [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden">
+                <Filter className="h-4 w-4" />
+              </SelectTrigger>
+              <SelectContent className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl">
+                <SelectItem value="all">All Notes</SelectItem>
+                <SelectItem value="shared-with-me">Shared with Me</SelectItem>
+                <SelectItem value="shared-with-others">My Shared Notes</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {searchTerm && (
+        <div className="text-sm text-muted-foreground mb-6 flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
+            {filteredAndSortedNotes.length}
+          </span>
+          <span>of {notes.length} notes</span>
+        </div>
+      )}
+
+      {/* Masonry grid layout */}
+      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 pb-24 space-y-4">
+        {filteredAndSortedNotes.map((note, index) => (
+          <div
+            key={note.id}
+            className="break-inside-avoid animate-float-in"
+            style={{ animationDelay: `${index * 0.03}s`, animationFillMode: "both" }}
+          >
+            <NoteCard
+              note={note}
+              onShareClick={handleShareClick}
+              isSelected={selectedNoteId === note.id}
+              onPress={handleCardPress}
+              onOpen={(n) => navigate(`/note/${n.id}`)}
+              isPinned={note.pinned}
+              onTogglePin={(n) => togglePinNote(n.id)}
+              onDelete={handleDeleteNote}
+              onDuplicate={handleDuplicateNote}
+            />
+          </div>
+        ))}
+      </div>
+
+      {shareManagerNote && (
+        <ShareManager
+          isOpen={!!shareManagerNote}
+          onClose={handleShareClose}
+          note={shareManagerNote}
+          onShareUpdate={handleShareUpdated}
+        />
+      )}
+
+      <AlertDialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 justify-center">
+              <Heart className="h-5 w-5 text-accent" fill="currentColor" />
+              Support Noteily!
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              Noteily is made with love by Win The Night. If you enjoy using Noteily, consider supporting our work!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-col gap-2">
+            <AlertDialogAction
+              onClick={() => window.open("https://winthenight.org/support", "_blank")}
+              className="w-full bg-accent hover:bg-accent/90"
+            >
+              Support Us
+            </AlertDialogAction>
+            <AlertDialogCancel className="w-full">Maybe Later</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 
-  return isMobile ? (
-    <PullToRefresh onRefresh={handleRefresh} pullingContent="">
-      {content}
-    </PullToRefresh>
-  ) : (
-    content
+  return (
+    <div className="min-h-full md:pl-20">
+      {header}
+      {isMobile ? (
+        <PullToRefresh onRefresh={handleRefresh} pullingContent="">
+          {scrollableContent}
+        </PullToRefresh>
+      ) : (
+        scrollableContent
+      )}
+    </div>
   );
 };
 

@@ -50,26 +50,26 @@ const PromptsPage = () => {
     <div className="h-full overflow-y-auto md:pl-20">
       {/* Sticky floating header */}
       <header className="sticky top-0 z-50 p-4 md:p-8 pb-4 pwa-safe-top">
-        {/* Mobile layout */}
+        {/* Mobile layout - matches desktop */}
         <div className="md:hidden">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250"
+                onClick={refreshDailyPrompts}
+                title="Refresh prompts"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
             <button
               onClick={() => setShowSupportDialog(true)}
               className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
             >
               <Heart className="h-5 w-5 text-accent" fill="currentColor" />
             </button>
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-11 w-11 rounded-full bg-secondary/70 hover:bg-secondary transition-all duration-250"
-              onClick={refreshDailyPrompts}
-              title="Refresh prompts"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
           </div>
         </div>
 
