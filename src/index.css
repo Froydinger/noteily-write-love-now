@@ -206,36 +206,63 @@
     padding-right: env(safe-area-inset-right);
   }
 
-  /* iOS standalone (PWA): use full available height + account for safe areas on fixed/sticky UI */
+  /* PWA standalone mode: apply safe areas and proper height handling for ALL platforms */
+  @media (display-mode: standalone) {
+    :root {
+      --pwa-safe-top: env(safe-area-inset-top, 0px);
+      --pwa-safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body, #root {
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+      /* Prevent transform/position offset bugs on Mac Safari PWA */
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+
+    /* Sidebar header: add safe-area + existing padding */
+    .apple-pwa-sidebar-header {
+      padding-top: calc(var(--pwa-safe-top) + 1.25rem) !important;
+    }
+
+    /* Sidebar footer: keep actions above the home indicator */
+    .apple-pwa-sidebar-footer {
+      padding-bottom: calc(var(--pwa-safe-bottom) + 1rem) !important;
+    }
+
+    /* Sticky note header: add ONLY top safe area (keep existing padding) */
+    [data-note-header] {
+      padding-top: calc(var(--pwa-safe-top) + 1rem) !important;
+    }
+
+    /* Generic utility: add top safe-area to any block (useful for pages without sticky header) */
+    .pwa-safe-top {
+      padding-top: calc(var(--pwa-safe-top) + 1rem) !important;
+    }
+
+    /* Fix CSS columns rendering issues on Mac Safari PWA */
+    /* Force hardware acceleration and proper stacking context */
+    [class*="columns-"] {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+
+    /* Ensure sticky headers render correctly with columns layout */
+    .sticky, [style*="sticky"] {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      will-change: transform;
+    }
+  }
+
+  /* iOS-specific standalone (PWA): additional iOS-only handling */
   @supports (-webkit-touch-callout: none) {
     @media (display-mode: standalone) {
-      :root {
-        --pwa-safe-top: env(safe-area-inset-top);
-        --pwa-safe-bottom: env(safe-area-inset-bottom);
-      }
-
       html, body, #root {
         min-height: -webkit-fill-available;
-      }
-
-      /* Sidebar header: add safe-area + existing padding */
-      .apple-pwa-sidebar-header {
-        padding-top: calc(var(--pwa-safe-top) + 1.25rem) !important;
-      }
-
-      /* Sidebar footer: keep actions above the home indicator */
-      .apple-pwa-sidebar-footer {
-        padding-bottom: calc(var(--pwa-safe-bottom) + 1rem) !important;
-      }
-
-      /* Sticky note header: add ONLY top safe area (keep existing padding) */
-      [data-note-header] {
-        padding-top: calc(var(--pwa-safe-top) + 1rem) !important;
-      }
-
-      /* Generic utility: add top safe-area to any block (useful for pages without sticky header) */
-      .pwa-safe-top {
-        padding-top: calc(var(--pwa-safe-top) + 1rem) !important;
       }
     }
   }
@@ -997,8 +1024,19 @@ html[data-title-font="mono"] .note-editor h6 {
 /* PWA mode - hide scrollbars completely to prevent white bar flashing */
 @media (display-mode: standalone) {
   html, body, #root {
-    overflow-x: hidden;
+    /* Use clip instead of hidden to prevent layout shift on Mac Safari PWA */
+    overflow-x: clip;
     overscroll-behavior: none;
+    /* Ensure proper rendering context for Mac Safari */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Fix Mac Safari PWA rendering issues with columns/masonry layout */
+  /* The combination of columns + sticky can cause visual offset bugs */
+  body {
+    /* Force GPU compositing to fix visual/interactive offset */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
   }
 
   /* Hide scrollbar in PWA mode but allow scrolling */
