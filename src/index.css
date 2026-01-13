@@ -220,7 +220,6 @@
     #root {
       min-height: 100dvh;
       min-height: -webkit-fill-available;
-      /* FIXED: Removed transforms which break sticky and fixed elements */
     }
 
     /* Sidebar header: add safe-area + existing padding */
@@ -243,7 +242,7 @@
       padding-top: calc(var(--pwa-safe-top) + 1rem) !important;
     }
 
-    /* FIXED: Removed the [class*="columns-"] block entirely. 
+    /* FIXED: Removed the [class*="columns-"] block entirely.
        Applying translateZ to columns BREAKS the mosaic layout on Mac Safari. */
 
     /* FIXED: Removed transform on sticky elements */
@@ -449,6 +448,23 @@
     100% {
       transform: translateY(0) scale(1);
       opacity: 1;
+    }
+  }
+
+  /* PWA standalone: use simpler animation to fix CSS columns rendering bug in Safari */
+  @media (display-mode: standalone) {
+    @keyframes float-in {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* Ensure items in columns don't have stacking context issues */
+    .break-inside-avoid {
+      transform: none !important;
     }
   }
 
@@ -1038,11 +1054,6 @@ html[data-title-font="mono"] .note-editor h6 {
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Fix Mac Safari PWA rendering issues with columns/masonry layout */
-  /* The combination of columns + sticky can cause visual offset bugs */
-  body {
-    /* FIXED: Removed transform here */
-  }
 
   /* Hide scrollbar in PWA mode but allow scrolling */
   ::-webkit-scrollbar {
