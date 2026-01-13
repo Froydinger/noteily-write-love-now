@@ -220,7 +220,7 @@
     #root {
       min-height: 100dvh;
       min-height: -webkit-fill-available;
-      /* FIXED: Removed transform here because it breaks sticky positioning and fixed elements */
+      /* FIXED: Removed transforms which break sticky and fixed elements */
     }
 
     /* Sidebar header: add safe-area + existing padding */
@@ -243,16 +243,10 @@
       padding-top: calc(var(--pwa-safe-top) + 1rem) !important;
     }
 
-    /* Fix CSS columns rendering issues on Mac Safari PWA */
-    /* Force hardware acceleration and proper stacking context */
-    [class*="columns-"] {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
-    }
+    /* FIXED: Removed the [class*="columns-"] block entirely. 
+       Applying translateZ to columns BREAKS the mosaic layout on Mac Safari. */
 
-    /* FIXED: Removed transform on sticky elements as it often prevents them from sticking */
+    /* FIXED: Removed transform on sticky elements */
     .sticky,
     [style*="sticky"] {
       will-change: transform;
@@ -1047,7 +1041,7 @@ html[data-title-font="mono"] .note-editor h6 {
   /* Fix Mac Safari PWA rendering issues with columns/masonry layout */
   /* The combination of columns + sticky can cause visual offset bugs */
   body {
-    /* FIXED: Removed transform here to fix sticky issues */
+    /* FIXED: Removed transform here */
   }
 
   /* Hide scrollbar in PWA mode but allow scrolling */
