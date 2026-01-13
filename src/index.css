@@ -1,5 +1,4 @@
-
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -48,7 +47,8 @@
     --sidebar-ring: 199 89% 48%;
 
     /* Light theme background - warm gradient */
-    background: linear-gradient(165deg,
+    background: linear-gradient(
+      165deg,
       hsl(40, 30%, 99%) 0%,
       hsl(40, 25%, 97%) 35%,
       hsl(45, 20%, 95%) 70%,
@@ -97,7 +97,8 @@
     --sidebar-ring: 199 89% 53%;
 
     /* Dark theme background - deep gradient */
-    background: linear-gradient(165deg,
+    background: linear-gradient(
+      165deg,
       hsl(240, 15%, 8%) 0%,
       hsl(250, 12%, 6%) 35%,
       hsl(260, 10%, 4%) 70%,
@@ -146,7 +147,8 @@
     --sidebar-ring: 199 89% 58%;
 
     /* Navy theme - rich blue gradient */
-    background: linear-gradient(165deg,
+    background: linear-gradient(
+      165deg,
       hsl(220, 45%, 14%) 0%,
       hsl(222, 42%, 11%) 35%,
       hsl(224, 40%, 8%) 70%,
@@ -154,7 +156,6 @@
     );
     background-attachment: fixed;
   }
-
 
   /* Apply navy mode by default only if no theme class exists */
   html:not(.light):not(.dark):not(.navy) {
@@ -185,7 +186,8 @@
     --sidebar-accent-foreground: 222 45% 7%;
     --sidebar-border: 220 30% 18%;
     --sidebar-ring: 199 89% 58%;
-    background: linear-gradient(165deg,
+    background: linear-gradient(
+      165deg,
       hsl(220, 45%, 14%) 0%,
       hsl(222, 42%, 11%) 35%,
       hsl(224, 40%, 8%) 70%,
@@ -196,7 +198,7 @@
 
   body {
     @apply text-foreground antialiased;
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: "DM Sans", system-ui, sans-serif;
     background: inherit;
     margin: 0;
     padding: 0;
@@ -213,12 +215,12 @@
       --pwa-safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    html, body, #root {
+    html,
+    body,
+    #root {
       min-height: 100dvh;
       min-height: -webkit-fill-available;
-      /* Prevent transform/position offset bugs on Mac Safari PWA */
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
+      /* FIXED: Removed transform here because it breaks sticky positioning and fixed elements */
     }
 
     /* Sidebar header: add safe-area + existing padding */
@@ -250,10 +252,9 @@
       backface-visibility: hidden;
     }
 
-    /* Ensure sticky headers render correctly with columns layout */
-    .sticky, [style*="sticky"] {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
+    /* FIXED: Removed transform on sticky elements as it often prevents them from sticking */
+    .sticky,
+    [style*="sticky"] {
       will-change: transform;
     }
   }
@@ -261,7 +262,9 @@
   /* iOS-specific standalone (PWA): additional iOS-only handling */
   @supports (-webkit-touch-callout: none) {
     @media (display-mode: standalone) {
-      html, body, #root {
+      html,
+      body,
+      #root {
         min-height: -webkit-fill-available;
       }
     }
@@ -284,8 +287,13 @@
     @apply border-border;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Space Grotesk", system-ui, sans-serif;
     font-weight: 500;
     letter-spacing: -0.02em;
   }
@@ -322,7 +330,6 @@
     background: hsl(var(--accent) / 0.35);
     color: hsl(var(--foreground));
   }
-
 
   /* Marked text highlight */
   :root mark {
@@ -362,15 +369,10 @@
 }
 
 .glass-shimmer::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    hsl(var(--accent) / 0.05) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, transparent 0%, hsl(var(--accent) / 0.05) 50%, transparent 100%);
   transform: translateX(-100%);
   transition: transform 0.6s ease;
 }
@@ -415,11 +417,14 @@
   }
 
   @keyframes glow-pulse {
-    0%, 100% {
+    0%,
+    100% {
       box-shadow: 0 0 8px hsl(var(--accent) / 0.25);
     }
     50% {
-      box-shadow: 0 0 24px hsl(var(--accent) / 0.45), 0 0 40px hsl(var(--accent) / 0.2);
+      box-shadow:
+        0 0 24px hsl(var(--accent) / 0.45),
+        0 0 40px hsl(var(--accent) / 0.2);
     }
   }
 
@@ -469,7 +474,8 @@
   }
 
   @keyframes gentle-bounce {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0);
     }
     50% {
@@ -478,11 +484,14 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% {
+    0%,
+    100% {
       box-shadow: 0 0 8px hsl(var(--primary) / 0.25);
     }
     50% {
-      box-shadow: 0 0 24px hsl(var(--primary) / 0.45), 0 0 40px hsl(var(--primary) / 0.2);
+      box-shadow:
+        0 0 24px hsl(var(--primary) / 0.45),
+        0 0 40px hsl(var(--primary) / 0.2);
     }
   }
 
@@ -498,7 +507,8 @@
   }
 
   @keyframes heartbeat {
-    0%, 100% {
+    0%,
+    100% {
       transform: scale(1);
     }
     50% {
@@ -518,7 +528,8 @@
   }
 
   @keyframes subtle-pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -569,14 +580,14 @@
 
   .note-editor {
     @apply min-h-[60vh] w-full outline-none text-lg;
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: "DM Sans", system-ui, sans-serif;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     line-height: 1.75;
   }
 
   .note-editor h1 {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: "Space Grotesk", system-ui, sans-serif;
     @apply text-4xl font-medium mb-4 mt-6;
     line-height: 1.2;
     letter-spacing: -0.025em;
@@ -601,7 +612,6 @@
   .editor-anchor {
     overflow-anchor: none;
   }
-
 
   /* Loading shimmer effect */
   .loading-shimmer {
@@ -703,7 +713,6 @@
     border-radius: 0.5rem !important;
   }
 
-
   /* Main navigation active states - fully rounded for all themes */
   .dark .sidebar-nav-active,
   .navy .sidebar-nav-active {
@@ -712,7 +721,6 @@
     background: hsl(var(--accent) / 0.1);
     border-radius: 9999px !important;
   }
-
 
   /* Button accessibility improvements */
   .btn-accessible {
@@ -739,7 +747,6 @@
     @apply text-foreground hover:text-foreground hover:bg-accent/15 rounded-full;
   }
 
-
   /* Sidebar toggle button specific styles */
   .sidebar-toggle {
     @apply transition-all duration-250 rounded-full;
@@ -754,7 +761,6 @@
   .navy .sidebar-toggle {
     @apply text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-full;
   }
-
 
   /* General button contrast improvements */
   .btn-contrast {
@@ -778,17 +784,13 @@
   }
 
   .google-shimmer::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.15) 50%,
-      transparent 100%
-    );
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 50%, transparent 100%);
     animation: shimmer 2s ease-in-out infinite;
     pointer-events: none;
   }
@@ -814,7 +816,7 @@
   }
 
   .glass-shimmer::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
@@ -827,8 +829,12 @@
       hsl(var(--foreground) / 0.08) 75%,
       hsl(var(--foreground) / 0.2) 100%
     );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -845,7 +851,6 @@
       hsl(var(--foreground) / 0.15) 100%
     );
   }
-
 }
 
 /* Glow shadow utilities for accent-colored elements */
@@ -854,42 +859,44 @@
 }
 
 .shadow-glow {
-  box-shadow: 0 0 20px hsl(var(--accent) / 0.4), 0 0 40px hsl(var(--accent) / 0.2);
+  box-shadow:
+    0 0 20px hsl(var(--accent) / 0.4),
+    0 0 40px hsl(var(--accent) / 0.2);
 }
 
 /* Dynamic font classes based on preferences */
 html[data-title-font="serif"] .dynamic-title-font {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: "Playfair Display", Georgia, serif;
   font-weight: 500;
   letter-spacing: -0.01em;
 }
 
 html[data-title-font="sans"] .dynamic-title-font {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: "DM Sans", system-ui, sans-serif;
   font-weight: 400;
   letter-spacing: -0.01em;
 }
 
 html[data-title-font="mono"] .dynamic-title-font {
-  font-family: 'JetBrains Mono', Menlo, Monaco, monospace;
+  font-family: "JetBrains Mono", Menlo, Monaco, monospace;
   font-weight: 400;
   letter-spacing: -0.02em;
 }
 
 html[data-body-font="serif"] .dynamic-body-font {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: "Playfair Display", Georgia, serif;
   font-weight: 400;
   letter-spacing: 0;
 }
 
 html[data-body-font="sans"] .dynamic-body-font {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: "DM Sans", system-ui, sans-serif;
   font-weight: 300;
   letter-spacing: -0.005em;
 }
 
 html[data-body-font="mono"] .dynamic-body-font {
-  font-family: 'JetBrains Mono', Menlo, Monaco, monospace;
+  font-family: "JetBrains Mono", Menlo, Monaco, monospace;
   font-weight: 300;
   letter-spacing: -0.01em;
 }
@@ -901,7 +908,7 @@ html[data-title-font="serif"] .note-editor h3,
 html[data-title-font="serif"] .note-editor h4,
 html[data-title-font="serif"] .note-editor h5,
 html[data-title-font="serif"] .note-editor h6 {
-  font-family: 'Playfair Display', Georgia, serif !important;
+  font-family: "Playfair Display", Georgia, serif !important;
   font-weight: 500 !important;
   letter-spacing: -0.01em !important;
 }
@@ -912,7 +919,7 @@ html[data-title-font="sans"] .note-editor h3,
 html[data-title-font="sans"] .note-editor h4,
 html[data-title-font="sans"] .note-editor h5,
 html[data-title-font="sans"] .note-editor h6 {
-  font-family: 'DM Sans', system-ui, sans-serif !important;
+  font-family: "DM Sans", system-ui, sans-serif !important;
   font-weight: 400 !important;
   letter-spacing: -0.01em !important;
 }
@@ -923,7 +930,7 @@ html[data-title-font="mono"] .note-editor h3,
 html[data-title-font="mono"] .note-editor h4,
 html[data-title-font="mono"] .note-editor h5,
 html[data-title-font="mono"] .note-editor h6 {
-  font-family: 'JetBrains Mono', Menlo, Monaco, monospace !important;
+  font-family: "JetBrains Mono", Menlo, Monaco, monospace !important;
   font-weight: 400 !important;
   letter-spacing: -0.02em !important;
 }
@@ -974,7 +981,9 @@ html[data-title-font="mono"] .note-editor h6 {
     box-shadow: 0 0 5px rgba(30, 174, 219, 0.4);
   }
   100% {
-    box-shadow: 0 0 20px rgba(30, 174, 219, 0.6), 0 0 35px rgba(30, 174, 219, 0.3);
+    box-shadow:
+      0 0 20px rgba(30, 174, 219, 0.6),
+      0 0 35px rgba(30, 174, 219, 0.3);
   }
 }
 
@@ -983,7 +992,9 @@ html[data-title-font="mono"] .note-editor h6 {
     box-shadow: 0 0 5px rgba(30, 174, 219, 0.4);
   }
   100% {
-    box-shadow: 0 0 20px rgba(30, 174, 219, 0.6), 0 0 35px rgba(30, 174, 219, 0.3);
+    box-shadow:
+      0 0 20px rgba(30, 174, 219, 0.6),
+      0 0 35px rgba(30, 174, 219, 0.3);
   }
 }
 
@@ -1023,7 +1034,9 @@ html[data-title-font="mono"] .note-editor h6 {
 
 /* PWA mode - hide scrollbars completely to prevent white bar flashing */
 @media (display-mode: standalone) {
-  html, body, #root {
+  html,
+  body,
+  #root {
     /* Use clip instead of hidden to prevent layout shift on Mac Safari PWA */
     overflow-x: clip;
     overscroll-behavior: none;
@@ -1034,9 +1047,7 @@ html[data-title-font="mono"] .note-editor h6 {
   /* Fix Mac Safari PWA rendering issues with columns/masonry layout */
   /* The combination of columns + sticky can cause visual offset bugs */
   body {
-    /* Force GPU compositing to fix visual/interactive offset */
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
+    /* FIXED: Removed transform here to fix sticky issues */
   }
 
   /* Hide scrollbar in PWA mode but allow scrolling */
@@ -1128,7 +1139,8 @@ html[data-title-font="mono"] .note-editor h6 {
   }
 
   /* Compact margins between header and content */
-  .mb-6, .mb-8 {
+  .mb-6,
+  .mb-8 {
     margin-bottom: 0.75rem !important;
   }
 
@@ -1155,7 +1167,8 @@ html[data-title-font="mono"] .note-editor h6 {
     height: 2.25rem !important;
   }
 
-  .w-11, .w-10 {
+  .w-11,
+  .w-10 {
     width: 2.25rem !important;
     height: 2.25rem !important;
   }
