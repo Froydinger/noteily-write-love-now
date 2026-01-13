@@ -177,19 +177,11 @@ const Index = () => {
   const content = (
     <div className="min-h-full md:pl-20">
       {/* Sticky floating header */}
-      <header className="sticky top-0 z-[100] px-4 pt-4 md:px-8 md:pt-8 pb-4 pwa-safe-top">
-        {/* Mobile layout */}
+      <header className="sticky top-0 z-[100] px-4 pt-4 md:px-8 md:pt-8 pb-4 pwa-safe-top bg-background/80 backdrop-blur-md">
+        {/* Mobile layout - matches desktop */}
         <div className="md:hidden">
           <div className="flex items-center justify-between">
-            {/* Left: Support heart icon */}
-            <button
-              onClick={() => setShowSupportDialog(true)}
-              className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
-            >
-              <Heart className="h-5 w-5 text-accent" fill="currentColor" />
-            </button>
-
-            {/* Right: Search and filter controls */}
+            {/* Left: Search button */}
             <div className="flex items-center gap-2">
               <Button
                 size="sm"
@@ -212,80 +204,26 @@ const Index = () => {
               >
                 <Search className="h-4 w-4" />
               </Button>
-              <Select
-                value={sortOrder}
-                onValueChange={(value) => {
-                  setSortOrder(value);
-                  setOpenSelect(null);
-                }}
-                open={openSelect === "sort-mobile"}
-                onOpenChange={(open) => {
-                  if (!open) setOpenSelect(null);
-                }}
+            </div>
+
+            {/* Right: Sync and Support */}
+            <div className="flex items-center gap-2">
+              {/* Sync button */}
+              <button
+                onClick={handleRefresh}
+                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
+                title="Sync notes"
               >
-                <SelectTrigger
-                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
-                  onClick={() => {
-                    setShowSearch(false);
-                    setOpenSelect(openSelect === "sort-mobile" ? null : "sort-mobile");
-                  }}
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </SelectTrigger>
-                <SelectContent
-                  className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated"
-                  side="bottom"
-                  align="center"
-                  sideOffset={8}
-                >
-                  <SelectItem value="latest" className="rounded-lg">
-                    Latest
-                  </SelectItem>
-                  <SelectItem value="oldest" className="rounded-lg">
-                    Oldest
-                  </SelectItem>
-                  <SelectItem value="alphabetical" className="rounded-lg">
-                    A-Z
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={shareFilter}
-                onValueChange={(value) => {
-                  setShareFilter(value);
-                  setOpenSelect(null);
-                }}
-                open={openSelect === "filter-mobile"}
-                onOpenChange={(open) => {
-                  if (!open) setOpenSelect(null);
-                }}
+                <RefreshCw className="h-5 w-5" />
+              </button>
+
+              {/* Support heart icon */}
+              <button
+                onClick={() => setShowSupportDialog(true)}
+                className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-200 shadow-sm glass-shimmer flex items-center justify-center"
               >
-                <SelectTrigger
-                  className="h-11 w-11 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 transition-all duration-250 shadow-sm glass-shimmer [&>svg[data-radix-select-icon]]:hidden [&_span]:hidden"
-                  onClick={() => {
-                    setShowSearch(false);
-                    setOpenSelect(openSelect === "filter-mobile" ? null : "filter-mobile");
-                  }}
-                >
-                  <Filter className="h-4 w-4" />
-                </SelectTrigger>
-                <SelectContent
-                  className="z-50 bg-card/95 backdrop-blur-xl border-border/50 rounded-xl shadow-elevated"
-                  side="bottom"
-                  align="center"
-                  sideOffset={8}
-                >
-                  <SelectItem value="all" className="rounded-lg">
-                    All Notes
-                  </SelectItem>
-                  <SelectItem value="shared-with-me" className="rounded-lg">
-                    Shared with Me
-                  </SelectItem>
-                  <SelectItem value="shared-with-others" className="rounded-lg">
-                    My Shared Notes
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                <Heart className="h-5 w-5 text-accent" fill="currentColor" />
+              </button>
             </div>
           </div>
         </div>
