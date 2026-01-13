@@ -177,7 +177,7 @@ const Index = () => {
   const content = (
     <div className="min-h-full md:pl-20">
       {/* Sticky floating header */}
-      <header className="sticky top-0 z-[100] px-4 pt-4 md:px-8 md:pt-8 pb-4 pwa-safe-top bg-background/80 backdrop-blur-md">
+      <header className="sticky top-0 z-[100] px-4 pt-4 md:px-8 md:pt-8 pb-4 pwa-safe-top">
         {/* Mobile layout - matches desktop */}
         <div className="md:hidden">
           <div className="flex items-center justify-between">

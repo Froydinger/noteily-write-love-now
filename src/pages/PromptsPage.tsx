@@ -49,7 +49,7 @@ const PromptsPage = () => {
   return (
     <div className="h-full overflow-y-auto md:pl-20">
       {/* Sticky floating header */}
-      <header className="sticky top-0 z-50 p-4 md:p-8 pb-4 pwa-safe-top bg-background/80 backdrop-blur-md">
+      <header className="sticky top-0 z-50 p-4 md:p-8 pb-4 pwa-safe-top">
         {/* Mobile layout - matches desktop */}
         <div className="md:hidden">
           <div className="flex items-center justify-between">
