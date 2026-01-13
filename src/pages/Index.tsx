@@ -288,7 +288,7 @@ const Index = () => {
   // Scrollable content - wrapped in PullToRefresh on mobile
   const scrollableContent = (
     <div
-      className="px-4 pb-4 md:px-8 animate-fade-in"
+      className="px-4 pt-2 pb-4 md:px-8 animate-fade-in"
       style={{ animationDelay: "0.05s", animationFillMode: "both" }}
       onClick={() => setSelectedNoteId(null)}
     >
@@ -356,11 +356,11 @@ const Index = () => {
       )}
 
       {/* Masonry grid layout */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 pb-24 space-y-4">
+      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 pb-24 [column-fill:balance]">
         {filteredAndSortedNotes.map((note, index) => (
           <div
             key={note.id}
-            className="break-inside-avoid animate-float-in"
+            className="break-inside-avoid mb-4 animate-float-in"
             style={{ animationDelay: `${index * 0.03}s`, animationFillMode: "both" }}
           >
             <NoteCard
