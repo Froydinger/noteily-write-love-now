@@ -241,15 +241,6 @@
     .pwa-safe-top {
       padding-top: calc(var(--pwa-safe-top) + 1rem) !important;
     }
-
-    /* FIXED: Removed the [class*="columns-"] block entirely.
-       Applying translateZ to columns BREAKS the mosaic layout on Mac Safari. */
-
-    /* FIXED: Removed transform on sticky elements */
-    .sticky,
-    [style*="sticky"] {
-      will-change: transform;
-    }
   }
 
   /* iOS-specific standalone (PWA): additional iOS-only handling */
@@ -451,29 +442,6 @@
     }
   }
 
-  /* PWA standalone: use simpler animation to fix CSS columns rendering bug in Safari */
-  @media (display-mode: standalone) {
-    @keyframes float-in {
-      0% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 1;
-      }
-    }
-
-    /* Ensure items in columns don't have stacking context issues */
-    .break-inside-avoid {
-      transform: none !important;
-      opacity: 1 !important;
-    }
-
-    /* Force cards to be visible - override animation fill mode issues */
-    .animate-float-in {
-      opacity: 1 !important;
-      animation: none !important;
-    }
-  }
 
   @keyframes scale-in {
     0% {
@@ -1049,19 +1017,8 @@ html[data-title-font="mono"] .note-editor h6 {
   background: transparent;
 }
 
-/* PWA mode - hide scrollbars completely to prevent white bar flashing */
+/* PWA mode - hide scrollbars only, no layout changes */
 @media (display-mode: standalone) {
-  html,
-  body,
-  #root {
-    /* Use clip instead of hidden to prevent layout shift on Mac Safari PWA */
-    overflow-x: clip;
-    overscroll-behavior: none;
-    /* Ensure proper rendering context for Mac Safari */
-    -webkit-overflow-scrolling: touch;
-  }
-
-
   /* Hide scrollbar in PWA mode but allow scrolling */
   ::-webkit-scrollbar {
     width: 0px;
