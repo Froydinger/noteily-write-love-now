@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { useTitleFont } from '@/hooks/useTitleFont';
+import { useTitleFont } from "@/hooks/useTitleFont";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   BookOpen,
@@ -23,7 +22,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
-  useSidebar
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -55,31 +54,32 @@ export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
 
   const filteredNotes = searchTerm
-    ? notes.filter(note =>
-        note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        note.content.toLowerCase().includes(searchTerm.toLowerCase())
+    ? notes.filter(
+        (note) =>
+          note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          note.content.toLowerCase().includes(searchTerm.toLowerCase()),
       )
     : notes;
 
-  const handleCreateNote = async (noteType: NoteType = 'note') => {
+  const handleCreateNote = async (noteType: NoteType = "note") => {
     try {
       const newNote = await addNote(noteType);
       setCurrentNote(newNote);
-      
+
       // On mobile, wait for sidebar animation to complete before navigating
       if (isMobile && state === "expanded") {
         toggleSidebar();
-        await new Promise(resolve => setTimeout(resolve, 350));
+        await new Promise((resolve) => setTimeout(resolve, 350));
       }
-      
+
       navigate(`/note/${newNote.id}`);
 
       // Delay toast to prevent render blocking during navigation
       setTimeout(() => {
-        toast.success(noteType === 'checklist' ? "Checklist created" : "Note created");
+        toast.success(noteType === "checklist" ? "Checklist created" : "Note created");
       }, 150);
     } catch (error) {
-      console.error('Failed to create note:', error);
+      console.error("Failed to create note:", error);
     }
   };
 
@@ -137,7 +137,7 @@ export function AppSidebar() {
                   <Bell className="h-4 w-4" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-semibold">
-                      {unreadCount > 9 ? '9+' : unreadCount}
+                      {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
                   )}
                 </Button>
@@ -177,12 +177,9 @@ export function AppSidebar() {
                   <ChevronDown className="h-3 w-3 ml-1 opacity-70" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="center" 
-                className="w-[200px] bg-popover border border-border shadow-lg z-50"
-              >
+              <DropdownMenuContent align="center" className="w-[200px] bg-popover border border-border shadow-lg z-100">
                 <DropdownMenuItem
-                  onClick={() => handleCreateNote('note')}
+                  onClick={() => handleCreateNote("note")}
                   className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                 >
                   <FileText className="h-4 w-4" />
@@ -192,7 +189,7 @@ export function AppSidebar() {
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => handleCreateNote('checklist')}
+                  onClick={() => handleCreateNote("checklist")}
                   className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                 >
                   <CheckSquare className="h-4 w-4" />
@@ -211,11 +208,11 @@ export function AppSidebar() {
               <div className="flex justify-center mb-5">
                 <div className="flex gap-1 w-full p-1 bg-secondary/30 rounded-xl">
                   <Button
-                    variant={isActive('/') ? 'default' : 'ghost'}
+                    variant={isActive("/") ? "default" : "ghost"}
                     size="sm"
                     asChild
                     className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250
-                      ${isActive('/') ? 'bg-card shadow-md text-foreground' : 'text-muted-foreground/70 hover:text-foreground hover:bg-card/30'}
+                      ${isActive("/") ? "bg-card shadow-md text-foreground" : "text-muted-foreground/70 hover:text-foreground hover:bg-card/30"}
                     `}
                   >
                     <a href="/" className="flex items-center justify-center gap-2">
@@ -224,11 +221,11 @@ export function AppSidebar() {
                     </a>
                   </Button>
                   <Button
-                    variant={isActive('/prompts') ? 'default' : 'ghost'}
+                    variant={isActive("/prompts") ? "default" : "ghost"}
                     size="sm"
                     asChild
                     className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250
-                      ${isActive('/prompts') ? 'bg-card shadow-md text-foreground' : 'text-muted-foreground/70 hover:text-foreground hover:bg-card/30'}
+                      ${isActive("/prompts") ? "bg-card shadow-md text-foreground" : "text-muted-foreground/70 hover:text-foreground hover:bg-card/30"}
                     `}
                   >
                     <a href="/prompts" className="flex items-center justify-center gap-2">
@@ -250,81 +247,80 @@ export function AppSidebar() {
               </div>
             </div>
             <SidebarGroupContent>
-                    <div className="h-[calc(100dvh-380px)] overflow-y-auto scrollbar-hide pr-1"
-                         style={{
-                           scrollbarWidth: 'none',
-                           msOverflowStyle: 'none'
-                         }}>
-                      <style>{`
+              <div
+                className="h-[calc(100dvh-380px)] overflow-y-auto scrollbar-hide pr-1"
+                style={{
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }}
+              >
+                <style>{`
                         .scrollbar-hide::-webkit-scrollbar {
                           display: none;
                         }
                       `}</style>
-                      <div className="space-y-1">
-                        {filteredNotes.length > 0 ? (
-                          filteredNotes.map((note, index) => (
-                            <div
-                              key={note.id}
-                              className={`
+                <div className="space-y-1">
+                  {filteredNotes.length > 0 ? (
+                    filteredNotes.map((note, index) => (
+                      <div
+                        key={note.id}
+                        className={`
                                 px-3 py-2.5 rounded-lg cursor-pointer
                                 transition-all duration-250 ease-bounce-out
                                 hover:bg-secondary/60
-                                ${location.pathname === `/note/${note.id}` ? 'sidebar-menu-active' : ''}
+                                ${location.pathname === `/note/${note.id}` ? "sidebar-menu-active" : ""}
                               `}
-                              onClick={() => handleSelectNote(note)}
-                              style={{
-                                animationDelay: `${index * 0.03}s`,
-                                animationFillMode: 'both'
-                              }}
-                            >
-                              <div className="flex items-center gap-2">
-                                {note.note_type === 'checklist' && (
-                                  <CheckSquare className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                                )}
-                                <h3 className="text-sm font-medium truncate dynamic-title-font text-foreground/90">
-                                  {note.title || (note.note_type === 'checklist' ? "Untitled Checklist" : "Untitled Note")}
-                                </h3>
-                              </div>
-                              <p className="text-xs text-muted-foreground truncate mt-0.5 leading-relaxed">
-                                {note.content ?
-                                  note.content
-                                    .replace(/<[^>]*>?/gm, '')
-                                    .replace(/&nbsp;/g, ' ')
-                                    .replace(/&[a-z]+;/gi, ' ')
-                                    .trim()
-                                    .substring(0, 50)
-                                  : "No content"
-                                }
-                              </p>
-                              <p className="text-[10px] text-muted-foreground/70 mt-1.5 flex items-center gap-1">
-                                <Clock className="h-2.5 w-2.5" />
-                                {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
-                              </p>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="px-3 py-6 text-center text-muted-foreground">
-                            <p className="text-sm">No notes found</p>
-                            {searchTerm && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="mt-3 btn-accessible rounded-full text-xs bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
-                                onClick={() => setSearchTerm("")}
-                              >
-                                Clear search
-                              </Button>
-                            )}
-                          </div>
-                        )}
+                        onClick={() => handleSelectNote(note)}
+                        style={{
+                          animationDelay: `${index * 0.03}s`,
+                          animationFillMode: "both",
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          {note.note_type === "checklist" && (
+                            <CheckSquare className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                          )}
+                          <h3 className="text-sm font-medium truncate dynamic-title-font text-foreground/90">
+                            {note.title || (note.note_type === "checklist" ? "Untitled Checklist" : "Untitled Note")}
+                          </h3>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5 leading-relaxed">
+                          {note.content
+                            ? note.content
+                                .replace(/<[^>]*>?/gm, "")
+                                .replace(/&nbsp;/g, " ")
+                                .replace(/&[a-z]+;/gi, " ")
+                                .trim()
+                                .substring(0, 50)
+                            : "No content"}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground/70 mt-1.5 flex items-center gap-1">
+                          <Clock className="h-2.5 w-2.5" />
+                          {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
+                        </p>
                       </div>
+                    ))
+                  ) : (
+                    <div className="px-3 py-6 text-center text-muted-foreground">
+                      <p className="text-sm">No notes found</p>
+                      {searchTerm && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="mt-3 btn-accessible rounded-full text-xs bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm"
+                          onClick={() => setSearchTerm("")}
+                        >
+                          Clear search
+                        </Button>
+                      )}
                     </div>
+                  )}
+                </div>
+              </div>
             </SidebarGroupContent>
           </SidebarGroup>
-
         </SidebarContent>
       )}
-
 
       <SidebarFooter className="px-4 py-4 border-t border-border/20 apple-pwa-sidebar-footer">
         <div className="flex justify-between items-center w-full gap-1 px-2">
@@ -343,7 +339,7 @@ export function AppSidebar() {
           <Button
             variant="ghost"
             size="sm"
-            className={`btn-accessible h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm ${isActive('/settings') ? 'bg-secondary/80 text-accent' : ''}`}
+            className={`btn-accessible h-9 w-9 rounded-full bg-background/60 backdrop-blur-md border border-border/30 hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm ${isActive("/settings") ? "bg-secondary/80 text-accent" : ""}`}
             asChild
             title="Settings"
           >
