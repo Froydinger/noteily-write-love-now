@@ -241,6 +241,22 @@
     .pwa-safe-top {
       padding-top: calc(var(--pwa-safe-top) + 1rem) !important;
     }
+
+    /* Mac PWA fix: Force GPU compositing for glass-card elements to fix WebKit rendering bug
+       where backdrop-filter in CSS columns layout causes tiles to not render properly */
+    .glass-card {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      will-change: transform, opacity;
+    }
+
+    /* Also fix animation wrapper to ensure proper compositing */
+    .break-inside-avoid {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
   }
 
   /* iOS-specific standalone (PWA): additional iOS-only handling */
