@@ -288,7 +288,7 @@ const Index = () => {
   // Scrollable content - wrapped in PullToRefresh on mobile
   const scrollableContent = (
     <div
-      className="px-4 pt-2 pb-4 md:px-8 animate-fade-in"
+      className="px-4 pb-4 md:px-8 animate-fade-in"
       style={{ animationDelay: "0.05s", animationFillMode: "both" }}
       onClick={() => setSelectedNoteId(null)}
     >
