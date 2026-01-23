@@ -177,7 +177,10 @@ export function AppSidebar() {
                   <ChevronDown className="h-3 w-3 ml-1 opacity-70" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-[200px] bg-popover border border-border shadow-lg z-100">
+              <DropdownMenuContent
+                align="center"
+                className="w-[200px] bg-popover border border-border shadow-lg z-1000"
+              >
                 <DropdownMenuItem
                   onClick={() => handleCreateNote("note")}
                   className="flex items-center gap-3 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
