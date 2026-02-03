@@ -90,10 +90,10 @@ const NotePage = () => {
           description: "You no longer have access to this shared note.",
         });
       } else {
-        // User owns the note - it's being moved to recently deleted
+        // User owns the note - permanently deleted
         toast({
-          title: "Note moved to Recently Deleted",
-          description: "You can restore this note within 7 days.",
+          title: "Note deleted",
+          description: "This note has been permanently deleted.",
         });
       }
       navigate("/");
@@ -254,19 +254,31 @@ const NotePage = () => {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    {note.isSharedWithUser && !note.isOwnedByUser ? "Remove Access" : "Delete Note"}
+                  <AlertDialogTitle className="flex items-center gap-2">
+                    {note.isSharedWithUser && !note.isOwnedByUser ? (
+                      "Remove Access"
+                    ) : (
+                      <>
+                        <Trash className="h-5 w-5 text-destructive" />
+                        Permanently Delete Note
+                      </>
+                    )}
                   </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {note.isSharedWithUser && !note.isOwnedByUser
-                      ? "Are you sure you want to remove your access to this shared note? You will no longer be able to view or edit it."
-                      : "Are you sure you want to delete this note? It will be moved to Recently Deleted where you can restore it within 7 days."}
+                  <AlertDialogDescription className="space-y-2">
+                    {note.isSharedWithUser && !note.isOwnedByUser ? (
+                      "Are you sure you want to remove your access to this shared note? You will no longer be able to view or edit it."
+                    ) : (
+                      <>
+                        <span className="block font-medium text-destructive">⚠️ This action cannot be undone.</span>
+                        <span className="block">This note will be permanently deleted. We don't have a Recently Deleted folder — once it's gone, it's gone forever.</span>
+                      </>
+                    )}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel className="btn-accessible">Cancel</AlertDialogCancel>
                   <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-                    {note.isSharedWithUser && !note.isOwnedByUser ? "Remove Access" : "Delete"}
+                    {note.isSharedWithUser && !note.isOwnedByUser ? "Remove Access" : "Delete Forever"}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
