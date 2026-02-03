@@ -189,10 +189,14 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
           </AlertDialogTrigger>
           <AlertDialogContent className="glass-card border-border/30">
             <AlertDialogHeader>
-              <AlertDialogTitle className="font-display">Delete Note Permanently</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this note? This action cannot be undone.
-            </AlertDialogDescription>
+              <AlertDialogTitle className="font-display flex items-center gap-2">
+                <Trash2 className="h-5 w-5 text-destructive" />
+                Permanently Delete Note
+              </AlertDialogTitle>
+              <AlertDialogDescription className="space-y-2">
+                <span className="block font-medium text-destructive">⚠️ This action cannot be undone.</span>
+                <span className="block">This note will be permanently deleted. We don't have a Recently Deleted folder — once it's gone, it's gone forever.</span>
+              </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
@@ -203,7 +207,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
                 }}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full"
               >
-                Delete
+                Delete Forever
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
