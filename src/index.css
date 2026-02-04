@@ -1014,6 +1014,11 @@ html[data-title-font="mono"] .note-editor h6 {
       margin-right: 8px !important;
       margin-bottom: 8px !important;
     }
+
+    /* Prevent top clipping on notes grid - iOS PWA mobile */
+    [data-masonry-grid] {
+      margin-top: 5px !important;
+    }
   }
 }
 
