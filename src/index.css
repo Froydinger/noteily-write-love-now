@@ -1137,11 +1137,11 @@ html[data-title-font="mono"] .note-editor h6 {
   }
 }
 
-/* PWA standalone on desktop/tablet: safe area for macOS traffic lights */
+/* PWA standalone on desktop/tablet: safe area for macOS/iPadOS traffic lights */
 @media (display-mode: standalone) and (min-width: 768px) {
-  /* Add top padding for macOS traffic lights - affects main content area */
-  .md\:pl-20 {
-    padding-top: 2.5rem !important;
+  /* Add top padding for macOS traffic lights on sidebar */
+  .pwa-sidebar-safe {
+    padding-top: 2.75rem !important;
   }
 
   /* Also disable glass backdrop-filter to prevent WebKit rendering issues */
