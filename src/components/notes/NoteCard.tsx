@@ -256,7 +256,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         <ArrowUpRight className="h-3.5 w-3.5" />
       </Button>
 
-      <CardContent className={`p-5 transition-all duration-300 ${!isTouchDevice ? 'group-hover:translate-y-[-1px]' : ''} select-none relative`}>
+      <CardContent className={`p-5 transition-all duration-300 ${!isTouchDevice ? 'group-hover:translate-y-[-1px]' : ''} select-none relative flex-1`}>
         {/* Shared note tags at top of content */}
         {isSharedWithUser && (
           <Badge
@@ -332,7 +332,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
 
       <CardFooter className={`
         px-5 pb-4 pt-0 text-xs text-muted-foreground/60
-        transition-all duration-300
+        transition-all duration-300 mt-auto
         ${!isTouchDevice ? 'group-hover:text-muted-foreground/80' : ''}
       `}>
         <span className="flex items-center gap-1.5">
