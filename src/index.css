@@ -149,10 +149,10 @@
     /* Navy theme - rich blue gradient */
     background: linear-gradient(
       165deg,
-      hsl(220, 45%, 14%) 0%,
-      hsl(222, 42%, 11%) 35%,
-      hsl(224, 40%, 8%) 70%,
-      hsl(226, 45%, 5%) 100%
+      hsl(222, 45%, 8%) 0%,
+      hsl(224, 42%, 7%) 35%,
+      hsl(226, 40%, 5%) 70%,
+      hsl(228, 45%, 4%) 100%
     );
     background-attachment: fixed;
   }
@@ -188,10 +188,10 @@
     --sidebar-ring: 199 89% 58%;
     background: linear-gradient(
       165deg,
-      hsl(220, 45%, 14%) 0%,
-      hsl(222, 42%, 11%) 35%,
-      hsl(224, 40%, 8%) 70%,
-      hsl(226, 45%, 5%) 100%
+      hsl(222, 45%, 8%) 0%,
+      hsl(224, 42%, 7%) 35%,
+      hsl(226, 40%, 5%) 70%,
+      hsl(228, 45%, 4%) 100%
     );
     background-attachment: fixed;
   }
