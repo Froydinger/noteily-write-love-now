@@ -242,20 +242,35 @@
       padding-top: calc(var(--pwa-safe-top) + 1rem) !important;
     }
 
-    /* Mac PWA fix: Force GPU compositing for glass-card elements to fix WebKit rendering bug
-       where backdrop-filter in CSS columns layout causes tiles to not render properly */
-    .glass-card {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
-      will-change: transform, opacity;
+    /* Mac/iPad PWA fix: Force GPU compositing to fix WebKit rendering bug
+       where backdrop-filter in CSS columns layout causes tiles to not render properly.
+       This affects Safari PWA on macOS and iPadOS. */
+    
+    /* Force the masonry container to create a new stacking context and compositing layer */
+    [data-masonry-grid] {
+      -webkit-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+      -webkit-perspective: 1000px;
+      perspective: 1000px;
+      isolation: isolate;
     }
 
-    /* Also fix animation wrapper to ensure proper compositing */
+    /* Each card wrapper needs its own compositing layer */
     .break-inside-avoid {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
+      -webkit-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      isolation: isolate;
+    }
+
+    /* Glass cards need explicit layer promotion */
+    .glass-card {
+      -webkit-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      will-change: transform;
     }
   }
 
