@@ -304,12 +304,21 @@ function ChecklistItemRow({
 }: ChecklistItemRowProps) {
   const [localContent, setLocalContent] = useState(item.content);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setLocalContent(item.content);
   }, [item.content]);
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
+  }, [localContent]);
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
     setLocalContent(newContent);
     
@@ -322,10 +331,20 @@ function ChecklistItemRow({
     }, 300);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      onKeyDown(e as unknown as React.KeyboardEvent<HTMLInputElement>);
+    } else if (e.key === 'Backspace' && localContent === '') {
+      e.preventDefault();
+      onKeyDown(e as unknown as React.KeyboardEvent<HTMLInputElement>);
+    }
+  };
+
   return (
     <div 
       className={cn(
-        "group flex items-center gap-3 py-2 px-3 rounded-lg",
+        "group flex items-start gap-3 py-2 px-3 rounded-lg",
         "hover:bg-secondary/50 transition-colors duration-150",
         item.completed && "opacity-60"
       )}
@@ -334,22 +353,23 @@ function ChecklistItemRow({
         checked={item.completed}
         onCheckedChange={onToggle}
         disabled={isReadOnly}
-        className="h-5 w-5 rounded-full border-2"
+        className="h-5 w-5 rounded-full border-2 mt-0.5 flex-shrink-0"
       />
       
-      <input
+      <textarea
+        ref={textareaRef}
         data-checklist-input
-        type="text"
         value={localContent}
         onChange={handleContentChange}
-        onKeyDown={onKeyDown}
+        onKeyDown={handleKeyDown}
         disabled={isReadOnly}
         placeholder="Enter item..."
+        rows={1}
         className={cn(
-          "flex-1 bg-transparent border-none outline-none text-foreground",
+          "flex-1 bg-transparent border-none outline-none text-foreground resize-none overflow-hidden",
           "placeholder:text-muted-foreground/40",
           "disabled:cursor-not-allowed",
-          "dynamic-body-font",
+          "dynamic-body-font leading-normal",
           item.completed && "line-through text-muted-foreground"
         )}
       />
@@ -359,7 +379,7 @@ function ChecklistItemRow({
           variant="ghost"
           size="icon"
           onClick={onDelete}
-          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive flex-shrink-0"
         >
           <Trash2 className="h-4 w-4" />
         </Button>

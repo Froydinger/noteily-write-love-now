@@ -301,13 +301,13 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
           <div className="space-y-2">
             {checklistItems.length > 0 ? (
               checklistItems.slice(0, 5).map((item) => (
-                <div key={item.id} className="flex items-center gap-2.5 text-sm">
+                <div key={item.id} className="flex items-start gap-2.5 text-sm">
                   {item.completed ? (
-                    <CheckCircle2 className="h-4 w-4 text-accent flex-shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
                   ) : (
-                    <Circle className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />
+                    <Circle className="h-4 w-4 text-muted-foreground/40 flex-shrink-0 mt-0.5" />
                   )}
-                  <span className={`truncate ${item.completed ? 'line-through text-muted-foreground/50' : 'text-foreground/80'}`}>
+                  <span className={`break-words ${item.completed ? 'line-through text-muted-foreground/50' : 'text-foreground/80'}`}>
                     {item.content || 'Empty item'}
                   </span>
                 </div>
