@@ -89,7 +89,6 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
         cursor-pointer group relative overflow-hidden
         glass-card
         transition-all duration-350 ease-bounce-out
-        ${isPinned ? 'ring-1 ring-accent/40 shadow-glow-sm' : ''}
         ${!isTouchDevice ? 'hover:shadow-elevated-lg hover:-translate-y-1 hover:ring-1 hover:ring-accent/20' : ''}
         ${isSelected ? 'ring-2 ring-accent/40 shadow-glow' : ''}
       `}
@@ -128,8 +127,8 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
           glass backdrop-blur-md border-border/30
           transition-all duration-250 ease-bounce-out
           ${isSelected ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}
-          ${isPinned ? 'text-accent border-accent/30 bg-accent/20' : ''}
-          hover:scale-110 hover:shadow-glow-sm
+          ${isPinned ? 'opacity-100 pointer-events-auto' : ''}
+          hover:scale-110
         `}
         aria-label={isPinned ? 'Unpin note' : 'Pin note'}
         onClick={(e) => {
@@ -137,7 +136,7 @@ export default function NoteCard({ note, onShareClick, isSelected = false, onPre
           onTogglePin?.(note);
         }}
       >
-        <Pin className="h-4 w-4" fill={isPinned ? "currentColor" : "none"} />
+        <Pin className={`h-4 w-4 ${isPinned ? 'text-accent' : ''}`} fill={isPinned ? "currentColor" : "none"} />
       </Button>
 
       {/* Duplicate button */}
