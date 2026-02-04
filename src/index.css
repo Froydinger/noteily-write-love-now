@@ -1019,6 +1019,11 @@ html[data-title-font="mono"] .note-editor h6 {
     [data-masonry-grid] {
       margin-top: 5px !important;
     }
+
+    /* Prevent top clipping on search bar - iOS PWA mobile */
+    [data-search-container] {
+      margin-top: 5px !important;
+    }
   }
 }
 
