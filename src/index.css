@@ -253,6 +253,8 @@
       -webkit-perspective: 1000px;
       perspective: 1000px;
       isolation: isolate;
+      /* Avoid WebKit “balance” repaint artifacts in standalone */
+      column-fill: auto;
     }
 
     /* Each card wrapper needs its own compositing layer */
@@ -271,6 +273,29 @@
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
       will-change: transform;
+    }
+
+    /* If WebKit still glitches, remove backdrop-filter in standalone on tablet+ sizes.
+       This is the most reliable fix for the “invisible tiles/mosaic” bug. */
+    @media (min-width: 768px) {
+      .glass,
+      .glass-card,
+      .glass-nav {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      .glass {
+        background: hsl(var(--card) / 0.85) !important;
+      }
+
+      .glass-card {
+        background: hsl(var(--card) / 0.82) !important;
+      }
+
+      .glass-nav {
+        background: hsl(var(--background) / 0.92) !important;
+      }
     }
   }
 
