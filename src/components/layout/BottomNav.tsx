@@ -142,7 +142,7 @@ export function BottomNav() {
       </nav>
 
       {/* Desktop Left Sidebar */}
-      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 z-50 flex-col items-center gap-4 py-6 px-3 bg-background/60 backdrop-blur-md border-r border-border/30">
+      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 z-50 flex-col items-center gap-4 py-6 px-3 bg-background/60 backdrop-blur-md border-r border-border/30 pwa-sidebar-safe">
         {/* Plus button */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
