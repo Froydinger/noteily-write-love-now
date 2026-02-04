@@ -1137,8 +1137,14 @@ html[data-title-font="mono"] .note-editor h6 {
   }
 }
 
-/* PWA standalone: also disable glass backdrop-filter to prevent WebKit rendering issues */
+/* PWA standalone on desktop/tablet: safe area for macOS traffic lights */
 @media (display-mode: standalone) and (min-width: 768px) {
+  /* Add top padding for macOS traffic lights - affects main content area */
+  .md\:pl-20 {
+    padding-top: 2.5rem !important;
+  }
+
+  /* Also disable glass backdrop-filter to prevent WebKit rendering issues */
   .glass,
   .glass-card,
   .glass-nav {
