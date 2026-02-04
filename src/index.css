@@ -396,6 +396,15 @@
   border-radius: 1.25rem;
 }
 
+/* Subtle blue outline for note cards - all themes */
+.note-card-outline {
+  box-shadow: 0 0 0 1px hsl(199 89% 48% / 0.12);
+}
+
+.note-card-outline:hover {
+  box-shadow: 0 0 0 1px hsl(199 89% 48% / 0.25);
+}
+
 .glass-nav {
   background: hsl(var(--background) / 0.8);
   backdrop-filter: blur(20px) saturate(180%);
@@ -1092,6 +1101,42 @@ html[data-title-font="mono"] .note-editor h6 {
     display: none;
     width: 0;
     height: 0;
+  }
+}
+
+/* PWA on desktop/tablet: use regular grid instead of masonry to avoid rendering bugs */
+@media (display-mode: standalone) and (min-width: 768px) {
+  [data-masonry-grid] {
+    columns: unset !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+
+  /* Disable glass backdrop-filter to prevent WebKit rendering issues */
+  .glass,
+  .glass-card,
+  .glass-nav {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .glass-card {
+    background: hsl(var(--card) / 0.82) !important;
+  }
+}
+
+/* PWA on larger desktop screens: 3 columns */
+@media (display-mode: standalone) and (min-width: 1024px) {
+  [data-masonry-grid] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* PWA on extra large screens: 4 columns */
+@media (display-mode: standalone) and (min-width: 1400px) {
+  [data-masonry-grid] {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
   }
 }
 
