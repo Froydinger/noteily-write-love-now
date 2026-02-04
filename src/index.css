@@ -1114,8 +1114,8 @@ html[data-title-font="mono"] .note-editor h6 {
   }
 }
 
-/* PWA on desktop/tablet: use regular grid instead of masonry to avoid rendering bugs */
-@media (display-mode: standalone) and (min-width: 768px) {
+/* Desktop/tablet: use regular grid instead of masonry for consistent equal-height tiles */
+@media (min-width: 768px) {
   [data-masonry-grid] {
     columns: unset !important;
     display: grid !important;
@@ -1135,8 +1135,10 @@ html[data-title-font="mono"] .note-editor h6 {
     display: flex !important;
     flex-direction: column !important;
   }
+}
 
-  /* Disable glass backdrop-filter to prevent WebKit rendering issues */
+/* PWA standalone: also disable glass backdrop-filter to prevent WebKit rendering issues */
+@media (display-mode: standalone) and (min-width: 768px) {
   .glass,
   .glass-card,
   .glass-nav {
@@ -1149,15 +1151,15 @@ html[data-title-font="mono"] .note-editor h6 {
   }
 }
 
-/* PWA on larger desktop screens: 3 columns */
-@media (display-mode: standalone) and (min-width: 1024px) {
+/* Larger desktop screens: 3 columns */
+@media (min-width: 1024px) {
   [data-masonry-grid] {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }
 }
 
-/* PWA on extra large screens: 4 columns */
-@media (display-mode: standalone) and (min-width: 1400px) {
+/* Extra large screens: 4 columns */
+@media (min-width: 1400px) {
   [data-masonry-grid] {
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
   }
