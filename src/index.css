@@ -1137,14 +1137,16 @@ html[data-title-font="mono"] .note-editor h6 {
   }
 }
 
-/* PWA standalone on desktop/tablet: safe area for macOS/iPadOS traffic lights */
-@media (display-mode: standalone) and (min-width: 768px) {
-  /* Add top padding for macOS traffic lights on sidebar */
+/* Desktop/tablet: safe area for sidebar (traffic lights on Mac/iPad) */
+@media (min-width: 768px) {
+  /* Add top padding for traffic lights on sidebar */
   .pwa-sidebar-safe {
     padding-top: 2.75rem !important;
   }
+}
 
-  /* Also disable glass backdrop-filter to prevent WebKit rendering issues */
+/* PWA standalone on desktop/tablet: disable glass backdrop-filter to prevent WebKit rendering issues */
+@media (display-mode: standalone) and (min-width: 768px) {
   .glass,
   .glass-card,
   .glass-nav {
