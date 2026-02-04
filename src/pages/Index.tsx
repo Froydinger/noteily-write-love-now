@@ -293,7 +293,7 @@ const Index = () => {
       onClick={() => setSelectedNoteId(null)}
     >
       {showSearch && (
-        <div className="relative mb-6 animate-in slide-in-from-top-2 duration-200">
+        <div data-search-container className="relative mb-6 animate-in slide-in-from-top-2 duration-200">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
