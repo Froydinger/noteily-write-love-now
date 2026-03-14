@@ -5,8 +5,6 @@ interface SpellCheckButtonProps {
   content: string;
   originalHTML: string;
   onContentChange: (newContent: string) => void;
-  onUndo?: () => void;
-  canUndo?: boolean;
   noteTitle: string;
   onTitleChange: (newTitle: string) => void;
   disabled?: boolean;
