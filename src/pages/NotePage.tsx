@@ -1,12 +1,11 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useNotes } from "@/contexts/NoteContext";
 import NoteEditor from "@/components/notes/NoteEditor";
 import ChecklistEditor from "@/components/notes/ChecklistEditor";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Trash, Menu, Users, Eye, Edit, Brain } from "lucide-react";
+import { ChevronLeft, Trash, Users, Eye, Edit, Brain, Undo2, Redo2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -35,12 +34,10 @@ const NotePage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { state, toggleSidebar } = useSidebar();
   const { user } = useAuth();
   const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
   const [entered, setEntered] = useState(false);
-  const { saveState } = useUndoRedo();
   const { isAiButtonVisible, openAiChat } = useAiButton();
   const [aiReplacementFunction, setAiReplacementFunction] = useState<
     ((newContent: string, isSelectionReplacement: boolean) => void) | null
@@ -48,6 +45,31 @@ const NotePage = () => {
   const headerRef = useRef<HTMLElement>(null);
 
   const note = getNote(id || "");
+
+  // Simple undo/redo based on auto-save snapshots
+  const { pushSnapshot, undo, redo, canUndo, canRedo, clearHistory } = useUndoRedo(
+    note?.title || "",
+    note?.content || ""
+  );
+
+  // Called by NoteEditor whenever a save happens
+  const handleNoteSaved = useCallback((title: string, content: string) => {
+    pushSnapshot(title, content);
+  }, [pushSnapshot]);
+
+  const handleUndo = useCallback(() => {
+    const state = undo();
+    if (state && note) {
+      updateNote(note.id, { title: state.title, content: state.content }, true);
+    }
+  }, [undo, note, updateNote]);
+
+  const handleRedo = useCallback(() => {
+    const state = redo();
+    if (state && note) {
+      updateNote(note.id, { title: state.title, content: state.content }, true);
+    }
+  }, [redo, note, updateNote]);
 
   // Keyboard handling - let native browser undo/redo work naturally
   useEffect(() => {
@@ -68,13 +90,12 @@ const NotePage = () => {
   // Always start at top when opening a note + play enter transition (no autofocus)
   useEffect(() => {
     setEntered(false);
-    // Blur any focused element to prevent iOS jumping to inputs
+    clearHistory();
     if (document.activeElement && document.activeElement !== document.body) {
       (document.activeElement as HTMLElement).blur();
     }
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 
-    // Simple timeout instead of nested RAF to reduce main thread blocking
     const timer = setTimeout(() => setEntered(true), 50);
     return () => clearTimeout(timer);
   }, [id]);
@@ -84,13 +105,11 @@ const NotePage = () => {
       deleteNote(id);
 
       if (note?.isSharedWithUser && !note?.isOwnedByUser) {
-        // It's a shared note - user is removing their access
         toast({
           title: "Access removed",
           description: "You no longer have access to this shared note.",
         });
       } else {
-        // User owns the note - permanently deleted
         toast({
           title: "Note deleted",
           description: "This note has been permanently deleted.",
@@ -103,11 +122,9 @@ const NotePage = () => {
   const handleCopy = () => {
     if (!note) return;
 
-    // Create a clean plain text version without artificial line breaks
     const contentElement = document.createElement("div");
     contentElement.innerHTML = note.content;
 
-    // Extract text content and normalize whitespace to remove artificial line breaks
     const textContent = contentElement.textContent || contentElement.innerText || "";
     const cleanText = textContent.replace(/\s+/g, " ").trim();
     const plainText = `${note.title}\n\n${cleanText}`;
@@ -133,7 +150,6 @@ const NotePage = () => {
   const handleShare = async () => {
     if (!note) return;
 
-    // Create a clean plain text version
     const contentElement = document.createElement("div");
     contentElement.innerHTML = note.content;
     const textContent = contentElement.textContent || contentElement.innerText || "";
@@ -147,7 +163,6 @@ const NotePage = () => {
           text: plainText,
         });
       } else {
-        // Fallback for browsers that don't support Web Share API
         handleCopy();
         toast({
           title: "No share functionality",
@@ -165,16 +180,11 @@ const NotePage = () => {
     }
   };
 
-  // Store state for AI revert functionality only
-  const storeUndoState = () => {
-    if (note) {
-      saveState(note.title, note.content);
-    }
-  };
-
   if (!note) {
     return <div className="p-8">Note not found</div>;
   }
+
+  const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
 
   return (
     <div
@@ -208,6 +218,32 @@ const NotePage = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Undo/Redo buttons - only for editable notes */}
+            {!isReadOnly && note.note_type !== "checklist" && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleUndo}
+                  disabled={!canUndo}
+                  className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer disabled:opacity-30"
+                  title="Undo"
+                >
+                  <Undo2 className="h-5 w-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRedo}
+                  disabled={!canRedo}
+                  className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer disabled:opacity-30"
+                  title="Redo"
+                >
+                  <Redo2 className="h-5 w-5" />
+                </Button>
+              </>
+            )}
+
             {/* AI Writer Button */}
             {isAiButtonVisible && (
               <Button
@@ -293,8 +329,7 @@ const NotePage = () => {
         ) : (
           <NoteEditor
             note={note}
-            onContentBeforeChange={storeUndoState}
-            onSpellCheckApplied={storeUndoState}
+            onNoteSaved={handleNoteSaved}
             onAIContentReplace={(replacementFn) => setAiReplacementFunction(() => replacementFn)}
           />
         )}
@@ -308,7 +343,6 @@ const NotePage = () => {
           note={note}
           onShareUpdate={() => {
             setShowShareManager(false);
-            // Force re-render to update note sharing state
             window.location.reload();
           }}
         />

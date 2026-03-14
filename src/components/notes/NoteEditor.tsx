@@ -70,14 +70,11 @@ function setEditorContent(editor: HTMLDivElement | null, content: string): void 
 
 interface NoteEditorProps {
   note: Note;
-  onContentBeforeChange?: () => void;
-  onSpellCheckApplied?: () => void;
-  onUndo?: () => void;
-  canUndo?: boolean;
+  onNoteSaved?: (title: string, content: string) => void;
   onAIContentReplace?: (replacementFunction: (newContent: string, isSelectionReplacement: boolean) => void) => void;
 }
 
-export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckApplied, onUndo, canUndo, onAIContentReplace }: NoteEditorProps) {
+export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: NoteEditorProps) {
   const titleFont = useTitleFont();
   const bodyFont = useBodyFont();
   const { updateNote } = useNotes();
@@ -109,7 +106,7 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
   // Timers
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const titleSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const undoStateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
 
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
 
@@ -233,11 +230,6 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
       const isAIUpdate = e && (e as Event & { isAIUpdate?: boolean }).isAIUpdate;
       const delay = isAIUpdate ? 0 : 500; // Immediate save for AI updates, debounced for user typing
 
-      // Debounce undo state save (only save after 1 second of no typing)
-      undoTimeout = setTimeout(() => {
-        onContentBeforeChange?.();
-      }, 1000);
-
       timeout = setTimeout(() => {
         // Sanitize content before saving to database
         const sanitizedContent = sanitizeContent(content);
@@ -246,6 +238,8 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
         if (isAIUpdate || sanitizedContent !== lastSavedContent) {
           updateNote(note.id, { content: sanitizedContent }, true); // Silent auto-save
           setLastSavedContent(sanitizedContent);
+          // Notify parent of save for undo/redo snapshots
+          onNoteSaved?.(title, sanitizedContent);
         }
       }, delay);
     };
@@ -266,7 +260,7 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
         currentRef.removeEventListener('input', handleContentChange);
       }
     };
-  }, [note.id, updateNote, lastSavedContent, onContentBeforeChange, sendInactivityNotification]);
+  }, [note.id, updateNote, lastSavedContent, onNoteSaved, sendInactivityNotification, title]);
 
   // Handle AI content replacement - both selection and full content
   const replaceContentFromAI = useCallback((newContent: string, isSelectionReplacement: boolean = false) => {
@@ -669,11 +663,6 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
               clearTimeout(titleSaveTimeoutRef.current);
             }
             
-            // Clear any existing undo state timeout
-            if (undoStateTimeoutRef.current) {
-              clearTimeout(undoStateTimeoutRef.current);
-            }
-            
             // Clear any existing inactivity timer
             if (inactivityTimerRef.current) {
               clearTimeout(inactivityTimerRef.current);
@@ -684,14 +673,12 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
               sendInactivityNotification();
             }, 5 * 60 * 1000); // 5 minutes
             
-            // Debounce undo state save (only save after 1 second of no typing)
-            undoStateTimeoutRef.current = setTimeout(() => {
-              onContentBeforeChange?.();
-            }, 1000);
             
-            // Debounce title save (500ms delay)
+            // Debounce title save (500ms delay) + notify parent for undo snapshots
             titleSaveTimeoutRef.current = setTimeout(() => {
-              updateNote(note.id, { title: newTitle }, true); // Silent title update
+              updateNote(note.id, { title: newTitle }, true);
+              const currentContent = getEditorContent(contentRef.current);
+              onNoteSaved?.(newTitle, currentContent);
             }, 500);
           }}
           placeholder="Untitled Note"
@@ -751,21 +738,13 @@ export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckAp
             content={contentRef.current?.innerHTML || ''}
             originalHTML={contentRef.current?.innerHTML || ''}
             onContentChange={(newHTML, isSelectionReplacement = false) => {
-              console.log('TextEnhancementMenu onContentChange called with:', { newHTML, isSelectionReplacement });
               if (contentRef.current) {
-                // Store previous state before making AI changes
                 previousStateRef.current = {
                   content: getEditorContent(contentRef.current),
                   title
                 };
 
-                onContentBeforeChange?.();
-
-                // Use the AI replacement function
                 replaceContentFromAI(newHTML, isSelectionReplacement);
-
-                onSpellCheckApplied?.();
-                console.log('Content updated in editor and saved to cloud');
               }
             }}
             noteTitle={title}
