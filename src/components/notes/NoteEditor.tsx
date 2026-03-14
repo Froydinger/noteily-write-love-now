@@ -106,7 +106,7 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
   // Timers
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const titleSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const undoStateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
 
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
 
