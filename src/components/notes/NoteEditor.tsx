@@ -260,7 +260,7 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
         currentRef.removeEventListener('input', handleContentChange);
       }
     };
-  }, [note.id, updateNote, lastSavedContent, onContentBeforeChange, sendInactivityNotification]);
+  }, [note.id, updateNote, lastSavedContent, onNoteSaved, sendInactivityNotification, title]);
 
   // Handle AI content replacement - both selection and full content
   const replaceContentFromAI = useCallback((newContent: string, isSelectionReplacement: boolean = false) => {
