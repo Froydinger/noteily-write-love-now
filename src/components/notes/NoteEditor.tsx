@@ -678,14 +678,12 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
               sendInactivityNotification();
             }, 5 * 60 * 1000); // 5 minutes
             
-            // Debounce undo state save (only save after 1 second of no typing)
-            undoStateTimeoutRef.current = setTimeout(() => {
-              onContentBeforeChange?.();
-            }, 1000);
             
-            // Debounce title save (500ms delay)
+            // Debounce title save (500ms delay) + notify parent for undo snapshots
             titleSaveTimeoutRef.current = setTimeout(() => {
-              updateNote(note.id, { title: newTitle }, true); // Silent title update
+              updateNote(note.id, { title: newTitle }, true);
+              const currentContent = getEditorContent(contentRef.current);
+              onNoteSaved?.(newTitle, currentContent);
             }, 500);
           }}
           placeholder="Untitled Note"
