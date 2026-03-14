@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Heart, ArrowRight, Zap, Lock, Share2, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { LoginDialog } from '@/components/auth/LoginDialog';
+import { useState } from "react";
+import { Heart, ArrowRight, Zap, Lock, Share2, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { LoginDialog } from "@/components/auth/LoginDialog";
 
 export default function LanderPage() {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
@@ -9,28 +9,28 @@ export default function LanderPage() {
   const features = [
     {
       icon: Sparkles,
-      title: 'Beautiful Writing',
-      description: 'A distraction-free experience designed for writers who love their craft',
-      color: 'from-cyan-500/20 to-cyan-500/5'
+      title: "Beautiful Writing",
+      description: "A distraction-free experience designed for writers who love their craft",
+      color: "from-cyan-500/20 to-cyan-500/5",
     },
     {
       icon: Zap,
-      title: 'Lightning Fast',
-      description: 'Instant syncing across all your devices with zero lag',
-      color: 'from-purple-500/20 to-purple-500/5'
+      title: "Lightning Fast",
+      description: "Instant syncing across all your devices with zero lag",
+      color: "from-purple-500/20 to-purple-500/5",
     },
     {
       icon: Lock,
-      title: 'Private & Secure',
-      description: 'Your notes are encrypted and only you can access them',
-      color: 'from-emerald-500/20 to-emerald-500/5'
+      title: "Private & Secure",
+      description: "Your notes are encrypted and only you can access them",
+      color: "from-emerald-500/20 to-emerald-500/5",
     },
     {
       icon: Share2,
-      title: 'Collaborate Easily',
-      description: 'Share notes with friends and collaborate in real-time',
-      color: 'from-pink-500/20 to-pink-500/5'
-    }
+      title: "Collaborate Easily",
+      description: "Share notes with friends and collaborate in real-time",
+      color: "from-pink-500/20 to-pink-500/5",
+    },
   ];
 
   return (
@@ -41,13 +41,13 @@ export default function LanderPage() {
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-blob" />
         <div className="absolute top-1/3 -left-40 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl animate-blob animation-delay-2000" />
         <div className="absolute bottom-20 right-1/4 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl animate-blob animation-delay-4000" />
-        
+
         {/* Grid Pattern */}
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.015]"
           style={{
             backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
-            backgroundSize: '40px 40px'
+            backgroundSize: "40px 40px",
           }}
         />
       </div>
@@ -62,12 +62,7 @@ export default function LanderPage() {
             <span className="text-lg font-display font-semibold tracking-tight">Noteily</span>
           </div>
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowLoginDialog(true)}
-              className="hover:bg-accent/10"
-            >
+            <Button variant="ghost" size="sm" onClick={() => setShowLoginDialog(true)} className="hover:bg-accent/10">
               Sign In
             </Button>
             <Button
@@ -90,7 +85,7 @@ export default function LanderPage() {
               {/* Glow rings */}
               <div className="absolute inset-0 rounded-3xl bg-accent/30 blur-2xl animate-pulse-slow scale-150" />
               <div className="absolute inset-0 rounded-3xl bg-accent/20 blur-xl animate-pulse-slow animation-delay-1000 scale-125" />
-              
+
               <div className="relative p-5 rounded-3xl bg-gradient-to-br from-accent/25 to-accent/5 backdrop-blur-xl border border-accent/30 shadow-2xl shadow-accent/20 animate-float">
                 <Heart className="h-24 w-24 text-accent animate-heartbeat" fill="currentColor" />
               </div>
@@ -99,11 +94,11 @@ export default function LanderPage() {
 
           {/* Title with staggered animation */}
           <div className="space-y-6">
-            <h1 
+            <h1
               className="text-5xl sm:text-6xl lg:text-8xl font-serif font-bold tracking-tight animate-fade-in"
-              style={{ animationDelay: '0.1s' }}
+              style={{ animationDelay: "0.1s" }}
             >
-              Write What You{' '}
+              Write What You{" "}
               <span className="relative inline-block">
                 <span className="bg-gradient-to-r from-accent via-pink-400 to-purple-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
                   Love
@@ -111,18 +106,18 @@ export default function LanderPage() {
                 <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-accent via-pink-400 to-purple-400 rounded-full opacity-50 blur-sm" />
               </span>
             </h1>
-            <p 
+            <p
               className="text-xl sm:text-2xl text-foreground/70 font-light max-w-2xl mx-auto animate-fade-in"
-              style={{ animationDelay: '0.2s' }}
+              style={{ animationDelay: "0.2s" }}
             >
               The note-taking app designed for passionate writers. Beautiful, fast, and built for your creative flow.
             </p>
           </div>
 
           {/* CTA Buttons with hover effects */}
-          <div 
+          <div
             className="flex flex-col sm:flex-row gap-4 justify-center pt-4 animate-fade-in"
-            style={{ animationDelay: '0.3s' }}
+            style={{ animationDelay: "0.3s" }}
           >
             <Button
               size="lg"
@@ -146,15 +141,11 @@ export default function LanderPage() {
           </div>
 
           {/* Trust badges with animations */}
-          <div 
+          <div
             className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-10 text-sm text-foreground/60 animate-fade-in"
-            style={{ animationDelay: '0.4s' }}
+            style={{ animationDelay: "0.4s" }}
           >
-            {[
-              'Secure & Private',
-              'Free Forever', 
-              'Cloud Synced'
-            ].map((badge, i) => (
+            {["Secure & Private", "Free Forever", "Cloud Synced"].map((badge, i) => (
               <div key={badge} className="flex items-center gap-2 group">
                 <div className="w-2 h-2 bg-accent rounded-full group-hover:scale-125 transition-transform shadow-lg shadow-accent/50" />
                 <span className="group-hover:text-foreground/80 transition-colors">{badge}</span>
@@ -168,9 +159,7 @@ export default function LanderPage() {
       <section className="py-24 sm:py-36 px-4 sm:px-6 lg:px-8 relative z-20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold mb-6">
-              Everything You Need
-            </h2>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold mb-6">Everything You Need</h2>
             <p className="text-lg sm:text-xl text-foreground/60 max-w-2xl mx-auto">
               Noteily is packed with features to enhance your writing journey
             </p>
@@ -184,12 +173,12 @@ export default function LanderPage() {
                   key={index}
                   className={`group relative overflow-hidden rounded-3xl p-8 lg:p-10 backdrop-blur-xl border border-border/40 bg-gradient-to-br ${feature.color} hover:border-accent/50 transition-all duration-500 hover:shadow-2xl hover:shadow-accent/10 hover:-translate-y-1`}
                   style={{
-                    animationDelay: `${index * 0.1}s`
+                    animationDelay: `${index * 0.1}s`,
                   }}
                 >
                   {/* Shimmer effect on hover */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  
+
                   {/* Background gradient on hover */}
                   <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -213,14 +202,12 @@ export default function LanderPage() {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-[600px] h-[600px] bg-accent/10 rounded-full blur-3xl" />
         </div>
-        
+
         <div className="relative max-w-2xl mx-auto text-center space-y-10">
           <div className="space-y-6">
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold">
-              Ready to Start Writing?
-            </h2>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold">Ready to Start Writing?</h2>
             <p className="text-lg sm:text-xl text-foreground/70">
-              Join thousands of writers who have discovered their creative flow with Noteily
+              Discover your creative writing flow with Noteily today.
             </p>
           </div>
 
@@ -252,10 +239,7 @@ export default function LanderPage() {
       <div className="h-20" />
 
       {/* Login Dialog */}
-      <LoginDialog
-        open={showLoginDialog}
-        onOpenChange={setShowLoginDialog}
-      />
+      <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
 
       <style>{`
         @keyframes float {
