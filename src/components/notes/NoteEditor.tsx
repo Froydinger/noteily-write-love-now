@@ -663,11 +663,6 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
               clearTimeout(titleSaveTimeoutRef.current);
             }
             
-            // Clear any existing undo state timeout
-            if (undoStateTimeoutRef.current) {
-              clearTimeout(undoStateTimeoutRef.current);
-            }
-            
             // Clear any existing inactivity timer
             if (inactivityTimerRef.current) {
               clearTimeout(inactivityTimerRef.current);
