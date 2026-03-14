@@ -238,6 +238,8 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
         if (isAIUpdate || sanitizedContent !== lastSavedContent) {
           updateNote(note.id, { content: sanitizedContent }, true); // Silent auto-save
           setLastSavedContent(sanitizedContent);
+          // Notify parent of save for undo/redo snapshots
+          onNoteSaved?.(title, sanitizedContent);
         }
       }, delay);
     };
