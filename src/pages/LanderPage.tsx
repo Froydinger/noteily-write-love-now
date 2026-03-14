@@ -206,9 +206,7 @@ export default function LanderPage() {
         <div className="relative max-w-2xl mx-auto text-center space-y-10">
           <div className="space-y-6">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold">Ready to Start Writing?</h2>
-            <p className="text-lg sm:text-xl text-foreground/70">
-              Discover your creative writing flow with Noteily today.
-            </p>
+            <p className="text-lg sm:text-xl text-foreground/70">Streamline your creative flow with Noteily today!</p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
