@@ -70,14 +70,11 @@ function setEditorContent(editor: HTMLDivElement | null, content: string): void 
 
 interface NoteEditorProps {
   note: Note;
-  onContentBeforeChange?: () => void;
-  onSpellCheckApplied?: () => void;
-  onUndo?: () => void;
-  canUndo?: boolean;
+  onNoteSaved?: (title: string, content: string) => void;
   onAIContentReplace?: (replacementFunction: (newContent: string, isSelectionReplacement: boolean) => void) => void;
 }
 
-export default function NoteEditor({ note, onContentBeforeChange, onSpellCheckApplied, onUndo, canUndo, onAIContentReplace }: NoteEditorProps) {
+export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: NoteEditorProps) {
   const titleFont = useTitleFont();
   const bodyFont = useBodyFont();
   const { updateNote } = useNotes();
