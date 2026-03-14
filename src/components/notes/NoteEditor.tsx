@@ -743,21 +743,13 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
             content={contentRef.current?.innerHTML || ''}
             originalHTML={contentRef.current?.innerHTML || ''}
             onContentChange={(newHTML, isSelectionReplacement = false) => {
-              console.log('TextEnhancementMenu onContentChange called with:', { newHTML, isSelectionReplacement });
               if (contentRef.current) {
-                // Store previous state before making AI changes
                 previousStateRef.current = {
                   content: getEditorContent(contentRef.current),
                   title
                 };
 
-                onContentBeforeChange?.();
-
-                // Use the AI replacement function
                 replaceContentFromAI(newHTML, isSelectionReplacement);
-
-                onSpellCheckApplied?.();
-                console.log('Content updated in editor and saved to cloud');
               }
             }}
             noteTitle={title}
