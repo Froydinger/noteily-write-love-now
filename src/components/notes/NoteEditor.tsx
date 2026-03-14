@@ -230,11 +230,6 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
       const isAIUpdate = e && (e as Event & { isAIUpdate?: boolean }).isAIUpdate;
       const delay = isAIUpdate ? 0 : 500; // Immediate save for AI updates, debounced for user typing
 
-      // Debounce undo state save (only save after 1 second of no typing)
-      undoTimeout = setTimeout(() => {
-        onContentBeforeChange?.();
-      }, 1000);
-
       timeout = setTimeout(() => {
         // Sanitize content before saving to database
         const sanitizedContent = sanitizeContent(content);
