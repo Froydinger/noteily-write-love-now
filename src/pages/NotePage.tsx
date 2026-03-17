@@ -119,7 +119,7 @@ const NotePage = () => {
           description: "This note has been permanently deleted.",
         });
       }
-      navigate("/");
+      navigate("/home");
     }
   };
 
