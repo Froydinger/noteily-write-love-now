@@ -32,7 +32,7 @@ import { useAiButton } from "@/contexts/AiButtonContext";
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
-  const { getNote, setCurrentNote, deleteNote, loading, updateNote } = useNotes();
+  const { getNote, setCurrentNote, deleteNote, loading, updateNote, addNote } = useNotes();
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
