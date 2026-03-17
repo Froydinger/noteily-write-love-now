@@ -27,6 +27,19 @@ export function getAuthCallbackCode() {
   return new URL(window.location.href).searchParams.get('code');
 }
 
+export function getAuthCallbackError() {
+  const url = new URL(window.location.href);
+  const hashParams = getHashSearchParams(url.hash);
+  const error = url.searchParams.get('error') || hashParams.get('error');
+  const description = url.searchParams.get('error_description') || hashParams.get('error_description');
+
+  if (!error && !description) {
+    return null;
+  }
+
+  return description || error;
+}
+
 export function getAuthHashSessionTokens() {
   const hashParams = getHashSearchParams();
   const access_token = hashParams.get('access_token');

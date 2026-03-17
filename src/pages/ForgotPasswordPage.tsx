@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Mail } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, Mail, AlertCircle } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
 
 export default function ForgotPasswordPage() {
-  const [identifier, setIdentifier] = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,69 +17,56 @@ export default function ForgotPasswordPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect if already logged in
     if (user) {
       navigate('/home');
     }
   }, [user, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!identifier.trim()) return;
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!email.trim()) return;
 
     setLoading(true);
     setError(null);
-    const { error } = await requestPasswordReset(identifier.trim());
+    const { error } = await requestPasswordReset(email.trim());
     setLoading(false);
 
     if (error) {
       setError(error.message);
-    } else {
-      setSent(true);
+      return;
     }
-  };
 
-  const handleTryAgain = () => {
-    setError(null);
-    setIdentifier('');
+    setSent(true);
   };
 
   if (sent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/50 p-4">
-        <Card className="w-full max-w-md bg-card/95 backdrop-blur-sm border-border/50">
-          <CardHeader className="text-center space-y-4">
-            <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-subtle px-4">
+        <Card className="w-full max-w-md border-border/60 bg-card/95 backdrop-blur">
+          <CardHeader className="space-y-4 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
               <Mail className="h-6 w-6 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
+            <CardTitle className="text-2xl">Check your email</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4">
             <p className="text-center text-muted-foreground">
-              If an account exists with the username or email you provided, you'll receive password reset instructions shortly.
+              If an account exists for that email, you’ll receive reset instructions shortly.
             </p>
-            
-            <div className="space-y-4">
-              <Button 
-                onClick={() => {
-                  setSent(false);
-                  setError(null);
-                  setIdentifier('');
-                }}
-                variant="outline"
-                className="w-full"
-              >
-                Send another email
-              </Button>
-              
+            <Button variant="outline" className="w-full" onClick={() => {
+              setSent(false);
+              setEmail('');
+              setError(null);
+            }}>
+              Send another email
+            </Button>
+            <Button asChild variant="ghost" className="w-full">
               <Link to="/">
-                <Button variant="ghost" className="w-full">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to sign in
-                </Button>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to sign in
               </Link>
-            </div>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -87,79 +74,51 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/50 p-4">
-      <Card className="w-full max-w-md bg-card/95 backdrop-blur-sm border-border/50">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-subtle px-4">
+      <Card className="w-full max-w-md border-border/60 bg-card/95 backdrop-blur">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Reset your password</CardTitle>
+          <CardTitle className="text-2xl">Reset your password</CardTitle>
           <p className="text-muted-foreground">
-            Enter your username or email address and we'll send you a link to reset your password.
+            Enter the email address for your account and we’ll send you a reset link.
           </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="space-y-2">
-                  <p>{error}</p>
-                  {error.includes('Google') && (
-                    <p className="text-sm">
-                      Try signing in with Google instead, or contact support if you need to reset your Google account password.
-                    </p>
-                  )}
-                  {error.includes('not found') && (
-                    <div className="flex gap-2 mt-2">
-                      <Button 
-                        onClick={handleTryAgain}
-                        variant="outline"
-                        size="sm"
-                      >
-                        Try different username/email
-                      </Button>
-                      <Link to="/">
-                        <Button variant="outline" size="sm">
-                          Create account instead
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
-                </AlertDescription>
+                <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            
+
             <div className="space-y-2">
-              <Label htmlFor="identifier">Username or Email</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="identifier"
-                type="text"
-                placeholder="Enter your username or email"
-                value={identifier}
-                onChange={(e) => {
-                  setIdentifier(e.target.value);
+                id="email"
+                type="email"
+                autoComplete="email"
+                autoFocus
+                placeholder="you@example.com"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
                   if (error) setError(null);
                 }}
                 required
-                autoComplete="username email"
-                autoFocus
               />
             </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loading || !identifier.trim()}
-            >
+
+            <Button type="submit" className="w-full" disabled={loading || !email.trim()}>
               {loading ? 'Sending...' : 'Send reset link'}
             </Button>
           </form>
-          
+
           <div className="mt-6 text-center">
-            <Link to="/">
-              <Button variant="ghost" className="text-sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
+            <Button asChild variant="ghost" className="text-sm">
+              <Link to="/">
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to sign in
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
