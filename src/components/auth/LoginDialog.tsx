@@ -247,6 +247,18 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                       ? (authMode === 'signup' ? 'Creating account...' : 'Signing in...') 
                       : (authMode === 'signup' ? 'Create account' : 'Sign in')}
                 </Button>
+                {authMode === 'signin' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleOpenChange(false);
+                      navigate('/forgot-password');
+                    }}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2 w-full text-center"
+                  >
+                    Forgot your password?
+                  </button>
+                )}
               </div>
             </div>
           )}
