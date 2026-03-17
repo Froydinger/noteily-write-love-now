@@ -198,7 +198,7 @@ const NotePage = () => {
       <header
         ref={headerRef}
         data-note-header
-        className="sticky top-0 z-[100] p-4"
+        className="sticky top-0 z-[100] p-4 pwa-safe-top bg-background/60 backdrop-blur-md border-b border-border/20"
         style={{ position: "sticky", top: 0, zIndex: 100 }}
       >
         <div className="flex items-center justify-between">
