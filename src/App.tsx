@@ -50,17 +50,26 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function RootRoute() {
   const { user, initializing } = useAuth();
-
-  // If OAuth params are present in the URL, the Lovable auth library is processing
-  // the Google sign-in return. Show a loading state and let it finish — do NOT
-  // forward to /auth/callback because those tokens use ES256 and the raw Supabase
-  // client cannot verify them.
+  const location = useLocation();
   const oauthReturning = hasAuthCallbackParams();
 
-  if (initializing || oauthReturning) {
+  if (oauthReturning) {
+    return (
+      <Navigate
+        to={{
+          pathname: "/auth/callback",
+          search: location.search,
+          hash: location.hash,
+        }}
+        replace
+      />
+    );
+  }
+
+  if (initializing) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoadingSpinner size="lg" text={oauthReturning ? "Signing you in..." : "Loading..."} />
+        <LoadingSpinner size="lg" text="Loading..." />
       </div>
     );
   }
