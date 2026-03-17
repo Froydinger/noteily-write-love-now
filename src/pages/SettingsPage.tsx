@@ -177,37 +177,6 @@ const SettingsPage = () => {
     }
   };
 
-  const isGoogleUser = () => {
-    return (
-      user?.app_metadata?.providers?.includes("google") ||
-      user?.identities?.some((identity) => identity.provider === "google")
-    );
-  };
-
-  const hasPassword = () => {
-    return user?.app_metadata?.provider !== "google" || newPassword.trim().length >= 6;
-  };
-
-  const handleDisconnectGoogle = async () => {
-    if (!user || !isGoogleUser()) return;
-    if (newPassword.trim().length < 6) {
-      toast.error("Please set a password first");
-      return;
-    }
-
-    setIsDisconnectingGoogle(true);
-    try {
-      const { error: passwordError } = await supabase.auth.updateUser({ password: newPassword });
-      if (passwordError) throw passwordError;
-      setNewPassword("");
-      toast.success("Password set successfully");
-    } catch (error: any) {
-      console.error("Error setting password:", error);
-      toast.error("Error setting password", { description: error.message });
-    } finally {
-      setIsDisconnectingGoogle(false);
-    }
-  };
 
   const handleDeleteAccount = async () => {
     if (!user) return;
