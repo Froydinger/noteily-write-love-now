@@ -185,18 +185,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      const { error } = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: window.location.origin,
-        extraParams: {
-          prompt: 'select_account',
+      // Clear legacy auth keys before starting OAuth to prevent stale session issues
+      clearAllAuthCache();
+
+      const hostname = window.location.hostname;
+      const isLovableDomain =
+        hostname.includes('lovable.app') || hostname.includes('lovableproject.com');
+
+      if (isLovableDomain) {
+        // Managed Lovable flow — works correctly on *.lovable.app
+        const { error } = await lovable.auth.signInWithOAuth('google', {
+          redirect_uri: window.location.origin,
+          extraParams: { prompt: 'select_account' },
+        });
+
+        if (error) {
+          toast({ title: 'Google sign in failed', description: error.message, variant: 'destructive' });
+        }
+        return { error };
+      }
+
+      // Custom domain — bypass auth-bridge, get OAuth URL directly
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          skipBrowserRedirect: true,
+          queryParams: { prompt: 'select_account' },
         },
       });
 
       if (error) {
         toast({ title: 'Google sign in failed', description: error.message, variant: 'destructive' });
+        return { error };
       }
 
-      return { error };
+      if (data?.url) {
+        // Validate the OAuth URL before redirecting
+        const oauthUrl = new URL(data.url);
+        const allowedHosts = [
+          'accounts.google.com',
+          `${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co`,
+        ];
+        if (!allowedHosts.some((h) => oauthUrl.hostname === h)) {
+          throw new Error('Invalid OAuth redirect URL');
+        }
+        window.location.href = data.url;
+      }
+
+      return { error: null };
     } catch (error: any) {
       toast({ title: 'Google sign in failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
       return { error };
