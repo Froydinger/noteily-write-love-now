@@ -184,11 +184,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithGoogle = async () => {
-    setLoading(true);
-
     try {
       const { error } = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
+        redirect_uri: window.location.origin,
         extraParams: {
           prompt: 'select_account',
         },
@@ -202,8 +200,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       toast({ title: 'Google sign in failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
       return { error };
-    } finally {
-      setLoading(false);
     }
   };
 

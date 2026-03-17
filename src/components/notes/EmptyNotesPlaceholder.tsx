@@ -23,7 +23,7 @@ export default function EmptyNotesPlaceholder() {
   };
   
   return (
-    <div className="h-full">
+    <div className="h-full pwa-safe-top">
       <div className="relative">
         {(isMobile || state === "collapsed") && (
           <div className="absolute top-4 left-4 z-10">
