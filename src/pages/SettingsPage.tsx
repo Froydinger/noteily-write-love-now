@@ -280,8 +280,7 @@ const SettingsPage = () => {
                       AI Features
                     </Label>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Enable or disable AI-powered writing assistance features like spell check, grammar correction, and
-                      text rewriting
+                      Enable or disable Arc AI writing assistant
                     </p>
                     <p className="text-xs text-primary mt-1 font-medium">
                       Current: {preferences.aiEnabled ? "Enabled" : "Disabled"}
