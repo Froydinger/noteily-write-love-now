@@ -3,6 +3,37 @@ import { Component, type ReactNode } from 'react'
 import App from './App.tsx'
 import './index.css'
 
+// Force service worker update on every page load to bust stale caches
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistration().then((reg) => {
+    if (!reg) return;
+    // Force update check
+    reg.update();
+    // If a new worker is already waiting, activate it immediately
+    if (reg.waiting) {
+      reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    }
+    // Listen for future waiting workers
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      if (!newWorker) return;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          newWorker.postMessage({ type: 'SKIP_WAITING' });
+        }
+      });
+    });
+    // Reload when the new worker takes over
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
+  });
+}
+
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null };
   static getDerivedStateFromError(error: Error) { return { error }; }
