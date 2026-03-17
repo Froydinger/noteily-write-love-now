@@ -58,8 +58,10 @@ export const useNotifications = () => {
 
       if (error) throw error;
 
-      // Drop any self-generated notifications
-      const filtered = (data || []).filter(n => !isSelf(n));
+      // Drop any self-generated notifications and map is_read -> read
+      const filtered = (data || [])
+        .map(n => ({ ...n, read: n.is_read }))
+        .filter(n => !isSelf(n));
 
       setNotifications(filtered);
       setUnreadCount(filtered.filter(n => !n.read).length);
