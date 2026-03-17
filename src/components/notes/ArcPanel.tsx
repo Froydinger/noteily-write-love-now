@@ -58,6 +58,7 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
   const [showHistory, setShowHistory] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvoId, setActiveConvoId] = useState<string | null>(null);
+  const [vpStyle, setVpStyle] = useState<React.CSSProperties>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -79,6 +80,23 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
       document.body.style.overflow = '';
     }
     return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  // Keep overlay anchored when mobile keyboard opens
+  useEffect(() => {
+    if (!isOpen || typeof window === 'undefined' || !window.visualViewport) return;
+    const update = () => {
+      const vp = window.visualViewport!;
+      setVpStyle({ top: vp.offsetTop, height: vp.height });
+    };
+    update();
+    window.visualViewport.addEventListener('resize', update);
+    window.visualViewport.addEventListener('scroll', update);
+    return () => {
+      window.visualViewport!.removeEventListener('resize', update);
+      window.visualViewport!.removeEventListener('scroll', update);
+      setVpStyle({});
+    };
   }, [isOpen]);
 
   // Reset chat when switching notes
@@ -318,15 +336,35 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
   };
 
   const formatToHtml = (text: string): string => {
-    let processed = text
+    const applyInline = (s: string) => s
       .replace(/\*\*\*(.+?)\*\*\*/g, '<b><i>$1</i></b>')
       .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
       .replace(/\*(.+?)\*/g, '<i>$1</i>');
-    return processed.split(/\n{2,}/)
-      .map(p => p.trim())
-      .filter(p => p !== '')
-      .map(p => `<p>${p.replace(/\n/g, ' ')}</p>`)
-      .join('');
+    const lines = text.split('\n');
+    const blocks: string[] = [];
+    let paraLines: string[] = [];
+    const flushPara = () => {
+      if (paraLines.length > 0) {
+        blocks.push(`<p>${paraLines.join('<br>')}</p>`);
+        paraLines = [];
+      }
+    };
+    for (const line of lines) {
+      if (line.trim() === '') {
+        flushPara();
+      } else if (/^#{1,3}\s/.test(line)) {
+        flushPara();
+        const tag = line.startsWith('### ') ? 'h3' : 'h2';
+        blocks.push(`<${tag}>${applyInline(line.replace(/^#+\s/, '').trim())}</${tag}>`);
+      } else if (line.startsWith('> ')) {
+        flushPara();
+        blocks.push(`<blockquote>${applyInline(line.slice(2).trim())}</blockquote>`);
+      } else {
+        paraLines.push(applyInline(line));
+      }
+    }
+    flushPara();
+    return blocks.join('');
   };
 
   const extractNoteContent = (content: string): string => {
@@ -416,7 +454,7 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className={cn("fixed right-5 z-[60] group", isNotePage ? "bottom-5" : "bottom-24 md:bottom-5")}
+          className="fixed right-5 bottom-5 z-[60] group"
           aria-label="Chat with Arc"
         >
           <div
@@ -434,7 +472,8 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed left-0 right-0 z-[9999] flex items-end justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          style={{ top: vpStyle.top ?? 0, height: vpStyle.height ?? '100dvh' }}
           onClick={(e) => { if (e.target === e.currentTarget) setIsOpen(false); }}
         >
           <div
