@@ -133,8 +133,7 @@ export default function LanderPage() {
             <span className="text-accent">love.</span>
           </h1>
           <p
-            className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed font-sans animate-fade-in"
-            style={{ animationDelay: '0.15s', animationFillMode: 'both' }}
+            className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed font-sans"
           >
             The note-taking app designed for passionate writers. Beautiful, fast, and built for your creative flow.
           </p>
