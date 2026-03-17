@@ -20,6 +20,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNotes } from "@/contexts/NoteContext";
 import { usePreferences } from "@/contexts/PreferencesContext";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useSubscription } from "@/hooks/useSubscription";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   LogOut,
@@ -33,6 +34,8 @@ import {
   X as XIcon,
   Loader2,
   Brain,
+  Sparkles,
+  Crown,
 } from "lucide-react";
 import { useTitleFont } from "@/hooks/useTitleFont";
 import { supabase } from "@/integrations/supabase/client";
