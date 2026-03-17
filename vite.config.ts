@@ -62,7 +62,7 @@ export default defineConfig(({ mode }) => ({
         ],
         // Add navigation fallback for SPA
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/, /^\/~oauth/],
       },
       // Force immediate reload when update is available
       devOptions: {
