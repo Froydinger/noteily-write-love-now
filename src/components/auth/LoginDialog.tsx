@@ -131,7 +131,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               {/* Apple Sign In */}
               <Button
                 type="button"
-                className="w-full bg-black text-white hover:bg-gray-900 border-0"
+                className="w-full bg-foreground text-background hover:bg-foreground/90 border-0"
                 onClick={handleAppleSignIn}
                 disabled={authLoading}
               >
