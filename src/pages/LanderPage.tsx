@@ -76,7 +76,7 @@ export default function LanderPage() {
       </nav>
 
       {/* Top Navigation */}
-      <nav className="relative z-50 flex items-center justify-between px-4 py-4 md:px-8 max-w-7xl mx-auto">
+      <nav className="relative z-50 flex items-center justify-between px-4 py-4 md:px-8 max-w-7xl mx-auto pwa-safe-top">
         <div className="flex items-center gap-2.5">
           <Heart className="h-8 w-8 text-accent" fill="currentColor" />
           <span className="font-display text-xl text-foreground tracking-tight">
