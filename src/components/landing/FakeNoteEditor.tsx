@@ -66,7 +66,7 @@ const FakeNoteEditor = () => {
         </div>
 
         {/* Editor */}
-        <div className="relative p-5 md:p-10 h-[440px] md:h-[500px] overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none' }}>
+        <div className="relative p-5 md:p-10 h-[380px] md:h-[420px] overflow-hidden" style={{ scrollbarWidth: 'none' }}>
           <div className="font-display text-2xl md:text-3xl text-foreground mb-4 leading-tight">
             The Noise Became Music
           </div>
