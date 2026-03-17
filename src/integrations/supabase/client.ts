@@ -2,8 +2,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://viidccjyjeipulbqqwua.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpaWRjY2p5amVpcHVsYnFxd3VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3NjY4ODEsImV4cCI6MjA2ODM0Mjg4MX0._79sE__CrRgSOMuycMUt5_3tH2oyWC91TDiz4qleOJA";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
@@ -13,14 +13,5 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce',
-    storageKey: 'supabase.auth.token',
-    debug: false,
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'noteily-app',
-    },
-  },
+  }
 });
