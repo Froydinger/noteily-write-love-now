@@ -350,6 +350,14 @@ export type Database = {
         Args: { p_identifier: string }
         Returns: boolean
       }
+      check_username_available_for_user: {
+        Args: { p_user_email: string; p_username: string }
+        Returns: boolean
+      }
+      create_email_share: {
+        Args: { p_email: string; p_note_id: string; p_permission: string }
+        Returns: boolean
+      }
       get_user_by_identifier: {
         Args: { p_identifier: string }
         Returns: {
