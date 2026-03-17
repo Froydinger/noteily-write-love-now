@@ -38,6 +38,7 @@ import { NoteType } from "@/types/sharing";
 
 const Index = () => {
   const { user } = useAuth();
+  const { preferences } = usePreferences();
   const {
     notes,
     addNote,

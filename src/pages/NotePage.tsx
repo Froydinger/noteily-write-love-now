@@ -38,6 +38,7 @@ const NotePage = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { user } = useAuth();
+  const { preferences } = usePreferences();
   const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
   const [entered, setEntered] = useState(false);
