@@ -47,12 +47,10 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     setIsLoading(true);
 
     if (authMode === 'signup') {
-      toast.success("Welcome to Arcana Notes! 🎉", { description: "Creating your account..." });
-
       const { error: signUpError } = await signUp(email, password);
       if (!signUpError) {
         setPassword('');
-        toast.success("Account created successfully! ✨", { description: "Check your email to confirm." });
+        toast.success("Welcome to Arcana Notes! 🎉");
         onOpenChange(false);
       }
     } else {
