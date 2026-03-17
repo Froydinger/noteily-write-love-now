@@ -730,33 +730,6 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
           )}
         </div>
         
-        {!isReadOnly && (
-          <TextEnhancementMenu
-            noteId={note.id}
-            content={contentRef.current?.innerHTML || ''}
-            originalHTML={contentRef.current?.innerHTML || ''}
-            onContentChange={(newHTML, isSelectionReplacement = false) => {
-              if (contentRef.current) {
-                previousStateRef.current = {
-                  content: getEditorContent(contentRef.current),
-                  title
-                };
-
-                replaceContentFromAI(newHTML, isSelectionReplacement);
-              }
-            }}
-            noteTitle={title}
-            onTitleChange={(newTitle) => {
-              console.log('TextEnhancementMenu onTitleChange called with:', newTitle);
-              previousStateRef.current.title = title;
-              setTitle(newTitle);
-              updateNote(note.id, { title: newTitle }, false);
-              console.log('Title updated and saved to cloud');
-            }}
-            previousContent={previousStateRef.current.content}
-            previousTitle={previousStateRef.current.title}
-          />
-        )}
       </div>
     </div>
     </EditorErrorBoundary>

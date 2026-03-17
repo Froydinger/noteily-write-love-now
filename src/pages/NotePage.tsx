@@ -246,18 +246,6 @@ const NotePage = () => {
               </>
             )}
 
-            {/* AI Writer Button */}
-            {isAiButtonVisible && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={openAiChat}
-                className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
-                title="AI Writer"
-              >
-                <Brain className="h-5 w-5 text-accent" />
-              </Button>
-            )}
 
             {/* Show people icon for owned notes (to share) or shared notes (to manage) */}
             {(note.isOwnedByUser || (note.isSharedWithUser && !note.isOwnedByUser)) && (
