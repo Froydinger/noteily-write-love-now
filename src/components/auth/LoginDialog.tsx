@@ -30,7 +30,18 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   };
 
   const handleEmailSubmit = () => {
-    if (!emailOrUsername) return;
+    const normalizedIdentifier = emailOrUsername.trim();
+
+    if (!normalizedIdentifier) return;
+
+    if (authMode === 'signup' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedIdentifier)) {
+      toast.error("Use an email to create your account", {
+        description: "Sign up requires a valid email address.",
+      });
+      return;
+    }
+
+    setEmailOrUsername(normalizedIdentifier);
     setCurrentStep('auth');
   };
 
@@ -175,14 +186,16 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email-or-username">Username or Email</Label>
+                <Label htmlFor="email-or-username">
+                  {authMode === 'signup' ? 'Email address' : 'Username or Email'}
+                </Label>
                 <Input
                   id="email-or-username"
-                  type="text"
+                  type={authMode === 'signup' ? 'email' : 'text'}
                   value={emailOrUsername}
                   onChange={(e) => setEmailOrUsername(e.target.value)}
-                  autoComplete="username email"
-                  placeholder="Enter your username or email"
+                  autoComplete={authMode === 'signup' ? 'email' : 'username email'}
+                  placeholder={authMode === 'signup' ? 'Enter your email address' : 'Enter your username or email'}
                   disabled={isLoading}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -223,7 +236,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    autoComplete="current-password"
+                    autoComplete={authMode === 'signup' ? 'new-password' : 'current-password'}
                     placeholder="Enter your password"
                     disabled={isLoading}
                     className={`transition-all ${shake ? 'animate-shake' : ''}`}

@@ -52,7 +52,7 @@ export default function LanderPage() {
     <div className="relative min-h-screen w-full bg-background">
       {/* Sticky Header */}
       <nav
-        className={`fixed left-0 right-0 z-50 border-b border-border/40 backdrop-blur-xl bg-background/80 transition-all duration-300 ${
+        className={`fixed left-0 right-0 z-50 border-b border-border/40 backdrop-blur-xl bg-background/80 transition-all duration-300 pwa-safe-top ${
           showStickyHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
         }`}
         style={{ top: 0 }}
@@ -76,7 +76,7 @@ export default function LanderPage() {
       </nav>
 
       {/* Top Navigation */}
-      <nav className="relative z-50 flex items-center justify-between px-4 py-4 md:px-8 max-w-7xl mx-auto">
+      <nav className="relative z-50 flex items-center justify-between px-4 py-4 md:px-8 max-w-7xl mx-auto pwa-safe-top">
         <div className="flex items-center gap-2.5">
           <Heart className="h-8 w-8 text-accent" fill="currentColor" />
           <span className="font-display text-xl text-foreground tracking-tight">
@@ -100,7 +100,10 @@ export default function LanderPage() {
 
       {/* Mobile Menu */}
       {showMobileMenu && (
-        <div className="md:hidden fixed top-20 right-6 z-50 rounded-2xl p-4 space-y-3 min-w-[200px] bg-card/95 backdrop-blur-xl border border-border/50 shadow-elevated-lg animate-scale-in">
+        <div
+          className="md:hidden fixed right-6 z-50 rounded-2xl p-4 space-y-3 min-w-[200px] bg-card/95 backdrop-blur-xl border border-border/50 shadow-elevated-lg animate-scale-in"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 5rem)' }}
+        >
           <a href="#features" onClick={() => setShowMobileMenu(false)} className="block text-muted-foreground hover:text-foreground transition-colors">Features</a>
           <a href="#why" onClick={() => setShowMobileMenu(false)} className="block text-muted-foreground hover:text-foreground transition-colors">Why Arcana Notes</a>
           <button

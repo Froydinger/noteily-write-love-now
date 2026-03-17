@@ -9,35 +9,82 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   initializing: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (identifier: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
-  requestPasswordReset: (email: string) => Promise<{ error: any }>;
+  requestPasswordReset: (identifier: string) => Promise<{ error: any }>;
 }
+
+interface ResolvedAuthIdentity {
+  email: string;
+  hasGoogleAuth?: boolean;
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const CURRENT_PROJECT_REF = 'zupjsghppxyvmgwxvycc';
+const STALE_PROJECT_REF = 'viidccjyjeipulbqqwua';
+const AUTH_KEY_PATTERNS = ['supabase.auth', 'sb-', CURRENT_PROJECT_REF, STALE_PROJECT_REF];
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Clear stale localStorage keys from old backend project to prevent phantom sessions
-function clearStaleAuthCache() {
-  const STALE_PROJECT_REF = 'viidccjyjeipulbqqwua';
+function collectMatchingStorageKeys(storage: Storage, patterns: string[]) {
   const keysToRemove: string[] = [];
-  
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.includes(STALE_PROJECT_REF)) {
+
+  for (let index = 0; index < storage.length; index += 1) {
+    const key = storage.key(index);
+    if (key && patterns.some((pattern) => key.includes(pattern))) {
       keysToRemove.push(key);
     }
   }
-  
-  keysToRemove.forEach(key => {
-    console.log('[Auth] Clearing stale cache key:', key);
-    localStorage.removeItem(key);
-  });
-  
-  if (keysToRemove.length > 0) {
-    console.log(`[Auth] Cleared ${keysToRemove.length} stale auth cache entries`);
+
+  return keysToRemove;
+}
+
+function clearStorageKeys(storage: Storage, patterns: string[]) {
+  const keysToRemove = collectMatchingStorageKeys(storage, patterns);
+  keysToRemove.forEach((key) => storage.removeItem(key));
+  return keysToRemove.length;
+}
+
+function clearStaleAuthCache() {
+  const clearedLocal = clearStorageKeys(localStorage, [STALE_PROJECT_REF]);
+  const clearedSession = clearStorageKeys(sessionStorage, [STALE_PROJECT_REF]);
+
+  if (clearedLocal || clearedSession) {
+    console.info(`[Auth] Cleared stale auth cache (${clearedLocal} local, ${clearedSession} session)`);
   }
+}
+
+async function resolveAuthIdentity(identifier: string): Promise<ResolvedAuthIdentity | null> {
+  const normalized = identifier.trim().toLowerCase();
+
+  if (!normalized) {
+    return null;
+  }
+
+  if (EMAIL_PATTERN.test(normalized)) {
+    return { email: normalized };
+  }
+
+  const { data, error } = await supabase.rpc('get_user_by_identifier', {
+    p_identifier: normalized,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  const match = data?.[0];
+
+  if (!match?.email) {
+    return null;
+  }
+
+  return {
+    email: match.email.toLowerCase(),
+    hasGoogleAuth: match.has_google_auth ?? false,
+  };
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -48,50 +95,70 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
-    // Clear any stale auth data from old backend before checking session
+    let isMounted = true;
+
     clearStaleAuthCache();
 
-    // Check for existing session immediately
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setInitializing(false);
+    const syncAuthState = (nextSession: Session | null) => {
+      if (!isMounted) return;
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      syncAuthState(nextSession);
     });
 
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session: nextSession } }) => {
+      syncAuthState(nextSession);
+      if (isMounted) {
         setInitializing(false);
       }
-    );
+    });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (identifier: string, password: string) => {
     setLoading(true);
+
     try {
+      const resolvedIdentity = await resolveAuthIdentity(identifier);
+
+      if (!resolvedIdentity?.email) {
+        const error = new Error('No account found with that email or username.');
+        toast({
+          title: 'Sign in failed',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return { error };
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: resolvedIdentity.email,
         password,
       });
 
       if (error) {
         toast({
-          title: "Sign in failed",
-          description: error.message,
-          variant: "destructive",
+          title: 'Sign in failed',
+          description: resolvedIdentity.hasGoogleAuth
+            ? `${error.message} If you originally signed up with Google, use Continue with Google instead.`
+            : error.message,
+          variant: 'destructive',
         });
       }
 
       return { error };
     } catch (error: any) {
       toast({
-        title: "Sign in failed",
-        description: "An unexpected error occurred",
-        variant: "destructive",
+        title: 'Sign in failed',
+        description: error?.message || 'An unexpected error occurred',
+        variant: 'destructive',
       });
       return { error };
     } finally {
@@ -101,34 +168,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string) => {
     setLoading(true);
+
     try {
+      const normalizedEmail = email.trim().toLowerCase();
+
+      if (!EMAIL_PATTERN.test(normalizedEmail)) {
+        const error = new Error('Please enter a valid email address to create your account.');
+        toast({
+          title: 'Sign up failed',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return { error };
+      }
+
       const { error } = await supabase.auth.signUp({
-        email: email.trim(),
+        email: normalizedEmail,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`
-        }
+          emailRedirectTo: `${window.location.origin}/`,
+        },
       });
 
       if (error) {
         toast({
-          title: "Sign up failed",
+          title: 'Sign up failed',
           description: error.message,
-          variant: "destructive",
+          variant: 'destructive',
         });
       } else {
         toast({
-          title: "Check your email",
-          description: "Please check your email for a confirmation link.",
+          title: 'Check your email',
+          description: 'Please check your email for a confirmation link.',
         });
       }
 
       return { error };
     } catch (error: any) {
       toast({
-        title: "Sign up failed",
-        description: "An unexpected error occurred",
-        variant: "destructive",
+        title: 'Sign up failed',
+        description: error?.message || 'An unexpected error occurred',
+        variant: 'destructive',
       });
       return { error };
     } finally {
@@ -136,32 +216,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const requestPasswordReset = async (email: string) => {
+  const requestPasswordReset = async (identifier: string) => {
     setLoading(true);
+
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/reset-password`
+      const resolvedIdentity = await resolveAuthIdentity(identifier);
+
+      if (!resolvedIdentity?.email) {
+        toast({
+          title: 'Password reset sent',
+          description: "If an account exists for that email or username, you'll receive reset instructions shortly.",
+        });
+        return { error: null };
+      }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(resolvedIdentity.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
       });
 
       if (error) {
         toast({
-          title: "Password reset failed",
+          title: 'Password reset failed',
           description: error.message,
-          variant: "destructive",
+          variant: 'destructive',
         });
       } else {
         toast({
-          title: "Password reset sent",
-          description: "Check your email for password reset instructions.",
+          title: 'Password reset sent',
+          description: 'Check your email for password reset instructions.',
         });
       }
 
       return { error };
     } catch (error: any) {
       toast({
-        title: "Password reset failed",
-        description: "An unexpected error occurred",
-        variant: "destructive",
+        title: 'Password reset failed',
+        description: error?.message || 'An unexpected error occurred',
+        variant: 'destructive',
       });
       return { error };
     } finally {
@@ -170,69 +261,65 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithGoogle = async () => {
-    const { error } = await lovable.auth.signInWithOAuth("google", {
+    const { error } = await lovable.auth.signInWithOAuth('google', {
       redirect_uri: window.location.origin,
+      extraParams: {
+        prompt: 'select_account',
+      },
     });
-    
+
     if (error) {
       toast({
-        title: "Google sign in failed",
+        title: 'Google sign in failed',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
-    
+
     return { error };
   };
 
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
-      
+
       if (error) {
         console.error('Sign out failed:', error);
         await supabase.auth.signOut({ scope: 'local' });
       }
-      
-      // Clear all auth-related localStorage for both old and new projects
-      const authKeyPatterns = ['supabase.auth', 'sb-', 'viidccjyjeipulbqqwua', 'zupjsghppxyvmgwxvycc'];
-      const keysToRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && authKeyPatterns.some(p => key.includes(p))) {
-          keysToRemove.push(key);
-        }
-      }
-      keysToRemove.forEach(key => localStorage.removeItem(key));
-      
+
+      clearStorageKeys(localStorage, AUTH_KEY_PATTERNS);
+      clearStorageKeys(sessionStorage, AUTH_KEY_PATTERNS);
+
       setSession(null);
       setUser(null);
-      
     } catch (globalError) {
       console.error('Sign out failed completely:', globalError);
       setSession(null);
       setUser(null);
-      
+
       toast({
-        title: "Sign out failed",
+        title: 'Sign out failed',
         description: "There was an issue signing out, but you've been logged out locally.",
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      loading,
-      initializing,
-      signIn,
-      signUp,
-      signInWithGoogle,
-      signOut,
-      requestPasswordReset,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        loading,
+        initializing,
+        signIn,
+        signUp,
+        signInWithGoogle,
+        signOut,
+        requestPasswordReset,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
