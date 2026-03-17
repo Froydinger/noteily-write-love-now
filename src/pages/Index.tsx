@@ -3,6 +3,7 @@ import { ArcPanel } from "@/components/notes/ArcPanel";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotes } from "@/contexts/NoteContext";
 import { Note } from "@/contexts/NoteContext";
+import { supabase } from "@/integrations/supabase/client";
 import NoteCard from "@/components/notes/NoteCard";
 import EmptyNotesPlaceholder from "@/components/notes/EmptyNotesPlaceholder";
 import { Button } from "@/components/ui/button";
