@@ -23,7 +23,7 @@ export default function ChecklistEditor({ note }: ChecklistEditorProps) {
   const [loading, setLoading] = useState(true);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const newItemInputRef = useRef<HTMLInputElement>(null);
-  const titleSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const titleSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
 
@@ -303,7 +303,7 @@ function ChecklistItemRow({
   onKeyDown 
 }: ChecklistItemRowProps) {
   const [localContent, setLocalContent] = useState(item.content);
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {

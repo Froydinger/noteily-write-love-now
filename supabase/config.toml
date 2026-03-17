@@ -1,4 +1,13 @@
-project_id = "viidccjyjeipulbqqwua"
+project_id = "zupjsghppxyvmgwxvycc"
+
+[functions.ai-assist]
+verify_jwt = false
 
 [functions.cleanup-deleted-notes]
+verify_jwt = false
+
+[functions.spell-check]
+verify_jwt = false
+
+[functions.notify-note-update]
 verify_jwt = false

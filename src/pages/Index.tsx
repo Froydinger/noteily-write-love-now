@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { ArcPanel } from "@/components/notes/ArcPanel";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotes } from "@/contexts/NoteContext";
 import { Note } from "@/contexts/NoteContext";
@@ -38,6 +39,7 @@ const Index = () => {
   const {
     notes,
     addNote,
+    updateNote,
     setCurrentNote,
     loading,
     syncNotes,
@@ -422,6 +424,14 @@ const Index = () => {
       ) : (
         scrollableContent
       )}
+      {/* Arc AI Panel - available on index for general writing help */}
+      <ArcPanel onCreateNote={async (content, title) => {
+        const note = await addNote("note");
+        if (note) {
+          await updateNote(note.id, { content, title });
+          navigate(`/note/${note.id}`);
+        }
+      }} />
     </div>
   );
 };

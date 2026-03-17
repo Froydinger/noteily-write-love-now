@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "14.4"
   }
   public: {
     Tables: {
@@ -173,9 +173,9 @@ export type Database = {
           created_at: string
           from_user_email: string | null
           id: string
+          is_read: boolean
           message: string
           note_id: string | null
-          read: boolean
           title: string
           type: string
           updated_at: string
@@ -185,9 +185,9 @@ export type Database = {
           created_at?: string
           from_user_email?: string | null
           id?: string
+          is_read?: boolean
           message: string
           note_id?: string | null
-          read?: boolean
           title: string
           type: string
           updated_at?: string
@@ -197,12 +197,48 @@ export type Database = {
           created_at?: string
           from_user_email?: string | null
           id?: string
+          is_read?: boolean
           message?: string
           note_id?: string | null
-          read?: boolean
           title?: string
           type?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth_key: string
+          created_at: string
+          device_name: string | null
+          endpoint: string
+          id: string
+          p256dh_key: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth_key: string
+          created_at?: string
+          device_name?: string | null
+          endpoint: string
+          id?: string
+          p256dh_key: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth_key?: string
+          created_at?: string
+          device_name?: string | null
+          endpoint?: string
+          id?: string
+          p256dh_key?: string
+          updated_at?: string
+          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
@@ -214,8 +250,9 @@ export type Database = {
           note_id: string
           owner_id: string
           permission: string
-          shared_with_email: string | null
+          shared_with_email: string
           shared_with_user_id: string | null
+          shared_with_username: string | null
           updated_at: string
         }
         Insert: {
@@ -224,8 +261,9 @@ export type Database = {
           note_id: string
           owner_id: string
           permission: string
-          shared_with_email?: string | null
+          shared_with_email: string
           shared_with_user_id?: string | null
+          shared_with_username?: string | null
           updated_at?: string
         }
         Update: {
@@ -234,8 +272,9 @@ export type Database = {
           note_id?: string
           owner_id?: string
           permission?: string
-          shared_with_email?: string | null
+          shared_with_email?: string
           shared_with_user_id?: string | null
+          shared_with_username?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -248,39 +287,13 @@ export type Database = {
           },
         ]
       }
-      shared_notes_audit: {
-        Row: {
-          accessed_email: string | null
-          action: string
-          created_at: string | null
-          id: string
-          shared_note_id: string
-          user_id: string
-        }
-        Insert: {
-          accessed_email?: string | null
-          action: string
-          created_at?: string | null
-          id?: string
-          shared_note_id: string
-          user_id: string
-        }
-        Update: {
-          accessed_email?: string | null
-          action?: string
-          created_at?: string | null
-          id?: string
-          shared_note_id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       user_preferences: {
         Row: {
           ai_enabled: boolean | null
           body_font: string | null
           created_at: string
           daily_prompt_time: string | null
+          email: string | null
           id: string
           notification_daily_prompt: boolean | null
           notification_note_shared: boolean | null
@@ -297,6 +310,7 @@ export type Database = {
           body_font?: string | null
           created_at?: string
           daily_prompt_time?: string | null
+          email?: string | null
           id?: string
           notification_daily_prompt?: boolean | null
           notification_note_shared?: boolean | null
@@ -313,6 +327,7 @@ export type Database = {
           body_font?: string | null
           created_at?: string
           daily_prompt_time?: string | null
+          email?: string | null
           id?: string
           notification_daily_prompt?: boolean | null
           notification_note_shared?: boolean | null
@@ -331,33 +346,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_share_with_user_link: {
-        Args: {
-          p_note_id: string
-          p_owner_id: string
-          p_permission: string
-          p_shared_with_email_or_username: string
-        }
-        Returns: string
+      check_identifier_exists: {
+        Args: { p_identifier: string }
+        Returns: boolean
       }
       check_username_available_for_user: {
         Args: { p_user_email: string; p_username: string }
         Returns: boolean
       }
-      cleanup_old_deleted_notes: { Args: never; Returns: number }
       create_email_share: {
         Args: { p_email: string; p_note_id: string; p_permission: string }
-        Returns: string
+        Returns: boolean
       }
-      get_note_sharing_info: {
-        Args: { note_id_param: string }
+      get_user_by_identifier: {
+        Args: { p_identifier: string }
         Returns: {
-          share_count: number
-          user_has_access: boolean
-          user_permission: string
+          email: string
+          has_google_auth: boolean
+          user_id: string
+          username: string
         }[]
       }
-      link_existing_shared_notes: { Args: never; Returns: number }
       permanently_delete_note: {
         Args: { note_id_param: string }
         Returns: boolean

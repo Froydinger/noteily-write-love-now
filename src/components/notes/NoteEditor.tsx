@@ -48,7 +48,7 @@ function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
+  let timeout: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
@@ -104,8 +104,8 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
   const [showFloatingBar, setShowFloatingBar] = useState(false);
 
   // Timers
-  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const titleSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const titleSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
 
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
@@ -206,8 +206,8 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
 
   // Handle content updates with debounce and inactivity tracking
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    let undoTimeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
+    let undoTimeout: ReturnType<typeof setTimeout>;
 
     const handleContentChange = (e?: Event) => {
       const content = getEditorContent(contentRef.current);

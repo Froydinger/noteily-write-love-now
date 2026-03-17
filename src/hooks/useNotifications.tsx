@@ -9,8 +9,9 @@ export interface Notification {
   title: string;
   message: string;
   note_id?: string;
-  from_user_email?: string; // email of the actor who triggered it
-  read: boolean;
+  from_user_email?: string;
+  is_read: boolean;
+  read: boolean; // mapped from is_read for convenience
   created_at: string;
   updated_at: string;
 }
@@ -57,8 +58,10 @@ export const useNotifications = () => {
 
       if (error) throw error;
 
-      // Drop any self-generated notifications
-      const filtered = (data || []).filter(n => !isSelf(n));
+      // Drop any self-generated notifications and map is_read -> read
+      const filtered = (data || [])
+        .map(n => ({ ...n, read: n.is_read }))
+        .filter(n => !isSelf(n));
 
       setNotifications(filtered);
       setUnreadCount(filtered.filter(n => !n.read).length);
@@ -83,7 +86,7 @@ export const useNotifications = () => {
     try {
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true })
+        .update({ is_read: true } as any)
         .eq('id', notificationId);
 
       if (error) throw error;
@@ -103,9 +106,9 @@ export const useNotifications = () => {
     try {
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true })
+        .update({ is_read: true } as any)
         .eq('user_id', user.id)
-        .eq('read', false);
+        .eq('is_read', false);
 
       if (error) throw error;
 

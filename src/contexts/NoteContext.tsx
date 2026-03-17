@@ -281,7 +281,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
 
     // Debounce loadNotes to prevent excessive calls
-    let reloadTimeout: NodeJS.Timeout | null = null;
+    let reloadTimeout: ReturnType<typeof setTimeout> | null = null;
     const throttledReload = () => {
       if (reloadTimeout) return;
       reloadTimeout = setTimeout(() => {
