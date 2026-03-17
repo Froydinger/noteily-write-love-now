@@ -42,8 +42,8 @@ export function BottomNav() {
   }, []);
 
   const isActive = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/' || location.pathname.startsWith('/note/');
+    if (path === '/home') {
+      return location.pathname === '/home' || location.pathname.startsWith('/note/');
     }
     return location.pathname === path;
   };
