@@ -141,6 +141,8 @@ const FakeNoteEditor = () => {
             <img src={arcLogo} alt="Arc" className="w-3.5 h-3.5 rounded-full" />
             <span className="hidden sm:inline">Arc AI</span>
           </div>
+          {/* Bottom fade */}
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-card/80 to-transparent pointer-events-none" />
         </div>
       </div>
 
