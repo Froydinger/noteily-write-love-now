@@ -453,7 +453,7 @@ const Index = () => {
             navigate(`/note/${note.id}`);
           }
         }}
-      />
+      />}
     </div>
   );
 };

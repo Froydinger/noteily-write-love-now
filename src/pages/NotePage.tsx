@@ -363,7 +363,7 @@ const NotePage = () => {
             navigate(`/note/${newNote.id}`);
           }
         }}
-      />
+      />}
     </div>
   );
 };
