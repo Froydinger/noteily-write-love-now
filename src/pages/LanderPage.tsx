@@ -139,8 +139,7 @@ export default function LanderPage() {
           </p>
 
           <div
-            className="flex flex-col items-center justify-center space-y-4 w-full max-w-sm mx-auto animate-fade-in"
-            style={{ animationDelay: '0.2s', animationFillMode: 'both' }}
+            className="flex flex-col items-center justify-center space-y-4 w-full max-w-sm mx-auto"
           >
             <Button
               onClick={() => setShowLoginDialog(true)}

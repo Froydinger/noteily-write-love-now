@@ -50,7 +50,7 @@ const FakeNoteEditor = () => {
   }, [isTyping]);
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
+    <div className="relative w-full max-w-3xl mx-auto">
       <div className="rounded-2xl overflow-hidden border border-border/60 bg-card/80 backdrop-blur-xl relative z-10 shadow-elevated-lg">
         {/* Title bar */}
         <div className="h-10 bg-muted/40 flex items-center px-4 border-b border-border/40">
