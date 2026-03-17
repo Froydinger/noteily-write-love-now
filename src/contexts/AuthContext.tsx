@@ -20,7 +20,9 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CURRENT_PROJECT_REF = 'zupjsghppxyvmgwxvycc';
 const STALE_PROJECT_REF = 'viidccjyjeipulbqqwua';
 const AUTH_KEY_PATTERNS = ['supabase.auth', 'sb-', CURRENT_PROJECT_REF, STALE_PROJECT_REF];
-
+const OAUTH_REDIRECT_PENDING_KEY = 'arcana-oauth-redirect-pending';
+const INITIAL_SESSION_RETRY_COUNT = 6;
+const INITIAL_SESSION_RETRY_DELAY_MS = 400;
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function collectMatchingStorageKeys(storage: Storage, patterns: string[]) {
