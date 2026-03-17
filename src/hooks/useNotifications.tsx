@@ -106,9 +106,9 @@ export const useNotifications = () => {
     try {
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true })
+        .update({ is_read: true } as any)
         .eq('user_id', user.id)
-        .eq('read', false);
+        .eq('is_read', false);
 
       if (error) throw error;
 
