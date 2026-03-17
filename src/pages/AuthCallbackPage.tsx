@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Heart } from 'lucide-react';
 
-const OTP_TYPES = new Set<EmailOtpType>(['signup', 'invite', 'magiclink', 'recovery', 'email_change', 'email']);
+const OTP_TYPES = new Set<EmailOtpType>(['signup', 'invite', 'recovery', 'email_change', 'email']);
 
 function getOtpParams() {
   const url = new URL(window.location.href);
