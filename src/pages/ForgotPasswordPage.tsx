@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
   useEffect(() => {
     // Redirect if already logged in
     if (user) {
-      navigate('/');
+      navigate('/home');
     }
   }, [user, navigate]);
 
