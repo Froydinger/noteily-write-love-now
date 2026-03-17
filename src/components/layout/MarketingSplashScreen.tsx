@@ -45,7 +45,7 @@ export function MarketingSplashScreen() {
               <div className="flex justify-between items-start mb-6 sm:mb-8">
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-serif mb-2 flex items-center justify-start">
-                    Why Choose Noteily<span className="text-xs text-muted-foreground ml-0.5 -mt-1">™</span>?
+                    Why Choose Arcana Notes<span className="text-xs text-muted-foreground ml-0.5 -mt-1">™</span>?
                   </h2>
                   <p className="text-muted-foreground text-sm sm:text-base">The note-taking app designed for passionate writers</p>
                 </div>
@@ -87,7 +87,7 @@ export function MarketingSplashScreen() {
 
               {/* SEO-friendly content for search engines */}
               <div className="sr-only">
-                <h3>Noteily Features for Search Engines</h3>
+                <h3>Arcana Notes Features for Search Engines</h3>
                 <ul>
                   <li>Beautiful Writing Experience: Distraction-free editor with rich formatting and beautiful themes</li>
                   <li>Sync Across Devices: Your notes are always up-to-date on all your devices</li>
@@ -114,7 +114,7 @@ export function MarketingSplashScreen() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "Noteily",
+            "name": "Arcana Notes",
             "description": "A simple notes app focused on creative expression and passionate writing. Beautiful, secure, and designed for writers who love their craft.",
             "applicationCategory": "Productivity",
             "operatingSystem": "Web Browser",
@@ -143,7 +143,7 @@ export function MarketingSplashScreen() {
             <Heart className="h-20 w-20 text-accent animate-heartbeat" />
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-foreground flex items-center justify-center">
-            Noteily<span className="text-xs sm:text-sm md:text-base text-muted-foreground ml-1 -mt-2">™</span>
+            Arcana Notes<span className="text-xs sm:text-sm md:text-base text-muted-foreground ml-1 -mt-2">™</span>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-light">
             Write What You Love

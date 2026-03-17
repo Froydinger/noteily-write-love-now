@@ -111,7 +111,7 @@ const SettingsPage = () => {
     },
     {
       question: "Can I access my notes offline?",
-      answer: "Yes, Noteily works offline. Your notes are stored locally and will sync when you're back online.",
+      answer: "Yes, Arcana Notes works offline. Your notes are stored locally and will sync when you're back online.",
     },
     {
       question: "How do I format text in my notes?",
@@ -143,7 +143,7 @@ const SettingsPage = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `noteily-export-${new Date().toISOString().split("T")[0]}.txt`;
+    link.download = `arcana-notes-export-${new Date().toISOString().split("T")[0]}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -312,12 +312,12 @@ const SettingsPage = () => {
               </div>
             </div>
 
-            {/* Noteily Pro Subscription */}
+            {/* Arcana Notes Pro Subscription */}
             {user && (
               <div className="bg-card rounded-lg p-4 border border-accent/20">
                 <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-accent" />
-                  Noteily Pro
+                  Arcana Notes Pro
                 </h2>
                 {isSubscribed ? (
                   <div className="space-y-3">
@@ -344,7 +344,7 @@ const SettingsPage = () => {
                       />
                     </div>
                     <div className="p-3 rounded-xl bg-accent/10 border border-accent/20">
-                      <p className="text-sm font-medium text-foreground mb-1">Upgrade to Noteily Pro</p>
+                      <p className="text-sm font-medium text-foreground mb-1">Upgrade to Arcana Notes Pro</p>
                       <p className="text-xs text-muted-foreground mb-3">
                         $5/month — Unlimited AI powered by <a href="https://askarc.chat" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">ArcAi™</a>.
                       </p>
@@ -463,10 +463,10 @@ const SettingsPage = () => {
             </div>
 
             <div className="bg-card rounded-lg p-4 border">
-              <h2 className="text-lg font-medium mb-3 font-serif">About Noteily</h2>
+              <h2 className="text-lg font-medium mb-3 font-serif">About Arcana Notes</h2>
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  Noteily - "Write What You Love" is a minimalist notes app focused on creative expression and
+                  Arcana Notes - "Write What You Love" is a minimalist notes app focused on creative expression and
                   passionate writing.
                 </p>
                 <p className="text-xs text-muted-foreground">Version 2.0.5</p>
@@ -476,11 +476,11 @@ const SettingsPage = () => {
             <div className="bg-card rounded-lg p-4 border">
               <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
                 <Heart className="h-5 w-5 text-pink-500" fill="#e91e63" />
-                Support Noteily
+                Support Arcana Notes
               </h2>
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  Enjoying Noteily? Consider supporting development to help keep the app running and add new features.
+                  Enjoying Arcana Notes? Consider supporting development to help keep the app running and add new features.
                 </p>
                 <a
                   href="https://buymeacoffee.com/froydinger"
@@ -552,10 +552,10 @@ const SettingsPage = () => {
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-2 justify-center">
                 <Heart className="h-5 w-5 text-accent" fill="currentColor" />
-                Support Noteily!
+                Support Arcana Notes!
               </AlertDialogTitle>
               <AlertDialogDescription className="text-center">
-                Noteily is made with love by Win The Night. If you enjoy using Noteily, consider supporting our work!
+                Arcana Notes is made with love by Win The Night. If you enjoy using Arcana Notes, consider supporting our work!
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="flex-col sm:flex-col gap-2">

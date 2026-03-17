@@ -60,11 +60,11 @@ export default function LanderPage() {
         <div className="flex items-center justify-between px-4 py-3 md:px-8 max-w-7xl mx-auto">
           <div className="flex items-center gap-2">
             <Heart className="h-6 w-6 text-accent" fill="currentColor" />
-            <span className="font-display text-lg text-foreground tracking-tight">Noteily</span>
+            <span className="font-display text-lg text-foreground tracking-tight">Arcana Notes</span>
           </div>
           <div className="flex items-center gap-4">
             <a href="#features" className="hidden md:block text-sm text-muted-foreground hover:text-foreground transition-colors">Features</a>
-            <a href="#why" className="hidden md:block text-sm text-muted-foreground hover:text-foreground transition-colors">Why Noteily</a>
+            <a href="#why" className="hidden md:block text-sm text-muted-foreground hover:text-foreground transition-colors">Why Arcana Notes</a>
             <button
               onClick={() => setShowLoginDialog(true)}
               className="px-4 py-2 rounded-full text-sm font-semibold bg-accent/15 border-2 border-accent text-accent hover:bg-accent/25 transition-all"
@@ -80,12 +80,12 @@ export default function LanderPage() {
         <div className="flex items-center gap-2.5">
           <Heart className="h-8 w-8 text-accent" fill="currentColor" />
           <span className="font-display text-xl text-foreground tracking-tight">
-            Noteily<span className="text-xs text-muted-foreground ml-0.5 -mt-1 align-super">™</span>
+            Arcana Notes<span className="text-xs text-muted-foreground ml-0.5 -mt-1 align-super">™</span>
           </span>
         </div>
         <div className="hidden md:flex items-center gap-6">
           <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Features</a>
-          <a href="#why" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Why Noteily</a>
+          <a href="#why" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Why Arcana Notes</a>
           <button
             onClick={() => setShowLoginDialog(true)}
             className="px-5 py-2.5 rounded-full text-sm font-semibold bg-accent/15 border-2 border-accent text-accent hover:bg-accent/25 transition-all"
@@ -102,7 +102,7 @@ export default function LanderPage() {
       {showMobileMenu && (
         <div className="md:hidden fixed top-20 right-6 z-50 rounded-2xl p-4 space-y-3 min-w-[200px] bg-card/95 backdrop-blur-xl border border-border/50 shadow-elevated-lg animate-scale-in">
           <a href="#features" onClick={() => setShowMobileMenu(false)} className="block text-muted-foreground hover:text-foreground transition-colors">Features</a>
-          <a href="#why" onClick={() => setShowMobileMenu(false)} className="block text-muted-foreground hover:text-foreground transition-colors">Why Noteily</a>
+          <a href="#why" onClick={() => setShowMobileMenu(false)} className="block text-muted-foreground hover:text-foreground transition-colors">Why Arcana Notes</a>
           <button
             onClick={() => { setShowLoginDialog(true); setShowMobileMenu(false); }}
             className="w-full px-4 py-2 rounded-full text-sm font-semibold bg-accent/15 border-2 border-accent text-accent text-center"
@@ -191,7 +191,7 @@ export default function LanderPage() {
         </div>
       </section>
 
-      {/* Why Noteily */}
+      {/* Why Arcana Notes */}
       <section className="relative z-10 py-20 px-6 max-w-4xl mx-auto text-center" id="why">
         <div className="space-y-6 flex flex-col items-center mb-10">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent/30 to-accent/10 flex items-center justify-center shadow-glow-sm">
@@ -263,7 +263,7 @@ export default function LanderPage() {
                 <span className="font-display text-4xl text-foreground">$5</span>
                 <span className="text-muted-foreground font-sans">/mo</span>
               </div>
-              <p className="text-sm text-accent font-sans font-medium">Noteily Pro</p>
+              <p className="text-sm text-accent font-sans font-medium">Arcana Notes Pro</p>
             </div>
             <div className="space-y-3 text-left mb-8">
               {["Everything in Free", "Unlimited AI powered by ArcAi™", "Priority AI access"].map((feature, i) => (
@@ -306,7 +306,7 @@ export default function LanderPage() {
         <div className="flex items-center justify-center gap-2 mb-4">
           <Heart className="h-5 w-5 text-accent/60" fill="currentColor" />
           <span className="font-display text-foreground/60">
-            Noteily<span className="text-xs text-muted-foreground/40 ml-0.5 align-super">™</span>
+            Arcana Notes<span className="text-xs text-muted-foreground/40 ml-0.5 align-super">™</span>
           </span>
         </div>
         <p className="text-xs text-muted-foreground/50 font-sans">

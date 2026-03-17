@@ -214,7 +214,7 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
       if (resp.status === 429) {
         const data = await resp.json().catch(() => null);
         if (data?.limit_reached) {
-          toast.error('Daily AI limit reached (20/day). Upgrade to Noteily Pro for unlimited!', { duration: 5000 });
+          toast.error('Daily AI limit reached (20/day). Upgrade to Arcana Notes Pro for unlimited!', { duration: 5000 });
         } else {
           toast.error('Rate limit reached. Try again in a moment.');
         }

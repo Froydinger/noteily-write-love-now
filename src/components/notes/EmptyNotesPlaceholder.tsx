@@ -34,7 +34,7 @@ export default function EmptyNotesPlaceholder() {
           icon={Heart}
           title={
             <div className="flex items-center justify-center">
-              Welcome to Noteily<span className="text-xs text-muted-foreground ml-0.5 -mt-1">™</span>
+              Welcome to Arcana Notes<span className="text-xs text-muted-foreground ml-0.5 -mt-1">™</span>
             </div>
           }
           description="Take a sec to jot down your thoughts."

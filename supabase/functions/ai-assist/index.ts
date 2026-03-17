@@ -31,7 +31,7 @@ serve(async (req) => {
         const { data: usageResult } = await serviceClient.rpc("increment_ai_usage", { p_user_id: user.id });
         if (usageResult && !usageResult.allowed) {
           return new Response(JSON.stringify({
-            error: "Daily AI limit reached. Upgrade to Noteily Pro for unlimited access.",
+            error: "Daily AI limit reached. Upgrade to Arcana Notes Pro for unlimited access.",
             limit_reached: true,
             count: usageResult.count,
             limit: usageResult.limit,
@@ -59,7 +59,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are Arc — the AI writing companion inside Noteily. You're built by ArcAi™ (https://askarc.chat). You help writers think clearer, write better, and stay in flow.
+            content: `You are Arc — the AI writing companion inside Arcana Notes. You're built by ArcAi™ (https://askarc.chat). You help writers think clearer, write better, and stay in flow.
 
 Session entropy: ${crypto.randomUUID()}
 

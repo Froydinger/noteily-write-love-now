@@ -70,8 +70,8 @@ export default defineConfig(({ mode }) => ({
       },
       includeAssets: ['favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
-        name: 'Noteily - Write What You Love',
-        short_name: 'Noteily',
+        name: 'Arcana Notes - Write What You Love',
+        short_name: 'Arcana Notes',
         description: 'Write What You Love - A minimalist notes app focused on creative expression and passionate writing',
         theme_color: '#00D9FF',
         background_color: '#0a0a0a',
