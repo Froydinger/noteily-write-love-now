@@ -8,8 +8,6 @@ import { sanitizeContent, sanitizeForDisplay, sanitizeImageUrl, isValidImageUrl 
 import { FloatingFormatBar, FormatType } from './FloatingFormatBar';
 import { usePageLeave } from '@/hooks/usePageLeave';
 import { useTitleFont, useBodyFont } from '@/hooks/useTitleFont';
-import { SpellCheckButton } from './SpellCheckButton';
-import { TextEnhancementMenu } from './TextEnhancementMenu';
 
 // Error boundary for the editor
 class EditorErrorBoundary extends Component<
