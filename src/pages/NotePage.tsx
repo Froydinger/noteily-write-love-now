@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { usePreferences } from "@/contexts/PreferencesContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { useNotes } from "@/contexts/NoteContext";
 import { supabase } from "@/integrations/supabase/client";

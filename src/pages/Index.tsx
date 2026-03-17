@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { usePreferences } from "@/contexts/PreferencesContext";
 import { ArcPanel } from "@/components/notes/ArcPanel";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotes } from "@/contexts/NoteContext";
