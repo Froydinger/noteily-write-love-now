@@ -348,6 +348,15 @@ const NotePage = () => {
           }}
         />
       )}
+
+      {/* Arc AI Panel */}
+      <ArcPanel
+        noteId={note.id}
+        noteContent={note.content}
+        noteTitle={note.title}
+        onContentReplace={(content) => updateNote(note.id, { content })}
+        onTitleReplace={(title) => updateNote(note.id, { title })}
+      />
     </div>
   );
 };
