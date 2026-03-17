@@ -76,7 +76,11 @@ export function useSubscription() {
       body: { returnUrl: window.location.origin + '/settings' },
     });
     if (error) throw error;
-    if (data?.url) window.location.href = data.url;
+    if (data?.url) {
+      // Use window.open for PWA/mobile compatibility; fallback to href
+      const opened = window.open(data.url, '_self');
+      if (!opened) window.location.href = data.url;
+    }
   };
 
   const openPortal = async () => {

@@ -48,6 +48,7 @@ const SettingsPage = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [isDisconnectingGoogle, setIsDisconnectingGoogle] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const isMobile = useIsMobile();
   const { state } = useSidebar();
   const { user, signOut } = useAuth();
@@ -349,12 +350,27 @@ const SettingsPage = () => {
                         $5/month — Unlimited AI powered by <a href="https://askarc.chat" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">ArcAi™</a>.
                       </p>
                       <Button
-                        onClick={createCheckout}
+                        onClick={async () => {
+                          setIsCheckingOut(true);
+                          try {
+                            await createCheckout();
+                          } catch (err) {
+                            toast.error('Could not open checkout. Please try again.');
+                            console.error('Checkout error:', err);
+                          } finally {
+                            setIsCheckingOut(false);
+                          }
+                        }}
+                        disabled={isCheckingOut}
                         size="sm"
                         className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
                       >
-                        <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-                        Upgrade — $5/mo
+                        {isCheckingOut ? (
+                          <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                        )}
+                        {isCheckingOut ? 'Opening checkout…' : 'Upgrade — $5/mo'}
                       </Button>
                     </div>
                   </div>
