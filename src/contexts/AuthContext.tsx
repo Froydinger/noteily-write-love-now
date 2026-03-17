@@ -12,7 +12,8 @@ interface AuthContextType {
   initializing: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
+  signInWithMagicLink: (email: string) => Promise<{ error: any }>;
+  signInWithApple: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<{ error: any }>;
 }
@@ -183,22 +184,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithMagicLink = async (email: string) => {
+    setLoading(true);
     try {
-      const { error } = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: window.location.origin,
-        extraParams: {
-          prompt: 'select_account',
+      const normalizedEmail = normalizeEmail(email);
+      if (!EMAIL_PATTERN.test(normalizedEmail)) {
+        const error = new Error('Please enter a valid email address.');
+        toast({ title: 'Magic link failed', description: error.message, variant: 'destructive' });
+        return { error };
+      }
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email: normalizedEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
       if (error) {
-        toast({ title: 'Google sign in failed', description: error.message, variant: 'destructive' });
+        toast({ title: 'Magic link failed', description: error.message, variant: 'destructive' });
+      } else {
+        toast({ title: 'Check your email', description: 'We sent you a magic link to sign in.' });
       }
 
       return { error };
     } catch (error: any) {
-      toast({ title: 'Google sign in failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
+      toast({ title: 'Magic link failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
+      return { error };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithApple = async () => {
+    try {
+      const { error } = await lovable.auth.signInWithOAuth('apple', {
+        redirect_uri: window.location.origin,
+      });
+
+      if (error) {
+        toast({ title: 'Apple sign in failed', description: error.message, variant: 'destructive' });
+      }
+
+      return { error };
+    } catch (error: any) {
+      toast({ title: 'Apple sign in failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
       return { error };
     }
   };
@@ -234,7 +264,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         initializing,
         signIn,
         signUp,
-        signInWithGoogle,
+        signInWithMagicLink,
+        signInWithApple,
         signOut,
         requestPasswordReset,
       }}
