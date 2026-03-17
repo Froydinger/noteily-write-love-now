@@ -338,7 +338,16 @@ const SettingsPage = () => {
                         {isChangingPassword ? "Updating..." : "Update"}
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground">Password must be at least 6 characters long</p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">Password must be at least 6 characters long</p>
+                      <button
+                        type="button"
+                        onClick={() => navigate('/forgot-password')}
+                        className="text-xs text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
                   </div>
 
                   {isGoogleUser() && (

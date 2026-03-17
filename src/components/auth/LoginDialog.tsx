@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [shake, setShake] = useState(false);
   const { signIn, signUp, signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
 
   const handleChoiceSelection = (mode: 'signin' | 'signup') => {
     setAuthMode(mode);
@@ -245,6 +247,18 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                       ? (authMode === 'signup' ? 'Creating account...' : 'Signing in...') 
                       : (authMode === 'signup' ? 'Create account' : 'Sign in')}
                 </Button>
+                {authMode === 'signin' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleOpenChange(false);
+                      navigate('/forgot-password');
+                    }}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2 w-full text-center"
+                  >
+                    Forgot your password?
+                  </button>
+                )}
               </div>
             </div>
           )}
