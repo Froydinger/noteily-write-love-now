@@ -312,12 +312,12 @@ const SettingsPage = () => {
               </div>
             </div>
 
-            {/* Arc AI Pro Subscription */}
+            {/* Noteily Pro Subscription */}
             {user && (
               <div className="bg-card rounded-lg p-4 border border-accent/20">
                 <h2 className="text-lg font-medium mb-3 font-serif flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-accent" />
-                  Arc AI Pro
+                  Noteily Pro
                 </h2>
                 {isSubscribed ? (
                   <div className="space-y-3">
@@ -326,7 +326,7 @@ const SettingsPage = () => {
                       <span className="text-sm font-medium text-accent">Active — Unlimited AI</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      You have unlimited Arc AI requests. Today's usage: {aiUsageToday} requests.
+                      Unlimited AI requests powered by <a href="https://askarc.chat" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">ArcAi™</a>. Today: {aiUsageToday} requests.
                     </p>
                     <Button variant="outline" size="sm" onClick={openPortal} className="w-full">
                       Manage Subscription
@@ -344,9 +344,9 @@ const SettingsPage = () => {
                       />
                     </div>
                     <div className="p-3 rounded-xl bg-accent/10 border border-accent/20">
-                      <p className="text-sm font-medium text-foreground mb-1">Upgrade to Arc AI Pro</p>
+                      <p className="text-sm font-medium text-foreground mb-1">Upgrade to Noteily Pro</p>
                       <p className="text-xs text-muted-foreground mb-3">
-                        $5/month — Unlimited AI requests, priority access.
+                        $5/month — Unlimited AI powered by <a href="https://askarc.chat" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">ArcAi™</a>.
                       </p>
                       <Button
                         onClick={createCheckout}

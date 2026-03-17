@@ -44,7 +44,7 @@ export default function LanderPage() {
 
   const proHighlights = [
     "Everything in Free",
-    "Unlimited Arc AI requests",
+    "Unlimited AI powered by ArcAi™",
     "Priority AI access",
   ];
 
