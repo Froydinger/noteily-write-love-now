@@ -9,19 +9,6 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    headers: {
-      // Content Security Policy for enhanced security
-      'Content-Security-Policy': [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-inline'",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "img-src 'self' data: https: blob:",
-        "font-src 'self' https://fonts.gstatic.com",
-        "connect-src 'self' https://*.supabase.co https://ai.gateway.lovable.dev https://*.lovable.dev https://*.lovable.app wss://*.supabase.co",
-        "object-src 'none'",
-        "base-uri 'self'"
-      ].join('; ')
-    }
   },
   plugins: [
     react(),
