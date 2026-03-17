@@ -45,7 +45,7 @@ const QUICK_PROMPTS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assist`;
 
-export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentReplace, onTitleReplace, onCreateNote }: ArcPanelProps) {
+export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentReplace, onTitleReplace, onCreateNote, onCreateChecklist }: ArcPanelProps) {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
