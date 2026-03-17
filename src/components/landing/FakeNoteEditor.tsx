@@ -56,8 +56,8 @@ const FakeNoteEditor = () => {
         <div className="h-10 bg-muted/40 flex items-center px-4 border-b border-border/40">
           <div className="flex space-x-1.5">
             <div className="w-3 h-3 rounded-full bg-destructive/50" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
-            <div className="w-3 h-3 rounded-full bg-green-500/50" />
+            <div className="w-3 h-3 rounded-full bg-accent/40" />
+            <div className="w-3 h-3 rounded-full bg-accent/25" />
           </div>
           <div className="flex-1 text-center text-xs text-muted-foreground font-medium">
             Noteily™
