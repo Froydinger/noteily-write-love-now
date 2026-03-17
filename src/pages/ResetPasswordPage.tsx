@@ -38,19 +38,12 @@ const ResetPasswordPage = () => {
     const initializeRecovery = async () => {
       try {
         const { tokenHash, type } = recoveryParams;
-        const hashTokens = getAuthHashSessionTokens();
 
         if (tokenHash && type && OTP_TYPES.has(type as EmailOtpType)) {
           const { error } = await supabase.auth.verifyOtp({
             token_hash: tokenHash,
             type: type as EmailOtpType,
           });
-
-          if (error) {
-            throw error;
-          }
-        } else if (hashTokens) {
-          const { error } = await supabase.auth.setSession(hashTokens);
 
           if (error) {
             throw error;
