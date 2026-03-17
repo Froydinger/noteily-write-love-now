@@ -66,7 +66,7 @@ export default defineConfig(({ mode }) => ({
       },
       // Force immediate reload when update is available
       devOptions: {
-        enabled: true
+        enabled: false
       },
       includeAssets: ['favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
