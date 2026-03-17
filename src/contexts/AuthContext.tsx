@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { clearAllAuthCache } from '@/lib/authStorage';
+import { clearAllAuthCache, clearStaleAuthCache } from '@/lib/authStorage';
 
 interface AuthContextType {
   user: User | null;
