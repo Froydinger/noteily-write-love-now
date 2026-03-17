@@ -1,9 +1,8 @@
 
-import { useState, useEffect } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppLayout } from "./components/layout/AppLayout";
 
@@ -28,25 +27,10 @@ import { LoadingSpinner } from "./components/ui/loading-spinner";
 
 const queryClient = new QueryClient();
 
-const App = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter>
-          <AuthProvider>
-            <Sonner />
-            <AppContent />
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-};
-
-const AppContent = () => {
+// Wrapper that redirects unauthenticated users to lander
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, initializing } = useAuth();
 
-  // Show loading spinner during authentication initialization
   if (initializing) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -55,64 +39,66 @@ const AppContent = () => {
     );
   }
 
-  return (
-    <>
-      <Routes>
-        {/* Public routes - accessible to everyone */}
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
-        <Route path="/terms" element={<TermsPage />} />
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
 
-        {/* Protected routes - require authentication */}
-        {user ? (
-          <>
-            <Route
-              path="/"
-              element={
-                <PreferencesProvider>
-                  <NotificationToastListener />
-                  <AppLayout><Index /></AppLayout>
-                </PreferencesProvider>
-              }
-            />
-            <Route
-              path="/note/:id"
-              element={
-                <PreferencesProvider>
-                  <AppLayout><NotePage /></AppLayout>
-                </PreferencesProvider>
-              }
-            />
-            <Route
-              path="/prompts"
-              element={
-                <PreferencesProvider>
-                  <AppLayout><PromptsPage /></AppLayout>
-                </PreferencesProvider>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <PreferencesProvider>
-                  <AppLayout><SettingsPage /></AppLayout>
-                </PreferencesProvider>
-              }
-            />
-            <Route path="*" element={<PreferencesProvider><NotFound /></PreferencesProvider>} />
-          </>
-        ) : (
-          <>
-            {/* Unauthenticated users see landing page on root */}
-            <Route path="/" element={<LanderPage />} />
-            <Route path="*" element={<NotFound />} />
-          </>
-        )}
-      </Routes>
-      <PWAInstall />
-      <PWAUpdateNotification />
-    </>
+  return (
+    <PreferencesProvider>
+      <NotificationToastListener />
+      <AppLayout>{children}</AppLayout>
+    </PreferencesProvider>
+  );
+}
+
+// Root route: show lander if logged out, redirect to /home if logged in
+function RootRoute() {
+  const { user, initializing } = useAuth();
+
+  if (initializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoadingSpinner size="lg" text="Loading..." />
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to="/home" replace />;
+  }
+
+  return <LanderPage />;
+}
+
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <Sonner />
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<RootRoute />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+
+              {/* Protected routes - always mounted, redirect inside */}
+              <Route path="/home" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/note/:id" element={<ProtectedRoute><NotePage /></ProtectedRoute>} />
+              <Route path="/prompts" element={<ProtectedRoute><PromptsPage /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <PWAInstall />
+            <PWAUpdateNotification />
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 

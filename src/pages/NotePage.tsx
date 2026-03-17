@@ -119,7 +119,7 @@ const NotePage = () => {
           description: "This note has been permanently deleted.",
         });
       }
-      navigate("/");
+      navigate("/home");
     }
   };
 
@@ -206,7 +206,7 @@ const NotePage = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/home")}
               className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
               title="Back to notes"
             >

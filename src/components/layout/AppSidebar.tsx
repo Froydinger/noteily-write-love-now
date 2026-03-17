@@ -211,14 +211,14 @@ export function AppSidebar() {
               <div className="flex justify-center mb-5">
                 <div className="flex gap-1 w-full p-1 bg-secondary/30 rounded-xl">
                   <Button
-                    variant={isActive("/") ? "default" : "ghost"}
+                    variant={isActive("/home") ? "default" : "ghost"}
                     size="sm"
                     asChild
                     className={`flex-1 h-9 rounded-lg font-medium text-sm transition-all duration-250
-                      ${isActive("/") ? "bg-card shadow-md text-foreground" : "text-muted-foreground/70 hover:text-foreground hover:bg-card/30"}
+                      ${isActive("/home") ? "bg-card shadow-md text-foreground" : "text-muted-foreground/70 hover:text-foreground hover:bg-card/30"}
                     `}
                   >
-                    <a href="/" className="flex items-center justify-center gap-2">
+                    <a href="/home" className="flex items-center justify-center gap-2">
                       <BookOpen className="h-4 w-4" />
                       <span>All</span>
                     </a>

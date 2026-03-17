@@ -42,8 +42,8 @@ export function BottomNav() {
   }, []);
 
   const isActive = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/' || location.pathname.startsWith('/note/');
+    if (path === '/home') {
+      return location.pathname === '/home' || location.pathname.startsWith('/note/');
     }
     return location.pathname === path;
   };
@@ -64,7 +64,7 @@ export function BottomNav() {
 
   // Dynamic nav items based on AI button visibility
   const leftNavItems = [
-    { path: '/', icon: NotebookTabs, label: 'Notes' },
+    { path: '/home', icon: NotebookTabs, label: 'Notes' },
   ];
 
   const rightNavItems = [
