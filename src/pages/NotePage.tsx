@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useNotes } from "@/contexts/NoteContext";
+import { supabase } from "@/integrations/supabase/client";
 import NoteEditor from "@/components/notes/NoteEditor";
 import ChecklistEditor from "@/components/notes/ChecklistEditor";
 import { Button } from "@/components/ui/button";
