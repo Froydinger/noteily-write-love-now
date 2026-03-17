@@ -213,8 +213,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         initializing,
         signIn,
         signUp,
-        signInWithMagicLink,
-        signInWithApple,
         signOut,
         requestPasswordReset,
       }}
