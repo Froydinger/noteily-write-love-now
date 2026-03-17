@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, CSSProperties } from 'react';
 import { X, ArrowRight, Plus, Trash2, MessageSquare, ChevronLeft } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { toast } from '@/components/ui/sonner';
@@ -58,7 +58,7 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
   const [showHistory, setShowHistory] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvoId, setActiveConvoId] = useState<string | null>(null);
-  const [vpStyle, setVpStyle] = useState<React.CSSProperties>({});
+  const [vpStyle, setVpStyle] = useState<CSSProperties>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 

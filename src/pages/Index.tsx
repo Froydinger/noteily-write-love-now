@@ -361,7 +361,7 @@ const Index = () => {
       )}
 
       {/* Masonry grid layout */}
-      <div className="flex flex-col gap-4 pb-24">
+      <div className="flex flex-col gap-4 pb-24 pt-1">
         {filteredAndSortedNotes.map((note, index) => (
           <div
             key={note.id}
