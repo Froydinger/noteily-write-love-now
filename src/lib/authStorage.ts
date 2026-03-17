@@ -1,4 +1,5 @@
 const CURRENT_PROJECT_REF = 'zupjsghppxyvmgwxvycc';
+const STALE_PROJECT_REFS = ['viidccjyjeipulbqqwua'];
 const AUTH_KEY_PATTERNS = ['supabase.auth', 'sb-', CURRENT_PROJECT_REF];
 
 function collectMatchingStorageKeys(storage: Storage, patterns: string[]) {
@@ -20,8 +21,15 @@ function clearStorageKeys(storage: Storage, patterns: string[]) {
   return keysToRemove.length;
 }
 
+/**
+ * Remove auth keys left behind by the old Supabase project so they
+ * can never conflict with the current project's JWT verification.
+ * Safe to call on every app boot — it only touches stale keys.
+ */
 export function clearStaleAuthCache() {
-  // No stale project refs to clear anymore
+  const stalePatterns = STALE_PROJECT_REFS.map((ref) => `sb-${ref}`);
+  clearStorageKeys(localStorage, stalePatterns);
+  clearStorageKeys(sessionStorage, stalePatterns);
 }
 
 export function clearAllAuthCache() {
