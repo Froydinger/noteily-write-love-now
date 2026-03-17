@@ -28,7 +28,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { handleNoteKeyboard } from "@/lib/viewport";
 import { useUndoRedo } from "@/hooks/useUndoRedo";
-import { useAiButton } from "@/contexts/AiButtonContext";
+
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
