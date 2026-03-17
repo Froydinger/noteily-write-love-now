@@ -326,8 +326,38 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
       .trim();
   };
 
+  const isChecklistResponse = (text: string): boolean => {
+    const lines = text.split('\n').filter(l => l.trim());
+    const checklistLines = lines.filter(l => /^-\s*\[([ x])\]\s+/.test(l.trim()));
+    return checklistLines.length >= 2;
+  };
+
+  const parseChecklist = (text: string): { title: string; items: { content: string; completed: boolean }[] } => {
+    const lines = text.split('\n').filter(l => l.trim());
+    let title = '';
+    const items: { content: string; completed: boolean }[] = [];
+    for (const line of lines) {
+      const match = line.trim().match(/^-\s*\[([ x])\]\s+(.+)/);
+      if (match) {
+        items.push({ content: match[2].trim(), completed: match[1] === 'x' });
+      } else if (!title && items.length === 0) {
+        title = line.replace(/^#+\s*/, '').replace(/\*+/g, '').trim();
+      }
+    }
+    return { title: title || 'Checklist', items };
+  };
+
   const applyToNote = (content: string) => {
     const noteOnly = extractNoteContent(content);
+
+    // Check if this is a checklist response
+    if (isChecklistResponse(noteOnly) && onCreateChecklist) {
+      const { title, items } = parseChecklist(noteOnly);
+      onCreateChecklist(title, items);
+      toast.success('Checklist created from Arc');
+      return;
+    }
+
     const html = formatToHtml(noteOnly);
     if (onContentReplace) {
       onContentReplace(html);
@@ -338,6 +368,13 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
       onCreateNote(html, title);
       toast.success('Note created from Arc');
     }
+  };
+
+  const getApplyLabel = (content: string): string => {
+    if (onContentReplace) return 'Apply to Note';
+    const noteOnly = extractNoteContent(content);
+    if (isChecklistResponse(noteOnly) && onCreateChecklist) return 'Create Checklist';
+    return 'Create Note';
   };
 
   const mdComponents = {
