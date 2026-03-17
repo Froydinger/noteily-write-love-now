@@ -115,7 +115,7 @@ export default function LanderPage() {
       {/* Hero */}
       <main className="relative z-10 pt-4 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="mb-8 flex justify-center animate-fade-in" style={{ animationFillMode: 'both' }}>
+          <div className="mb-8 flex justify-center">
             <div className="relative">
               <Heart
                 className="w-24 h-24 md:w-32 md:h-32 text-accent drop-shadow-lg"
