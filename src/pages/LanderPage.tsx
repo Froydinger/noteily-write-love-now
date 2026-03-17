@@ -148,7 +148,7 @@ export default function LanderPage() {
               <Heart className="h-5 w-5" fill="currentColor" />
               Start Writing — It's Free
             </Button>
-            <span className="text-xs text-muted-foreground/60">Free forever · No credit card required</span>
+            <span className="text-xs text-muted-foreground/60">Free to use · Unlimited AI for $5/mo</span>
           </div>
         </div>
 
