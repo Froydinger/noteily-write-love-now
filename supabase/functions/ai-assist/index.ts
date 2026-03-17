@@ -31,7 +31,7 @@ serve(async (req) => {
         const { data: usageResult } = await serviceClient.rpc("increment_ai_usage", { p_user_id: user.id });
         if (usageResult && !usageResult.allowed) {
           return new Response(JSON.stringify({
-            error: "Daily AI limit reached. Upgrade to Arc AI Pro for unlimited access.",
+            error: "Daily AI limit reached. Upgrade to Noteily Pro for unlimited access.",
             limit_reached: true,
             count: usageResult.count,
             limit: usageResult.limit,
