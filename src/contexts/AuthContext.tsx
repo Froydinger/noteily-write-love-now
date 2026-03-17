@@ -21,8 +21,8 @@ const CURRENT_PROJECT_REF = 'zupjsghppxyvmgwxvycc';
 const STALE_PROJECT_REF = 'viidccjyjeipulbqqwua';
 const AUTH_KEY_PATTERNS = ['supabase.auth', 'sb-', CURRENT_PROJECT_REF, STALE_PROJECT_REF];
 const OAUTH_REDIRECT_PENDING_KEY = 'arcana-oauth-redirect-pending';
-const INITIAL_SESSION_RETRY_COUNT = 6;
-const INITIAL_SESSION_RETRY_DELAY_MS = 400;
+const INITIAL_SESSION_MAX_WAIT_MS = 10000;
+const INITIAL_SESSION_RETRY_DELAY_MS = 500;
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -79,10 +79,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     clearStaleAuthCache();
 
-    const syncAuthState = (nextSession: Session | null) => {
+    const syncAuthState = (nextSession: Session | null, fallbackUser: User | null = null) => {
       if (!isMounted) return;
       setSession(nextSession);
-      setUser(nextSession?.user ?? null);
+      setUser(nextSession?.user ?? fallbackUser ?? null);
     };
 
     const finishInitialization = () => {
@@ -92,11 +92,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const hydrateInitialSession = async () => {
       const pendingOAuth = isOAuthRedirectPending();
-      const maxAttempts = pendingOAuth ? INITIAL_SESSION_RETRY_COUNT : 0;
+      const startedAt = Date.now();
 
-      for (let attempt = 0; attempt <= maxAttempts; attempt += 1) {
-        const { data: { session: nextSession } } = await supabase.auth.getSession();
-        console.info('[Auth] getSession attempt:', attempt + 1, nextSession?.user?.email ?? 'no session');
+      while (true) {
+        const { data: { session: nextSession }, error } = await supabase.auth.getSession();
+        const elapsedMs = Date.now() - startedAt;
+
+        console.info('[Auth] getSession check:', {
+          pendingOAuth,
+          hasSession: !!nextSession,
+          hasUser: !!nextSession?.user,
+          elapsedMs,
+          error: error?.message ?? null,
+        });
 
         if (!isMounted) return;
 
@@ -113,9 +121,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
 
-        if (attempt < maxAttempts) {
-          await delay(INITIAL_SESSION_RETRY_DELAY_MS);
+        if (elapsedMs >= INITIAL_SESSION_MAX_WAIT_MS) {
+          break;
         }
+
+        await delay(INITIAL_SESSION_RETRY_DELAY_MS);
+      }
+
+      const { data: { user: fallbackUser }, error: fallbackError } = await supabase.auth.getUser();
+      console.info('[Auth] getUser fallback:', fallbackUser?.email ?? 'no user', fallbackError?.message ?? 'ok');
+
+      if (!isMounted) return;
+
+      if (fallbackUser) {
+        clearOAuthRedirectPending();
+        syncAuthState(null, fallbackUser);
+        finishInitialization();
+        return;
       }
 
       clearOAuthRedirectPending();
