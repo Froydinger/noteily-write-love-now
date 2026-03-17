@@ -33,13 +33,19 @@ export default function LanderPage() {
     },
   ];
 
-  const highlights = [
+  const freeHighlights = [
     "Unlimited notes & checklists",
-    "Arc AI writing assistant",
     "Rich text editor with formatting",
     "Cloud sync across all devices",
     "Private & secure by default",
     "Works offline as a PWA",
+    "20 AI requests per day",
+  ];
+
+  const proHighlights = [
+    "Everything in Free",
+    "Unlimited Arc AI requests",
+    "Priority AI access",
   ];
 
   return (
