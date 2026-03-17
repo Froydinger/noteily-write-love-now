@@ -9,8 +9,9 @@ export interface Notification {
   title: string;
   message: string;
   note_id?: string;
-  from_user_email?: string; // email of the actor who triggered it
-  read: boolean;
+  from_user_email?: string;
+  is_read: boolean;
+  read: boolean; // mapped from is_read for convenience
   created_at: string;
   updated_at: string;
 }
