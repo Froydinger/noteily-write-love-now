@@ -3,6 +3,7 @@ import { ArcPanel } from "@/components/notes/ArcPanel";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotes } from "@/contexts/NoteContext";
 import { Note } from "@/contexts/NoteContext";
+import { supabase } from "@/integrations/supabase/client";
 import NoteCard from "@/components/notes/NoteCard";
 import EmptyNotesPlaceholder from "@/components/notes/EmptyNotesPlaceholder";
 import { Button } from "@/components/ui/button";
@@ -425,13 +426,32 @@ const Index = () => {
         scrollableContent
       )}
       {/* Arc AI Panel - available on index for general writing help */}
-      <ArcPanel onCreateNote={async (content, title) => {
-        const note = await addNote("note");
-        if (note) {
-          await updateNote(note.id, { content, title });
-          navigate(`/note/${note.id}`);
-        }
-      }} />
+      <ArcPanel
+        onCreateNote={async (content, title) => {
+          const note = await addNote("note");
+          if (note) {
+            await updateNote(note.id, { content, title });
+            navigate(`/note/${note.id}`);
+          }
+        }}
+        onCreateChecklist={async (title, items) => {
+          const note = await addNote("checklist");
+          if (note) {
+            await updateNote(note.id, { title });
+            // Insert checklist items
+            const rows = items.map((item, i) => ({
+              note_id: note.id,
+              content: item.content,
+              completed: item.completed,
+              position: i,
+            }));
+            if (rows.length > 0) {
+              await supabase.from('checklist_items').insert(rows);
+            }
+            navigate(`/note/${note.id}`);
+          }
+        }}
+      />
     </div>
   );
 };

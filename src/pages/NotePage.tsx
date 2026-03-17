@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useNotes } from "@/contexts/NoteContext";
+import { supabase } from "@/integrations/supabase/client";
 import NoteEditor from "@/components/notes/NoteEditor";
 import ChecklistEditor from "@/components/notes/ChecklistEditor";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,7 @@ import { useAiButton } from "@/contexts/AiButtonContext";
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
-  const { getNote, setCurrentNote, deleteNote, loading, updateNote } = useNotes();
+  const { getNote, setCurrentNote, deleteNote, loading, updateNote, addNote } = useNotes();
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -356,6 +357,22 @@ const NotePage = () => {
         noteTitle={note.title}
         onContentReplace={(content) => updateNote(note.id, { content })}
         onTitleReplace={(title) => updateNote(note.id, { title })}
+        onCreateChecklist={async (title, items) => {
+          const newNote = await addNote("checklist");
+          if (newNote) {
+            await updateNote(newNote.id, { title });
+            const rows = items.map((item, i) => ({
+              note_id: newNote.id,
+              content: item.content,
+              completed: item.completed,
+              position: i,
+            }));
+            if (rows.length > 0) {
+              await supabase.from('checklist_items').insert(rows);
+            }
+            navigate(`/note/${newNote.id}`);
+          }
+        }}
       />
     </div>
   );
