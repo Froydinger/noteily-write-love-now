@@ -9,7 +9,7 @@ const ORIGINAL_LINES = [
 ];
 
 const AI_REWRITE =
-  "I didn't start writing for anyone else.\n\nThe thoughts were too loud to keep inside, so I poured them onto a page — messy, unfiltered, mine.\n\nNo strategy. No audience in mind. Just a quiet place to think out loud.\n\nBut something strange happened.\n\nThe more I wrote for myself, the more it resonated with others.\n\nTurns out, the most universal things we can write are the most personal ↓";
+  "I didn't start writing for anyone else.\n\nThe thoughts were too loud to keep inside, so I poured them onto a page — messy, unfiltered, mine.\n\nNo strategy. No audience in mind. Just a quiet place to think out loud.";
 
 const FakeNoteEditor = () => {
   const [showAI, setShowAI] = useState(false);
@@ -66,7 +66,7 @@ const FakeNoteEditor = () => {
         </div>
 
         {/* Editor */}
-        <div className="relative p-5 md:p-10 h-[440px] md:h-[500px] overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none' }}>
+        <div className="relative p-5 md:p-10 h-[380px] md:h-[420px] overflow-hidden" style={{ scrollbarWidth: 'none' }}>
           <div className="font-display text-2xl md:text-3xl text-foreground mb-4 leading-tight">
             The Noise Became Music
           </div>
@@ -119,14 +119,7 @@ const FakeNoteEditor = () => {
               )}
             </div>
             <div className="text-sm md:text-base text-foreground/85 leading-relaxed font-sans whitespace-pre-wrap">
-              {aiText.split('\n').map((line, i) => (
-                <span key={i}>
-                  {line === "Turns out, the most universal things we can write are the most personal ↓"
-                    ? <strong className="text-foreground">{line}</strong>
-                    : line}
-                  {i < aiText.split('\n').length - 1 && <br />}
-                </span>
-              ))}
+              {aiText}
               {isTyping && (
                 <span className="inline-block w-0.5 h-4 bg-accent ml-0.5 align-middle animate-pulse" />
               )}
@@ -148,6 +141,8 @@ const FakeNoteEditor = () => {
             <img src={arcLogo} alt="Arc" className="w-3.5 h-3.5 rounded-full" />
             <span className="hidden sm:inline">Arc AI</span>
           </div>
+          {/* Bottom fade */}
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-card/80 to-transparent pointer-events-none" />
         </div>
       </div>
 

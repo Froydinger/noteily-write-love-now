@@ -189,7 +189,16 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
         body: JSON.stringify({ messages: apiMessages, stream: true }),
       });
 
-      if (resp.status === 429) { toast.error('Rate limit reached. Try again in a moment.'); setIsLoading(false); return; }
+      if (resp.status === 429) {
+        const data = await resp.json().catch(() => null);
+        if (data?.limit_reached) {
+          toast.error('Daily AI limit reached (20/day). Upgrade to Arc AI Pro for unlimited!', { duration: 5000 });
+        } else {
+          toast.error('Rate limit reached. Try again in a moment.');
+        }
+        setIsLoading(false);
+        return;
+      }
       if (resp.status === 402) { toast.error('AI credits exhausted.'); setIsLoading(false); return; }
 
       if (!resp.ok) {

@@ -33,13 +33,19 @@ export default function LanderPage() {
     },
   ];
 
-  const highlights = [
+  const freeHighlights = [
     "Unlimited notes & checklists",
-    "Arc AI writing assistant",
     "Rich text editor with formatting",
     "Cloud sync across all devices",
     "Private & secure by default",
     "Works offline as a PWA",
+    "20 AI requests per day",
+  ];
+
+  const proHighlights = [
+    "Everything in Free",
+    "Unlimited Arc AI requests",
+    "Priority AI access",
   ];
 
   return (
@@ -219,39 +225,63 @@ export default function LanderPage() {
       <section className="relative z-10 py-24 px-6 max-w-4xl mx-auto text-center">
         <div className="space-y-6 flex flex-col items-center mb-10">
           <h2 className="font-display text-3xl md:text-5xl text-foreground leading-tight">
-            All of this,<br />
-            <span className="text-accent">completely free.</span>
+            Simple pricing,<br />
+            <span className="text-accent">powerful writing.</span>
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed max-w-lg font-sans">
-            No paywalls. No premium tiers. Everything you need to write, right out of the box.
+            Start for free. Upgrade when you need unlimited AI.
           </p>
         </div>
 
-        <div className="max-w-sm mx-auto">
-          <div className="rounded-3xl p-8 bg-card/60 backdrop-blur-sm border border-accent/20 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent to-accent/50" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          {/* Free Plan */}
+          <div className="rounded-3xl p-8 bg-card/60 backdrop-blur-sm border border-border/50 relative overflow-hidden">
             <div className="mb-6">
               <div className="flex items-baseline justify-center gap-1 mb-2">
-                <span className="font-display text-5xl text-foreground">Free</span>
+                <span className="font-display text-4xl text-foreground">Free</span>
               </div>
-              <p className="text-sm text-muted-foreground font-sans">Full access to everything</p>
+              <p className="text-sm text-muted-foreground font-sans">No credit card required</p>
             </div>
-
             <div className="space-y-3 text-left mb-8">
-              {highlights.map((feature, i) => (
+              {freeHighlights.map((feature, i) => (
                 <div key={i} className="flex items-center gap-3 text-sm text-foreground/80 font-sans">
                   <Check className="w-4 h-4 text-accent shrink-0" />
                   <span>{feature}</span>
                 </div>
               ))}
             </div>
+            <Button
+              onClick={() => setShowLoginDialog(true)}
+              className="w-full h-12 rounded-full bg-muted border border-border text-foreground hover:bg-muted/80 font-sans text-base gap-2 transition-all"
+            >
+              Get Started Free
+            </Button>
+          </div>
 
+          {/* Pro Plan */}
+          <div className="rounded-3xl p-8 bg-card/60 backdrop-blur-sm border-2 border-accent/40 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent to-accent/50" />
+            <div className="mb-6">
+              <div className="flex items-baseline justify-center gap-1 mb-2">
+                <span className="font-display text-4xl text-foreground">$5</span>
+                <span className="text-muted-foreground font-sans">/mo</span>
+              </div>
+              <p className="text-sm text-accent font-sans font-medium">Arc AI Pro</p>
+            </div>
+            <div className="space-y-3 text-left mb-8">
+              {proHighlights.map((feature, i) => (
+                <div key={i} className="flex items-center gap-3 text-sm text-foreground/80 font-sans">
+                  <Check className="w-4 h-4 text-accent shrink-0" />
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
             <Button
               onClick={() => setShowLoginDialog(true)}
               className="w-full h-12 rounded-full bg-accent/15 border-2 border-accent text-accent hover:bg-accent/25 font-sans text-base gap-2 transition-all hover:scale-105 shadow-glow-sm"
             >
               <Heart className="h-4 w-4" fill="currentColor" />
-              Get Started Free
+              Start Writing with Pro
             </Button>
           </div>
         </div>
