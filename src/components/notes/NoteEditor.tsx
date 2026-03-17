@@ -104,8 +104,8 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
   const [showFloatingBar, setShowFloatingBar] = useState(false);
 
   // Timers
-  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const titleSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const titleSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
 
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
