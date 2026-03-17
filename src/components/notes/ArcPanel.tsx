@@ -365,7 +365,7 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed left-5 bottom-5 z-50 group"
+          className="fixed right-5 bottom-5 z-50 group"
           aria-label="Chat with Arc"
         >
           <div
