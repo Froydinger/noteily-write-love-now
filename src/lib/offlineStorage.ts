@@ -5,6 +5,15 @@ export class OfflineStorage {
     return `arcana_notes_${userId}`;
   }
 
+  // One-time cleanup of old keys from before the app rename
+  clearLegacyKeys(): void {
+    try {
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('noteily_notes') || k.startsWith('noteily-'))
+        .forEach(k => localStorage.removeItem(k));
+    } catch {}
+  }
+
   async saveNotes(notes: Note[], userId: string): Promise<void> {
     try {
       const notesData = JSON.stringify(notes);

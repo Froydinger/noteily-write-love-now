@@ -3,6 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { useToast } from '@/hooks/use-toast';
+import { offlineStorage } from '@/lib/offlineStorage';
 
 interface AuthContextType {
   user: User | null;
@@ -26,6 +27,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
+    // Clear old localStorage keys from before the Noteily → Arcana Notes rename
+    offlineStorage.clearLegacyKeys();
+
     // Check for existing session immediately
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
