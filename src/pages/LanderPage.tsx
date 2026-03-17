@@ -44,7 +44,7 @@ export default function LanderPage() {
 
   const proHighlights = [
     "Everything in Free",
-    "Unlimited Arc AI requests",
+    "Unlimited AI powered by ArcAi™",
     "Priority AI access",
   ];
 
@@ -263,10 +263,10 @@ export default function LanderPage() {
                 <span className="font-display text-4xl text-foreground">$5</span>
                 <span className="text-muted-foreground font-sans">/mo</span>
               </div>
-              <p className="text-sm text-accent font-sans font-medium">Arc AI Pro</p>
+              <p className="text-sm text-accent font-sans font-medium">Noteily Pro</p>
             </div>
             <div className="space-y-3 text-left mb-8">
-              {proHighlights.map((feature, i) => (
+              {["Everything in Free", "Unlimited AI powered by ArcAi™", "Priority AI access"].map((feature, i) => (
                 <div key={i} className="flex items-center gap-3 text-sm text-foreground/80 font-sans">
                   <Check className="w-4 h-4 text-accent shrink-0" />
                   <span>{feature}</span>
