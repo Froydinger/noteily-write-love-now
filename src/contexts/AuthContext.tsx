@@ -97,8 +97,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const hydrateInitialSession = async () => {
-      const pendingOAuth = isOAuthRedirectPending();
+      const pendingOAuth = isOAuthRedirectPending() || hasAuthCallbackParams();
       const startedAt = Date.now();
+
+      if (pendingOAuth) {
+        const authCode = getAuthCallbackCode();
+        const hashTokens = getAuthHashSessionTokens();
+
+        if (authCode) {
+          const { data, error } = await supabase.auth.exchangeCodeForSession(authCode);
+
+          console.info('[Auth] exchangeCodeForSession:', {
+            hasSession: !!data.session,
+            hasUser: !!data.session?.user,
+            error: error?.message ?? null,
+          });
+
+          if (!isMounted) return;
+
+          if (data.session?.user) {
+            clearAuthCallbackParams();
+            clearOAuthRedirectPending();
+            syncAuthState(data.session);
+            finishInitialization();
+            return;
+          }
+        }
+
+        if (hashTokens) {
+          const { data, error } = await supabase.auth.setSession(hashTokens);
+
+          console.info('[Auth] setSession from hash:', {
+            hasSession: !!data.session,
+            hasUser: !!data.session?.user,
+            error: error?.message ?? null,
+          });
+
+          if (!isMounted) return;
+
+          if (data.session?.user) {
+            clearAuthCallbackParams();
+            clearOAuthRedirectPending();
+            syncAuthState(data.session);
+            finishInitialization();
+            return;
+          }
+        }
+      }
 
       while (true) {
         const { data: { session: nextSession }, error } = await supabase.auth.getSession();
@@ -115,6 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!isMounted) return;
 
         if (nextSession?.user) {
+          clearAuthCallbackParams();
           clearOAuthRedirectPending();
           syncAuthState(nextSession);
           finishInitialization();
@@ -140,6 +186,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!isMounted) return;
 
       if (fallbackUser) {
+        clearAuthCallbackParams();
         clearOAuthRedirectPending();
         syncAuthState(null, fallbackUser);
         finishInitialization();
