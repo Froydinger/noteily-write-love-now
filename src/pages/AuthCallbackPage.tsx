@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Heart } from 'lucide-react';
 
-const OTP_TYPES = new Set<EmailOtpType>(['signup', 'invite', 'magiclink', 'recovery', 'email_change', 'email']);
+const OTP_TYPES = new Set<EmailOtpType>(['signup', 'invite', 'recovery', 'email_change', 'email']);
 
 function getOtpParams() {
   const url = new URL(window.location.href);
@@ -18,9 +18,8 @@ function getOtpParams() {
 }
 
 /**
- * This page handles EMAIL-ONLY auth flows: email confirmation, magic links,
- * password recovery, invite links. Google OAuth is handled by the managed
- * Lovable auth bridge on the root route (/) and should never land here.
+ * This page handles email auth flows: email confirmation,
+ * password recovery, invite links.
  */
 export default function AuthCallbackPage() {
   const navigate = useNavigate();

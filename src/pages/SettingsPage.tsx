@@ -47,7 +47,7 @@ const SettingsPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
-  const [isDisconnectingGoogle, setIsDisconnectingGoogle] = useState(false);
+  
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const isMobile = useIsMobile();
   const { state } = useSidebar();
@@ -177,37 +177,6 @@ const SettingsPage = () => {
     }
   };
 
-  const isGoogleUser = () => {
-    return (
-      user?.app_metadata?.providers?.includes("google") ||
-      user?.identities?.some((identity) => identity.provider === "google")
-    );
-  };
-
-  const hasPassword = () => {
-    return user?.app_metadata?.provider !== "google" || newPassword.trim().length >= 6;
-  };
-
-  const handleDisconnectGoogle = async () => {
-    if (!user || !isGoogleUser()) return;
-    if (newPassword.trim().length < 6) {
-      toast.error("Please set a password first");
-      return;
-    }
-
-    setIsDisconnectingGoogle(true);
-    try {
-      const { error: passwordError } = await supabase.auth.updateUser({ password: newPassword });
-      if (passwordError) throw passwordError;
-      setNewPassword("");
-      toast.success("Password set successfully");
-    } catch (error: any) {
-      console.error("Error setting password:", error);
-      toast.error("Error setting password", { description: error.message });
-    } finally {
-      setIsDisconnectingGoogle(false);
-    }
-  };
 
   const handleDeleteAccount = async () => {
     if (!user) return;
@@ -426,25 +395,6 @@ const SettingsPage = () => {
                     </div>
                   </div>
 
-                  {isGoogleUser() && (
-                    <div className="space-y-3 border-t pt-3">
-                      <div className="text-sm">
-                        <p className="font-medium text-muted-foreground mb-1">Google Account Connected</p>
-                        <p className="text-xs text-muted-foreground">
-                          Set a password to enable email/password login as backup
-                        </p>
-                      </div>
-                      <Button
-                        onClick={handleDisconnectGoogle}
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        disabled={isDisconnectingGoogle || newPassword.trim().length < 6}
-                      >
-                        {isDisconnectingGoogle ? "Setting Password..." : "Set Password for Account Security"}
-                      </Button>
-                    </div>
-                  )}
 
                   <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
                     <LogOut className="mr-2 h-4 w-4" />

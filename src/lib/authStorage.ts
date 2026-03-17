@@ -1,6 +1,5 @@
 const CURRENT_PROJECT_REF = 'zupjsghppxyvmgwxvycc';
-const STALE_PROJECT_REF = 'viidccjyjeipulbqqwua';
-const AUTH_KEY_PATTERNS = ['supabase.auth', 'sb-', CURRENT_PROJECT_REF, STALE_PROJECT_REF];
+const AUTH_KEY_PATTERNS = ['supabase.auth', 'sb-', CURRENT_PROJECT_REF];
 
 function collectMatchingStorageKeys(storage: Storage, patterns: string[]) {
   const keysToRemove: string[] = [];
@@ -22,12 +21,7 @@ function clearStorageKeys(storage: Storage, patterns: string[]) {
 }
 
 export function clearStaleAuthCache() {
-  const clearedLocal = clearStorageKeys(localStorage, [STALE_PROJECT_REF]);
-  const clearedSession = clearStorageKeys(sessionStorage, [STALE_PROJECT_REF]);
-
-  if (clearedLocal || clearedSession) {
-    console.info(`[Auth] Cleared stale auth cache (${clearedLocal} local, ${clearedSession} session)`);
-  }
+  // No stale project refs to clear anymore
 }
 
 export function clearAllAuthCache() {
