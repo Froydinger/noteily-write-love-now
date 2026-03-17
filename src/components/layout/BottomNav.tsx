@@ -72,15 +72,17 @@ export function BottomNav() {
     { path: '/settings', icon: Settings, label: 'Settings' },
   ];
 
+  const isNotePage = location.pathname.startsWith('/note/');
+
   return (
     <>
       {/* Mobile Bottom Navigation */}
       <nav className={cn(
-        "fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300",
-        isKeyboardOpen && "translate-y-full"
+        "fixed bottom-0 left-0 right-0 z-50 md:hidden transition-transform duration-300 overflow-visible",
+        (isKeyboardOpen || isNotePage) && "translate-y-full"
       )}>
-        {/* Navigation Items - All aligned */}
-        <div className="relative flex items-center justify-center px-4 h-20 pb-safe gap-3" style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}>
+        {/* Navigation Items - Left aligned */}
+        <div className="relative flex items-center justify-start px-6 h-20 gap-4 overflow-visible" style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}>
         {/* Plus button - slightly larger */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

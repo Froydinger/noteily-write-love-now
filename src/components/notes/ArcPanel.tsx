@@ -4,6 +4,8 @@ import ReactMarkdown from 'react-markdown';
 import { toast } from '@/components/ui/sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import arcLogo from '@/assets/arc-logo.png';
 
 interface ArcPanelProps {
@@ -47,6 +49,8 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assist`;
 
 export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentReplace, onTitleReplace, onCreateNote, onCreateChecklist }: ArcPanelProps) {
   const { user } = useAuth();
+  const location = useLocation();
+  const isNotePage = location.pathname.startsWith('/note/');
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -412,7 +416,7 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed right-5 bottom-5 z-50 group"
+          className={cn("fixed right-5 z-[60] group", isNotePage ? "bottom-5" : "bottom-24 md:bottom-5")}
           aria-label="Chat with Arc"
         >
           <div
