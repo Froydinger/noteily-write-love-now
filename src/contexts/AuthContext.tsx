@@ -9,16 +9,11 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   initializing: boolean;
-  signIn: (identifier: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
-  requestPasswordReset: (identifier: string) => Promise<{ error: any }>;
-}
-
-interface ResolvedAuthIdentity {
-  email: string;
-  hasGoogleAuth?: boolean;
+  requestPasswordReset: (email: string) => Promise<{ error: any }>;
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,14 +25,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function collectMatchingStorageKeys(storage: Storage, patterns: string[]) {
   const keysToRemove: string[] = [];
-
   for (let index = 0; index < storage.length; index += 1) {
     const key = storage.key(index);
     if (key && patterns.some((pattern) => key.includes(pattern))) {
       keysToRemove.push(key);
     }
   }
-
   return keysToRemove;
 }
 
@@ -50,41 +43,9 @@ function clearStorageKeys(storage: Storage, patterns: string[]) {
 function clearStaleAuthCache() {
   const clearedLocal = clearStorageKeys(localStorage, [STALE_PROJECT_REF]);
   const clearedSession = clearStorageKeys(sessionStorage, [STALE_PROJECT_REF]);
-
   if (clearedLocal || clearedSession) {
     console.info(`[Auth] Cleared stale auth cache (${clearedLocal} local, ${clearedSession} session)`);
   }
-}
-
-async function resolveAuthIdentity(identifier: string): Promise<ResolvedAuthIdentity | null> {
-  const normalized = identifier.trim().toLowerCase();
-
-  if (!normalized) {
-    return null;
-  }
-
-  if (EMAIL_PATTERN.test(normalized)) {
-    return { email: normalized };
-  }
-
-  const { data, error } = await supabase.rpc('get_user_by_identifier', {
-    p_identifier: normalized,
-  });
-
-  if (error) {
-    throw error;
-  }
-
-  const match = data?.[0];
-
-  if (!match?.email) {
-    return null;
-  }
-
-  return {
-    email: match.email.toLowerCase(),
-    hasGoogleAuth: match.has_google_auth ?? false,
-  };
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -105,11 +66,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(nextSession?.user ?? null);
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    // Set up listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      console.info('[Auth] onAuthStateChange:', event, nextSession?.user?.email ?? 'no user');
       syncAuthState(nextSession);
+      if (isMounted && initializing) {
+        setInitializing(false);
+      }
     });
 
+    // Then check existing session
     supabase.auth.getSession().then(({ data: { session: nextSession } }) => {
+      console.info('[Auth] getSession:', nextSession?.user?.email ?? 'no session');
       syncAuthState(nextSession);
       if (isMounted) {
         setInitializing(false);
@@ -122,44 +90,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const signIn = async (identifier: string, password: string) => {
+  const signIn = async (email: string, password: string) => {
     setLoading(true);
-
     try {
-      const resolvedIdentity = await resolveAuthIdentity(identifier);
+      const normalizedEmail = email.trim().toLowerCase();
 
-      if (!resolvedIdentity?.email) {
-        const error = new Error('No account found with that email or username.');
-        toast({
-          title: 'Sign in failed',
-          description: error.message,
-          variant: 'destructive',
-        });
+      if (!normalizedEmail) {
+        const error = new Error('Please enter your email address.');
+        toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
         return { error };
       }
 
       const { error } = await supabase.auth.signInWithPassword({
-        email: resolvedIdentity.email,
+        email: normalizedEmail,
         password,
       });
 
       if (error) {
-        toast({
-          title: 'Sign in failed',
-          description: resolvedIdentity.hasGoogleAuth
-            ? `${error.message} If you originally signed up with Google, use Continue with Google instead.`
-            : error.message,
-          variant: 'destructive',
-        });
+        toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
       }
 
       return { error };
     } catch (error: any) {
-      toast({
-        title: 'Sign in failed',
-        description: error?.message || 'An unexpected error occurred',
-        variant: 'destructive',
-      });
+      toast({ title: 'Sign in failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
       return { error };
     } finally {
       setLoading(false);
@@ -168,17 +121,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string) => {
     setLoading(true);
-
     try {
       const normalizedEmail = email.trim().toLowerCase();
 
       if (!EMAIL_PATTERN.test(normalizedEmail)) {
         const error = new Error('Please enter a valid email address to create your account.');
-        toast({
-          title: 'Sign up failed',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast({ title: 'Sign up failed', description: error.message, variant: 'destructive' });
         return { error };
       }
 
@@ -191,69 +139,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        toast({
-          title: 'Sign up failed',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast({ title: 'Sign up failed', description: error.message, variant: 'destructive' });
       } else {
-        toast({
-          title: 'Check your email',
-          description: 'Please check your email for a confirmation link.',
-        });
+        toast({ title: 'Check your email', description: 'Please check your email for a confirmation link.' });
       }
 
       return { error };
     } catch (error: any) {
-      toast({
-        title: 'Sign up failed',
-        description: error?.message || 'An unexpected error occurred',
-        variant: 'destructive',
-      });
+      toast({ title: 'Sign up failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
       return { error };
     } finally {
       setLoading(false);
     }
   };
 
-  const requestPasswordReset = async (identifier: string) => {
+  const requestPasswordReset = async (email: string) => {
     setLoading(true);
-
     try {
-      const resolvedIdentity = await resolveAuthIdentity(identifier);
+      const normalizedEmail = email.trim().toLowerCase();
 
-      if (!resolvedIdentity?.email) {
-        toast({
-          title: 'Password reset sent',
-          description: "If an account exists for that email or username, you'll receive reset instructions shortly.",
-        });
-        return { error: null };
-      }
-
-      const { error } = await supabase.auth.resetPasswordForEmail(resolvedIdentity.email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
 
-      if (error) {
-        toast({
-          title: 'Password reset failed',
-          description: error.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Password reset sent',
-          description: 'Check your email for password reset instructions.',
-        });
-      }
+      // Always show the same message to prevent email enumeration
+      toast({
+        title: 'Password reset sent',
+        description: "If an account exists for that email, you'll receive reset instructions shortly.",
+      });
 
       return { error };
     } catch (error: any) {
-      toast({
-        title: 'Password reset failed',
-        description: error?.message || 'An unexpected error occurred',
-        variant: 'destructive',
-      });
+      toast({ title: 'Password reset failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
       return { error };
     } finally {
       setLoading(false);
@@ -261,6 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithGoogle = async () => {
+    // Don't set loading - page will redirect away
     const { error } = await lovable.auth.signInWithOAuth('google', {
       redirect_uri: window.location.origin,
       extraParams: {
@@ -269,11 +187,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (error) {
-      toast({
-        title: 'Google sign in failed',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Google sign in failed', description: error.message, variant: 'destructive' });
     }
 
     return { error };

@@ -14,12 +14,11 @@ interface LoginDialogProps {
 }
 
 export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
-  const [emailOrUsername, setEmailOrUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [currentStep, setCurrentStep] = useState<'choice' | 'email' | 'auth'>('choice');
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isLoading, setIsLoading] = useState(false);
-  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [shake, setShake] = useState(false);
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
@@ -30,60 +29,51 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   };
 
   const handleEmailSubmit = () => {
-    const normalizedIdentifier = emailOrUsername.trim();
+    const trimmed = email.trim();
+    if (!trimmed) return;
 
-    if (!normalizedIdentifier) return;
-
-    if (authMode === 'signup' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedIdentifier)) {
+    if (authMode === 'signup' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
       toast.error("Use an email to create your account", {
         description: "Sign up requires a valid email address.",
       });
       return;
     }
 
-    setEmailOrUsername(normalizedIdentifier);
+    setEmail(trimmed);
     setCurrentStep('auth');
   };
 
   const handleAuth = async () => {
-    if (!emailOrUsername || !password) return;
+    if (!email || !password) return;
 
     setIsLoading(true);
-    
+
     if (authMode === 'signup') {
-      setIsCreatingAccount(true);
-      
       toast.success("Welcome to Arcana Notes! 🎉", { description: "Creating your account..." });
-      
-      const { error: signUpError } = await signUp(emailOrUsername, password);
+
+      const { error: signUpError } = await signUp(email, password);
       if (!signUpError) {
         setPassword('');
-        toast.success("Account created successfully! ✨", { description: "You're all set to start taking notes." });
+        toast.success("Account created successfully! ✨", { description: "Check your email to confirm." });
         onOpenChange(false);
       }
-      setIsCreatingAccount(false);
     } else {
-      const { error: signInError } = await signIn(emailOrUsername, password);
-      
+      const { error: signInError } = await signIn(email, password);
+
       if (!signInError) {
         onOpenChange(false);
       } else {
-        // Trigger shake animation for wrong password
         setShake(true);
         setTimeout(() => setShake(false), 600);
       }
     }
-    
+
     setIsLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    const { error } = await signInWithGoogle();
-    if (!error) {
-      onOpenChange(false);
-    }
-    setIsLoading(false);
+    // Don't set isLoading — page redirects away, any state update is irrelevant
+    await signInWithGoogle();
   };
 
   const handleBack = () => {
@@ -95,10 +85,9 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     setPassword('');
   };
 
-  // Reset form when dialog closes
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
-      setEmailOrUsername('');
+      setEmail('');
       setPassword('');
       setCurrentStep('choice');
       setAuthMode('signin');
@@ -117,22 +106,22 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
             Welcome to Arcana Notes<span className="text-xs text-muted-foreground ml-0.5 -mt-1">™</span>
           </DialogTitle>
           <DialogDescription>
-            {currentStep === 'choice' 
-              ? 'Sign in to sync your notes across all devices'
-              : currentStep === 'email' 
-                ? `${authMode === 'signin' ? 'Sign in to' : 'Create account for'} ${authMode === 'signin' ? 'your account' : 'Arcana Notes'}`
-                : `Continue as ${emailOrUsername}`}
+            {currentStep === 'choice'
+              ? 'Sign in or create an account to sync your notes'
+              : currentStep === 'email'
+                ? `Enter your email to ${authMode === 'signin' ? 'sign in' : 'create an account'}`
+                : `Continue as ${email}`}
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           {currentStep === 'choice' ? (
             <div className="space-y-4">
-              <Button 
+              {/* Google — works for both sign-in and sign-up */}
+              <Button
                 type="button"
                 className="w-full bg-slate-800 text-white hover:bg-slate-700 border-0 google-shimmer"
                 onClick={handleGoogleSignIn}
-                disabled={isLoading}
               >
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -142,60 +131,50 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 </svg>
                 Continue with Google
               </Button>
-              
+
               <div className="my-6 flex justify-center">
                 <span className="text-xs uppercase text-muted-foreground">
-                  Or
+                  Or use email
                 </span>
               </div>
 
               <div className="flex flex-col items-center space-y-2">
-                <Button 
+                <Button
                   type="button"
                   onClick={() => handleChoiceSelection('signin')}
                   size="sm"
-                  className="w-48 bg-black text-white hover:bg-gray-800 border-0" 
-                  disabled={isLoading}
+                  className="w-48 bg-black text-white hover:bg-gray-800 border-0"
                 >
-                  Sign in
+                  Sign in with email
                 </Button>
-                
-                <Button 
+
+                <Button
                   type="button"
                   onClick={() => handleChoiceSelection('signup')}
                   size="sm"
-                  className="w-48 bg-black text-white hover:bg-gray-800 border-0" 
-                  disabled={isLoading}
+                  className="w-48 bg-black text-white hover:bg-gray-800 border-0"
                 >
-                  Create account
+                  Create account with email
                 </Button>
               </div>
             </div>
           ) : currentStep === 'email' ? (
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-4">
-                <Button
-                  type="button"
-                  onClick={handleBack}
-                  disabled={isLoading}
-                  variant="ghost"
-                  size="sm"
-                >
+                <Button type="button" onClick={handleBack} variant="ghost" size="sm">
                   ← Back
                 </Button>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email-or-username">
-                  {authMode === 'signup' ? 'Email address' : 'Username or Email'}
-                </Label>
+                <Label htmlFor="email">Email address</Label>
                 <Input
-                  id="email-or-username"
-                  type={authMode === 'signup' ? 'email' : 'text'}
-                  value={emailOrUsername}
-                  onChange={(e) => setEmailOrUsername(e.target.value)}
-                  autoComplete={authMode === 'signup' ? 'email' : 'username email'}
-                  placeholder={authMode === 'signup' ? 'Enter your email address' : 'Enter your username or email'}
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  placeholder="Enter your email address"
                   disabled={isLoading}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -205,11 +184,11 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                   }}
                 />
               </div>
-              <Button 
+              <Button
                 type="button"
                 onClick={handleEmailSubmit}
-                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" 
-                disabled={isLoading || !emailOrUsername}
+                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                disabled={isLoading || !email}
               >
                 Continue
               </Button>
@@ -217,13 +196,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
           ) : (
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-4">
-                <Button
-                  type="button"
-                  onClick={handleBack}
-                  disabled={isLoading}
-                  variant="ghost"
-                  size="sm"
-                >
+                <Button type="button" onClick={handleBack} disabled={isLoading} variant="ghost" size="sm">
                   ← Back
                 </Button>
               </div>
@@ -248,17 +221,15 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                     }}
                   />
                 </div>
-                <Button 
+                <Button
                   type="button"
                   onClick={handleAuth}
-                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" 
+                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
                   disabled={isLoading || !password}
                 >
-                  {isCreatingAccount 
-                    ? 'Creating your account...' 
-                    : isLoading 
-                      ? (authMode === 'signup' ? 'Creating account...' : 'Signing in...') 
-                      : (authMode === 'signup' ? 'Create account' : 'Sign in')}
+                  {isLoading
+                    ? (authMode === 'signup' ? 'Creating account...' : 'Signing in...')
+                    : (authMode === 'signup' ? 'Create account' : 'Sign in')}
                 </Button>
                 {authMode === 'signin' && (
                   <button
