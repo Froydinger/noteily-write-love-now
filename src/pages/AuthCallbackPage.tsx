@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { EmailOtpType } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { clearAuthCallbackParams, getAuthCallbackCode, getAuthCallbackError, getAuthHashSessionTokens } from '@/lib/authRedirect';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
@@ -12,13 +11,17 @@ const OTP_TYPES = new Set<EmailOtpType>(['signup', 'invite', 'magiclink', 'recov
 
 function getOtpParams() {
   const url = new URL(window.location.href);
-
   return {
     tokenHash: url.searchParams.get('token_hash') ?? url.searchParams.get('token'),
     type: url.searchParams.get('type'),
   };
 }
 
+/**
+ * This page handles EMAIL-ONLY auth flows: email confirmation, magic links,
+ * password recovery, invite links. Google OAuth is handled by the managed
+ * Lovable auth bridge on the root route (/) and should never land here.
+ */
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
@@ -28,61 +31,37 @@ export default function AuthCallbackPage() {
 
     const completeAuth = async () => {
       try {
-        const callbackError = getAuthCallbackError();
-        if (callbackError) {
-          throw new Error(callbackError);
+        // Check for error params first
+        const url = new URL(window.location.href);
+        const errorParam = url.searchParams.get('error') || url.searchParams.get('error_description');
+        if (errorParam) {
+          throw new Error(url.searchParams.get('error_description') || errorParam);
         }
 
         const { tokenHash, type } = getOtpParams();
 
         if (tokenHash && type && OTP_TYPES.has(type as EmailOtpType)) {
+          // Email OTP verification (signup confirmation, magic link, recovery, etc.)
           const { error } = await supabase.auth.verifyOtp({
             token_hash: tokenHash,
             type: type as EmailOtpType,
           });
-
-          if (error) {
-            throw error;
-          }
+          if (error) throw error;
         } else {
-          const code = getAuthCallbackCode();
-          const tokens = getAuthHashSessionTokens();
-
-          if (code) {
-            const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-            if (error) {
-              throw error;
-            }
-            if (!data.session?.user) {
-              throw new Error('No session was created after authentication.');
-            }
-          } else if (tokens) {
-            const { data, error } = await supabase.auth.setSession(tokens);
-            if (error) {
-              throw error;
-            }
-            if (!data.session?.user) {
-              throw new Error('No session was created after authentication.');
-            }
-          } else {
-            const {
-              data: { session },
-            } = await supabase.auth.getSession();
-
-            if (!session?.user) {
-              throw new Error('Unable to complete sign in. Please try again.');
-            }
+          // No OTP params — check if there's already an active session
+          // (e.g. user navigated here directly)
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.user) {
+            throw new Error('Unable to complete sign in. Please try again.');
           }
         }
 
-        clearAuthCallbackParams();
+        // Clean URL and navigate to app
         window.history.replaceState({}, document.title, window.location.pathname);
         navigate('/home', { replace: true });
       } catch (err: any) {
         console.error('[AuthCallback] Failed to complete auth', err);
-        clearAuthCallbackParams();
         window.history.replaceState({}, document.title, window.location.pathname);
-
         if (isActive) {
           setError(err?.message ?? 'Unable to complete sign in. Please try again.');
         }
@@ -91,9 +70,7 @@ export default function AuthCallbackPage() {
 
     void completeAuth();
 
-    return () => {
-      isActive = false;
-    };
+    return () => { isActive = false; };
   }, [navigate]);
 
   if (error) {
@@ -125,7 +102,7 @@ export default function AuthCallbackPage() {
             <Heart className="h-8 w-8 text-accent" fill="currentColor" />
           </div>
           <CardTitle>Finishing sign in</CardTitle>
-          <CardDescription>We’re securing your session and sending you into the app.</CardDescription>
+          <CardDescription>We're confirming your email and sending you into the app.</CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center pb-8">
           <LoadingSpinner size="lg" text="Signing you in..." />

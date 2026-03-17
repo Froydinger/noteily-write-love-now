@@ -186,7 +186,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithGoogle = async () => {
     try {
       const { error } = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
+        redirect_uri: window.location.origin,
         extraParams: {
           prompt: 'select_account',
         },

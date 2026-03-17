@@ -1,7 +1,7 @@
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppLayout } from "./components/layout/AppLayout";
 import { PWAInstall } from "./components/pwa/PWAInstall";
@@ -50,26 +50,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function RootRoute() {
   const { user, initializing } = useAuth();
-  const location = useLocation();
   const oauthReturning = hasAuthCallbackParams();
 
-  if (oauthReturning) {
-    return (
-      <Navigate
-        to={{
-          pathname: "/auth/callback",
-          search: location.search,
-          hash: location.hash,
-        }}
-        replace
-      />
-    );
-  }
-
-  if (initializing) {
+  // While auth is initializing OR managed OAuth is hydrating, show spinner
+  if (initializing || oauthReturning) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoadingSpinner size="lg" text="Loading..." />
+        <LoadingSpinner size="lg" text="Signing you in..." />
       </div>
     );
   }
