@@ -40,7 +40,7 @@ const PrivacyPage = () => {
             </CardHeader>
             <CardContent className="text-foreground space-y-3">
               <p>
-                Noteily is a free note-taking tool. We keep it simple:
+                Arcana Notes is a free note-taking tool. We keep it simple:
               </p>
               <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
                 <li><strong className="text-foreground">We don't collect your data</strong> - Your notes stay on your device and sync to your account. That's it.</li>
@@ -118,7 +118,7 @@ const PrivacyPage = () => {
             </CardHeader>
             <CardContent className="text-foreground space-y-3">
               <p className="text-muted-foreground">
-                By using Noteily, you agree to:
+                By using Arcana Notes, you agree to:
               </p>
               <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
                 <li>Not use the service for anything illegal</li>

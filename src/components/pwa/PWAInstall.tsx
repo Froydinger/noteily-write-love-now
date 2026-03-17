@@ -28,13 +28,13 @@ export const PWAInstall = () => {
                     (window.navigator as any).standalone === true;
     
     // Check if we've already shown the add to home prompt
-    const hasSeenAddToHome = localStorage.getItem('noteily-add-to-home-seen');
+    const hasSeenAddToHome = localStorage.getItem('arcana-notes-add-to-home-seen');
     
     // Show add to home prompt if not in PWA and haven't seen it before
     if (!isInPWA && !hasSeenAddToHome) {
       const timer = setTimeout(() => {
         setShowAddToHomePrompt(true);
-        localStorage.setItem('noteily-add-to-home-seen', 'true');
+        localStorage.setItem('arcana-notes-add-to-home-seen', 'true');
       }, 2000); // Show after 2 seconds
       
       return () => clearTimeout(timer);
@@ -81,7 +81,7 @@ export const PWAInstall = () => {
       <Card className="fixed z-50 w-80 animate-slide-up shadow-lg border-neon-blue/20 apple-pwa-floating">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-serif">Install Noteily</CardTitle>
+            <CardTitle className="text-lg font-serif">Install Arcana Notes</CardTitle>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -92,7 +92,7 @@ export const PWAInstall = () => {
             </Button>
           </div>
           <CardDescription>
-            Install Noteily on your device for quick access and offline usage.
+            Install Arcana Notes on your device for quick access and offline usage.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
@@ -125,7 +125,7 @@ export const PWAInstall = () => {
           </Button>
         </div>
         <CardDescription>
-          Add Noteily to your home screen for faster access and a native app experience.
+          Add Arcana Notes to your home screen for faster access and a native app experience.
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">

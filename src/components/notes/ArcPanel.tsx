@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, CSSProperties } from 'react';
 import { X, ArrowRight, Plus, Trash2, MessageSquare, ChevronLeft } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { toast } from '@/components/ui/sonner';
@@ -58,7 +58,7 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
   const [showHistory, setShowHistory] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvoId, setActiveConvoId] = useState<string | null>(null);
-  const [vpStyle, setVpStyle] = useState<React.CSSProperties>({});
+  const [vpStyle, setVpStyle] = useState<CSSProperties>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -214,7 +214,7 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
       if (resp.status === 429) {
         const data = await resp.json().catch(() => null);
         if (data?.limit_reached) {
-          toast.error('Daily AI limit reached (20/day). Upgrade to Noteily Pro for unlimited!', { duration: 5000 });
+          toast.error('Daily AI limit reached (20/day). Upgrade to Arcana Notes Pro for unlimited!', { duration: 5000 });
         } else {
           toast.error('Rate limit reached. Try again in a moment.');
         }

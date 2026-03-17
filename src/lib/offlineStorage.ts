@@ -2,7 +2,7 @@ import { Note } from '@/contexts/NoteContext';
 
 export class OfflineStorage {
   private getStorageKey(userId: string): string {
-    return `noteily_notes_${userId}`;
+    return `arcana_notes_${userId}`;
   }
 
   async saveNotes(notes: Note[], userId: string): Promise<void> {

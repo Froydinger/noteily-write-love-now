@@ -42,7 +42,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     if (authMode === 'signup') {
       setIsCreatingAccount(true);
       
-      toast.success("Welcome to Noteily! 🎉", { description: "Creating your account..." });
+      toast.success("Welcome to Arcana Notes! 🎉", { description: "Creating your account..." });
       
       const { error: signUpError } = await signUp(emailOrUsername, password);
       if (!signUpError) {
@@ -103,13 +103,13 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
             <Heart className="h-8 w-8 text-accent" />
           </div>
           <DialogTitle className="text-2xl font-serif flex items-center justify-center">
-            Welcome to Noteily<span className="text-xs text-muted-foreground ml-0.5 -mt-1">™</span>
+            Welcome to Arcana Notes<span className="text-xs text-muted-foreground ml-0.5 -mt-1">™</span>
           </DialogTitle>
           <DialogDescription>
             {currentStep === 'choice' 
               ? 'Sign in to sync your notes across all devices'
               : currentStep === 'email' 
-                ? `${authMode === 'signin' ? 'Sign in to' : 'Create account for'} ${authMode === 'signin' ? 'your account' : 'Noteily'}`
+                ? `${authMode === 'signin' ? 'Sign in to' : 'Create account for'} ${authMode === 'signin' ? 'your account' : 'Arcana Notes'}`
                 : `Continue as ${emailOrUsername}`}
           </DialogDescription>
         </DialogHeader>

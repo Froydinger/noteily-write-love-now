@@ -60,7 +60,7 @@ const FakeNoteEditor = () => {
             <div className="w-3 h-3 rounded-full bg-accent/25" />
           </div>
           <div className="flex-1 text-center text-xs text-muted-foreground font-medium">
-            Noteily™
+            Arcana Notes™
           </div>
           <div className="w-10" />
         </div>

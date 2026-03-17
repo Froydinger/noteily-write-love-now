@@ -158,7 +158,7 @@ export const exportNoteToPDF = async (note: NoteForExport): Promise<void> => {
   pdf.setFontSize(8);
   pdf.setFont('helvetica', 'italic');
   const dateStr = new Date(note.createdAt).toLocaleDateString();
-  const footer = `Created: ${dateStr} | Exported from Noteily`;
+  const footer = `Created: ${dateStr} | Exported from Arcana Notes`;
   const footerY = pageHeight - 10;
   pdf.text(footer, margin, footerY);
   

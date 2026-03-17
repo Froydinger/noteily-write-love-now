@@ -119,7 +119,7 @@ export function AppSidebar() {
           </div>
           {state !== "collapsed" && (
             <div className="flex items-center">
-              <h1 className="text-xl font-display font-medium tracking-tight dynamic-title-font">Noteily</h1>
+              <h1 className="text-xl font-display font-medium tracking-tight dynamic-title-font">Arcana Notes</h1>
               <span className="text-[10px] text-muted-foreground ml-0.5 -mt-2 font-medium">TM</span>
             </div>
           )}

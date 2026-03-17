@@ -1,5 +1,5 @@
 // Aggressive cache busting service worker
-const CACHE_NAME = 'noteily-v' + Date.now(); // Force new cache on every update
+const CACHE_NAME = 'arcana-notes-v' + Date.now(); // Force new cache on every update
 const urlsToCache = [
   '/',
   '/index.html',

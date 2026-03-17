@@ -361,7 +361,7 @@ const Index = () => {
       )}
 
       {/* Masonry grid layout */}
-      <div className="flex flex-col gap-4 pb-24">
+      <div className="flex flex-col gap-4 pb-24 pt-1">
         {filteredAndSortedNotes.map((note, index) => (
           <div
             key={note.id}
@@ -397,10 +397,10 @@ const Index = () => {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 justify-center">
               <Heart className="h-5 w-5 text-accent" fill="currentColor" />
-              Support Noteily!
+              Support Arcana Notes!
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              Noteily is made with love by Win The Night. If you enjoy using Noteily, consider supporting our work!
+              Arcana Notes is made with love by Win The Night. If you enjoy using Arcana Notes, consider supporting our work!
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-col gap-2">
