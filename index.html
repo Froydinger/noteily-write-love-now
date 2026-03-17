@@ -149,18 +149,9 @@
     </script>
     <div id="root"></div>
     <script>
-      // Clear stale service worker caches to prevent serving broken builds
+      // Clear stale service worker caches (do NOT unregister SWs — breaks OAuth callback)
       (function() {
         try {
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(regs) {
-              regs.forEach(function(reg) {
-                // Unregister any SW not controlling the current page
-                if (!navigator.serviceWorker.controller) reg.unregister();
-              });
-            });
-          }
-          // Purge all caches older than the current build stamp
           var BUILD_STAMP = 'arcana-notes-2025-03';
           if ('caches' in window) {
             caches.keys().then(function(names) {
