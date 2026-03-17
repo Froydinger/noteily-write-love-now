@@ -18,6 +18,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Clear stale localStorage keys from old backend project to prevent phantom sessions
+function clearStaleAuthCache() {
+  const STALE_PROJECT_REF = 'viidccjyjeipulbqqwua';
+  const keysToRemove: string[] = [];
+  
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.includes(STALE_PROJECT_REF)) {
+      keysToRemove.push(key);
+    }
+  }
+  
+  keysToRemove.forEach(key => {
+    console.log('[Auth] Clearing stale cache key:', key);
+    localStorage.removeItem(key);
+  });
+  
+  if (keysToRemove.length > 0) {
+    console.log(`[Auth] Cleared ${keysToRemove.length} stale auth cache entries`);
+  }
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -26,6 +48,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
+    // Clear any stale auth data from old backend before checking session
+    clearStaleAuthCache();
+
     // Check for existing session immediately
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -169,14 +194,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await supabase.auth.signOut({ scope: 'local' });
       }
       
-      // Clear local state
+      // Clear all auth-related localStorage for both old and new projects
+      const authKeyPatterns = ['supabase.auth', 'sb-', 'viidccjyjeipulbqqwua', 'zupjsghppxyvmgwxvycc'];
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && authKeyPatterns.some(p => key.includes(p))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
       setSession(null);
       setUser(null);
       
     } catch (globalError) {
       console.error('Sign out failed completely:', globalError);
-      
-      // Even if everything fails, clear local state
       setSession(null);
       setUser(null);
       
