@@ -186,14 +186,16 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email-or-username">Username or Email</Label>
+                <Label htmlFor="email-or-username">
+                  {authMode === 'signup' ? 'Email address' : 'Username or Email'}
+                </Label>
                 <Input
                   id="email-or-username"
-                  type="text"
+                  type={authMode === 'signup' ? 'email' : 'text'}
                   value={emailOrUsername}
                   onChange={(e) => setEmailOrUsername(e.target.value)}
-                  autoComplete="username email"
-                  placeholder="Enter your username or email"
+                  autoComplete={authMode === 'signup' ? 'email' : 'username email'}
+                  placeholder={authMode === 'signup' ? 'Enter your email address' : 'Enter your username or email'}
                   disabled={isLoading}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
