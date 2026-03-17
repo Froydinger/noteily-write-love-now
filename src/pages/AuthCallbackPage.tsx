@@ -17,10 +17,19 @@ function getOtpParams() {
   };
 }
 
-/**
- * This page handles email auth flows: email confirmation,
- * password recovery, invite links.
- */
+function getOAuthParams() {
+  const url = new URL(window.location.href);
+  const hash = url.hash.startsWith('#') ? url.hash.slice(1) : url.hash;
+  const hashParams = new URLSearchParams(hash);
+
+  return {
+    code: url.searchParams.get('code'),
+    error: url.searchParams.get('error') || url.searchParams.get('error_description') || hashParams.get('error') || hashParams.get('error_description'),
+    accessToken: hashParams.get('access_token') || url.searchParams.get('access_token'),
+    refreshToken: hashParams.get('refresh_token') || url.searchParams.get('refresh_token'),
+  };
+}
+
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
@@ -30,32 +39,35 @@ export default function AuthCallbackPage() {
 
     const completeAuth = async () => {
       try {
-        // Check for error params first
-        const url = new URL(window.location.href);
-        const errorParam = url.searchParams.get('error') || url.searchParams.get('error_description');
-        if (errorParam) {
-          throw new Error(url.searchParams.get('error_description') || errorParam);
+        const { tokenHash, type } = getOtpParams();
+        const { code, error: oauthError, accessToken, refreshToken } = getOAuthParams();
+
+        if (oauthError) {
+          throw new Error(oauthError);
         }
 
-        const { tokenHash, type } = getOtpParams();
-
         if (tokenHash && type && OTP_TYPES.has(type as EmailOtpType)) {
-          // Email OTP verification (signup confirmation, magic link, recovery, etc.)
           const { error } = await supabase.auth.verifyOtp({
             token_hash: tokenHash,
             type: type as EmailOtpType,
           });
           if (error) throw error;
+        } else if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else if (accessToken && refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (error) throw error;
         } else {
-          // No OTP params — check if there's already an active session
-          // (e.g. user navigated here directly)
           const { data: { session } } = await supabase.auth.getSession();
           if (!session?.user) {
             throw new Error('Unable to complete sign in. Please try again.');
           }
         }
 
-        // Clean URL and navigate to app
         window.history.replaceState({}, document.title, window.location.pathname);
         navigate('/home', { replace: true });
       } catch (err: any) {
@@ -69,7 +81,9 @@ export default function AuthCallbackPage() {
 
     void completeAuth();
 
-    return () => { isActive = false; };
+    return () => {
+      isActive = false;
+    };
   }, [navigate]);
 
   if (error) {
@@ -101,7 +115,7 @@ export default function AuthCallbackPage() {
             <Heart className="h-8 w-8 text-accent" fill="currentColor" />
           </div>
           <CardTitle>Finishing sign in</CardTitle>
-          <CardDescription>We're confirming your email and sending you into the app.</CardDescription>
+          <CardDescription>We're signing you in and opening your notes.</CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center pb-8">
           <LoadingSpinner size="lg" text="Signing you in..." />
