@@ -64,7 +64,7 @@ export function BottomNav() {
 
   // Dynamic nav items based on AI button visibility
   const leftNavItems = [
-    { path: '/', icon: NotebookTabs, label: 'Notes' },
+    { path: '/home', icon: NotebookTabs, label: 'Notes' },
   ];
 
   const rightNavItems = [

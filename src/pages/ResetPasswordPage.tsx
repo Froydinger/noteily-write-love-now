@@ -162,7 +162,7 @@ const ResetPasswordPage = () => {
           title: "Password updated successfully",
           description: "You can now sign in with your new password.",
         });
-        navigate('/');
+        navigate('/home');
       }
     } catch (err) {
       console.error('Password reset error:', err);
