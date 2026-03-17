@@ -39,6 +39,7 @@ const Index = () => {
   const {
     notes,
     addNote,
+    updateNote,
     setCurrentNote,
     loading,
     syncNotes,
