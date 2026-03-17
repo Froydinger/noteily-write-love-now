@@ -30,7 +30,18 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   };
 
   const handleEmailSubmit = () => {
-    if (!emailOrUsername) return;
+    const normalizedIdentifier = emailOrUsername.trim();
+
+    if (!normalizedIdentifier) return;
+
+    if (authMode === 'signup' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedIdentifier)) {
+      toast.error("Use an email to create your account", {
+        description: "Sign up requires a valid email address.",
+      });
+      return;
+    }
+
+    setEmailOrUsername(normalizedIdentifier);
     setCurrentStep('auth');
   };
 

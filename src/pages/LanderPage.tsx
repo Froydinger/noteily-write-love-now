@@ -52,7 +52,7 @@ export default function LanderPage() {
     <div className="relative min-h-screen w-full bg-background">
       {/* Sticky Header */}
       <nav
-        className={`fixed left-0 right-0 z-50 border-b border-border/40 backdrop-blur-xl bg-background/80 transition-all duration-300 ${
+        className={`fixed left-0 right-0 z-50 border-b border-border/40 backdrop-blur-xl bg-background/80 transition-all duration-300 pwa-safe-top ${
           showStickyHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
         }`}
         style={{ top: 0 }}
