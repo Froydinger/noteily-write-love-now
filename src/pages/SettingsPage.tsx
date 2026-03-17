@@ -47,7 +47,7 @@ const SettingsPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
-  const [isDisconnectingGoogle, setIsDisconnectingGoogle] = useState(false);
+  
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const isMobile = useIsMobile();
   const { state } = useSidebar();
