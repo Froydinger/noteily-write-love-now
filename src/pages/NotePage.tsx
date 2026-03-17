@@ -40,7 +40,7 @@ const NotePage = () => {
   const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
   const [entered, setEntered] = useState(false);
-  const { isAiButtonVisible, openAiChat } = useAiButton();
+  
   const [aiReplacementFunction, setAiReplacementFunction] = useState<
     ((newContent: string, isSelectionReplacement: boolean) => void) | null
   >(null);
