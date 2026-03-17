@@ -15,7 +15,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <NoteProvider>
       <SidebarProvider>
         <div className="flex min-h-[100dvh] w-full">
-          <main className={`flex-1 min-w-0 pwa-safe-top ${isMobile ? 'pb-20' : ''}`}>
+          <main className="flex-1 min-w-0" style={isMobile ? { paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' } : undefined}>
             {children}
           </main>
           <BottomNav />
