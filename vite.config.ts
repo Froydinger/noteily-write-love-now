@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => ({
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "img-src 'self' data: https: blob:",
         "font-src 'self' https://fonts.gstatic.com",
-        "connect-src 'self' https://*.supabase.co",
+        "connect-src 'self' https://*.supabase.co https://ai.gateway.lovable.dev https://*.lovable.dev https://*.lovable.app wss://*.supabase.co",
         "object-src 'none'",
         "base-uri 'self'"
       ].join('; ')
@@ -66,7 +66,7 @@ export default defineConfig(({ mode }) => ({
       },
       // Force immediate reload when update is available
       devOptions: {
-        enabled: true
+        enabled: false
       },
       includeAssets: ['favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
