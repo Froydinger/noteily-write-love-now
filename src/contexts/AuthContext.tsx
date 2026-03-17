@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-
 import { useToast } from '@/hooks/use-toast';
 import { clearAllAuthCache, clearStaleAuthCache } from '@/lib/authStorage';
 
@@ -17,7 +16,6 @@ interface AuthContextType {
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const AUTH_CALLBACK_PATH = '/auth/callback';
 const RESET_PASSWORD_PATH = '/reset-password';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -101,9 +99,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
+        return { error };
       }
 
-      return { error };
+      return { error: null };
     } catch (error: any) {
       toast({ title: 'Sign in failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
       return { error };
@@ -124,19 +123,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error };
       }
 
-      const { error } = await supabase.auth.signUp({
+      if (password.length < 6) {
+        const error = new Error('Password must be at least 6 characters long.');
+        toast({ title: 'Sign up failed', description: error.message, variant: 'destructive' });
+        return { error };
+      }
+
+      const { data, error } = await supabase.auth.signUp({
         email: normalizedEmail,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
-        },
       });
 
       if (error) {
         toast({ title: 'Sign up failed', description: error.message, variant: 'destructive' });
+        return { error };
       }
 
-      return { error };
+      if (!data.session) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password,
+        });
+
+        if (signInError) {
+          toast({
+            title: 'Account created, but sign in failed',
+            description: signInError.message,
+            variant: 'destructive',
+          });
+          return { error: signInError };
+        }
+      }
+
+      return { error: null };
     } catch (error: any) {
       toast({ title: 'Sign up failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
       return { error };
