@@ -191,14 +191,15 @@ const NotePage = () => {
   const isReadOnly = note.isSharedWithUser && note.userPermission === 'read';
 
   return (
+    <>
     <div
       key={id}
-      className={`min-h-[100dvh] md:pl-20 transform transition-all duration-200 ease-out ${entered ? "translate-x-0 opacity-100" : "translate-x-1 opacity-90"}`}
+      className={`min-h-[100dvh] md:pl-20 transition-opacity duration-200 ease-out ${entered ? "opacity-100" : "opacity-90"}`}
     >
       <header
         ref={headerRef}
         data-note-header
-        className="sticky top-0 z-[100] p-4 pwa-safe-top bg-background/60 backdrop-blur-md border-b border-border/20"
+        className="sticky top-0 z-[100] p-4 pwa-safe-top md:bg-background/60 md:backdrop-blur-md md:border-b md:border-border/20"
         style={{ position: "sticky", top: 0, zIndex: 100 }}
       >
         <div className="flex items-center justify-between">
@@ -340,7 +341,9 @@ const NotePage = () => {
         />
       )}
 
-      {/* Arc AI Panel */}
+    </div>
+
+      {/* Arc AI Panel - outside transform context so position:fixed works correctly */}
       {preferences.aiEnabled && <ArcPanel
         noteId={note.id}
         noteContent={note.content}
@@ -364,7 +367,7 @@ const NotePage = () => {
           }
         }}
       />}
-    </div>
+    </>
   );
 };
 

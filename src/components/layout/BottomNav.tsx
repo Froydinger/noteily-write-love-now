@@ -82,7 +82,7 @@ export function BottomNav() {
         (isKeyboardOpen || isNotePage) && "translate-y-full"
       )}>
         {/* Navigation Items - Left aligned */}
-        <div className="relative flex items-center justify-start px-6 h-20 gap-4 overflow-visible" style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}>
+        <div className="relative flex items-center justify-start px-6 gap-4 overflow-visible" style={{ paddingTop: '0.875rem', paddingBottom: 'calc(0.875rem + env(safe-area-inset-bottom))' }}>
         {/* Plus button - slightly larger */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
