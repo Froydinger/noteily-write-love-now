@@ -423,6 +423,14 @@ const Index = () => {
       ) : (
         scrollableContent
       )}
+      {/* Arc AI Panel - available on index for general writing help */}
+      <ArcPanel onCreateNote={async (content, title) => {
+        const note = await addNote("note");
+        if (note) {
+          await updateNote(note.id, { content, title });
+          navigate(`/note/${note.id}`);
+        }
+      }} />
     </div>
   );
 };
