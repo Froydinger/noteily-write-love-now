@@ -155,7 +155,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
             <div className="mb-5 text-center">
               <h2 className="text-xl font-semibold text-foreground">{copy.title}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                {mode === 'signup' ? 'No Google. No Apple. Just email and password.' : 'Use your email and password to get back in.'}
+                {mode === 'signup' ? 'Create your account with email and password.' : 'Use your email and password to get back in.'}
               </p>
             </div>
 

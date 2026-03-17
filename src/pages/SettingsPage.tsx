@@ -395,25 +395,6 @@ const SettingsPage = () => {
                     </div>
                   </div>
 
-                  {isGoogleUser() && (
-                    <div className="space-y-3 border-t pt-3">
-                      <div className="text-sm">
-                        <p className="font-medium text-muted-foreground mb-1">Google Account Connected</p>
-                        <p className="text-xs text-muted-foreground">
-                          Set a password to enable email/password login as backup
-                        </p>
-                      </div>
-                      <Button
-                        onClick={handleDisconnectGoogle}
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        disabled={isDisconnectingGoogle || newPassword.trim().length < 6}
-                      >
-                        {isDisconnectingGoogle ? "Setting Password..." : "Set Password for Account Security"}
-                      </Button>
-                    </div>
-                  )}
 
                   <Button onClick={handleSignOut} variant="outline" size="sm" className="w-full">
                     <LogOut className="mr-2 h-4 w-4" />
