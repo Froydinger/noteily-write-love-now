@@ -428,7 +428,7 @@ const Index = () => {
         scrollableContent
       )}
       {/* Arc AI Panel - available on index for general writing help */}
-      <ArcPanel
+      {preferences.aiEnabled && <ArcPanel
         onCreateNote={async (content, title) => {
           const note = await addNote("note");
           if (note) {

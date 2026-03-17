@@ -341,7 +341,7 @@ const NotePage = () => {
       )}
 
       {/* Arc AI Panel */}
-      <ArcPanel
+      {preferences.aiEnabled && <ArcPanel
         noteId={note.id}
         noteContent={note.content}
         noteTitle={note.title}
