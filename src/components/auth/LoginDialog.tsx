@@ -252,7 +252,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 setInlineError(null);
                 try {
                   const result = await lovable.auth.signInWithOAuth('google', {
-                    redirect_uri: `${window.location.origin}/auth/callback`,
+                    redirect_uri: window.location.origin,
                   });
                   if (result?.error) {
                     setInlineError(result.error.message || 'Google sign-in failed.');

@@ -37,6 +37,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (initialized.current) return;
     initialized.current = true;
 
+    // Remove any auth keys from the old project before hydrating
+    clearStaleAuthCache();
+
     let isMounted = true;
 
     const syncAuthState = (nextSession: Session | null) => {
