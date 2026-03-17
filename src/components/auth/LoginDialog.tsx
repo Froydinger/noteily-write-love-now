@@ -236,7 +236,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    autoComplete="current-password"
+                    autoComplete={authMode === 'signup' ? 'new-password' : 'current-password'}
                     placeholder="Enter your password"
                     disabled={isLoading}
                     className={`transition-all ${shake ? 'animate-shake' : ''}`}
