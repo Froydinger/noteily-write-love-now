@@ -558,7 +558,7 @@ export function ArcPanel({ noteId, noteContent = '', noteTitle = '', onContentRe
                                   onClick={() => applyToNote(msg.content)}
                                   className="mt-2 px-3 py-1 rounded-full text-[10px] font-medium transition-all hover:scale-105 bg-accent/15 border border-accent/25 text-accent"
                                 >
-                                  {onContentReplace ? 'Apply to Note' : 'Create Note'}
+                                  {getApplyLabel(msg.content)}
                                 </button>
                               )}
                             </>
