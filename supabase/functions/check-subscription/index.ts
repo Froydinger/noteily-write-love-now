@@ -67,14 +67,18 @@ serve(async (req) => {
     });
 
     const isActive = subscriptions.data.length > 0;
-    const sub = subscriptions.data[0];
+    const sub = isActive ? subscriptions.data[0] : null;
+
+    const periodEnd = sub?.current_period_end
+      ? new Date(sub.current_period_end * 1000).toISOString()
+      : null;
 
     await supabaseClient.from("subscriptions").upsert({
       user_id: user.id,
       stripe_customer_id: customer.id,
-      stripe_subscription_id: isActive ? sub.id : null,
+      stripe_subscription_id: sub?.id ?? null,
       status: isActive ? "active" : "free",
-      current_period_end: isActive ? new Date(sub.current_period_end * 1000).toISOString() : null,
+      current_period_end: periodEnd,
     }, { onConflict: "user_id" });
 
     logStep("Subscription status", { isActive });
@@ -82,7 +86,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       subscribed: isActive,
       status: isActive ? "active" : "free",
-      current_period_end: isActive ? new Date(sub.current_period_end * 1000).toISOString() : null,
+      current_period_end: periodEnd,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
