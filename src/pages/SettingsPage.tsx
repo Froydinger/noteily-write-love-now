@@ -362,6 +362,7 @@ const SettingsPage = () => {
               </div>
             )}
 
+            <div className="bg-card rounded-lg p-4 border">
               <h2 className="text-lg font-medium mb-3 font-serif">Account</h2>
               {user ? (
                 <div className="space-y-4">
