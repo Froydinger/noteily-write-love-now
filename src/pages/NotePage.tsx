@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import NoteEditor from "@/components/notes/NoteEditor";
 import ChecklistEditor from "@/components/notes/ChecklistEditor";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Trash, Users, Eye, Edit, Brain, Undo2, Redo2 } from "lucide-react";
+import { ChevronLeft, Trash, Users, Eye, Edit, Undo2, Redo2 } from "lucide-react";
 import { ArcPanel } from "@/components/notes/ArcPanel";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -28,7 +28,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { handleNoteKeyboard } from "@/lib/viewport";
 import { useUndoRedo } from "@/hooks/useUndoRedo";
-import { useAiButton } from "@/contexts/AiButtonContext";
+
 
 const NotePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,7 +40,7 @@ const NotePage = () => {
   const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
   const [entered, setEntered] = useState(false);
-  const { isAiButtonVisible, openAiChat } = useAiButton();
+  
   const [aiReplacementFunction, setAiReplacementFunction] = useState<
     ((newContent: string, isSelectionReplacement: boolean) => void) | null
   >(null);
@@ -246,18 +246,6 @@ const NotePage = () => {
               </>
             )}
 
-            {/* AI Writer Button */}
-            {isAiButtonVisible && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={openAiChat}
-                className="h-10 w-10 p-0 bg-background/60 backdrop-blur-md border border-border/30 rounded-full hover:bg-secondary/80 hover:border-border/50 transition-all duration-200 shadow-sm glass-shimmer"
-                title="AI Writer"
-              >
-                <Brain className="h-5 w-5 text-accent" />
-              </Button>
-            )}
 
             {/* Show people icon for owned notes (to share) or shared notes (to manage) */}
             {(note.isOwnedByUser || (note.isSharedWithUser && !note.isOwnedByUser)) && (
