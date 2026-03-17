@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import NoteEditor from "@/components/notes/NoteEditor";
 import ChecklistEditor from "@/components/notes/ChecklistEditor";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Trash, Users, Eye, Edit, Brain, Undo2, Redo2 } from "lucide-react";
+import { ChevronLeft, Trash, Users, Eye, Edit, Undo2, Redo2 } from "lucide-react";
 import { ArcPanel } from "@/components/notes/ArcPanel";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
