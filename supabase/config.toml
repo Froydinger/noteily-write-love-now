@@ -1,5 +1,10 @@
 project_id = "zupjsghppxyvmgwxvycc"
 
+[auth.hook.send_email]
+enabled = true
+uri = "https://zupjsghppxyvmgwxvycc.supabase.co/functions/v1/auth-email-hook"
+secrets = "env(LOVABLE_API_KEY)"
+
 [functions]
   [functions.ai-assist]
     verify_jwt = false
