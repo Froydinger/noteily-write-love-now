@@ -303,7 +303,7 @@ function ChecklistItemRow({
   onKeyDown 
 }: ChecklistItemRowProps) {
   const [localContent, setLocalContent] = useState(item.content);
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {

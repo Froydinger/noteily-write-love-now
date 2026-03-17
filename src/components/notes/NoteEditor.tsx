@@ -206,8 +206,8 @@ export default function NoteEditor({ note, onNoteSaved, onAIContentReplace }: No
 
   // Handle content updates with debounce and inactivity tracking
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    let undoTimeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
+    let undoTimeout: ReturnType<typeof setTimeout>;
 
     const handleContentChange = (e?: Event) => {
       const content = getEditorContent(contentRef.current);
