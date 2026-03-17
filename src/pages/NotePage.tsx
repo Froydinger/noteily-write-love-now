@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { usePreferences } from "@/contexts/PreferencesContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { useNotes } from "@/contexts/NoteContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +38,7 @@ const NotePage = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { user } = useAuth();
+  const { preferences } = usePreferences();
   const { unreadCount } = useNotifications();
   const [showShareManager, setShowShareManager] = useState(false);
   const [entered, setEntered] = useState(false);
@@ -339,7 +341,7 @@ const NotePage = () => {
       )}
 
       {/* Arc AI Panel */}
-      <ArcPanel
+      {preferences.aiEnabled && <ArcPanel
         noteId={note.id}
         noteContent={note.content}
         noteTitle={note.title}
@@ -361,7 +363,7 @@ const NotePage = () => {
             navigate(`/note/${newNote.id}`);
           }
         }}
-      />
+      />}
     </div>
   );
 };

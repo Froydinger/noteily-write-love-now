@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { usePreferences } from "@/contexts/PreferencesContext";
 import { ArcPanel } from "@/components/notes/ArcPanel";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotes } from "@/contexts/NoteContext";
@@ -37,6 +38,7 @@ import { NoteType } from "@/types/sharing";
 
 const Index = () => {
   const { user } = useAuth();
+  const { preferences } = usePreferences();
   const {
     notes,
     addNote,
@@ -426,7 +428,7 @@ const Index = () => {
         scrollableContent
       )}
       {/* Arc AI Panel - available on index for general writing help */}
-      <ArcPanel
+      {preferences.aiEnabled && <ArcPanel
         onCreateNote={async (content, title) => {
           const note = await addNote("note");
           if (note) {
@@ -451,7 +453,7 @@ const Index = () => {
             navigate(`/note/${note.id}`);
           }
         }}
-      />
+      />}
     </div>
   );
 };
