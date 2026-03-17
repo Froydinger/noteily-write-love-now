@@ -9,7 +9,7 @@ const ORIGINAL_LINES = [
 ];
 
 const AI_REWRITE =
-  "I didn't start writing for anyone else.\n\nThe thoughts were too loud to keep inside, so I poured them onto a page — messy, unfiltered, mine.\n\nNo strategy. No audience in mind. Just a quiet place to think out loud.\n\nBut something strange happened.\n\nThe more I wrote for myself, the more it resonated with others.\n\nTurns out, the most universal things we can write are the most personal ↓";
+  "I didn't start writing for anyone else.\n\nThe thoughts were too loud to keep inside, so I poured them onto a page — messy, unfiltered, mine.\n\nNo strategy. No audience in mind. Just a quiet place to think out loud.";
 
 const FakeNoteEditor = () => {
   const [showAI, setShowAI] = useState(false);
