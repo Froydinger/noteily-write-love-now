@@ -182,55 +182,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signInWithMagicLink = async (email: string) => {
-    setLoading(true);
-    try {
-      const normalizedEmail = normalizeEmail(email);
-      if (!EMAIL_PATTERN.test(normalizedEmail)) {
-        const error = new Error('Please enter a valid email address.');
-        toast({ title: 'Magic link failed', description: error.message, variant: 'destructive' });
-        return { error };
-      }
-
-      const { error } = await supabase.auth.signInWithOtp({
-        email: normalizedEmail,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        toast({ title: 'Magic link failed', description: error.message, variant: 'destructive' });
-      } else {
-        toast({ title: 'Check your email', description: 'We sent you a magic link to sign in.' });
-      }
-
-      return { error };
-    } catch (error: any) {
-      toast({ title: 'Magic link failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
-      return { error };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signInWithApple = async () => {
-    try {
-      const { error } = await lovable.auth.signInWithOAuth('apple', {
-        redirect_uri: window.location.origin,
-      });
-
-      if (error) {
-        toast({ title: 'Apple sign in failed', description: error.message, variant: 'destructive' });
-      }
-
-      return { error };
-    } catch (error: any) {
-      toast({ title: 'Apple sign in failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
-      return { error };
-    }
-  };
-
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
