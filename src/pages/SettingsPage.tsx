@@ -57,6 +57,14 @@ const SettingsPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [showSupportDialog, setShowSupportDialog] = useState(false);
+  const { isSubscribed, status, aiUsageToday, aiLimit, loading: subLoading, createCheckout, openPortal, checkSubscription } = useSubscription();
+
+  // Check subscription on return from Stripe
+  useEffect(() => {
+    if (searchParams.get('session_id')) {
+      checkSubscription();
+    }
+  }, [searchParams]);
 
   const getThemeLabel = (theme: string) => {
     switch (theme) {
