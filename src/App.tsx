@@ -21,8 +21,6 @@ import { PreferencesProvider } from "./contexts/PreferencesContext";
 import { NotificationToastListener } from "./components/notifications/NotificationToastListener";
 import { useAuth } from "./contexts/AuthContext";
 import { LoadingSpinner } from "./components/ui/loading-spinner";
-import { hasAuthCallbackParams } from "./lib/authRedirect";
-
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -50,13 +48,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function RootRoute() {
   const { user, initializing } = useAuth();
-  const oauthReturning = hasAuthCallbackParams();
 
-  // While auth is initializing OR managed OAuth is hydrating, show spinner
-  if (initializing || oauthReturning) {
+  if (initializing) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoadingSpinner size="lg" text="Signing you in..." />
+        <LoadingSpinner size="lg" text="Loading..." />
       </div>
     );
   }
