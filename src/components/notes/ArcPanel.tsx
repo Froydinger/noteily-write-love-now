@@ -13,6 +13,7 @@ interface ArcPanelProps {
   onContentReplace?: (content: string) => void;
   onTitleReplace?: (title: string) => void;
   onCreateNote?: (content: string, title: string) => void;
+  onCreateChecklist?: (title: string, items: { content: string; completed: boolean }[]) => void;
 }
 
 type Message = { role: 'user' | 'assistant'; content: string };
