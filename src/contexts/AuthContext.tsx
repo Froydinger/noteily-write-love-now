@@ -20,6 +20,9 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CURRENT_PROJECT_REF = 'zupjsghppxyvmgwxvycc';
 const STALE_PROJECT_REF = 'viidccjyjeipulbqqwua';
 const AUTH_KEY_PATTERNS = ['supabase.auth', 'sb-', CURRENT_PROJECT_REF, STALE_PROJECT_REF];
+const OAUTH_REDIRECT_PENDING_KEY = 'arcana-oauth-redirect-pending';
+const INITIAL_SESSION_RETRY_COUNT = 6;
+const INITIAL_SESSION_RETRY_DELAY_MS = 400;
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -48,6 +51,22 @@ function clearStaleAuthCache() {
   }
 }
 
+function isOAuthRedirectPending() {
+  return localStorage.getItem(OAUTH_REDIRECT_PENDING_KEY) === 'true';
+}
+
+function markOAuthRedirectPending() {
+  localStorage.setItem(OAUTH_REDIRECT_PENDING_KEY, 'true');
+}
+
+function clearOAuthRedirectPending() {
+  localStorage.removeItem(OAUTH_REDIRECT_PENDING_KEY);
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -66,23 +85,71 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(nextSession?.user ?? null);
     };
 
-    // Set up listener FIRST
+    const finishInitialization = () => {
+      if (!isMounted) return;
+      setInitializing(false);
+    };
+
+    const hydrateInitialSession = async () => {
+      const pendingOAuth = isOAuthRedirectPending();
+      const maxAttempts = pendingOAuth ? INITIAL_SESSION_RETRY_COUNT : 0;
+
+      for (let attempt = 0; attempt <= maxAttempts; attempt += 1) {
+        const { data: { session: nextSession } } = await supabase.auth.getSession();
+        console.info('[Auth] getSession attempt:', attempt + 1, nextSession?.user?.email ?? 'no session');
+
+        if (!isMounted) return;
+
+        if (nextSession?.user) {
+          clearOAuthRedirectPending();
+          syncAuthState(nextSession);
+          finishInitialization();
+          return;
+        }
+
+        if (!pendingOAuth) {
+          syncAuthState(null);
+          finishInitialization();
+          return;
+        }
+
+        if (attempt < maxAttempts) {
+          await delay(INITIAL_SESSION_RETRY_DELAY_MS);
+        }
+      }
+
+      clearOAuthRedirectPending();
+      syncAuthState(null);
+      finishInitialization();
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
       console.info('[Auth] onAuthStateChange:', event, nextSession?.user?.email ?? 'no user');
+
+      if (event === 'INITIAL_SESSION' && !nextSession?.user && isOAuthRedirectPending()) {
+        return;
+      }
+
       syncAuthState(nextSession);
-      if (isMounted && initializing) {
-        setInitializing(false);
+
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        clearOAuthRedirectPending();
+        finishInitialization();
+        return;
+      }
+
+      if (event === 'SIGNED_OUT') {
+        clearOAuthRedirectPending();
+        finishInitialization();
+        return;
+      }
+
+      if (event === 'INITIAL_SESSION') {
+        finishInitialization();
       }
     });
 
-    // Then check existing session
-    supabase.auth.getSession().then(({ data: { session: nextSession } }) => {
-      console.info('[Auth] getSession:', nextSession?.user?.email ?? 'no session');
-      syncAuthState(nextSession);
-      if (isMounted) {
-        setInitializing(false);
-      }
-    });
+    void hydrateInitialSession();
 
     return () => {
       isMounted = false;
@@ -162,7 +229,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         redirectTo: `${window.location.origin}/reset-password`,
       });
 
-      // Always show the same message to prevent email enumeration
       toast({
         title: 'Password reset sent',
         description: "If an account exists for that email, you'll receive reset instructions shortly.",
@@ -178,23 +244,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithGoogle = async () => {
-    // Don't set loading - page will redirect away
-    const { error } = await lovable.auth.signInWithOAuth('google', {
-      redirect_uri: window.location.origin,
-      extraParams: {
-        prompt: 'select_account',
-      },
-    });
+    markOAuthRedirectPending();
 
-    if (error) {
-      toast({ title: 'Google sign in failed', description: error.message, variant: 'destructive' });
+    try {
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: window.location.origin,
+        extraParams: {
+          prompt: 'select_account',
+        },
+      });
+
+      const error = 'error' in result ? result.error : null;
+
+      if (error) {
+        clearOAuthRedirectPending();
+        toast({ title: 'Google sign in failed', description: error.message, variant: 'destructive' });
+      }
+
+      return { error };
+    } catch (error: any) {
+      clearOAuthRedirectPending();
+      toast({ title: 'Google sign in failed', description: error?.message || 'An unexpected error occurred', variant: 'destructive' });
+      return { error };
     }
-
-    return { error };
   };
 
   const signOut = async () => {
     try {
+      clearOAuthRedirectPending();
       const { error } = await supabase.auth.signOut();
 
       if (error) {
