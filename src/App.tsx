@@ -50,26 +50,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function RootRoute() {
   const { user, initializing } = useAuth();
-  const location = useLocation();
   const oauthReturning = hasAuthCallbackParams();
 
-  if (oauthReturning) {
-    return (
-      <Navigate
-        to={{
-          pathname: "/auth/callback",
-          search: location.search,
-          hash: location.hash,
-        }}
-        replace
-      />
-    );
-  }
-
-  if (initializing) {
+  // While auth is initializing OR managed OAuth is hydrating, show spinner
+  if (initializing || oauthReturning) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoadingSpinner size="lg" text="Loading..." />
+        <LoadingSpinner size="lg" text="Signing you in..." />
       </div>
     );
   }
