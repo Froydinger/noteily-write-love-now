@@ -119,14 +119,7 @@ const FakeNoteEditor = () => {
               )}
             </div>
             <div className="text-sm md:text-base text-foreground/85 leading-relaxed font-sans whitespace-pre-wrap">
-              {aiText.split('\n').map((line, i) => (
-                <span key={i}>
-                  {line === "Turns out, the most universal things we can write are the most personal ↓"
-                    ? <strong className="text-foreground">{line}</strong>
-                    : line}
-                  {i < aiText.split('\n').length - 1 && <br />}
-                </span>
-              ))}
+              {aiText}
               {isTyping && (
                 <span className="inline-block w-0.5 h-4 bg-accent ml-0.5 align-middle animate-pulse" />
               )}
