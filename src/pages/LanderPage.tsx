@@ -127,8 +127,7 @@ export default function LanderPage() {
           </div>
 
           <h1
-            className="font-display text-5xl md:text-7xl text-foreground tracking-tight mb-6 leading-tight animate-fade-in"
-            style={{ animationDelay: '0.1s', animationFillMode: 'both' }}
+            className="font-display text-5xl md:text-7xl text-foreground tracking-tight mb-6 leading-tight"
           >
             Write what you{" "}
             <span className="text-accent">love.</span>
