@@ -22,6 +22,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [shake, setShake] = useState(false);
   const { signIn, signUp, signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
 
   const handleChoiceSelection = (mode: 'signin' | 'signup') => {
     setAuthMode(mode);
