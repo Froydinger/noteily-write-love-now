@@ -1,4 +1,5 @@
 import arcanaLogo from "@/assets/arcana-logo-new.png";
+import noteilyLogo from "@/assets/logo-base.png";
 import "./index.css";
 
 const App = () => {
