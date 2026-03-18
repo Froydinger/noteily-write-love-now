@@ -9,6 +9,18 @@ const App = () => {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(56,152,236,0.08)_0%,_transparent_60%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(56,152,236,0.03)_0%,_transparent_40%)]" />
 
+      {/* Noteily legacy */}
+      <div className="relative z-10 flex flex-col items-center mb-10 animate-fade-in">
+        <img
+          src={noteilyLogo}
+          alt="Noteily"
+          className="w-12 h-12 md:w-16 md:h-16 rounded-xl opacity-40 grayscale"
+        />
+        <p className="text-white/30 text-xs md:text-sm tracking-[0.15em] mt-3 uppercase font-light">
+          Noteily is now…
+        </p>
+      </div>
+
       {/* Logo */}
       <a
         href="https://arcananotes.com"
