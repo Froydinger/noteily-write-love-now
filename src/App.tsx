@@ -11,7 +11,7 @@ const App = () => {
 
       {/* Noteily legacy */}
       <div className="relative z-10 flex flex-col items-center mb-10 animate-fade-in">
-        <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden opacity-30 grayscale" style={{ background: 'black' }}>
+        <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl overflow-hidden opacity-30 grayscale" style={{ background: 'black' }}>
           <img
             src={noteilyLogo}
             alt="Noteily"
