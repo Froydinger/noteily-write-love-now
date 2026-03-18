@@ -50,6 +50,9 @@ const App = () => {
           <p className="text-white/30 text-[10px] md:text-xs tracking-[0.2em] mt-1.5 uppercase">
             powered by ArcAi<span className="text-[8px] align-super">™</span>
           </p>
+          <p className="text-white/20 text-[10px] md:text-xs tracking-[0.1em] mt-4 font-light italic">
+            tap the A to write what you love
+          </p>
         </div>
       </a>
     </div>
