@@ -11,11 +11,13 @@ const App = () => {
 
       {/* Noteily legacy */}
       <div className="relative z-10 flex flex-col items-center mb-10 animate-fade-in">
-        <img
-          src={noteilyLogo}
-          alt="Noteily"
-          className="w-12 h-12 md:w-16 md:h-16 rounded-xl opacity-40 grayscale"
-        />
+        <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden opacity-30 grayscale" style={{ background: 'black' }}>
+          <img
+            src={noteilyLogo}
+            alt="Noteily"
+            className="w-full h-full object-cover mix-blend-lighten"
+          />
+        </div>
         <p className="text-white/30 text-xs md:text-sm tracking-[0.15em] mt-3 uppercase font-light">
           Noteily is now…
         </p>
@@ -47,6 +49,9 @@ const App = () => {
           </h1>
           <p className="text-white/30 text-[10px] md:text-xs tracking-[0.2em] mt-1.5 uppercase">
             powered by ArcAi<span className="text-[8px] align-super">™</span>
+          </p>
+          <p className="text-white/20 text-[10px] md:text-xs tracking-[0.1em] mt-4 font-light italic">
+            tap the A to write what you love
           </p>
         </div>
       </a>
