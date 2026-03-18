@@ -1,97 +1,43 @@
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { AppLayout } from "./components/layout/AppLayout";
-import { PWAInstall } from "./components/pwa/PWAInstall";
-import { PWAUpdateNotification } from "./components/pwa/PWAUpdateNotification";
-import Index from "./pages/Index";
-import NotePage from "./pages/NotePage";
-import PromptsPage from "./pages/PromptsPage";
-import SettingsPage from "./pages/SettingsPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import PrivacyPage from "./pages/PrivacyPage";
-import TermsPage from "./pages/TermsPage";
-import NotFound from "./pages/NotFound";
-import AuthCallbackPage from "./pages/AuthCallbackPage";
-import LanderPage from "./pages/LanderPage";
-import { PreferencesProvider } from "./contexts/PreferencesContext";
-import { NotificationToastListener } from "./components/notifications/NotificationToastListener";
-import { useAuth } from "./contexts/AuthContext";
-import { LoadingSpinner } from "./components/ui/loading-spinner";
-const queryClient = new QueryClient();
-
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, initializing } = useAuth();
-
-  if (initializing) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoadingSpinner size="lg" text="Loading..." />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-
-  return (
-    <PreferencesProvider>
-      <NotificationToastListener />
-      <AppLayout>{children}</AppLayout>
-    </PreferencesProvider>
-  );
-}
-
-function RootRoute() {
-  const { user, initializing } = useAuth();
-
-  if (initializing) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoadingSpinner size="lg" text="Loading..." />
-      </div>
-    );
-  }
-
-  if (user) {
-    return <Navigate to="/home" replace />;
-  }
-
-  return <LanderPage />;
-}
+import arcanaLogo from "@/assets/arcana-logo-new.png";
+import "./index.css";
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter>
-          <AuthProvider>
-            <Sonner />
-            <Routes>
-              <Route path="/" element={<RootRoute />} />
-              <Route path="/auth/callback" element={<AuthCallbackPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/privacy" element={<PrivacyPage />} />
-              <Route path="/terms" element={<TermsPage />} />
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center relative overflow-hidden">
+      {/* Abyss background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(56,152,236,0.08)_0%,_transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(56,152,236,0.03)_0%,_transparent_40%)]" />
 
-              <Route path="/home" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/note/:id" element={<ProtectedRoute><NotePage /></ProtectedRoute>} />
-              <Route path="/prompts" element={<ProtectedRoute><PromptsPage /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+      {/* Logo */}
+      <a
+        href="https://arcananotes.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="relative group cursor-pointer flex flex-col items-center gap-8 z-10"
+      >
+        {/* Glow layers */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] md:w-[400px] md:h-[400px] rounded-full bg-[rgba(56,152,236,0.15)] blur-[80px] group-hover:bg-[rgba(56,152,236,0.25)] transition-all duration-700" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] h-[180px] md:w-[260px] md:h-[260px] rounded-full bg-[rgba(56,152,236,0.1)] blur-[40px] group-hover:bg-[rgba(56,152,236,0.2)] transition-all duration-700" />
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <PWAInstall />
-            <PWAUpdateNotification />
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+        <img
+          src={arcanaLogo}
+          alt="Arcana Notes"
+          className="w-32 h-32 md:w-48 md:h-48 relative z-10 drop-shadow-[0_0_30px_rgba(56,152,236,0.5)] group-hover:drop-shadow-[0_0_50px_rgba(56,152,236,0.7)] transition-all duration-500 group-hover:scale-105"
+          style={{
+            filter: "drop-shadow(0 0 20px rgba(56,152,236,0.4)) drop-shadow(0 0 60px rgba(56,152,236,0.2))",
+          }}
+        />
+
+        <div className="relative z-10 text-center">
+          <h1 className="text-white/90 text-sm md:text-base tracking-[0.3em] uppercase font-light">
+            Arcana<span className="text-[10px] align-super">™</span> Notes
+          </h1>
+          <p className="text-white/30 text-[10px] md:text-xs tracking-[0.2em] mt-1.5 uppercase">
+            powered by ArcAi<span className="text-[8px] align-super">™</span>
+          </p>
+        </div>
+      </a>
+    </div>
   );
 };
 
